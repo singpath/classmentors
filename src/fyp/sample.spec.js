@@ -4,7 +4,7 @@ describe('calculator', function () {
 
   var $controller;
 
-  // injecting will cause an error. 
+  // injecting will cause an error.
   beforeEach(inject(function(_$controller_){
     $controller = _$controller_;
   }));
@@ -18,8 +18,6 @@ describe('calculator', function () {
 			$scope.sum();
 			expect($scope.z).toBe(3);
             expect(1).toBe(1);
-		});	
-        
+		});
 	});
-
 });
