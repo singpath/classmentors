@@ -5,4 +5,7 @@ angular.module('sampleApp', []).controller('SampleController', function Calculat
   $scope.subtract = function() {
     $scope.z = $scope.x - $scope.y;
   };
+  $scope.multiply = function() {
+    $scope.z = $scope.x * $scope.y;
+  };
 });
