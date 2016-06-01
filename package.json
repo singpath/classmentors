@@ -6,6 +6,8 @@
   "main": "src/classmentors/index.js",
   "dependencies": {},
   "devDependencies": {
+    "angular": "^1.5.6",
+    "angular-mocks": "^1.5.6",
     "babel-eslint": "^5.0.0-beta8",
     "compression": "^1.6.1",
     "eslint": "^1.10.3",

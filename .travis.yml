@@ -2,7 +2,6 @@ language: node_js
 node_js:
   - '4'
 script:
-  - npm run lint
   - npm run test
 after_success:
   - ./bin/build-gh-pages-travis
