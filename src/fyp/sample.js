@@ -2,4 +2,7 @@ angular.module('sampleApp', []).controller('SampleController', function Calculat
   $scope.sum = function() {
     $scope.z = $scope.x + $scope.y;
   };
+  $scope.subtract = function() {
+    $scope.z = $scope.x - $scope.y;
+  };
 });
