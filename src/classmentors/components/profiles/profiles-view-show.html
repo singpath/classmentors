@@ -13,12 +13,34 @@
     </div>
 
     <div flex="67">
-
+        <!--
         <div clm-spf-profile="ctrl.profile.$id"></div>
+
         <div clm-profile="ctrl.profile" clm-service-id="codeCombat" clm-current-user="ctrl.currentUserProfile"></div>
         <div clm-profile="ctrl.profile" clm-service-id="codeSchool" clm-current-user="ctrl.currentUserProfile"></div>
         <div clm-profile="ctrl.profile" clm-service-id="treeHouse" clm-current-user="ctrl.currentUserProfile"></div>
+        -->
+        
+        <div id="register-freecodecamp" class="register-service md-whiteframe-z1">
+            <h2>Free Code Camp</h2>
+            <p>
+                    <a href="https://www.freecodecamp.com" target="_blank">
+                        FreeCodeCamp
+                    </a> is an open source community of busy people who learn to code and help nonprofits.
+            </p>
 
+        </div>
+        <div id="register-pivotalexpert" class="register-service md-whiteframe-z1">
+            <h2>Pivotal Expert</h2>
+
+            <p>
+                Learn just enough programming to make yourself a more productive professional.
+                <a href="https://pivotal-expert.firebaseapp.com" target="_blank">
+                    Pivotal Expert
+                </a> helps you to learn just enough programming to make yourself a more productive professional.
+            </p>
+
+        </div>
         <div id="register-codecombat" ng-if="!ctrl.profile.services.codeCombat.details.id" class="register-service md-whiteframe-z1">
             <h2>Code Combat</h2>
 
@@ -39,6 +61,7 @@
             </p>
 
         </div>
+               
         <!--
         <div id="register-treehouse" class="register-service md-whiteframe-z1">
             <h2>Treehouse</h2>

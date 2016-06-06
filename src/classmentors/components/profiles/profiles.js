@@ -156,7 +156,6 @@ classMentors.controller('ClmProfileCtrl', [
   ) {
     var self = this;
     var menu = [];
-
     this.auth = initialData.auth;
     this.currentUser = initialData.currentUser;
     this.currentUserProfile = initialData.currentUserProfile;
@@ -186,7 +185,56 @@ classMentors.controller('ClmProfileCtrl', [
       currentUser.country = spfFirebase.cleanObj(currentUser.country);
       currentUser.school = spfFirebase.cleanObj(currentUser.school);
     }
-
+    
+    this.updateFreeCodeCampUsername = function(username){
+      console.log("The new FreeCodeCamp username is "+username);
+      // TODO: Change on Firebase. 
+      this.profile.services.freeCodeCamp = {'details':{"id":username}};
+    }
+    this.removeFreeCodeCamp = function(){
+      console.log("Removing Free Code Camp from profile.");
+      // TODO: Change on Firebase. 
+      this.profile.services.freeCodeCamp = {};
+      
+    }
+    
+    this.updatePivotalExpertUsername = function(username){
+      console.log("The new Pivotal Expert username is "+username);
+      // TODO: Change on Firebase. 
+       this.profile.services.pivotalExpert = {'details':{"id":username}};
+    }
+    
+    this.removePivotalExpert = function(){
+      console.log("Removing pivotal expert from profile.");
+      // TODO: Change on Firebase. 
+      this.profile.services.pivotalExpert = {};
+      
+    }
+    
+    this.updateCodeCombatUsername = function(username){
+      console.log("The new Code Combat username is "+username);
+      // TODO: Change on Firebase. 
+      this.profile.services.codeCombat = {'details':{"id":username}};
+    }
+    this.removeCodeCombat = function(){
+      console.log("Removing Code Combat from profile.");
+      // TODO: Change on Firebase. 
+      this.profile.services.codeCombat = {};
+      
+    }
+    
+    this.updateCodeSchoolUsername = function(username){
+      console.log("The new Code School username is "+username);
+      // TODO: Change on Firebase. 
+      this.profile.services.codeSchool = {'details':{"id":username}};
+    }
+    this.removeCodeSchool = function(){
+      console.log("Removing Code School from profile.");
+      // TODO: Change on Firebase. 
+      this.profile.services.codeSchool = {};
+      
+    }
+    
     this.setPublicId = function(currentUser) {
       var saved;
 
