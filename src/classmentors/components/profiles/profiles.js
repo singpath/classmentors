@@ -187,11 +187,12 @@ classMentors.controller('ClmProfileCtrl', [
       currentUser.school = spfFirebase.cleanObj(currentUser.school);
     }
     
-     
-    // TODO: Experiment for Firebase access.
-    // This works but hardcodes the url. 
+    // TODO: This works but hardcodes the firebaseUrl. 
     // Assumes removal of validation based on classMentors/serviceUserIds/$serviceId/$publicID  
-    this.ref = new Firebase("https://singpath-play.firebaseio.com");
+    var firebaseUrl = "https://singpath-play.firebaseio.com";
+    //var firebaseUrl = "https://singpath.firebaseio.com";
+    this.ref = new Firebase(firebaseUrl );
+    console.log("Using firebase url "+firebaseUrl+ " for profile updates.");
 
     this.updateFreeCodeCampUsername = function(username){
       console.log("The new FreeCodeCamp username is "+username);
