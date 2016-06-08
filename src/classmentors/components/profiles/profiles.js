@@ -199,7 +199,10 @@ classMentors.controller('ClmProfileCtrl', [
       console.log("Requesting achievement update ");
       //ref.child('queue/tasks').push({ id: $scope.profile.$id, service: "freeCodeCamp" });
 
-      this.ref.child('queue/tasks').push({ id: 'cboesch', service: "freeCodeCamp" });
+      this.ref.child('queue/tasks').push({ id: this.profile.$id, service: "freeCodeCamp" });
+      this.ref.child('queue/tasks').push({ id: this.profile.$id, service: "pivotalExpert" });
+      this.ref.child('queue/tasks').push({ id: this.profile.$id, service: "codeSchool" });
+      //this.ref.child('queue/tasks').push({ id: this.profile.$id, service: "codeCombat" });
       //var updateTasks = $firebaseArray($scope.ref.child('queue/tasks'));
       //var updateTasks.$add({ id: $scope.profile.$id, service: "freeCodeCamp" });
     }
