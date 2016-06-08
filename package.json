@@ -12,6 +12,7 @@
     "compression": "^1.6.1",
     "eslint": "^1.10.3",
     "finalhandler": "^0.4.1",
+    "firebase-tools": "^3.0.2",
     "http2": "^3.3.2",
     "js-yaml": "^3.5.5",
     "jscs": "^2.9.0",

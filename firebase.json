@@ -1,5 +1,5 @@
 {
-  "firebase": "singpath",
+  "rules": "security_rules/security-rules.json",
   "public": "dist/classmentors",
   "ignore": [
     "firebase.json",
@@ -8,5 +8,8 @@
   ],
   "hosting": {
     "public": "dist/classmentors"
+  },
+  "database": {
+    "rules": "security_rules/security-rules.json"
   }
 }

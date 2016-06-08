@@ -192,8 +192,18 @@ classMentors.controller('ClmProfileCtrl', [
     var firebaseUrl = "https://singpath-play.firebaseio.com";
     //var firebaseUrl = "https://singpath.firebaseio.com";
     this.ref = new Firebase(firebaseUrl );
+      
     console.log("Using firebase url "+firebaseUrl+ " for profile updates.");
 
+    this.refreshAchievements = function(){
+      console.log("Requesting achievement update ");
+      //ref.child('queue/tasks').push({ id: $scope.profile.$id, service: "freeCodeCamp" });
+
+      this.ref.child('queue/tasks').push({ id: 'cboesch', service: "freeCodeCamp" });
+      //var updateTasks = $firebaseArray($scope.ref.child('queue/tasks'));
+      //var updateTasks.$add({ id: $scope.profile.$id, service: "freeCodeCamp" });
+    }
+    
     this.updateFreeCodeCampUsername = function(username){
       console.log("The new FreeCodeCamp username is "+username);
       this.ref.child("classMentors/userProfiles/"+this.profile.$id+"/services/freeCodeCamp/details").update({ 'id': username, 'name':username,'registeredBefore':Firebase.ServerValue.TIMESTAMP });
