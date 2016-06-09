@@ -85,7 +85,7 @@
                     <button type="submit" ng-click="ctrl.removePivotalExpert()">Remove</button>
                 </div>
             </div>
-            
+            <!--- until API corrected 
             <div id="register-codecombat" class="register-service md-whiteframe-z1">
                 <h2>Code Combat</h2>
 
@@ -106,7 +106,7 @@
                     <button type="submit" ng-click="ctrl.removeCodeCombat()">Remove</button>
                 </div>
             </div>
-            
+            --> 
             <div id="register-codeschool" class="register-service md-whiteframe-z1">
                 <h2>Code School</h2>
 
@@ -130,68 +130,6 @@
                 </div>
             </div>
            
-           <!--
-            <div id="register-codeschool" ng-if="!ctrl.profile.services.codeSchool.details.id" class="register-service md-whiteframe-z1">
-                <h2>Code School</h2>
-
-                <p>
-                    <a href="https://www.codeschool.com/" target="_blank">Code School</a>
-                    teaches web technologies in the comfort of your browser with video lessons,
-                    coding challenges, and screencasts. Registering is free, and the provides
-                    free content to try out.
-                </p>
-
-                <form name="codeSchoolForm" class="form-horizontal" ng-submit="ctrl.lookUp.codeSchool.save()">
-                    <div layout="row">
-                        <md-input-container flex>
-                            <label for="cc-username">Username</label>
-                            <input
-                                type="text" id="cc-username"
-                                name="ccUsername" placeholder="Your Code School username"
-                                ng-model="ctrl.lookUp.codeSchool.id"
-                                ng-model-options="{ updateOn: 'default blur', debounce: {'default': 1000, 'blur': 0} }"
-                                clm-service-user-id-exists="codeSchool"
-                                clm-service-user-id-uniq="codeSchool"
-                            />
-
-                            <div ng-messages="codeSchoolForm.ccUsername.$error">
-                                <div ng-message="clmServiceUserIdExists">
-                                    We couldn't find the profile for this username on Code School.
-                                    Misspell? Is it public?
-                                </div>
-                            </div>
-                        </md-input-container>
-
-                        <md-button type="submit" class="md-raised md-primary" ng-disabled="!codeSchoolForm.$valid || codeSchoolForm.$pristine">
-                            Save
-                        </md-button>
-                    </div>
-                    <p ng-if="!codeSchoolForm.ccUsername.$valid || codeSchoolForm.ccUsername.$pristine">
-                        You should visit your
-                        <a href="https://www.codeschool.com/account/edit" target="_blank">Code School profile page</a>,
-                        set a username,
-                        set your report card as public by unticking the "Keep Report Card Private?"
-                        and save.
-                    </p>
-                </form>
-            </div>
-           -->
-            
-            <!--
-            <div id="register-treehouse" class="register-service md-whiteframe-z1">
-                <h2>Treehouse</h2>
-
-                <p>
-                    Learn HTML, CSS, iPhone apps &amp; more at
-                    <a href="http://www.teamtreehouse.com/signup_code/singapore" target="_blank">
-                        Treehouse
-                    </a>.
-                    Treehouse offers a 14 days free trial.
-                </p>
-
-            </div>
-            -->
-
         </div>
     </div>
 
