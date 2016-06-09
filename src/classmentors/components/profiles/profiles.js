@@ -195,13 +195,13 @@ classMentors.controller('ClmProfileCtrl', [
       
     console.log("Using firebase url "+firebaseUrl+ " for profile updates.");
 
-    this.refreshAchievements = function(){
+    this.refreshAchievements = function(profileId){
       console.log("Requesting achievement update ");
       //ref.child('queue/tasks').push({ id: $scope.profile.$id, service: "freeCodeCamp" });
 
-      this.ref.child('queue/tasks').push({ id: this.profile.$id, service: "freeCodeCamp" });
-      this.ref.child('queue/tasks').push({ id: this.profile.$id, service: "pivotalExpert" });
-      this.ref.child('queue/tasks').push({ id: this.profile.$id, service: "codeSchool" });
+      this.ref.child('queue/tasks').push({ id: profileId, service: "freeCodeCamp" });
+      this.ref.child('queue/tasks').push({ id: profileId, service: "pivotalExpert" });
+      this.ref.child('queue/tasks').push({ id: profileId, service: "codeSchool" });
       //this.ref.child('queue/tasks').push({ id: this.profile.$id, service: "codeCombat" });
       //var updateTasks = $firebaseArray($scope.ref.child('queue/tasks'));
       //var updateTasks.$add({ id: $scope.profile.$id, service: "freeCodeCamp" });

@@ -11,7 +11,7 @@
             </h3>
         </div>
     </div>
-
+    
     <div flex="67">
         <!--
         <div clm-spf-profile="ctrl.profile.$id"></div>
@@ -20,7 +20,8 @@
         <div clm-profile="ctrl.profile" clm-service-id="codeSchool" clm-current-user="ctrl.currentUserProfile"></div>
         <div clm-profile="ctrl.profile" clm-service-id="treeHouse" clm-current-user="ctrl.currentUserProfile"></div>
         -->
-        
+        <button type="submit" ng-click="ctrl.refreshAchievements(ctrl.profile.$id)">Refresh Achievements for {{ctrl.profile.$id}} </button>
+         
         <div id="register-freecodecamp" class="register-service md-whiteframe-z1">
             <h2>Free Code Camp</h2>
             <p>
