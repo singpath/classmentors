@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html ng-app="session-admin">
+	<head>
+		<link rel="stylesheet" type="text/css" href="styles/bootstrap-3.3.6-dist/css">
+		<script type="text/javascript" src="lib/angular.min.js"></script>
+		<script type="text/javascript" src="session.js"></script>
+	</head>
+	<body ng-controller="SessionController as session">
+		<h2>{{session.enrolment.length}} students currently enrolled</h2>
+		<div ng-repeat="student in session.enrolment">
+			{{student.name}}: Rank {{student.ranking}}
+		</div>
+	</body>
+</html>
