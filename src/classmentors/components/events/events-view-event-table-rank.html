@@ -45,7 +45,7 @@
             </thead>
             <tbody>
                 <tr>
-                    <th colspan="5" ng-if="(ctrl.rankingView|spfEmpty)">
+                    <th colspan="5" ng-if="(ctrl.rankingView2|spfEmpty)">
                         No participants
                     </th> 
                 </tr>
@@ -73,11 +73,11 @@
                     <td>{{ ctrl.currentUserRanking.codeSchool || 0 }}</td>
                     <td>{{ ctrl.currentUserRanking.singPath || 0 }}</td>
                     <td>{{ ctrl.currentUserRanking.freeCodeCamp || 0 }}</td>
-                    <td>{{ ctrl.currentUserRanking.codeVantage || 0 }}</td>
+                    <td>{{ ctrl.currentUserRanking.pivotalExpert || 0 }}</td>
                     --> 
                 </tr>
 
-                <tr ng-repeat="participant in ctrl.rankingView track by participant.$id" ng-class="'index-' + $index + ' ' + ($odd ? 'odd' : 'even')">
+                <tr ng-repeat="participant in ctrl.rankingView2 track by participant.$id" ng-class="'index-' + $index + ' ' + ($odd ? 'odd' : 'even')">
                     <th>
                         {{ participant.$ranking }}
                     </th>

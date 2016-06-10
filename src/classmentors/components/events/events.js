@@ -1508,6 +1508,9 @@ classMentors.controller('ClmEventRankTableCtrl', [
   'clmDataStore',
   'clmPagerOption',
   function ClmEventRankTableCtrl($scope, $log, clmDataStore, clmPagerOption) {
+    
+
+    
     var self = this;
     var unwatchers = [];
     var rankingList = [];
@@ -1540,14 +1543,97 @@ classMentors.controller('ClmEventRankTableCtrl', [
     };
 
     this.rankingView = [];
+    this.rankingView2 = []; // 2016 update to new cm-worker
     //If there are no ranked services on the event, use the default.
     //Add this after the event is fetched if rankedServices is null.
-    this.rankedServices = [{id: 'codeCombat',name: 'Code Combat Levels'},
-                           {id: 'singPath',name:  'SingPath Problems'},
+    this.rankedServices = [{id:'freeCodeCamp',name: 'Free Code Camp'},
+                           {id:'pivotalExpert',name:'Pivotal Expert'},
+                           {id: 'codeCombat',name: 'Code Combat Levels'},
+                           //{id: 'singPath',name:  'SingPath Problems'},
                            {id: 'codeSchool',name: 'Code School Badges'}
-                           //,{id:'freeCodeCamp',name: 'FreeCodeCamp'}
-                           //,{id:'codeVantage',name:'CodeVantage'}
-                           ];
+                        ];
+                       
+    // June 2016 
+    var firebaseUrl = "https://singpath-play.firebaseio.com";
+    var ref = new Firebase(firebaseUrl);
+    
+    var getUserProfile = function(publicId, newRanking){
+      var userRef = ref.child("classMentors/userProfiles/"+publicId);
+      console.log("Fetching userProfile for "+publicId);
+      userRef.once("value", function(data) {
+          // do some stuff once
+          console.log("User data");
+          var result = data.val();
+          console.log(result);
+
+          var temp = {}//{"user":{"country":{"code":"GB","name":"United Kingdom"},"displayName":"Damien Lebrun","gravatar":"//www.gravatar.com/avatar/e9a3b6564eecada3d338c194f8c29363","isAdmin":true,"isPremium":true}};
+          temp["$id"]=publicId;
+          temp["$ranking"]=newRanking.length + 1;
+          temp["user"] = result["user"]
+          var total = 0; 
+
+          if(result.services.codeSchool){
+            temp["codeSchool"] = result.services.codeSchool.totalAchievements;
+            total += result.services.codeSchool.totalAchievements;
+          }
+          if(result.services.pivotalExpert){
+            temp["pivotalExpert"] = result.services.pivotalExpert.totalAchievements;
+            total += result.services.pivotalExpert.totalAchievements;
+          }
+          if(result.services.freeCodeCamp){
+            temp["freeCodeCamp"] = result.services.freeCodeCamp.totalAchievements;
+            total += result.services.freeCodeCamp.totalAchievements; 
+          }
+          if(result.services.codeCombat){
+            temp["codeCombat"] = result.services.codeCombat.totalAchievements;
+            total += result.services.codeCombat.totalAchievements;
+          }
+          
+          temp['total'] = total; 
+          temp['displayName'] = result['user']['displayName'];
+          temp['user'] = result['user'];
+          newRanking.push(temp);
+          console.log(newRanking);
+      });
+    }
+    
+    var getUserProfilesFromEventParticipants = function(parentScope){
+      // Clear ranking and re-rank
+      parentScope.rankingView2 = [];
+      
+      console.log("Fetching participants for event");
+      console.log(parentScope.eventParticipants);
+      for (var publicId in parentScope.eventParticipants) {
+        if (parentScope.eventParticipants.hasOwnProperty(publicId)) {
+            //Fetch the userProfile. 
+            getUserProfile(publicId, parentScope.rankingView2);
+            console.log("Adding "+publicId);
+        }
+      }
+
+      
+    };
+    
+    this.getParticipants = function (parentScope) {
+      var participantsRef = ref.child("classMentors/eventParticipants/"+parentScope.event.$id);
+      // Attach an asynchronous callback to read the data at our posts reference
+
+      participantsRef.on("value", function (snapshot) {
+        var result = snapshot.val();
+        console.log(result);
+        parentScope.eventParticipants = result;
+        getUserProfilesFromEventParticipants(parentScope);
+
+      }, function (errorObject) {
+        console.log("The eventParticipants read failed: " + errorObject.code);
+      });
+
+    }
+
+    this.getParticipants(this);
+
+  
+    
     this.loading = true;
     this.currentUserRanking = undefined;
     this.orderOpts = [{
