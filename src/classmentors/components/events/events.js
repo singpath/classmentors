@@ -1548,9 +1548,9 @@ classMentors.controller('ClmEventRankTableCtrl', [
     //Add this after the event is fetched if rankedServices is null.
     this.rankedServices = [{id:'freeCodeCamp',name: 'Free Code Camp'},
                            {id:'pivotalExpert',name:'Pivotal Expert'},
-                           {id: 'codeCombat',name: 'Code Combat Levels'},
+                           //{id: 'codeCombat',name: 'Code Combat Levels'},
                            //{id: 'singPath',name:  'SingPath Problems'},
-                           {id: 'codeSchool',name: 'Code School Badges'}
+                           {id: 'codeSchool',name: 'Code School'}
                         ];
                        
     // June 2016 
@@ -1584,12 +1584,12 @@ classMentors.controller('ClmEventRankTableCtrl', [
             temp["freeCodeCamp"] = result.services.freeCodeCamp.totalAchievements;
             total += result.services.freeCodeCamp.totalAchievements; 
           }
-          if(result.services.codeCombat){
-            temp["codeCombat"] = result.services.codeCombat.totalAchievements;
-            total += result.services.codeCombat.totalAchievements;
-          }
+          //if(result.services.codeCombat){
+          //  temp["codeCombat"] = result.services.codeCombat.totalAchievements;
+          //  total += result.services.codeCombat.totalAchievements;
+          //}
           
-          temp['total'] = total; 
+          temp['total'] = 99;//total; 
           temp['displayName'] = result['user']['displayName'];
           temp['user'] = result['user'];
           newRanking.push(temp);
