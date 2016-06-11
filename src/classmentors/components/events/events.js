@@ -1395,6 +1395,7 @@ classMentors.controller('ClmEventTableCtrl', [
     };
 
     this.update = function(event, tasks, userSolutions, profile) {
+      /*
       return clmDataStore.events.updateCurrentUserProfile(
         event, tasks, userSolutions, profile
       ).then(function() {
@@ -1403,6 +1404,7 @@ classMentors.controller('ClmEventTableCtrl', [
         $log.error(err);
         spfAlert.error('Failed to update profile');
       });
+      */
     };
 
     this.removeParticipant = function(e, event, participant) {
@@ -1455,12 +1457,14 @@ classMentors.controller('ClmEventTableCtrl', [
       self.loading = false;
     }).then(function(results) {
       var update = function() {
+        /*
         return clmDataStore.events.updateCurrentUserProfile(
           self.event,
           self.tasks,
           results.userSolution,
           self.profile
         );
+        */
       };
 
       // Watch for singpath problem getting updated
@@ -1509,8 +1513,6 @@ classMentors.controller('ClmEventRankTableCtrl', [
   'clmPagerOption',
   function ClmEventRankTableCtrl($scope, $log, clmDataStore, clmPagerOption) {
     
-
-    
     var self = this;
     var unwatchers = [];
     var rankingList = [];
@@ -1543,18 +1545,39 @@ classMentors.controller('ClmEventRankTableCtrl', [
     };
 
     this.rankingView = [];
+    
+    // June 2016 
     this.rankingView2 = []; // 2016 update to new cm-worker
     //If there are no ranked services on the event, use the default.
     //Add this after the event is fetched if rankedServices is null.
-    this.rankedServices = [{id:'freeCodeCamp',name: 'Free Code Camp'},
-                           {id:'pivotalExpert',name:'Pivotal Expert'},
-                           //{id: 'codeCombat',name: 'Code Combat Levels'},
-                           //{id: 'singPath',name:  'SingPath Problems'},
-                           {id: 'codeSchool',name: 'Code School'}
-                        ];
-                       
-    // June 2016 
-    var firebaseUrl = "https://singpath-play.firebaseio.com";
+
+    var addRankedServices = function (parentScope) {
+      if (parentScope.event.rankedServices) {
+        parentScope.rankedServices = [];
+        for (var property in parentScope.event.rankedServices) {
+          if (parentScope.event.rankedServices.hasOwnProperty(property)) {
+            // do stuff
+            parentScope.rankedServices.push({ id: property, name: property });
+          }
+        }
+      }
+      else { // load the default services to list in ranking table. 
+        parentScope.rankedServices = [
+          { id: 'freeCodeCamp', name: 'Free Code Camp' },
+          { id: 'pivotalExpert', name: 'Pivotal Expert' },
+          //{id: 'codeCombat',name: 'Code Combat Levels'},
+          //{id: 'singPath',name:  'SingPath Problems'},
+          { id: 'codeSchool', name: 'Code School' }
+        ];
+      }
+
+    }
+    // Update the list of services to show in table. 
+    addRankedServices(this);
+    
+
+    var firebaseUrl = "https://singpath.firebaseio.com";
+    //var firebaseUrl = "https://singpath-play.firebaseio.com";
     var ref = new Firebase(firebaseUrl);
     
     var getUserProfile = function(publicId, newRanking){
@@ -1562,38 +1585,48 @@ classMentors.controller('ClmEventRankTableCtrl', [
       console.log("Fetching userProfile for "+publicId);
       userRef.once("value", function(data) {
           // do some stuff once
-          console.log("User data");
+          //console.log("User data");
           var result = data.val();
-          console.log(result);
+          //console.log(result);
 
-          var temp = {}//{"user":{"country":{"code":"GB","name":"United Kingdom"},"displayName":"Damien Lebrun","gravatar":"//www.gravatar.com/avatar/e9a3b6564eecada3d338c194f8c29363","isAdmin":true,"isPremium":true}};
+          var temp = {};//{"user":{"country":{"code":"GB","name":"United Kingdom"},"displayName":"Damien Lebrun","gravatar":"//www.gravatar.com/avatar/e9a3b6564eecada3d338c194f8c29363","isAdmin":true,"isPremium":true}};
           temp["$id"]=publicId;
           temp["$ranking"]=newRanking.length + 1;
           temp["user"] = result["user"]
           var total = 0; 
-
+          //For each ranked service in the event.  
+          for (var i=0; i<self.rankedServices.length; i++){
+            //console.log(self.rankedServices[i].id);
+            //If the user has registered for the service and has a totoalAchievements value.  
+            if(result.services[self.rankedServices[i].id] && result.services[self.rankedServices[i].id].totalAchievements){
+                 temp[self.rankedServices[i].id] = result.services[self.rankedServices[i].id].totalAchievements;
+                 total += parseInt(result.services[self.rankedServices[i].id].totalAchievements);
+            }
+          }
+          /*
           if(result.services.codeSchool){
             temp["codeSchool"] = result.services.codeSchool.totalAchievements;
-            total += result.services.codeSchool.totalAchievements;
+            total += parseInt(result.services.codeSchool.totalAchievements);
           }
           if(result.services.pivotalExpert){
             temp["pivotalExpert"] = result.services.pivotalExpert.totalAchievements;
-            total += result.services.pivotalExpert.totalAchievements;
+            total += parseInt(result.services.pivotalExpert.totalAchievements);
           }
           if(result.services.freeCodeCamp){
             temp["freeCodeCamp"] = result.services.freeCodeCamp.totalAchievements;
-            total += result.services.freeCodeCamp.totalAchievements; 
+            total += parseInt(result.services.freeCodeCamp.totalAchievements); 
           }
           //if(result.services.codeCombat){
           //  temp["codeCombat"] = result.services.codeCombat.totalAchievements;
           //  total += result.services.codeCombat.totalAchievements;
           //}
+          */
           
-          temp['total'] = 99;//total; 
+          temp['total'] = total; 
           temp['displayName'] = result['user']['displayName'];
           temp['user'] = result['user'];
           newRanking.push(temp);
-          console.log(newRanking);
+          //console.log(newRanking);
       });
     }
     
@@ -1602,12 +1635,12 @@ classMentors.controller('ClmEventRankTableCtrl', [
       parentScope.rankingView2 = [];
       
       console.log("Fetching participants for event");
-      console.log(parentScope.eventParticipants);
+      //console.log(parentScope.eventParticipants);
       for (var publicId in parentScope.eventParticipants) {
         if (parentScope.eventParticipants.hasOwnProperty(publicId)) {
             //Fetch the userProfile. 
             getUserProfile(publicId, parentScope.rankingView2);
-            console.log("Adding "+publicId);
+            //console.log("Adding "+publicId);
         }
       }
 
@@ -1620,7 +1653,7 @@ classMentors.controller('ClmEventRankTableCtrl', [
 
       participantsRef.on("value", function (snapshot) {
         var result = snapshot.val();
-        console.log(result);
+        //console.log(result);
         parentScope.eventParticipants = result;
         getUserProfilesFromEventParticipants(parentScope);
 
@@ -1631,10 +1664,9 @@ classMentors.controller('ClmEventRankTableCtrl', [
     }
 
     this.getParticipants(this);
-
-  
+    this.loading = true; //This will hide the table view. 
+    this.loading = false;
     
-    this.loading = true;
     this.currentUserRanking = undefined;
     this.orderOpts = [{
       key: 'total',
@@ -1646,8 +1678,8 @@ classMentors.controller('ClmEventRankTableCtrl', [
     this.pagerOpts = clmPagerOption();
     unwatchers.push(self.pagerOpts.$destroy.bind(self.pagerOpts));
 
-    load();
-
+    //load();
+    /*
     function load() {
       $scope.$on('$destroy', unload);
 
@@ -1678,7 +1710,7 @@ classMentors.controller('ClmEventRankTableCtrl', [
         }
       });
     }
-
+   */
     function badgeComparer(propId) {
       return function(a, b) {
         var aB = a[propId] || 0;

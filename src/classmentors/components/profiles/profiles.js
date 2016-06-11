@@ -189,8 +189,8 @@ classMentors.controller('ClmProfileCtrl', [
     
     // TODO: This works but hardcodes the firebaseUrl. 
     // Assumes removal of validation based on classMentors/serviceUserIds/$serviceId/$publicID  
-    var firebaseUrl = "https://singpath-play.firebaseio.com";
-    //var firebaseUrl = "https://singpath.firebaseio.com";
+    var firebaseUrl = "https://singpath.firebaseio.com";
+    //var firebaseUrl = "https://singpath-play.firebaseio.com";
     this.ref = new Firebase(firebaseUrl );
       
     console.log("Using firebase url "+firebaseUrl+ " for profile updates.");
