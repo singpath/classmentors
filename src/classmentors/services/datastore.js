@@ -931,11 +931,13 @@ classMentors.factory('clmDataStore', [
           var unWatchParticipants = participants.$watch(debouncedUpdate);
 
           function update() {
+            /* Will this stop the old way of doing badge checking?  June 2016
             return participants.map(function(participant) {
               return clmDataStore.events.updateProgress(
                 event, tasks, solutions, participant.$id, progress[participant.$id]
               );
             });
+            */
           }
 
           function debouncedUpdate() {

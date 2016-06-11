@@ -1544,7 +1544,7 @@ classMentors.controller('ClmEventRankTableCtrl', [
       singPath: badgeComparer('singPath')
     };
 
-    this.rankingView = [];
+    //this.rankingView = [];
     
     // June 2016 
     this.rankingView2 = []; // 2016 update to new cm-worker
@@ -1574,13 +1574,12 @@ classMentors.controller('ClmEventRankTableCtrl', [
     }
     // Update the list of services to show in table. 
     addRankedServices(this);
-    
 
     var firebaseUrl = "https://singpath.firebaseio.com";
     //var firebaseUrl = "https://singpath-play.firebaseio.com";
     var ref = new Firebase(firebaseUrl);
     
-    var getUserProfile = function(publicId, newRanking){
+    var getUserProfile = function(publicId, parentScope){
       var userRef = ref.child("classMentors/userProfiles/"+publicId);
       console.log("Fetching userProfile for "+publicId);
       userRef.once("value", function(data) {
@@ -1591,44 +1590,47 @@ classMentors.controller('ClmEventRankTableCtrl', [
 
           var temp = {};//{"user":{"country":{"code":"GB","name":"United Kingdom"},"displayName":"Damien Lebrun","gravatar":"//www.gravatar.com/avatar/e9a3b6564eecada3d338c194f8c29363","isAdmin":true,"isPremium":true}};
           temp["$id"]=publicId;
-          temp["$ranking"]=newRanking.length + 1;
-          temp["user"] = result["user"]
+          temp["$ranking"]=parentScope.rankingView2.length + 1;
           var total = 0; 
           //For each ranked service in the event.  
           for (var i=0; i<self.rankedServices.length; i++){
             //console.log(self.rankedServices[i].id);
             //If the user has registered for the service and has a totoalAchievements value.  
             if(result.services[self.rankedServices[i].id] && result.services[self.rankedServices[i].id].totalAchievements){
-                 temp[self.rankedServices[i].id] = result.services[self.rankedServices[i].id].totalAchievements;
+                 temp[self.rankedServices[i].id] = parseInt(result.services[self.rankedServices[i].id].totalAchievements);
                  total += parseInt(result.services[self.rankedServices[i].id].totalAchievements);
             }
+            else{
+              temp[self.rankedServices[i].id] = 0;
+            }
           }
-          /*
-          if(result.services.codeSchool){
-            temp["codeSchool"] = result.services.codeSchool.totalAchievements;
-            total += parseInt(result.services.codeSchool.totalAchievements);
-          }
-          if(result.services.pivotalExpert){
-            temp["pivotalExpert"] = result.services.pivotalExpert.totalAchievements;
-            total += parseInt(result.services.pivotalExpert.totalAchievements);
-          }
-          if(result.services.freeCodeCamp){
-            temp["freeCodeCamp"] = result.services.freeCodeCamp.totalAchievements;
-            total += parseInt(result.services.freeCodeCamp.totalAchievements); 
-          }
-          //if(result.services.codeCombat){
-          //  temp["codeCombat"] = result.services.codeCombat.totalAchievements;
-          //  total += result.services.codeCombat.totalAchievements;
-          //}
-          */
           
           temp['total'] = total; 
           temp['displayName'] = result['user']['displayName'];
+          temp['name'] = result['user']['displayName'];
           temp['user'] = result['user'];
-          newRanking.push(temp);
-          //console.log(newRanking);
+          parentScope.rankingView2.push(temp);
+          //parentScope.orderBy('total');
+          //console.log(parentScope.rankingView2);
       });
     }
+    
+    var refreshAchievements = function(profileId){
+      console.log("Requesting achievement update for "+profileId);
+      ref.child('queue/tasks').push({ id: profileId, service: "freeCodeCamp" });
+      ref.child('queue/tasks').push({ id: profileId, service: "pivotalExpert" });
+      ref.child('queue/tasks').push({ id: profileId, service: "codeSchool" });
+      //this.ref.child('queue/tasks').push({ id: this.profile.$id, service: "codeCombat" });
+    }
+    
+    this.updateAllParticipantUserProfiles = function(){      
+      console.log("Requesting all users be updated.");
+      for (var publicId in self.eventParticipants) {
+        if (self.eventParticipants.hasOwnProperty(publicId)) {
+            refreshAchievements(publicId);
+        }
+      }  
+    };
     
     var getUserProfilesFromEventParticipants = function(parentScope){
       // Clear ranking and re-rank
@@ -1639,14 +1641,12 @@ classMentors.controller('ClmEventRankTableCtrl', [
       for (var publicId in parentScope.eventParticipants) {
         if (parentScope.eventParticipants.hasOwnProperty(publicId)) {
             //Fetch the userProfile. 
-            getUserProfile(publicId, parentScope.rankingView2);
+            getUserProfile(publicId, parentScope);
             //console.log("Adding "+publicId);
         }
-      }
-
-      
+      }  
     };
-    
+   
     this.getParticipants = function (parentScope) {
       var participantsRef = ref.child("classMentors/eventParticipants/"+parentScope.event.$id);
       // Attach an asynchronous callback to read the data at our posts reference
@@ -1741,11 +1741,12 @@ classMentors.controller('ClmEventRankTableCtrl', [
     }
 
     function rankingView() {
+      console.log("In ranking view")
       rankingList.sort(comparer(self.orderOpts)).forEach(function(p, i) {
         p.$ranking = i + 1;
       });
 
-      self.rankingView = rankingList.slice(
+      self.rankingView2 = rankingList.slice(
         self.pagerOpts.range.start,
         self.pagerOpts.range.end
       );
@@ -1772,18 +1773,57 @@ classMentors.controller('ClmEventRankTableCtrl', [
       self.pagerOpts.setRowCount(rankingList.length);
     }
 
-    this.orderBy = function(key) {
+    this.orderBy = function (key) {
+      //Adjust this to support new ordering mechanism. 
+    
+      console.log("orderBy " + key);
+
       if (self.orderOpts[0] && self.orderOpts[0].key === key) {
         self.orderOpts[0].reversed = !self.orderOpts[0].reversed;
       } else {
         self.orderOpts.unshift({
           key: key,
-          reversed: false
+          reversed: true
         });
         self.orderOpts = self.orderOpts.slice(0, 2);
       }
+      
+      //TODO: Revisit when 2nd order ranking becomes a priority. 
+      //There was an issue with getting both strings and numbers to rank properly. 
+      //Just leaving the array as is and allowing the view to do the sorting. 
+      //console.log(self.orderOpts);
+      // Can we use > rather than - to deal with strings? 
+      /*
+      if(self.orderOpts[1].reversed){
+         self.rankingView2.sort(function(a, b) {
+          return b[self.orderOpts[1].key] - a[self.orderOpts[1].key]; 
+         });
+      }
+      else{
+         self.rankingView2.sort(function(a, b) {
+          return a[self.orderOpts[1].key] - b[self.orderOpts[1].key];
+         });       
+      }
+      
+      if(self.orderOpts[0].reversed){
+         self.rankingView2.sort(function(a, b) {
+          return b[self.orderOpts[0].key] - a[self.orderOpts[0].key]; 
+         });
+      }
+      else{
+         self.rankingView2.sort(function(a, b) {
+          return a[self.orderOpts[0].key] - b[self.orderOpts[0].key];
+         });       
+      }
+           
+      //Update ordering
+      for(var i=0; i<self.rankingView2.length; i++){
+        self.rankingView2[i]["$ranking"] = i+1; 
+      }
+      */
 
-      rankingView();
+      //rankingView();
+     
     };
 
   }
