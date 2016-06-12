@@ -1457,6 +1457,7 @@ classMentors.controller('ClmEventTableCtrl', [
       self.loading = false;
     }).then(function(results) {
       var update = function() {
+        // Removed due to June 2016 profile updating process change.
         /*
         return clmDataStore.events.updateCurrentUserProfile(
           self.event,
@@ -1647,8 +1648,7 @@ classMentors.controller('ClmEventRankTableCtrl', [
         return promise;
       }).then(function (data) {
         var result = data;
-        console.log("The second promise result");
-        console.log(result);
+        //console.log(result);
         parentScope.eventParticipants = result;
         getUserProfilesFromEventParticipants(parentScope);
         
@@ -1672,9 +1672,9 @@ classMentors.controller('ClmEventRankTableCtrl', [
     }];
     this.pagerOpts = clmPagerOption();
     unwatchers.push(self.pagerOpts.$destroy.bind(self.pagerOpts));
-
-    //load();
     /*
+    load();
+
     function load() {
       $scope.$on('$destroy', unload);
 
