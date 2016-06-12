@@ -1620,10 +1620,9 @@ classMentors.controller('ClmEventRankTableCtrl', [
     
     this.updateAllParticipantUserProfiles = function(){      
       console.log("Requesting all users be updated.");
-      for (var publicId in self.eventParticipants) {
-        if (self.eventParticipants.hasOwnProperty(publicId)) {
-            refreshAchievements(publicId);
-        }
+      for(var i=0; i<self.eventParticipants.length; i++){
+        var publicId = self.eventParticipants[i].$id;
+        refreshAchievements(publicId);
       }  
     };
     
