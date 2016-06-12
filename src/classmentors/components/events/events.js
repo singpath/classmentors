@@ -1509,9 +1509,10 @@ classMentors.directive('clmEventRankTable', [
 classMentors.controller('ClmEventRankTableCtrl', [
   '$scope',
   '$log',
+   'spfFirebase',
   'clmDataStore',
   'clmPagerOption',
-  function ClmEventRankTableCtrl($scope, $log, clmDataStore, clmPagerOption) {
+  function ClmEventRankTableCtrl($scope, $log, spfFirebase, clmDataStore, clmPagerOption) {
     
     var self = this;
     var unwatchers = [];
@@ -1574,21 +1575,13 @@ classMentors.controller('ClmEventRankTableCtrl', [
     }
     // Update the list of services to show in table. 
     addRankedServices(this);
-
-    var firebaseUrl = "https://singpath.firebaseio.com";
-    //var firebaseUrl = "https://singpath-play.firebaseio.com";
-    var ref = new Firebase(firebaseUrl);
     
     var getUserProfile = function(publicId, parentScope){
-      var userRef = ref.child("classMentors/userProfiles/"+publicId);
-      console.log("Fetching userProfile for "+publicId);
-      userRef.once("value", function(data) {
-          // do some stuff once
-          //console.log("User data");
-          var result = data.val();
-          //console.log(result);
-
-          var temp = {};//{"user":{"country":{"code":"GB","name":"United Kingdom"},"displayName":"Damien Lebrun","gravatar":"//www.gravatar.com/avatar/e9a3b6564eecada3d338c194f8c29363","isAdmin":true,"isPremium":true}};
+      
+      spfFirebase.loadedObj(['classMentors/userProfiles', publicId]).then(function (promise) {
+        return promise;
+      }).then(function (result) {
+          var temp = {};
           temp["$id"]=publicId;
           temp["$ranking"]=parentScope.rankingView2.length + 1;
           var total = 0; 
@@ -1610,17 +1603,18 @@ classMentors.controller('ClmEventRankTableCtrl', [
           temp['name'] = result['user']['displayName'];
           temp['user'] = result['user'];
           parentScope.rankingView2.push(temp);
-          //parentScope.orderBy('total');
-          //console.log(parentScope.rankingView2);
+      }, function (reason) {
+        console.log("Failed " + reason);
       });
     }
     
     var refreshAchievements = function(profileId){
+      //TODO: Only request updates for the services that users have registered for.
       console.log("Requesting achievement update for "+profileId);
-      ref.child('queue/tasks').push({ id: profileId, service: "freeCodeCamp" });
-      ref.child('queue/tasks').push({ id: profileId, service: "pivotalExpert" });
-      ref.child('queue/tasks').push({ id: profileId, service: "codeSchool" });
-      //this.ref.child('queue/tasks').push({ id: this.profile.$id, service: "codeCombat" });
+      spfFirebase.push(['queue/tasks'], { id: profileId, service: "freeCodeCamp" });      
+      spfFirebase.push(['queue/tasks'], { id: profileId, service: "pivotalExpert" });      
+      spfFirebase.push(['queue/tasks'], { id: profileId, service: "codeSchool" });     
+      //spfFirebase.push(['queue/tasks'], { id: profileId, service: "codeCombat" });     
     }
     
     this.updateAllParticipantUserProfiles = function(){      
@@ -1635,32 +1629,33 @@ classMentors.controller('ClmEventRankTableCtrl', [
     var getUserProfilesFromEventParticipants = function(parentScope){
       // Clear ranking and re-rank
       parentScope.rankingView2 = [];
-      
       console.log("Fetching participants for event");
-      //console.log(parentScope.eventParticipants);
-      for (var publicId in parentScope.eventParticipants) {
-        if (parentScope.eventParticipants.hasOwnProperty(publicId)) {
-            //Fetch the userProfile. 
-            getUserProfile(publicId, parentScope);
-            //console.log("Adding "+publicId);
-        }
-      }  
+      for(var i=0; i<parentScope.eventParticipants.length; i++){
+        var publicId = parentScope.eventParticipants[i].$id;
+        getUserProfile(publicId, parentScope);
+      }
+
     };
    
     this.getParticipants = function (parentScope) {
-      var participantsRef = ref.child("classMentors/eventParticipants/"+parentScope.event.$id);
-      // Attach an asynchronous callback to read the data at our posts reference
-
-      participantsRef.on("value", function (snapshot) {
-        var result = snapshot.val();
-        //console.log(result);
+      
+      spfFirebase.loadedArray(['classMentors/eventParticipants', parentScope.event.$id], {
+            //orderByChild: 'featured',
+            //equalTo: true,
+            limitToLast: 100
+          }).then(function (promise) {
+        return promise;
+      }).then(function (data) {
+        var result = data;
+        console.log("The second promise result");
+        console.log(result);
         parentScope.eventParticipants = result;
         getUserProfilesFromEventParticipants(parentScope);
-
-      }, function (errorObject) {
-        console.log("The eventParticipants read failed: " + errorObject.code);
+        
+      }, function (reason) {
+        console.log("Failed " + reason);
       });
-
+      
     }
 
     this.getParticipants(this);

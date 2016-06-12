@@ -161,7 +161,6 @@ classMentors.controller('ClmProfileCtrl', [
     this.currentUserProfile = initialData.currentUserProfile;
     this.profile = initialData.profile;
     
-   
     if (
       this.profile &&
       this.profile.$id &&
@@ -187,61 +186,58 @@ classMentors.controller('ClmProfileCtrl', [
       currentUser.school = spfFirebase.cleanObj(currentUser.school);
     }
     
-    // TODO: This works but hardcodes the firebaseUrl. 
-    // Assumes removal of validation based on classMentors/serviceUserIds/$serviceId/$publicID  
-    var firebaseUrl = "https://singpath.firebaseio.com";
-    //var firebaseUrl = "https://singpath-play.firebaseio.com";
-    this.ref = new Firebase(firebaseUrl );
-      
-    console.log("Using firebase url "+firebaseUrl+ " for profile updates.");
-
+           
     this.refreshAchievements = function(profileId){
       console.log("Requesting achievement update ");
-      //ref.child('queue/tasks').push({ id: $scope.profile.$id, service: "freeCodeCamp" });
-
-      this.ref.child('queue/tasks').push({ id: profileId, service: "freeCodeCamp" });
-      this.ref.child('queue/tasks').push({ id: profileId, service: "pivotalExpert" });
-      this.ref.child('queue/tasks').push({ id: profileId, service: "codeSchool" });
-      //this.ref.child('queue/tasks').push({ id: this.profile.$id, service: "codeCombat" });
-      //var updateTasks = $firebaseArray($scope.ref.child('queue/tasks'));
-      //var updateTasks.$add({ id: $scope.profile.$id, service: "freeCodeCamp" });
+      spfFirebase.push(['queue/tasks'], { id: profileId, service: "freeCodeCamp" });      
+      spfFirebase.push(['queue/tasks'], { id: profileId, service: "pivotalExpert" });      
+      spfFirebase.push(['queue/tasks'], { id: profileId, service: "codeSchool" });      
+      
     }
     
     this.updateFreeCodeCampUsername = function(username){
       console.log("The new FreeCodeCamp username is "+username);
-      this.ref.child("classMentors/userProfiles/"+this.profile.$id+"/services/freeCodeCamp/details").update({ 'id': username, 'name':username,'registeredBefore':Firebase.ServerValue.TIMESTAMP });
+      spfFirebase.patch(["classMentors/userProfiles", this.profile.$id, "services/freeCodeCamp/details"], 
+             {'id': username, 'name':username,'registeredBefore':Firebase.ServerValue.TIMESTAMP}
+      );
     }
     this.removeFreeCodeCamp = function(){
       console.log("Removing Free Code Camp from profile.");
-      this.ref.child("classMentors/userProfiles/"+this.profile.$id+"/services/freeCodeCamp").set({});      
+      spfFirebase.set(["classMentors/userProfiles", this.profile.$id, "services/freeCodeCamp"], {} );   
     }
     
     this.updatePivotalExpertUsername = function(username){
       console.log("The new Pivotal Expert username is "+username);
-      this.ref.child("classMentors/userProfiles/"+this.profile.$id+"/services/pivotalExpert/details").update({ 'id': username, 'name':username,'registeredBefore':Firebase.ServerValue.TIMESTAMP });  
+      spfFirebase.patch(["classMentors/userProfiles", this.profile.$id, "services/pivotalExpert/details"], 
+             {'id': username, 'name':username,'registeredBefore':Firebase.ServerValue.TIMESTAMP}
+      );  
     }
     
     this.removePivotalExpert = function(){
       console.log("Removing pivotal expert from profile.");
-      this.ref.child("classMentors/userProfiles/"+this.profile.$id+"/services/pivotalExpert").set({});  
+      spfFirebase.set(["classMentors/userProfiles", this.profile.$id, "services/pivotalExpert"], {} );   
     }
     
     this.updateCodeCombatUsername = function(username){
       console.log("The new Code Combat username is "+username);
-      this.ref.child("classMentors/userProfiles/"+this.profile.$id+"/services/codeCombat/details").update({ 'id': username, 'name':username,'registeredBefore':Firebase.ServerValue.TIMESTAMP });
+      spfFirebase.patch(["classMentors/userProfiles", this.profile.$id, "services/codeCombat/details"], 
+             {'id': username, 'name':username,'registeredBefore':Firebase.ServerValue.TIMESTAMP}
+      );
     }
     this.removeCodeCombat = function(){
       console.log("Removing Code Combat from profile.");
-      this.ref.child("classMentors/userProfiles/"+this.profile.$id+"/services/codeCombat").set({});
+      spfFirebase.set(["classMentors/userProfiles", this.profile.$id, "services/codeCombat"], {} );  
     }
     
     this.updateCodeSchoolUsername = function(username){
       console.log("The new Code School username is "+username);
-      this.ref.child("classMentors/userProfiles/"+this.profile.$id+"/services/codeSchool/details").update({ 'id': username, 'name':username,'registeredBefore':Firebase.ServerValue.TIMESTAMP });
+      spfFirebase.patch(["classMentors/userProfiles", this.profile.$id, "services/codeSchool/details"], 
+             {'id': username, 'name':username,'registeredBefore':Firebase.ServerValue.TIMESTAMP}
+      );
     }
     this.removeCodeSchool = function(){
       console.log("Removing Code School from profile.");
-      this.ref.child("classMentors/userProfiles/"+this.profile.$id+"/services/codeSchool").set({});
+      spfFirebase.set(["classMentors/userProfiles", this.profile.$id, "services/codeSchool"], {} );  
     }
     
     this.setPublicId = function(currentUser) {
