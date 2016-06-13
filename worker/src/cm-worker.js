@@ -7,7 +7,7 @@ var Queue = require('firebase-queue'),
 cm-worker.js firebaseUrl=http://firebase.com token=myToken numTasks=1 maxIdle=5
 
 */
-
+var profileUpdateCount = 0
 var options={};
 var args = process.argv.slice(2);
 // node cm-worker.js -t <secret>
@@ -61,10 +61,11 @@ var get_service_url = function (service, serviceID) {
     theUrl = "https://www.freecodecamp.com/" + serviceID;
   }
  
+ //TODO: Add back support for codeCombat once the user API is updated.
   else if (service == "codeCombat") {
      theUrl = "https://codecombat.com/db/user/" + serviceID + "/level.sessions?project=state.complete,levelID,levelName";
      //theUrl= "https://codecombat.com/db/user/"+serviceID;
-    console.log("Using codeCombat url "+theUrl); 
+    //console.log("Using codeCombat url "+theUrl); 
   }
   
   else if (service == "pivotalExpert") {
@@ -81,11 +82,13 @@ var get_service_url = function (service, serviceID) {
 
 var get_achievements_from_response = function (service, body) {
   var totalAchievements = 0;
+  var error = null;
+  
   if (service == "freeCodeCamp") {
     var start = body.indexOf(">[ ");
     var stop = body.indexOf(" ]<");
     totalAchievements = body.substring(start + 3, stop);
-    console.log("Free Code Camp levels = " + totalAchievements);
+    //console.log("Free Code Camp levels = " + totalAchievements);
   }
   else if(service == "pivotalExpert"){
     var jsonObject = JSON.parse(body);
@@ -103,12 +106,12 @@ var get_achievements_from_response = function (service, body) {
     try {
       jsonObject = JSON.parse(body);
     } catch (e) {
-      console.log("Error parsing json from codeCombat");
+      console.log("Error parsing json from codeCombat "+e);
     }
 
     if (jsonObject) {
       //Currently includes stat.complete.false levels
-      console.log("Code Combat levels = " + jsonObject.length);
+      //console.log("Code Combat levels = " + jsonObject.length);
       var theCount = 0;
       for (var i = 0; i < jsonObject.length; i++) {
         if (jsonObject[i].state.complete == true) {
@@ -127,42 +130,44 @@ var get_achievements_from_response = function (service, body) {
     try {
       jsonObject = JSON.parse(body);
     } catch (e) {
-      console.log("Error parsing json from codeSchool");
+      if(e.name ="SyntaxError"){
+        var message = "User Code School profile is not public."
+        console.log(message);
+        error = message;
+        totalAchievements = -1;
+      }
+      //console.log("Error parsing json from codeSchool. "+e);
+      //console.log(e);
     }
 
     if (jsonObject) {
       var badges = jsonObject['badges'];
-      console.log("Code School Badges earned " + badges.length);
+      //console.log("Code School Badges earned " + badges.length);
       totalAchievements = badges.length;
     }
   }
 
   //console.log("Fetched totalAchievements " + totalAchievements+ " on "+service); // Show the HTML for homepage.
+  
   return totalAchievements;
-
+  //return {totalAchievements:totalAchievements, error: error};
 }
-
-
-/*
-// Uncomment to include authenticated access. 
-ref.authWithCustomToken('<YOUR_TOKEN_HERE>', function(err, authData){
-    if (err) {
-      console.log("Login failed with error: ", error);
-    } else {
-      console.log("Authenticated successfully with payload: ", authData);
-    }
-});
-*/
 
 var update_profile_and_clear_task = function (err, data, reject, resolve) {
   if (err) {
     console.log("Error updating " + err);
     reject(err);
   } else {
-    console.log("Successfully updated. Resolving task. " + JSON.stringify(data));
+    //console.log("Successfully updated. Resolving task. " + JSON.stringify(data));
     resolve(data);
     data["updated"] = Firebase.ServerValue.TIMESTAMP;
-    ref.child('logs/profileUpdates').push(data); //, function (err) {if (err){ } else {}});    
+    ref.child('logs/profileUpdates').push(data); //, function (err) {if (err){ } else {}}); 
+    profileUpdateCount += 1
+    var message = profileUpdateCount+". "+data['id']+" "+data['service']+" updated to "+data['count']
+    var offset = 50-message.length;
+    if (offset<1) offset=5;
+    console.log( message + Array(offset).join(" ")+Date());
+    
   }
 }
 
@@ -170,7 +175,7 @@ var update_achievements_and_clear_queue = function (location, theData, data, rej
   // data = {"id":"cboesch","service":"pivotalExpert","count":1}
   var profileUpdate = "classMentors/userProfiles/"+data['id']+"/services/"+data['service'];
   var updateData = {"lastUpdate":Firebase.ServerValue.TIMESTAMP, "totalAchievements":data['count']};
-  console.log("Will update "+profileUpdate+" with "+JSON.stringify(updateData));
+  //console.log("Will update "+profileUpdate+" with "+JSON.stringify(updateData));
   
   //Update the user profile as well.  
   ref.child(profileUpdate).update(updateData);
@@ -197,6 +202,10 @@ var fetch_service_url = function (theUrl, data, service, serviceID, reject, reso
   }
   else {
     console.log("There was an error fetching " + theUrl + " status code " + response.statusCode + " error " + error);
+    data.count = -1; 
+    var location = "classMentors/userAchievements/" + data.id + "/services/" + service;
+    var theData = { "totalAchievements": data.count, "id": serviceID };
+    callback(location, theData, data, reject, resolve);
   }
 }
 
@@ -208,7 +217,7 @@ var get_profile = function (service_response_body, task_data, reject, resolve) {
   //console.log("services",services);
   // If the user does not have the service it will be skipped. 
   if(!services.hasOwnProperty(service)){
-    console.log("User has not registered for " + service);
+    console.log(task_data['id']+" has not registered for " + task_data['service']);
     resolve("User has not registered for " + service);
   }
   else {
@@ -223,7 +232,7 @@ var get_profile = function (service_response_body, task_data, reject, resolve) {
     }
     else {
     //Fetch the service url
-      console.log("requesting url ", theUrl)  
+      //console.log("requesting url ", theUrl)  
       request(theUrl, function (error, response, body) {
         if (error) console.log(error);
         //console.log("the body", body);
@@ -236,13 +245,13 @@ var get_profile = function (service_response_body, task_data, reject, resolve) {
 
 // Called by Queue when new tasks are present. 
 var process_task = function (data, progress, resolve, reject) {
-  console.log("service " + data.service + " for user " + data.id);
+  //console.log("service " + data.service + " for user " + data.id);
   var service = data.service;
   var user = data.id;
 
   //Fetch the userProfile from ClassMentors
   var userProfileUrl = firebaseUrl+"/classMentors/userProfiles/" + user + ".json";
-  console.log("Fetching profile "+userProfileUrl);  
+  //console.log("Fetching profile "+userProfileUrl);  
   request(userProfileUrl, function (error, response, body) {
     //TODO: handle profile fetch error. 
     //TODO: check that response is valid. 

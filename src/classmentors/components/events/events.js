@@ -1585,6 +1585,7 @@ classMentors.controller('ClmEventRankTableCtrl', [
           var temp = {};
           temp["$id"]=publicId;
           temp["$ranking"]=parentScope.rankingView2.length + 1;
+          temp['services'] = result.services;
           var total = 0; 
           //For each ranked service in the event.  
           for (var i=0; i<self.rankedServices.length; i++){
@@ -1609,21 +1610,31 @@ classMentors.controller('ClmEventRankTableCtrl', [
       });
     }
     
-    var refreshAchievements = function(profileId){
+    var refreshAchievements = function(profileId, service){
       //TODO: Only request updates for the services that users have registered for.
       console.log("Requesting achievement update for "+profileId);
-      spfFirebase.push(['queue/tasks'], { id: profileId, service: "freeCodeCamp" });      
-      spfFirebase.push(['queue/tasks'], { id: profileId, service: "pivotalExpert" });      
-      spfFirebase.push(['queue/tasks'], { id: profileId, service: "codeSchool" });     
-      //spfFirebase.push(['queue/tasks'], { id: profileId, service: "codeCombat" });     
+      spfFirebase.push(['queue/tasks'], { id: profileId, service: service });            
+      //spfFirebase.push(['queue/tasks'], { id: profileId, service: "freeCodeCamp" });      
     }
     
-    this.updateAllParticipantUserProfiles = function(){      
-      console.log("Requesting all users be updated.");
-      for(var i=0; i<self.eventParticipants.length; i++){
-        var publicId = self.eventParticipants[i].$id;
-        refreshAchievements(publicId);
-      }  
+    this.updateAllParticipantUserProfiles = function () {
+      //console.log("Requesting all users in ranking to be updated.");
+      //For each user in the ranking
+      for (var i = 0; i < self.rankingView2.length; i++) {
+        var publicId = self.rankingView2[i].$id;
+        //for service in ranked services
+        for (var j=0; j< self.rankedServices.length; j++) {
+            //console.log(self.rankedServices[j].id);
+            //If the user in the ranking has the key for a service (has registered)
+            if( self.rankingView2[i].services[self.rankedServices[j].id]){
+              //console.log("Adding "+self.rankedServices[j].id+ " for user "+publicId);
+              refreshAchievements(publicId, self.rankedServices[j].id);    
+            }
+            else{
+              //console.log("Skipping "+self.rankedServices[j].id+ " for user "+publicId+ " since not registered");
+            }      
+        }
+      }
     };
     
     var getUserProfilesFromEventParticipants = function(parentScope){
@@ -1634,11 +1645,9 @@ classMentors.controller('ClmEventRankTableCtrl', [
         var publicId = parentScope.eventParticipants[i].$id;
         getUserProfile(publicId, parentScope);
       }
-
     };
    
     this.getParticipants = function (parentScope) {
-      
       spfFirebase.loadedArray(['classMentors/eventParticipants', parentScope.event.$id], {
             //orderByChild: 'featured',
             //equalTo: true,
