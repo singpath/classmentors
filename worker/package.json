@@ -18,6 +18,7 @@
     "mocha": "2.4.5",
     "mocha-lcov-reporter": "^1.2.0",
     "mockfirebase": "latest",
+    "node-lambda": "^0.8.5",
     "proxyquire": "latest",
     "sinon": "latest",
     "superagent": "1.8.3",

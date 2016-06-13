@@ -7,9 +7,29 @@ var Queue = require('firebase-queue'),
 cm-worker.js firebaseUrl=http://firebase.com token=myToken numTasks=1 maxIdle=5
 
 */
+
 var profileUpdateCount = 0
 var options={};
 var args = process.argv.slice(2);
+var firebaseUrl;
+var ref;
+var queueRef;
+var queue;
+
+var initiateFirebase = function(_firebaseUrl, firebaseToken){
+    firebaseUrl = _firebaseUrl;
+    ref = new Firebase(firebaseUrl);
+    queueRef = new Firebase(firebaseUrl+'/queue');
+    ref.authWithCustomToken(firebaseToken, function(error, authData) {
+    if (error) {
+        console.log("Login Failed!", error);
+    } else {
+        //console.log("Firebase login succeeded!");
+        //console.log("Login Succeeded!", authData);
+    }
+    });  
+}
+
 // node cm-worker.js -t <secret>
 if(args[0] == '-t'){
   console.log("creating token");
@@ -22,36 +42,29 @@ if(args[0] == '-t'){
   process.exit(0);
   
 }
-else {
+
+else if(args.length>1) {
   for(var i=0; i<args.length; i++){
       var temp = args[i].split("=")
       options[temp[0]] = temp[1]
       //console.log(temp);  
   }
+  initiateFirebase(options['firebaseUrl'], options['token']);
+  console.log("Listending to url "+options['firebaseUrl']);
+  console.log("with token "+options['token']);
 
 }
-console.log("Listending to url "+options['firebaseUrl']);
-console.log("with token "+options['token']);
-
-var firebaseUrl = options['firebaseUrl'];
-var ref = new Firebase(firebaseUrl);
-var queueRef = new Firebase(firebaseUrl+'/queue');
-ref.authWithCustomToken(options['token'], function(error, authData) {
-  if (error) {
-    console.log("Login Failed!", error);
-  } else {
-    console.log("Login Succeeded!", authData);
-  }
-});
 
 // Exit on ctrl-c
 // or kill -s SIGINT [process_id] from termina. 
 // or pass in a signal from a queue. 
 process.on('SIGINT', function () {
-  console.log('Got a SIGINT. Goodbye cruel world');
-  process.exit(0);
+  queue.shutdown().then(function() {
+    console.log('Got a SIGINT. Goodbye cruel world');
+    console.log('Finished queue shutdown');
+    process.exit(0);
+  });
 });
-
 
 var get_service_url = function (service, serviceID) {
   var theUrl = "";
@@ -264,14 +277,69 @@ var process_task = function (data, progress, resolve, reject) {
   });
 }
 
+ var handler = function (event, context) {
+    //console.log( "event", event );
+    //console.log(context);
+    //console.log(process.env);
+    var firebaseUrl = process.env.FIREBASE_URL;
+    var firebaseToken = process.env.FIREBASE_TOKEN;
+    if(firebaseUrl && firebaseToken){
+      console.log("--------");
+      //console.log(firebaseUrl);
+      //console.log(firebaseToken);
+      initiateFirebase(firebaseUrl, firebaseToken);
+      var data = {"from":"handler", "updated":Firebase.ServerValue.TIMESTAMP};
+      ref.child('queue/tasks').once('value', function (snapshot) {
+          // code to handle new value
+          var tasks = snapshot.val();
+          if(tasks){
+              console.log("There were tasks.");
+              var delay = 50000;
+              console.log("Starting queue for "+delay+"ms.")  
+              var options = {
+                'specId': 'lambda-worker',
+                'numWorkers': 5,
+                //'sanitize': false,
+                //'suppressStack': true
+                };
+              queue = new Queue(queueRef, process_task);
+              
+              setTimeout(function() { queue.shutdown().then(function () {
+                  console.log('Finished queue shutdown');
+                  console.log("--------");
+                  context.done();
+                 }); 
+            }, delay);
+            
+          }
+          else {
+              console.log("There were no tasks.");
+              context.done();
+          }
+          
+      }, function (err) {
+          console.log(err);
+          // code to handle read error
+          context.done();
+      });
+      
+    
+    } else {
+      console.log("firebaseUrl or firebaseToken missing. ");
+      context.done();
+    }
+    //context.done();
+ }
+ 
 // Do not run the server when loading as a module. 
 if (require.main === module) {
-  var queue = new Queue(queueRef, process_task);
+  queue = new Queue(queueRef, process_task);
 
   // Export modules if we aren't running the worker so that we can test functions. 
 } else {
 
   module.exports = {
+    "handler": handler,
     "get_service_url": get_service_url,
     "get_achievements_from_response": get_achievements_from_response,
     "update_achievements_and_clear_queue": update_achievements_and_clear_queue,
@@ -281,4 +349,5 @@ if (require.main === module) {
     "update_profile_and_clear_task": update_profile_and_clear_task
   }
 }
+
 
