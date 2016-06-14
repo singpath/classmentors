@@ -229,7 +229,7 @@ var get_profile = function (service_response_body, task_data, reject, resolve) {
   
   //console.log("services",services);
   // If the user does not have the service it will be skipped. 
-  if(!services.hasOwnProperty(service)){
+  if(!services || !services.hasOwnProperty(service)){
     console.log(task_data['id']+" has not registered for " + task_data['service']);
     resolve("User has not registered for " + service);
   }
