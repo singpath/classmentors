@@ -340,6 +340,7 @@ if (require.main === module) {
 
   module.exports = {
     "handler": handler,
+    "initiateFirebase":initiateFirebase,
     "get_service_url": get_service_url,
     "get_achievements_from_response": get_achievements_from_response,
     "update_achievements_and_clear_queue": update_achievements_and_clear_queue,
