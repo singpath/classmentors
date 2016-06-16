@@ -531,9 +531,7 @@
         ".write": "auth.uid == 'queue-worker'"
       },
       "userProfiles": {
-        "$publicId": {
-          ".validate": "newData.hasChildren(['user'])", 
-          ".write": "auth !== null &&  (\n  root.child('auth/publicIds/' + $publicId).val() === auth.uid\n  || root.child('classMentors/admins').child(auth.uid).val() === true\n)", 
+        "$publicId": {         
           "createdEvents": {
             "$eventId": {
               ".validate": "newData.hasChildren(['createdAt', 'title']) && root.child('classMentors/events').child($eventId).child('owner/publicId').val() === $publicId", 
@@ -600,12 +598,11 @@
               }, 
               "details": {
                 ".validate": "newData.hasChildren(['id', 'name', 'registeredBefore'])", 
-
                 "name": {
                   ".validate": "newData.isString() && newData.val().length >= 1"
                 }, 
                 "registeredBefore": {
-                  ".validate": "newData.val() === now"
+                 
                 }
               }, 
               "lastUpdate": {
@@ -652,7 +649,8 @@
             "yearOfBirth": {
               ".validate": "newData.val() === root.child('auth/users').child(auth.uid).child('yearOfBirth').val()"
             }
-          }
+          },
+          ".write": "auth !== null && root.child('auth/publicIds/' + $publicId).val() === auth.uid"
         }, 
         ".read": true,
         ".write":"auth.uid == 'queue-worker'"

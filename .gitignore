@@ -9,3 +9,4 @@ coverage/
 *.sublime-project
 *.sublime-workspace
 npm-debug.log
+worker/*.env
