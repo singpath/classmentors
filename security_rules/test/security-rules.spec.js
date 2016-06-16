@@ -145,12 +145,19 @@ describe('With current security rules', function () {
         it("cannot write to another users' classMentors/userProfiles/$publicId", function () {
           expect(theUser).cannot.write(data).path("classMentors/userProfiles/chris"); 
         });
-        /*
-        var chrisUser = {uid: "github:116418"}; //chris
+        
+        var chrisUser = {uid: "google:110893970871115341770"}; //cboesch
+     
         it("can write to their own classMentors/userProfiles/$publicId", function () {
-          expect(chrisUser).can.write(data).path("classMentors/userProfiles/chris"); 
+          expect(chrisUser).can.write(data).path("classMentors/userProfiles/cboesch"); 
         });
-        */
+        
+        var serviceData = {"freeCodeCamp":{"details":{'id':'singaporeclouds', 'name':'chris','registeredBefore':1465207026228}}};
+        it("can write to their own classMentors/userProfiles/$publicId/services", function () {
+          expect(chrisUser).can.write(serviceData).path("classMentors/userProfiles/cboesch/services"); 
+        });
+        
+        
                  
     }); 
     
