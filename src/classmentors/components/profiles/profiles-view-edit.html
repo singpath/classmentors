@@ -124,6 +124,10 @@
                     </form>
                 </div>   
                 <div ng-show="ctrl.profile.services.codeSchool.details.id">
+                    <div ng-show="ctrl.profile.services.codeSchool.totalAchievements<0">
+                        <font color="red">{{ctrl.profile.services.codeSchool.details.id}} does not have a public profile on Code School.</font>
+                    </div>
+                    
                     {{ctrl.profile.services.codeSchool.totalAchievements}}  achievements<br>
                    Registered as <a href="https://www.codeschool.com/users/{{ctrl.profile.services.codeSchool.details.id}}">{{ctrl.profile.services.codeSchool.details.id}}</a> on Code School.
                     <button type="submit" ng-click="ctrl.removeCodeSchool()">Remove</button>
