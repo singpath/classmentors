@@ -1,6 +1,7 @@
 'use strict';
 
 import angular from 'angular';
+import Firebase from 'firebase';
 
 import {classMentors} from '../../module.js';
 
@@ -15,49 +16,48 @@ classMentors.config([
   '$routeProvider',
   'routes',
   function($routeProvider, routes) {
-    $routeProvider.
+    $routeProvider
+      .when(routes.setProfileCodeCombatId, {
+        template: ccLookupTmpl,
+        controller: 'SetCodeCombatUserIdCtrl',
+        controllerAs: 'ctrl',
+        resolve: {
+          initialData: [
+            'setCodeCombatUserIdCtrlInitialData',
+            function(setCodeCombatUserIdCtrlInitialData) {
+              return setCodeCombatUserIdCtrlInitialData();
+            }
+          ]
+        }
+      })
 
-    when(routes.setProfileCodeCombatId, {
-      template: ccLookupTmpl,
-      controller: 'SetCodeCombatUserIdCtrl',
-      controllerAs: 'ctrl',
-      resolve: {
-        'initialData': [
-          'setCodeCombatUserIdCtrlInitialData',
-          function(setCodeCombatUserIdCtrlInitialData) {
-            return setCodeCombatUserIdCtrlInitialData();
-          }
-        ]
-      }
-    }).
+      .when(routes.editProfile, {
+        template: editTmpl,
+        controller: 'ClmProfileCtrl',
+        controllerAs: 'ctrl',
+        resolve: {
+          initialData: [
+            'clmEditProfileInitialDataResolver',
+            function(clmEditProfileInitialDataResolver) {
+              return clmEditProfileInitialDataResolver();
+            }
+          ]
+        }
+      })
 
-    when(routes.editProfile, {
-      template: editTmpl,
-      controller: 'ClmProfileCtrl',
-      controllerAs: 'ctrl',
-      resolve: {
-        'initialData': [
-          'clmEditProfileInitialDataResolver',
-          function(clmEditProfileInitialDataResolver) {
-            return clmEditProfileInitialDataResolver();
-          }
-        ]
-      }
-    }).
-
-    when(routes.profile, {
-      template: showTmpl,
-      controller: 'ClmProfileCtrl',
-      controllerAs: 'ctrl',
-      resolve: {
-        'initialData': [
-          'clmShowProfileInitialDataResolver',
-          function(clmShowProfileInitialDataResolver) {
-            return clmShowProfileInitialDataResolver();
-          }
-        ]
-      }
-    })
+      .when(routes.profile, {
+        template: showTmpl,
+        controller: 'ClmProfileCtrl',
+        controllerAs: 'ctrl',
+        resolve: {
+          initialData: [
+            'clmShowProfileInitialDataResolver',
+            function(clmShowProfileInitialDataResolver) {
+              return clmShowProfileInitialDataResolver();
+            }
+          ]
+        }
+      })
 
     ;
 
@@ -115,7 +115,7 @@ classMentors.factory('clmShowProfileInitialDataResolver', [
       var publicId = $route.current.params.publicId;
       var profilePromise;
       var errNoPublicId = new Error('Unexpected error: the public id is missing');
-      var errNoProfile = new Error('Could not found the profile for ' + publicId);
+      var errNoProfile = new Error(`Could not found the profile for ${publicId}`);
 
       if (!publicId) {
         return $q.reject(errNoPublicId);
@@ -160,7 +160,7 @@ classMentors.controller('ClmProfileCtrl', [
     this.currentUser = initialData.currentUser;
     this.currentUserProfile = initialData.currentUserProfile;
     this.profile = initialData.profile;
-    
+
     if (
       this.profile &&
       this.profile.$id &&
@@ -185,61 +185,60 @@ classMentors.controller('ClmProfileCtrl', [
       currentUser.country = spfFirebase.cleanObj(currentUser.country);
       currentUser.school = spfFirebase.cleanObj(currentUser.school);
     }
-    
-           
-    this.refreshAchievements = function(profileId){
-      console.log("Requesting achievement update ");
-      spfFirebase.push(['queue/tasks'], { id: profileId, service: "freeCodeCamp" });      
-      spfFirebase.push(['queue/tasks'], { id: profileId, service: "pivotalExpert" });      
-      spfFirebase.push(['queue/tasks'], { id: profileId, service: "codeSchool" });      
-      
-    }
-    
-    this.updateFreeCodeCampUsername = function(username){
-      console.log("The new FreeCodeCamp username is "+username);
-      spfFirebase.patch(["classMentors/userProfiles", this.profile.$id, "services/freeCodeCamp/details"], 
-             {'id': username, 'name':username,'registeredBefore':Firebase.ServerValue.TIMESTAMP}
+
+    this.refreshAchievements = function(profileId) {
+      console.log('Requesting achievement update ');
+      spfFirebase.push(['queue/tasks'], {id: profileId, service: 'freeCodeCamp'});
+      spfFirebase.push(['queue/tasks'], {id: profileId, service: 'pivotalExpert'});
+      spfFirebase.push(['queue/tasks'], {id: profileId, service: 'codeSchool'});
+    };
+
+    this.updateFreeCodeCampUsername = function(username) {
+      console.log(`The new FreeCodeCamp username is ${username}`);
+      spfFirebase.patch(['classMentors/userProfiles', this.profile.$id, 'services/freeCodeCamp/details'],
+             {id: username, name: username, registeredBefore: Firebase.ServerValue.TIMESTAMP}
       );
-    }
-    this.removeFreeCodeCamp = function(){
-      console.log("Removing Free Code Camp from profile.");
-      spfFirebase.set(["classMentors/userProfiles", this.profile.$id, "services/freeCodeCamp"], {} );   
-    }
-    
-    this.updatePivotalExpertUsername = function(username){
-      console.log("The new Pivotal Expert username is "+username);
-      spfFirebase.patch(["classMentors/userProfiles", this.profile.$id, "services/pivotalExpert/details"], 
-             {'id': username, 'name':username,'registeredBefore':Firebase.ServerValue.TIMESTAMP}
-      );  
-    }
-    
-    this.removePivotalExpert = function(){
-      console.log("Removing pivotal expert from profile.");
-      spfFirebase.set(["classMentors/userProfiles", this.profile.$id, "services/pivotalExpert"], {} );   
-    }
-    
-    this.updateCodeCombatUsername = function(username){
-      console.log("The new Code Combat username is "+username);
-      spfFirebase.patch(["classMentors/userProfiles", this.profile.$id, "services/codeCombat/details"], 
-             {'id': username, 'name':username,'registeredBefore':Firebase.ServerValue.TIMESTAMP}
+    };
+
+    this.removeFreeCodeCamp = function() {
+      console.log('Removing Free Code Camp from profile.');
+      spfFirebase.set(['classMentors/userProfiles', this.profile.$id, 'services/freeCodeCamp'], {});
+    };
+
+    this.updatePivotalExpertUsername = function(username) {
+      console.log(`The new Pivotal Expert username is ${username}`);
+      spfFirebase.patch(['classMentors/userProfiles', this.profile.$id, 'services/pivotalExpert/details'],
+             {id: username, name: username, registeredBefore: Firebase.ServerValue.TIMESTAMP}
       );
-    }
-    this.removeCodeCombat = function(){
-      console.log("Removing Code Combat from profile.");
-      spfFirebase.set(["classMentors/userProfiles", this.profile.$id, "services/codeCombat"], {} );  
-    }
-    
-    this.updateCodeSchoolUsername = function(username){
-      console.log("The new Code School username is "+username);
-      spfFirebase.patch(["classMentors/userProfiles", this.profile.$id, "services/codeSchool/details"], 
-             {'id': username, 'name':username,'registeredBefore':Firebase.ServerValue.TIMESTAMP}
+    };
+
+    this.removePivotalExpert = function() {
+      console.log('Removing pivotal expert from profile.');
+      spfFirebase.set(['classMentors/userProfiles', this.profile.$id, 'services/pivotalExpert'], {});
+    };
+
+    this.updateCodeCombatUsername = function(username) {
+      console.log(`The new Code Combat username is ${username}`);
+      spfFirebase.patch(['classMentors/userProfiles', this.profile.$id, 'services/codeCombat/details'],
+             {id: username, name: username, registeredBefore: Firebase.ServerValue.TIMESTAMP}
       );
-    }
-    this.removeCodeSchool = function(){
-      console.log("Removing Code School from profile.");
-      spfFirebase.set(["classMentors/userProfiles", this.profile.$id, "services/codeSchool"], {} );  
-    }
-    
+    };
+    this.removeCodeCombat = function() {
+      console.log('Removing Code Combat from profile.');
+      spfFirebase.set(['classMentors/userProfiles', this.profile.$id, 'services/codeCombat'], {});
+    };
+
+    this.updateCodeSchoolUsername = function(username) {
+      console.log(`The new Code School username is ${username}`);
+      spfFirebase.patch(['classMentors/userProfiles', this.profile.$id, 'services/codeSchool/details'],
+             {id: username, name: username, registeredBefore: Firebase.ServerValue.TIMESTAMP}
+      );
+    };
+    this.removeCodeSchool = function() {
+      console.log('Removing Code School from profile.');
+      spfFirebase.set(['classMentors/userProfiles', this.profile.$id, 'services/codeSchool'], {});
+    };
+
     this.setPublicId = function(currentUser) {
       var saved;
 
@@ -522,7 +521,7 @@ classMentors.directive('clmServiceUserIdExists', [
           }
           return clmDataStore.services[serviceId].userIdExist(viewValue).then(function(exists) {
             if (!exists) {
-              return $q.reject(new Error(viewValue + 'does not exist or is not public'));
+              return $q.reject(new Error(`${viewValue} does not exist or is not public`));
             }
             return true;
           });
