@@ -43,7 +43,7 @@
       "lib": "src/classmentors"
     },
     "dependencies": {
-      "singpath-core": "github:singpath/singpath-core@^0.3.1"
+      "singpath-core": "github:singpath/singpath-core@^0.3.2"
     },
     "devDependencies": {
       "plugin-babel": "npm:systemjs-plugin-babel@^0.0.11"
@@ -112,6 +112,21 @@
           }
         }
       },
+      "github:angular/bower-angular-animate@1.5.7": {
+        "main": "angular-animate",
+        "registry": "jspm",
+        "dependencies": {
+          "angular": "^1.3.0"
+        },
+        "meta": {
+          "angular-animate.js": {
+            "deps": [
+              "angular"
+            ],
+            "format": "global"
+          }
+        }
+      },
       "github:angular/bower-angular-aria@1.5.7": {
         "main": "angular-aria",
         "registry": "jspm",
@@ -158,6 +173,15 @@
         }
       },
       "github:angular/bower-angular@1.5.5": {
+        "main": "angular",
+        "meta": {
+          "angular.js": {
+            "exports": "angular",
+            "format": "global"
+          }
+        }
+      },
+      "github:angular/bower-angular@1.5.7": {
         "main": "angular",
         "meta": {
           "angular.js": {
