@@ -1574,7 +1574,7 @@ classMentors.controller('ClmEventRankTableCtrl', [
     addRankedServices(this);
 
     var getUserProfile = function(publicId, parentScope) {
-
+      // console.log(publicId);
       spfFirebase.loadedObj(['classMentors/userProfiles', publicId]).then(function(promise) {
         return promise;
       }).then(function(result) {
@@ -1584,23 +1584,26 @@ classMentors.controller('ClmEventRankTableCtrl', [
         temp.$ranking = parentScope.rankingView2.length + 1;
         temp.services = result.services;
 
+        // console.log("In user profile fetch with services", result.services);
         var total = 0;
-          // For each ranked service in the event.
+
+        // If the user has no registered services, add an empty object to support the following logic.
+        if (!result.services) {
+          result.services = {};
+        }
+
+        // For each ranked service in the event.
         for (var i = 0; i < self.rankedServices.length; i++) {
-            // console.log(self.rankedServices[i].id);
-            // If the user has registered for the service and has a totoalAchievements value.
+          // console.log(self.rankedServices[i].id);
+          // If the user has registered for the service and has a totoalAchievements value.
           if (
             result.services[self.rankedServices[i].id] &&
             result.services[self.rankedServices[i].id].totalAchievements
           ) {
             temp[self.rankedServices[i].id] = parseInt(
-              result.services[self.rankedServices[i].id].totalAchievements,
-              10
+              result.services[self.rankedServices[i].id].totalAchievements, 10
             );
-            total += parseInt(
-              result.services[self.rankedServices[i].id].totalAchievements,
-              10
-            );
+            total += parseInt(result.services[self.rankedServices[i].id].totalAchievements, 10);
           } else {
             temp[self.rankedServices[i].id] = 0;
           }
@@ -1631,8 +1634,8 @@ classMentors.controller('ClmEventRankTableCtrl', [
         // for service in ranked services
         for (var j = 0; j < self.rankedServices.length; j++) {
             // console.log(self.rankedServices[j].id);
-            // If the user in the ranking has the key for a service (has registered)
-          if (self.rankingView2[i].services[self.rankedServices[j].id]) {
+            // If the user in the ranking has the key services and key for a service
+          if (self.rankingView2[i].services && self.rankingView2[i].services[self.rankedServices[j].id]) {
               // console.log("Adding "+self.rankedServices[j].id+ " for user "+publicId);
             refreshAchievements(publicId, self.rankedServices[j].id);
           } else {
