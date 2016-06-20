@@ -97,21 +97,6 @@
           }
         }
       },
-      "github:angular/bower-angular-animate@1.5.5": {
-        "main": "angular-animate",
-        "registry": "jspm",
-        "dependencies": {
-          "angular": "^1.3.0"
-        },
-        "meta": {
-          "angular-animate.js": {
-            "deps": [
-              "angular"
-            ],
-            "format": "global"
-          }
-        }
-      },
       "github:angular/bower-angular-animate@1.5.7": {
         "main": "angular-animate",
         "registry": "jspm",
@@ -142,7 +127,7 @@
           }
         }
       },
-      "github:angular/bower-angular-messages@1.5.5": {
+      "github:angular/bower-angular-messages@1.5.7": {
         "main": "angular-messages",
         "registry": "jspm",
         "dependencies": {
@@ -157,7 +142,7 @@
           }
         }
       },
-      "github:angular/bower-angular-route@1.5.5": {
+      "github:angular/bower-angular-route@1.5.7": {
         "main": "angular-route",
         "registry": "jspm",
         "dependencies": {
@@ -168,15 +153,6 @@
             "deps": [
               "angular"
             ],
-            "format": "global"
-          }
-        }
-      },
-      "github:angular/bower-angular@1.5.5": {
-        "main": "angular",
-        "meta": {
-          "angular.js": {
-            "exports": "angular",
             "format": "global"
           }
         }

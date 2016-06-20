@@ -103,7 +103,7 @@ SystemJS.config({
       "github:ajaxorg/ace-builds@1.2.3/theme-twilight.js": [
         "ace/ace"
       ],
-      "github:angular/bower-angular-animate@1.5.5/angular-animate.js": [
+      "github:angular/bower-angular-animate@1.5.7/angular-animate.js": [
         "angular"
       ],
       "github:angular/bower-angular-aria@1.5.7/angular-aria.js": [
@@ -129,7 +129,7 @@ SystemJS.config({
         "firebase",
         "angular"
       ],
-      "github:singpath/singpath-core@0.3.1/components/ace/ace.js": [
+      "github:singpath/singpath-core@0.3.2/components/ace/ace.js": [
         "angular",
         "../../module.js",
         "ace",
@@ -140,38 +140,38 @@ SystemJS.config({
         "ace/theme-twilight.js",
         "./ace.css!"
       ],
-      "github:singpath/singpath-core@0.3.1/components/alert/alert.js": [
+      "github:singpath/singpath-core@0.3.2/components/alert/alert.js": [
         "../../module.js",
         "./alert-view-toaster.html!text",
         "./alert.css!text"
       ],
-      "github:singpath/singpath-core@0.3.1/components/index.js": [
+      "github:singpath/singpath-core@0.3.2/components/index.js": [
         "./ace/ace.js",
         "./alert/alert.js",
         "./navbar/navbar.js",
         "./sign/sign.js"
       ],
-      "github:singpath/singpath-core@0.3.1/components/navbar/navbar.js": [
+      "github:singpath/singpath-core@0.3.2/components/navbar/navbar.js": [
         "angular",
         "../../module.js",
         "./navbar-view.html!text",
         "./navbar.css!"
       ],
-      "github:singpath/singpath-core@0.3.1/components/sign/sign.js": [
+      "github:singpath/singpath-core@0.3.2/components/sign/sign.js": [
         "../../module.js",
         "./sign-view.html!text"
       ],
-      "github:singpath/singpath-core@0.3.1/filters.js": [
+      "github:singpath/singpath-core@0.3.2/filters.js": [
         "./module.js"
       ],
-      "github:singpath/singpath-core@0.3.1/index.js": [
+      "github:singpath/singpath-core@0.3.2/index.js": [
         "./module.js",
         "./filters.js",
         "./services/index.js",
         "./components/index.js",
         "./shared.css!"
       ],
-      "github:singpath/singpath-core@0.3.1/module.js": [
+      "github:singpath/singpath-core@0.3.2/module.js": [
         "angular",
         "firebase",
         "angularfire",
@@ -181,10 +181,10 @@ SystemJS.config({
         "angular-route",
         "angular-material"
       ],
-      "github:singpath/singpath-core@0.3.1/services/countries.js": [
+      "github:singpath/singpath-core@0.3.2/services/countries.js": [
         "../module.js"
       ],
-      "github:singpath/singpath-core@0.3.1/services/crypto.js": [
+      "github:singpath/singpath-core@0.3.2/services/crypto.js": [
         "npm:systemjs-plugin-babel@0.0.11/babel-helpers/classCallCheck.js",
         "npm:systemjs-plugin-babel@0.0.11/babel-helpers/createClass.js",
         "cryptojs",
@@ -192,27 +192,28 @@ SystemJS.config({
         "cryptojs/pbkdf2.js",
         "cryptojs/sha256.js"
       ],
-      "github:singpath/singpath-core@0.3.1/services/datastore.js": [
+      "github:singpath/singpath-core@0.3.2/services/datastore.js": [
         "angular",
         "../module.js"
       ],
-      "github:singpath/singpath-core@0.3.1/services/firebase.js": [
+      "github:singpath/singpath-core@0.3.2/services/firebase.js": [
         "angular",
         "firebase",
         "../module.js"
       ],
-      "github:singpath/singpath-core@0.3.1/services/icons/icons.js": [
+      "github:singpath/singpath-core@0.3.2/services/icons/icons.js": [
         "./svgdefs.svg!text",
         "./icons-python.svg!text",
         "./icons-angularjs.svg!text",
         "./icons-javascript.svg!text",
         "./icons-java.svg!text"
       ],
-      "github:singpath/singpath-core@0.3.1/services/index.js": [
+      "github:singpath/singpath-core@0.3.2/services/index.js": [
         "../module.js",
         "./countries.js",
         "./icons/icons.js",
         "./crypto.js",
+        "./routes.js",
         "./datastore.js",
         "./firebase.js"
       ],
@@ -248,11 +249,6 @@ SystemJS.config({
           "loader": "plugin-babel"
         }
       }
-    },
-    "github:angular/bower-angular-animate@1.5.5": {
-      "map": {
-        "angular": "github:angular/bower-angular@1.5.7"
-      }
     }
   }
 });
@@ -269,8 +265,8 @@ SystemJS.config({
     "angular-animate": "github:angular/bower-angular-animate@1.5.7",
     "angular-loading-bar": "github:chieffancypants/angular-loading-bar@0.8.0",
     "angular-material": "github:angular/bower-material@1.0.9",
-    "angular-messages": "github:angular/bower-angular-messages@1.5.5",
-    "angular-route": "github:angular/bower-angular-route@1.5.5",
+    "angular-messages": "github:angular/bower-angular-messages@1.5.7",
+    "angular-route": "github:angular/bower-angular-route@1.5.7",
     "angularfire": "github:firebase/angularfire@1.1.4",
     "assert": "github:jspm/nodelibs-assert@0.2.0-alpha",
     "buffer": "github:jspm/nodelibs-buffer@0.2.0-alpha",
@@ -301,16 +297,6 @@ SystemJS.config({
       "map": {
         "angular": "github:angular/bower-angular@1.5.7",
         "firebase": "github:firebase/firebase-bower@2.4.2"
-      }
-    },
-    "github:angular/bower-angular-messages@1.5.5": {
-      "map": {
-        "angular": "github:angular/bower-angular@1.5.7"
-      }
-    },
-    "github:angular/bower-angular-route@1.5.5": {
-      "map": {
-        "angular": "github:angular/bower-angular@1.5.7"
       }
     },
     "github:angular/bower-material@1.0.9": {
@@ -369,6 +355,16 @@ SystemJS.config({
       }
     },
     "github:angular/bower-angular-animate@1.5.7": {
+      "map": {
+        "angular": "github:angular/bower-angular@1.5.7"
+      }
+    },
+    "github:angular/bower-angular-messages@1.5.7": {
+      "map": {
+        "angular": "github:angular/bower-angular@1.5.7"
+      }
+    },
+    "github:angular/bower-angular-route@1.5.7": {
       "map": {
         "angular": "github:angular/bower-angular@1.5.7"
       }
