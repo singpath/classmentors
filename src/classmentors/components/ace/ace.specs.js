@@ -1,3 +1,4 @@
+/* eslint no-new: "off" */
 import {expect} from 'chai';
 import sinon from 'sinon';
 
