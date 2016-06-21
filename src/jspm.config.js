@@ -109,10 +109,10 @@ SystemJS.config({
       "github:angular/bower-angular-aria@1.5.7/angular-aria.js": [
         "angular"
       ],
-      "github:angular/bower-angular-messages@1.5.5/angular-messages.js": [
+      "github:angular/bower-angular-messages@1.5.7/angular-messages.js": [
         "angular"
       ],
-      "github:angular/bower-angular-route@1.5.5/angular-route.js": [
+      "github:angular/bower-angular-route@1.5.7/angular-route.js": [
         "angular"
       ],
       "github:angular/bower-material@1.0.9/angular-material.js": [

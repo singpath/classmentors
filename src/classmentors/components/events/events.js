@@ -1563,7 +1563,7 @@ classMentors.controller('ClmEventRankTableCtrl', [
         parentScope.rankedServices = [
           {id: 'freeCodeCamp', name: 'Free Code Camp'},
           {id: 'pivotalExpert', name: 'Pivotal Expert'},
-          // {id: 'codeCombat',name: 'Code Combat Levels'},
+          {id: 'codeCombat',name: 'Code Combat'},
           // {id: 'singPath',name:  'SingPath Problems'},
           {id: 'codeSchool', name: 'Code School'}
         ];
