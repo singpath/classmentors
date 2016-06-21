@@ -74,11 +74,10 @@ var get_service_url = function (service, serviceID) {
     theUrl = "https://www.freecodecamp.com/" + serviceID;
   }
  
- //TODO: Add back support for codeCombat once the user API is updated.
   else if (service == "codeCombat") {
      theUrl = "https://codecombat.com/db/user/" + serviceID + "/level.sessions?project=state.complete,levelID,levelName";
      //theUrl= "https://codecombat.com/db/user/"+serviceID;
-    //console.log("Using codeCombat url "+theUrl); 
+    console.log("Using codeCombat url "+theUrl); 
   }
   
   else if (service == "pivotalExpert") {

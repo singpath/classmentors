@@ -139,9 +139,11 @@ function ClmProfileCtrl(
   }
 
   this.refreshAchievements = function(profileId) {
+    //TODO: Only request updates if the user has registered for the service. 
     console.log('Requesting achievement update ');
     spfFirebase.push(['queue/tasks'], {id: profileId, service: 'freeCodeCamp'});
     spfFirebase.push(['queue/tasks'], {id: profileId, service: 'pivotalExpert'});
+    spfFirebase.push(['queue/tasks'], {id: profileId, service: 'codeCombat'});
     spfFirebase.push(['queue/tasks'], {id: profileId, service: 'codeSchool'});
   };
 
