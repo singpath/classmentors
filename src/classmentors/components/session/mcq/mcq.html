@@ -6,8 +6,10 @@
     <link rel="stylesheet" type="text/css" href="../bootstrap-3.3.6-dist/css/bootstrap.min.css" />
 </head>
 <body ng-controller="FirebaseController as fbc">
-<pre> {{data | json}} </pre>
-
+<!--<pre> {{data | json}} </pre>-->
+<div ng-controller="QuestionController as QC">
+    <pre>{{data | json}}</pre>
+</div>
 
 <!-- IMPORTANT:
     1. When pushing developing, use un-minified version so that error messages will be easier to understand

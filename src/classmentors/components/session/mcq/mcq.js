@@ -19,4 +19,13 @@
         $scope.data = $firebaseObject(ref);
     });
 
+    //Pulls questions from firebase
+    mcq.controller('QuestionController', function($scope, $firebaseObject, $firebaseArray){
+        // Tentatively hardcoding URL, currently firebase does not support content search
+        // Propose new DB design where questions can be selected by type
+        var ref = firebase.database().ref('events/AA Week 1/challenges');
+
+        // For testing purposes only
+        $scope.data = $firebaseObject(ref)
+    });
 })();
