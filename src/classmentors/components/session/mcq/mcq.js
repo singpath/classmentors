@@ -14,18 +14,44 @@
         firebase.initializeApp(config);
     });
 
-    mcq.controller('FirebaseController', function($scope, $firebaseObject){
-        var ref = firebase.database().ref();
-        $scope.data = $firebaseObject(ref);
-    });
+    // mcq.controller('FirebaseController', function($scope, $firebaseObject){
+    //     var ref = firebase.database().ref();
+    //     $scope.data = $firebaseObject(ref);
+    // });
 
     //Pulls questions from firebase
-    mcq.controller('QuestionController', function($scope, $firebaseObject, $firebaseArray){
+
+    mcq.factory('retrieveMCQItems', function($firebaseObject, $firebaseArray){
+        var ref = firebase.database().ref('events/0/challenges/MCQ/0');
+
+        return{
+            getQuestions: function(){
+                var list = $firebaseArray(ref.child('questions'));
+                return list;
+            },
+            getTest: function(){
+                var obj = $firebaseObject(ref);
+                return obj
+            }
+        }
+    });
+
+
+    mcq.controller('MCQController', function($scope, retrieveMCQItems){
         // Tentatively hardcoding URL, currently firebase does not support content search
         // Propose new DB design where questions can be selected by type
-        var ref = firebase.database().ref('events/AA Week 1/challenges');
-
-        // For testing purposes only
-        $scope.data = $firebaseObject(ref)
+        // Using new database structure:
+        // On retrieving data from database.
+        $scope.questions = retrieveMCQItems.getQuestions();
+        $scope.applyClass = function(type){
+            if(type == 'multiple'){
+                console.log(type, 'YOOHOO?');
+                return 'checkbox';
+            }else{
+                console.log('TEST');
+                return 'radio';
+            }
+        }
+        // $scope.data = retrieveMCQItems.getTest();
     });
 })();

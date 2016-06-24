@@ -5,10 +5,20 @@
     <title>Multiple Choice Questions</title>
     <link rel="stylesheet" type="text/css" href="../bootstrap-3.3.6-dist/css/bootstrap.min.css" />
 </head>
-<body ng-controller="FirebaseController as fbc">
-<!--<pre> {{data | json}} </pre>-->
-<div ng-controller="QuestionController as QC">
-    <pre>{{data | json}}</pre>
+<body ng-controller="MCQController as MQC">
+<div class="container-fluid">
+    <div class="well well-lg" ng-repeat="q in questions">
+        <h3>{{q.question}}</h3>
+
+        <div class={{applyClass(q.type)}} ng-repeat="option in q.options">
+
+            <label>
+
+                <input type={{applyClass(q.type)}} name="optionsRadios" id="{{$index}}" value="option1" checked>
+                {{option}}
+            </label>
+        </div>
+    </div>
 </div>
 
 <!-- IMPORTANT:
@@ -16,12 +26,13 @@
     2. When pushing to production, use minified version of .js (with a .min.js extention)
         libraries available for better performance
  -->
+<!-- <script/> tags added last for better performance-->
 <!-- Angular etc dependencies must be added first before mcq.js -->
-<script type="text/javascript" src="../lib/angular/angular.min.js"></script>
+<script type="text/javascript" src="../lib/angular/angular.js"></script>
 <script src="../lib/firebase/firebase.js"></script>
 <script type="text/javascript" src="../lib/angularfire/dist/angularfire.js"></script>
-<script type="text/javascript" src="../bootstrap-3.3.6-dist/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="../lib/jquery/dist/jquery.min.js"></script>
+<script type="text/javascript" src="../bootstrap-3.3.6-dist/js/bootstrap.min.js"></script>
 <!-- To be safe, always place the 'app' js file as the last one to be loaded. -->
 <script type="text/javascript" src="mcq.js"></script>
 
