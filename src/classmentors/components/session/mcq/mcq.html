@@ -15,7 +15,7 @@
 
                 <label>
 
-                    <input type={{applyClass(q.type)}} name="optionsRadios" id="{{$index}}" value="option1" checked>
+                    <input type={{applyClass(q.type)}} name="options" id="{{$index}}">
                     {{option}}
                 </label>
             </div>
@@ -31,10 +31,16 @@
 <!-- <script/> tags added last for better performance-->
 <!-- Angular etc dependencies must be added first before mcq.js -->
 <script type="text/javascript" src="../lib/angular/angular.js"></script>
-<script src="../lib/firebase/firebase.js"></script>
+<script type="text/javascript" src="../lib/firebase/firebase.js"></script>
 <script type="text/javascript" src="../lib/angularfire/dist/angularfire.js"></script>
 <script type="text/javascript" src="../lib/jquery/dist/jquery.min.js"></script>
 <script type="text/javascript" src="../bootstrap-3.3.6-dist/js/bootstrap.min.js"></script>
+
+<!--<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.7/angular.js"></script>-->
+<!--<script type="text/javascript" src="https://cdn.firebase.com/js/client/2.4.2/firebase.js"></script>-->
+<!--<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angularFire/2.0.1/angularfire.js"></script>-->
+<!--<script type="text/javascript" src="https://code.jquery.com/jquery-3.0.0.js"   integrity="sha256-jrPLZ+8vDxt2FnE1zvZXCkCcebI/C8Dt5xyaQBjxQIo="   crossorigin="anonymous"></script>-->
+<!--<script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>-->
 <!-- To be safe, always place the 'app' js file as the last one to be loaded. -->
 <script type="text/javascript" src="mcq.js"></script>
 
