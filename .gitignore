@@ -1,8 +1,32 @@
-
+# Project specific files #
+##########################
 src/jspm_packages/
 package.json
 coverage/
-*.sublime-project
-*.sublime-workspace
 npm-debug.log
 worker/*.env
+
+# Dev tools, IDE #
+##################
+# Netbeans
+core
+nbproject/*
+!nbproject/project.properties
+!nbproject/project.xml
+
+# Intellij
+.idea
+
+# Sublime
+*.sublime-project
+*.sublime-workspace
+
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
