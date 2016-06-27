@@ -1,7 +1,6 @@
 # Project specific files #
 ##########################
 src/jspm_packages/
-package.json
 coverage/
 npm-debug.log
 worker/*.env
