@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html ng-App="MyApp">
     <head>
-        <link rel="stylesheet" href="node_modules/angular-material/angular-material.min.css"/>
+        <link rel="stylesheet" href="../lib/angular-material/angular-material.min.css"/>
     </head>
     <body  layout="column" ng-controller="SampleCtrl" >
 
@@ -50,15 +50,15 @@
 
 
         </div>
-        <script src="node_modules/angular/angular.min.js"></script>
-        <script src="node_modules/angular-animate/angular-animate.js"></script>
-        <script src="node_modules/angular-aria/angular-aria.min.js"></script>
-        <script src="node_modules/angular-material/angular-material.min.js"></script>
+        <script src="../lib/angular/angular.min.js"></script>
+        <script src="../lib/angular-animate/angular-animate.js"></script>
+        <script src="../lib/angular-aria/angular-aria.min.js"></script>
+        <script src="../lib/angular-material/angular-material.min.js"></script>
         <script>
-                                    angular.module('MyApp', ['ngMaterial'])
-                                            .run(function () {
-                                                console.log('MyApp is ready!');
-                                            });
+            angular.module('MyApp', ['ngMaterial'])
+                    .run(function () {
+                        console.log('MyApp is ready!');
+                    });
         </script>
         <style>
             .red{background-color:red;}
