@@ -82,11 +82,6 @@ sed 's/app\.js/app.'${APP_HASH}'.js/g' $INDEX > "${INDEX}.temp"
 mv "${INDEX}.temp" $INDEX
 
 
-echo "Copying Ace editor assets..."
-cp src/jspm_packages/github/ajaxorg/ace-builds@*/worker-html.js       ${BUILD_DEST}/worker-html.js
-cp src/jspm_packages/github/ajaxorg/ace-builds@*/worker-javascript.js ${BUILD_DEST}/worker-javascript.js
-
-
 echo 'Creating archive in "'$BUILD_DIR'/'${APP_NAME}'.zip"...'
 cd $BUILD_DIR
 zip -r "${APP_NAME}.zip" $APP_NAME

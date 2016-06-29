@@ -279,7 +279,7 @@ SystemJS.config({
     "fs": "github:jspm/nodelibs-fs@0.2.0-alpha",
     "path": "github:jspm/nodelibs-path@0.2.0-alpha",
     "process": "github:jspm/nodelibs-process@0.2.0-alpha",
-    "singpath-core": "github:singpath/singpath-core@0.3.2",
+    "singpath-core": "github:singpath/singpath-core@0.4.0",
     "sinon": "npm:sinon@1.17.4",
     "sinon-chai": "npm:sinon-chai@2.8.0",
     "text": "github:systemjs/plugin-text@0.0.8",

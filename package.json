@@ -48,7 +48,7 @@
       "lib": "src/classmentors"
     },
     "dependencies": {
-      "singpath-core": "github:singpath/singpath-core@^0.3.2"
+      "singpath-core": "github:singpath/singpath-core@^0.4.0"
     },
     "devDependencies": {
       "plugin-babel": "npm:systemjs-plugin-babel@^0.0.11"
