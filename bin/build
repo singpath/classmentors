@@ -6,7 +6,7 @@ NODE_ENV=production
 
 
 # Build variables.
-# THEY SHOULD BE SET VIA NPM RUN.
+# SOME SHOULD BE SET VIA NPM RUN.
 if [[ -z "$npm_package_config_build_dir" ]]; then
 	>&2 echo "npm_package_config_build_dir is not set"
 	exit 1
@@ -53,10 +53,22 @@ cp -r ${BUILD_ASSETS_DIR}/* $BUILD_DEST
 
 
 echo 'Building "'$SOURCE'" bundle in "'$OUTPUT_MIN'"...'
-echo 'The is exported as "'$GLOBAL_NAME'"'
-jspm build $SOURCE $OUTPUT_MIN \
+echo 'The app is exported as "'$GLOBAL_NAME'"'
+jspm build \
+	$SOURCE - angular - angular-route - angular-messages - angular-aria - angular-animate - angular-material - firebase - angularfire \
+	$OUTPUT_MIN \
 	--format umd --minify \
-	--global-name $GLOBAL_NAME
+	--global-name $GLOBAL_NAME \
+	--global-deps "{\
+		'angular/angular.js': 'angular',\
+		'angular-route/angular-route.js': 'angular',\
+		'angular-messages/angular-messages.js': 'angular',\
+		'angular-aria/angular-aria.js': 'angular',\
+		'angular-animate/angular-animate.js': 'angular',\
+		'angular-material/angular-material.js': 'angular',\
+		'firebase/firebase.js': 'Firebase',\
+		'angularfire/dist/angularfire.js': 'angular'\
+	}"
 
 
 echo 'Removing source map directive from "'${OUTPUT_MIN}'"...'
@@ -80,11 +92,6 @@ mv $OUTPUT_MIN $OUTPUT_MIN_WITH_HASH
 echo 'Replacing reference to "'$OUTPUT_MIN'" for "'$OUTPUT_MIN_WITH_HASH'"...'
 sed 's/app\.js/app.'${APP_HASH}'.js/g' $INDEX > "${INDEX}.temp"
 mv "${INDEX}.temp" $INDEX
-
-
-echo "Copying Ace editor assets..."
-cp src/jspm_packages/github/ajaxorg/ace-builds@*/worker-html.js       ${BUILD_DEST}/worker-html.js
-cp src/jspm_packages/github/ajaxorg/ace-builds@*/worker-javascript.js ${BUILD_DEST}/worker-javascript.js
 
 
 echo 'Creating archive in "'$BUILD_DIR'/'${APP_NAME}'.zip"...'

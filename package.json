@@ -48,7 +48,7 @@
       "lib": "src/classmentors"
     },
     "dependencies": {
-      "singpath-core": "github:singpath/singpath-core@^0.3.2"
+      "singpath-core": "github:singpath/singpath-core@^0.4.0"
     },
     "devDependencies": {
       "plugin-babel": "npm:systemjs-plugin-babel@^0.0.11"
@@ -57,6 +57,7 @@
       "ace": "github:ajaxorg/ace-builds@^1.2.3",
       "angular": "github:angular/bower-angular@^1.5.7",
       "angular-animate": "github:angular/bower-angular-animate@^1.5.7",
+      "angular-aria": "github:angular/bower-angular-aria@^1.5.7",
       "angular-loading-bar": "github:chieffancypants/angular-loading-bar@^0.8.0",
       "angular-material": "github:angular/bower-material@^1.0.9",
       "angular-messages": "github:angular/bower-angular-messages@^1.5.7",
