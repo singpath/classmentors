@@ -5,14 +5,14 @@
   </head>
   <body>
     <classmentors layout="row"></classmentors>
-
-		<script>
-			window.SINGPATH = {
-				firebaseId: 'singpath',
-        singpathURL: 'http://www.singpath.com/',
-        backendURL: 'http://backend.singpath.com/'
-			};
-		</script>
+    
     <script src="app.js"></script>
+		<script>
+      classmentors.bootstrap({
+        firebaseId: 'singpath',
+        singpathURL: 'http://www.singpath.com',
+        backendURL: 'http://api.singpath.com'
+      });
+		</script>
   </body>
 </html>
