@@ -1,7 +1,7 @@
 {
   "name": "classmentors",
   "exportAs": "classmentors",
-  "version": "0.4.9",
+  "version": "0.5.0",
   "description": "Class Mentors UI",
   "repository": "github:singpath/classmentors",
   "main": "src/classmentors/index.js",
