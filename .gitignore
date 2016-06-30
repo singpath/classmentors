@@ -5,6 +5,7 @@ coverage/
 npm-debug.log
 worker/*.env
 node_modules/
+dist/
 
 # Dev tools, IDE #
 ##################
