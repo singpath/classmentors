@@ -4,6 +4,7 @@ src/jspm_packages/
 coverage/
 npm-debug.log
 worker/*.env
+node_modules/
 
 # Dev tools, IDE #
 ##################
