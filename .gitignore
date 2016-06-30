@@ -1,11 +1,11 @@
 # Project specific files #
 ##########################
+node_modules/
 src/jspm_packages/
+dist/
 coverage/
 npm-debug.log
 worker/*.env
-node_modules/
-dist/
 
 # Dev tools, IDE #
 ##################
