@@ -1,14 +1,10 @@
-'use strict';
-
-import module from 'classmentors/module.js';
-
 /**
  * Label paths - to be used by each component to configure their route.
  *
  * See src/app/components/events for example.
  *
  */
-module.constant('routes', {
+const routes = {
   // home: '/events',
   home: '/profile/',
   aceOfCoders: '/ace-of-coders',
@@ -23,3 +19,5 @@ module.constant('routes', {
   setProfileCodeCombatId: '/profile/codeCombat',
   cohort:'/cohort'
 });
+
+export default routes;
