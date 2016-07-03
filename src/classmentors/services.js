@@ -1,5 +1,5 @@
 /**
- * classmentors/services/datastore.js
+ * classmentors/services.js
  */
 
 export function clmServiceFactory($q, $log, spfFirebase) {
