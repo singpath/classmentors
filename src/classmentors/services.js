@@ -821,7 +821,7 @@ export function clmDataStoreFactory(
           task.linkPattern &&
           solutions &&
           solutions[task.$id] &&
-          angular.isFunction(solutions[task.$id].match) &&
+          solutions[task.$id].match &&
           solutions[task.$id].match(task.linkPattern)
         );
       },

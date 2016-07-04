@@ -11,6 +11,8 @@ import linkTmpl from './events-view-provide-link.html!text';
 import responseTmpl from './events-view-provide-response.html!text';
 import './events.css!';
 
+const noop = () => undefined;
+
 export function configRoute($routeProvider, routes) {
   $routeProvider
     .when(routes.events, {
@@ -268,7 +270,7 @@ function viewEventCtrlInitialData($q, $route, spfAuth, spfAuthData, clmDataStore
   var errNoEvent = new Error('Event not found');
   var eventId = $route.current.params.eventId;
 
-  var profilePromise = clmDataStore.currentUserProfile().catch(angular.noop);
+  var profilePromise = clmDataStore.currentUserProfile().catch(noop);
 
   var eventPromise = clmDataStore.events.get(eventId).then(function(event) {
     if (event.$value === null) {
@@ -285,7 +287,7 @@ function viewEventCtrlInitialData($q, $route, spfAuth, spfAuthData, clmDataStore
   });
 
   return $q.all({
-    currentUser: spfAuthData.user().catch(angular.noop),
+    currentUser: spfAuthData.user().catch(noop),
     profile: profilePromise,
     event: eventPromise,
     canView: canviewPromise,
@@ -352,8 +354,8 @@ function ViewEventCtrl(
     );
   } else {
     monitorHandler = {
-      update: angular.noop,
-      unwatch: angular.noop
+      update: noop,
+      unwatch: noop
     };
   }
 
@@ -485,7 +487,7 @@ function ViewEventCtrl(
 
   this.removeParticipant = function(e, event, participant) {
     var confirm = $mdDialog.confirm()
-      .parent(angular.element($document.body))
+      .parent($document.body)
       .title(`Would you like to remove ${participant.user.displayName}?`)
       .content('The participant progress will be kept but he/she will not show as participant')
       .ariaLabel('Remove participant')
@@ -1064,7 +1066,7 @@ function ClmEventTableCtrl(
     var task = self.tasks.$getRecord(taskId);
 
     if (!task || (!task.textResponse && !task.linkPattern)) {
-      return angular.noop;
+      return noop;
     }
 
     return function(a, b) {
@@ -1308,7 +1310,7 @@ function ClmEventTableCtrl(
 
   this.removeParticipant = function(e, event, participant) {
     var confirm = $mdDialog.confirm()
-      .parent(angular.element($document.body))
+      .parent($document.body)
       .title(`Would you like to remove ${participant.user.displayName}?`)
       .content('The participant progress will be kept but he/she will not show as participant')
       .ariaLabel('Remove participant')
