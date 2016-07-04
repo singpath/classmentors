@@ -51,19 +51,16 @@
 
         <md-tab label="Results" ng-disabled="!ctrl.participants">
             <md-content layout-padding>
-                <md-switch class="md-primary" ng-model="ctrl.task.archived" aria-label="Archived?">
+                <md-switch class="md-primary" ng-model="ctrl.viewArchived" aria-label="Archived?">
                     View archived challenges
                 </md-switch>
                 <md-input-container flex layout="column">
-                    <md-select flex name="editTaskServiceId"
-                               ng-model="ctrl.task.serviceId" required placeholder="Select a Service">
-                        <md-option ng-value="opt" ng-repeat="opt in ['codeSchool', 'codeCombat', 'treeHouse', 'singPath']">
-                            {{opt}}
+                    <md-select flex name="selectChallengeResult"
+                               ng-model="ctrl" required placeholder="Select a challenge to view results">
+                        <md-option ng-value="task" ng-repeat="task in ctrl.tasks" ng-if="!task.archived || ctrl.viewArchived">
+                                {{task.title}}
                         </md-option>
                     </md-select>
-                    <div ng-messages="editTask.editTaskServiceId.$error">
-                        <div ng-message="required">A challenge needs a service id.</div>
-                    </div>
                 </md-input-container>
             </md-content>
         </md-tab>
