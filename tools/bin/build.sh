@@ -92,8 +92,12 @@ echo 'Replacing reference to "'$OUTPUT_MIN'" for "'$OUTPUT_MIN_WITH_HASH'"...'
 sed 's/app\.js/app.'${APP_HASH}'.js/g' "$INDEX" > "${INDEX}.temp"
 mv "${INDEX}.temp" "$INDEX"
 
-
-echo 'Creating archive in "'$BUILD_DIR'/'${APP_NAME}'.zip"...'
-cd "$BUILD_DIR"
-zip -r "${APP_NAME}.zip" "$APP_NAME"
-cd "$__PWD"
+if hash zip 2>/dev/null; then
+	echo 'Creating archive in "'$BUILD_DIR'/'${APP_NAME}'.zip"...'
+	cd "$BUILD_DIR"
+	zip -r "${APP_NAME}.zip" "$APP_NAME"
+	cd "$__PWD"
+else
+	echo '"zip" was not found.'
+	echo 'Skipping creating app archive.'
+fi
