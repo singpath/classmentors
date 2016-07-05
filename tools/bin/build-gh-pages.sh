@@ -3,8 +3,6 @@
 # exit with nonzero exit code if anything fails
 set -e
 
-__DIRNAME="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-__PWD="$(pwd)"
 NODE_ENV=production
 
 # Build variables.
@@ -60,7 +58,7 @@ else
 fi
 
 # go to the ${BUILD_DEST} directory and create a *new* Git repo
-cd ${BUILD_DEST}
+cd "${BUILD_DEST}"
 git init
 
 # inside this git repo we'll pretend to be a new user
