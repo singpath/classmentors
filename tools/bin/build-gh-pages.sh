@@ -66,18 +66,20 @@ git config user.name "${GIT_COMMIT_NAME}"
 git config user.email "${GIT_COMMIT_EMAIL}"
 
 # Set Firebase database name the app should target.
-sed -i.tmp "s/firebaseId: '[-a-zA-Z0-9]*'/firebaseId: '${PROD_FIREBASE_ID}'/g" index.html
+mv index.html index.html.tmp
+sed "s/firebaseId: '[-a-zA-Z0-9]*'/firebaseId: '${PROD_FIREBASE_ID}'/g" index.html.tmp > index.html
 
 # The first and only commit to this new Git repo contains all the
 # files present with the commit message "Deploy to GitHub Pages".
 git add .
 git commit -m "Deploy to GitHub Pages"
 
-# Revert Firebase DB target change
-mv index.html.tmp index.html
-
 # Force push from the current repo's master branch to the remote
 # repo's gh-pages branch. (All previous history on the gh-pages branch
 # will be lost, since we are overwriting it.) We redirect any ${BUILD_DEST}put to
 # /dev/null to hide any sensitive credential data that might otherwise be exposed.
 git push --force --quiet $GIT_REMOTE_URL master:gh-pages > /dev/null 2>&1
+
+# cleanup dist directory
+rm -rf .git
+mv index.html.tmp index.html
