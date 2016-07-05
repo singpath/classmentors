@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-__DIRNAME="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 __PWD="$(pwd)"
 NODE_ENV=production
 
