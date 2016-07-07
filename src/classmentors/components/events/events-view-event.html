@@ -62,9 +62,14 @@
                         </md-option>
                     </md-select>
                 </md-input-container>
-                <div>Selected challenge: {{ctrl.selected}}</br></br>
-
-                Event Answers: {{ctrl.solutions}}</div>
+                <div>
+                    Selected challenge: {{ctrl.selected}}
+                    </br></br>
+                    Event Answers:
+                </div>
+                <div ng-repeat="solution in ctrl.solutions">
+                    {{solution[ctrl.selected.$id]}}
+                </div>
                 <clm-event-result-table
                         ng-if="ctrl.selected"
                         event="ctrl.event"
