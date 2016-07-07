@@ -62,6 +62,19 @@
                         </md-option>
                     </md-select>
                 </md-input-container>
+                <div>Selected challenge: {{ctrl.selected}}</br></br>
+
+                Event Answers: {{ctrl.solutions}}</div>
+                <clm-event-result-table
+                        ng-if="ctrl.selected"
+                        event="ctrl.event"
+                        participants="ctrl.participants"
+                        tasks="ctrl.tasks"
+                        progress="ctrl.progress"
+                        solutions="ctrl.solutions"
+                        profile="ctrl.profile"
+                >
+                </clm-event-result-table>
             </md-content>
         </md-tab>
     </md-tabs>
