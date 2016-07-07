@@ -56,7 +56,7 @@
                 </md-switch>
                 <md-input-container flex layout="column">
                     <md-select flex name="selectChallengeResult"
-                               ng-model="ctrl" required placeholder="Select a challenge to view results">
+                               ng-model="ctrl.selected" required placeholder="Select a challenge to view results">
                         <md-option ng-value="task" ng-repeat="task in ctrl.tasks" ng-if="!task.archived || ctrl.viewArchived">
                                 {{task.title}}
                         </md-option>
