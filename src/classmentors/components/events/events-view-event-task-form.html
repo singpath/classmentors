@@ -5,9 +5,9 @@
                 <md-input-container flex>
                     <label for="edit-task-name">Name</label>
                     <input type="text" name="editTaskTitle" id="edit-task-name"
-                        ng-model="ctrl.task.title"
-                        required="required" ng-minLength="3" md-maxLength="30"
-                        placeholer="Challenge name"
+                           ng-model="ctrl.task.title"
+                           required="required" ng-minLength="3" md-maxLength="30"
+                           placeholer="Challenge name"
                     />
                     <div ng-messages="editTask.editTaskTitle.$error">
                         <div ng-message="required">A challenge needs a name.</div>
@@ -18,9 +18,9 @@
                 <md-input-container flex>
                     <label for="edit-task-priority">Priority</label>
                     <input type="number" name="editTaskPriority" id="edit-task-priority"
-                        ng-model="ctrl.task.priority"
-                        min="0" step="1"
-                        placeholer="Challenge priority"
+                           ng-model="ctrl.task.priority"
+                           min="0" step="1"
+                           placeholer="Challenge priority"
                     />
                     <div ng-messages="editTask.editTaskPriority.$error">
                         <div ng-message="number">The priority should be a positive number.</div>
@@ -33,9 +33,9 @@
             <md-input-container>
                 <label for="edit-task-desc">Description</label>
                 <textarea name="editTaskDesc" id="edit-task-desc"
-                    ng-model="ctrl.task.description"
-                    required="required" ng-minLength="3" md-maxLength="200"
-                    placeholer="Challenge description"
+                          ng-model="ctrl.task.description"
+                          required="required" ng-minLength="3" md-maxLength="200"
+                          placeholer="Challenge description"
                 ></textarea>
                 <div ng-messages="editTask.editTaskDesc.$error">
                     <div ng-message="required">A challenge needs a description.</div>
@@ -49,9 +49,9 @@
             <md-input-container>
                 <label for="edit-task-link">Help Link</label>
                 <input type="text" name="editTaskLink" id="edit-task-link"
-                    ng-model="ctrl.task.link"
-                    pattern="^(https?://.+|#/).+$"
-                    placeholer="URL to a challenge help page"
+                       ng-model="ctrl.task.link"
+                       pattern="^(https?://.+|#/).+$"
+                       placeholer="URL to a challenge help page"
                 />
                 <div ng-messages="editTask.editTaskLink.$error">
                     <div ng-message="pattern">Wrong format for an absolute or relative URL.</div>
@@ -83,7 +83,7 @@
                     Show all participant progress.
                 </md-switch>
             </p>
-            
+
             <p>
                 <md-switch class="md-primary" ng-model="ctrl.task.showLinks" aria-label="closed?">
                     Show all participant solutions.
@@ -115,19 +115,16 @@
                             <md-radio-button value="code" class="md-primary">Code</md-radio-button>
                             <md-radio-button value="video" class="md-primary">Video</md-radio-button>
                             <md-radio-button value="journalling" class="md-primary">Journalling</md-radio-button>
+                            <md-radio-button value="survey" class="md-primary">Survey</md-radio-button>
                         </td>
                     </tr>
                 </table>
             </md-radio-group>
         </div>
-        <div>
-            <h3>Survey</h3>
-            <md-checkbox value="survey" class="md-primary">Survey</md-checkbox>
-        </div>
         <div layout="row" ng-if="ctrl.taskType == 'service'">
             <md-input-container flex layout="column">
                 <md-select flex name="editTaskServiceId"
-                    ng-model="ctrl.task.serviceId" required placeholder="Select a Service">
+                           ng-model="ctrl.task.serviceId" required placeholder="Select a Service">
                     <md-option ng-value="opt" ng-repeat="opt in ['codeSchool', 'codeCombat', 'treeHouse', 'singPath']">
                         {{opt}}
                     </md-option>
@@ -138,8 +135,8 @@
             </md-input-container>
             <md-input-container flex layout="column" ng-if="ctrl.task.serviceId &amp;&amp; ctrl.task.serviceId != 'singPath'">
                 <md-select flex name="editTaskBadge"
-                    ng-model="ctrl.task.badge"
-                    placeholder="Select a badge (optional)"
+                           ng-model="ctrl.task.badge"
+                           placeholder="Select a badge (optional)"
                 >
                     <md-option ng-value="badge" ng-repeat="badge in ctrl.badges[ctrl.task.serviceId]">
                         {{badge.name}}
@@ -151,8 +148,8 @@
         <div layout="row" ng-if="ctrl.task.serviceId == 'singPath'">
             <md-input-container flex layout="column">
                 <md-select flex name="editTaskSingPathPath"
-                    ng-model="ctrl.task.singPathProblem.path"
-                    placeholder="Select a Path (optional)"
+                           ng-model="ctrl.task.singPathProblem.path"
+                           placeholder="Select a Path (optional)"
                 >
                     <md-option ng-value="opt" ng-repeat="opt in ctrl.singPath.paths">
                         {{opt.title}}
@@ -161,10 +158,10 @@
             </md-input-container>
             <md-input-container flex layout="column" ng-if="ctrl.task.singPathProblem.path">
                 <md-select flex name="editTaskSingPathLevel"
-                    ng-model="ctrl.task.singPathProblem.level"
-                    required
-                    md-on-open="ctrl.loadLevels(ctrl.task.singPathProblem)"
-                    placeholder="Select a Level"
+                           ng-model="ctrl.task.singPathProblem.level"
+                           required
+                           md-on-open="ctrl.loadLevels(ctrl.task.singPathProblem)"
+                           placeholder="Select a Level"
                 >
                     <md-option ng-value="opt" ng-repeat="opt in ctrl.singPath.levels">
                         {{opt.title}}
@@ -176,10 +173,10 @@
             </md-input-container>
             <md-input-container flex layout="column" ng-if="ctrl.task.singPathProblem.level">
                 <md-select flex name="editTaskSingPathProblem"
-                    ng-model="ctrl.task.singPathProblem.problem"
-                    required
-                    md-on-open="ctrl.loadProblems(ctrl.task.singPathProblem)"
-                    placeholder="Select a Problem"
+                           ng-model="ctrl.task.singPathProblem.problem"
+                           required
+                           md-on-open="ctrl.loadProblems(ctrl.task.singPathProblem)"
+                           placeholder="Select a Problem"
                 >
                     <md-option ng-value="opt" ng-repeat="opt in ctrl.singPath.problems">
                         {{opt.title}}
@@ -195,9 +192,9 @@
             <md-input-container>
                 <label for="edit-link-pattern">Link pattern</label>
                 <input type="text" name="editTaskLink" id="edit-link-pattern"
-                    ng-model="ctrl.task.linkPattern"
-                    required="true"
-                    placeholer="Pattern"
+                       ng-model="ctrl.task.linkPattern"
+                       required="true"
+                       placeholer="Pattern"
                 />
                 <div ng-messages="editTask.editTaskLink.$error">
                     <div ng-message="required">Required.</div>
@@ -209,9 +206,9 @@
             <md-input-container>
                 <label for="edit-text-esponse">Question</label>
                 <input type="text" name="editTextResponse" id="edit-text-esponse"
-                    ng-model="ctrl.task.textResponse"
-                    required="true"
-                    placeholer="Question"
+                       ng-model="ctrl.task.textResponse"
+                       required="true"
+                       placeholer="Question"
                 />
                 <div ng-messages="editTask.editTextResponse.$error">
                     <div ng-message="required">Required.</div>
@@ -251,3 +248,4 @@
 
     </form>
 </md-content>
+

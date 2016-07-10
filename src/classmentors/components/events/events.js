@@ -9,6 +9,7 @@ import pagerTmpl from './events-view-pager.html!text';
 import passwordTmpl from './events-view-password.html!text';
 import linkTmpl from './events-view-provide-link.html!text';
 import responseTmpl from './events-view-provide-response.html!text';
+
 import './events.css!';
 
 const noop = () => undefined;
@@ -748,7 +749,7 @@ function AddEventTaskCtrl(
       $location.path(urlFor('editEvent', {eventId: self.event.$id}));
     }).catch(function(err) {
       $log.error(err);
-      spfAlert.error('Failed to created new task');
+      spfAlert.error('Failed to create new task');
     }).finally(function() {
       self.creatingTask = false;
     });
