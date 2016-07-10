@@ -115,7 +115,6 @@
                             <md-radio-button value="code" class="md-primary">Code</md-radio-button>
                             <md-radio-button value="video" class="md-primary">Video</md-radio-button>
                             <md-radio-button value="journalling" class="md-primary">Journalling</md-radio-button>
-                            <md-radio-button value="survey" class="md-primary">Survey</md-radio-button>
                         </td>
                     </tr>
                 </table>
@@ -238,6 +237,11 @@
         </div>
 
         <div layout="row" layout-align="center center">
+            <!--TODO:
+            1. Create continue button controller to route to other views depending on challenge type
+            2. -->
+
+            <md-button type="button" class="md-raised" ng-href="" ng-disabled>Continue</md-button>
             <md-button type="submit" class="md-raised md-primary" ng-disabled="editTask.$invalid || !ctrl.taskType ||ctrl.savingTask">Save</md-button>
             <md-button type="reset" class="md-raised" ng-href="#{{ 'editEvent' | urlFor: {eventId: ctrl.event.$id} }}">Back</md-button>
         </div>
