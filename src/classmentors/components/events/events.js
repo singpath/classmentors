@@ -52,6 +52,7 @@ export function configRoute($routeProvider, routes) {
       }
     })
 
+
     .when(routes.addEventTask, {
       template: eventTaskFormTmpl,
       controller: AddEventTaskCtrl,
