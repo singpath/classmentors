@@ -685,6 +685,7 @@ addEventTaskCtrlInitialData.$inject = ['$q', '$route', 'spfAuthData', 'clmDataSt
 function AddEventTaskCtrl(
   initialData, $location, $log, spfFirebase, spfAlert, urlFor, spfNavBarService, clmDataStore
 ) {
+
   var self = this;
 
   this.event = initialData.event;
@@ -693,6 +694,7 @@ function AddEventTaskCtrl(
   this.singPath = initialData.singPath;
   this.savingTask = false;
   this.task = {archived: false};
+  this.enableBeta = false;
 
   spfNavBarService.update(
     'New Challenge', [{
@@ -718,6 +720,31 @@ function AddEventTaskCtrl(
       self.singPath.problems = problems;
     });
   };
+
+  //TODO: fill in respective routes for various challenge types.
+  //TODO: grab form data.
+  this.challengeRouteProvider = function(tasktype){
+    if(tasktype == 'service'){
+      console.log('service is clicked');
+    }else if(tasktype == 'singPath'){
+      console.log('singpath is clicked');
+    }else if(tasktype == 'linkPattern'){
+      console.log('linkPattern is clicked');
+    }else if(tasktype == 'textResponse'){
+      console.log('textResponse is clicked');
+    }else if(tasktype == 'indexCard'){
+      console.log('indexCard is clicked');
+    }else if(tasktype == 'multipleChoice'){
+      console.log('multipleChoice is clicked');
+      return '/challenges/mcq'
+    }else if(tasktype == 'code'){
+      console.log('code is clicked');
+    }else if(tasktype == 'video'){
+      console.log('video is clicked');
+    }else if(tasktype == 'journalling'){
+      console.log('journalling is clicked');
+    }
+  }
 
   this.saveTask = function(event, _, task, taskType, isOpen) {
     var copy = spfFirebase.cleanObj(task);
