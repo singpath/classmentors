@@ -58,7 +58,9 @@
                 </div>
             </md-input-container>
         </div>
-
+            <md-switch class="md-primary" ng-model="ctrl.enableBeta" aria-label="closed?">
+                Enable BETA functions (WARNING: MAY BREAK STUFF)
+            </md-switch>
         <div>
             <h3>options</h3>
             <p>
@@ -241,7 +243,7 @@
             1. Create continue button controller to route to other views depending on challenge type
             2. -->
 
-            <md-button type="button" class="md-raised" ng-href="{{ctrl.challengeRouteProvider(ctrl.taskType)}}">Continue</md-button>
+            <md-button type="button" class="md-raised" ng-disabled="!ctrl.enableBeta" ng-href="#{{ctrl.challengeRouteProvider(ctrl.taskType)}}">Continue</md-button>
             <md-button type="submit" class="md-raised md-primary" ng-disabled="editTask.$invalid || !ctrl.taskType ||ctrl.savingTask">Save</md-button>
             <md-button type="reset" class="md-raised" ng-href="#{{ 'editEvent' | urlFor: {eventId: ctrl.event.$id} }}">Back</md-button>
         </div>
