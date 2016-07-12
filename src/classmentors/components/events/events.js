@@ -685,6 +685,7 @@ addEventTaskCtrlInitialData.$inject = ['$q', '$route', 'spfAuthData', 'clmDataSt
 function AddEventTaskCtrl(
   initialData, $location, $log, spfFirebase, spfAlert, urlFor, spfNavBarService, clmDataStore
 ) {
+
   var self = this;
 
   this.event = initialData.event;
@@ -693,6 +694,7 @@ function AddEventTaskCtrl(
   this.singPath = initialData.singPath;
   this.savingTask = false;
   this.task = {archived: false};
+  this.enableBeta = false;
 
   spfNavBarService.update(
     'New Challenge', [{
@@ -720,6 +722,7 @@ function AddEventTaskCtrl(
   };
 
   //TODO: fill in respective routes for various challenge types.
+  //TODO: grab form data.
   this.challengeRouteProvider = function(tasktype){
     if(tasktype == 'service'){
       console.log('service is clicked');
@@ -733,6 +736,7 @@ function AddEventTaskCtrl(
       console.log('indexCard is clicked');
     }else if(tasktype == 'multipleChoice'){
       console.log('multipleChoice is clicked');
+      return '/challenges/mcq'
     }else if(tasktype == 'code'){
       console.log('code is clicked');
     }else if(tasktype == 'video'){
