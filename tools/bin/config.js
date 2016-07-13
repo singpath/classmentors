@@ -45,6 +45,7 @@ const externals = [{
 }];
 
 exports.name = pkg.name;
+
 exports.build = {
   root: config.buildDir,
   app: {
@@ -87,6 +88,6 @@ exports.build = {
   }
 
 };
-exports.coverage = {
-  root: 'coverage/'
-}
+
+exports.coverage = {root: 'coverage/'};
+exports.test = {main: 'classmentors/index.specs.js'};

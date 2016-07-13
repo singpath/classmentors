@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 'use strict';
 
+const config = require('./config.js');
 const sh = require('shelljs');
 const tools = require('@singpath/tools');
-const config = require('./config.js');
 
 sh.set('-e');
 

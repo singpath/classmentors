@@ -7,9 +7,9 @@
 
 
 // dependencies
-const tools = require('@singpath/tools');
-const sh = require('shelljs');
 const config = require('./config');
+const sh = require('shelljs');
+const tools = require('@singpath/tools');
 
 // exit on error
 sh.set('-e');
