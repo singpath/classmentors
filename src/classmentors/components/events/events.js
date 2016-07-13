@@ -683,7 +683,7 @@ addEventTaskCtrlInitialData.$inject = ['$q', '$route', 'spfAuthData', 'clmDataSt
  *
  */
 function AddEventTaskCtrl(
-  initialData, $location, $log, spfFirebase, spfAlert, urlFor, spfNavBarService, clmDataStore
+  initialData, $location, $log, spfFirebase, spfAlert, urlFor, spfNavBarService, clmDataStore, $mdDialog, $scope
 ) {
 
   var self = this;
@@ -726,25 +726,53 @@ function AddEventTaskCtrl(
   this.challengeRouteProvider = function(tasktype){
     if(tasktype == 'service'){
       console.log('service is clicked');
+
     }else if(tasktype == 'singPath'){
       console.log('singpath is clicked');
+
     }else if(tasktype == 'linkPattern'){
       console.log('linkPattern is clicked');
+
     }else if(tasktype == 'textResponse'){
       console.log('textResponse is clicked');
+
     }else if(tasktype == 'indexCard'){
       console.log('indexCard is clicked');
+
     }else if(tasktype == 'multipleChoice'){
       console.log('multipleChoice is clicked');
       return '/challenges/mcq'
+
     }else if(tasktype == 'code'){
       console.log('code is clicked');
+
     }else if(tasktype == 'video'){
       console.log('video is clicked');
+
     }else if(tasktype == 'journalling'){
       console.log('journalling is clicked');
     }
   }
+
+    //todo: this function double checks with user if he wishes to go back and discard all changes thus far
+    this.discardNewChallenge = function (ev,task){
+        var confirm = $mdDialog.confirm()
+            .title('Would you like to discard your changes?')
+            .textContent('All of the information input will be discarded. Are you sure you want to continue?')
+            .ariaLabel('Discard changes')
+            .targetEvent(ev)
+            .ok('Discard All')
+            .cancel('Bring me back');
+        $mdDialog.show(confirm).then(function() {
+            // decided to discard data, bring user to previous page
+            $location.path(urlFor('editEvent', {eventId: self.event.$id}));
+
+        }), function() {
+            //go back to the current page
+            //todo: preserve the data that was keyed into form. (data should not be saved into the db yet)
+
+        };
+    }
 
   this.saveTask = function(event, _, task, taskType, isOpen) {
     var copy = spfFirebase.cleanObj(task);
@@ -790,7 +818,9 @@ AddEventTaskCtrl.$inject = [
   'spfAlert',
   'urlFor',
   'spfNavBarService',
-  'clmDataStore'
+  'clmDataStore',
+  '$mdDialog',
+    '$scope'
 ];
 
 /**
