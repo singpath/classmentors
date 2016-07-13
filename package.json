@@ -495,7 +495,7 @@
     "serve": "node ./tools/bin/server.js src/",
     "serve-build": "node ./tools/bin/server.js ${npm_package_config_buildDir}/${npm_package_name}",
     "start": "node ./tools/bin/server.js src/",
-    "test": "bash ./tools/bin/test.sh",
+    "test": "node ./tools/bin/test.js",
     "travis-setup": "node ./tools/bin/travis-setup.js"
   },
   "keywords": [],
