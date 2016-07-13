@@ -486,7 +486,7 @@
   "scripts": {
     "build": "node ./tools/bin/build.js",
     "build:gh-pages": "bash ./tools/bin/build-gh-pages.sh",
-    "clean": "bash ./tools/bin/clean.sh",
+    "clean": "node ./tools/bin/clean.js",
     "cover": "bash ./tools/bin/coverage.sh",
     "coveralls": "bash ./tools/bin/coveralls.sh",
     "keygen": "bash ./tools/bin/keygen.sh",
