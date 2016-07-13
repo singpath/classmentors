@@ -17,7 +17,7 @@ script:
   - npm run test
   - npm run coveralls
 after_success:
-  - ./bin/build-gh-pages-travis
+  - ./tools/bin/build-gh-pages-travis.sh
 `.trimLeft();
 
 if (!travis) {
