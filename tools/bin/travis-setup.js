@@ -1,48 +1,44 @@
 #!/usr/bin/env node
 'use strict';
 
-const fs = require('fs');
-const sh = require('child_process');
+const sh = require('shelljs');
+const tools = require('@singpath/tools');
 const yaml = require('js-yaml');
+const travis = sh.which('travis');
+
+sh.set('-e');
 
 const travisFile = './.travis.yml';
 const travisInit = `
 language: node_js
 node_js:
-- '4.2'
+  - '4'
 script:
-- npm run lint
-- npm run test
+  - npm run test
+  - npm run coveralls
 after_success:
-- ./bin/build-gh-pages-travis
+  - ./bin/build-gh-pages-travis
 `.trimLeft();
-const travis = sh.spawnSync('which', ['travis']);
 
-if (travis.status !== 0) {
-  console.error('Travis is not install.');
-  console.error('Run "gem install travis".');
-  process.exit(1);
+if (!travis) {
+  process.stderr.write('Travis is not install.\n');
+  process.stderr.write('Run "gem install travis".\n');
+  sh.exit(1);
 }
 
-console.log(`Initiating "${travisFile}"...`);
-fs.writeFileSync(travisFile, travisInit);
+sh.echo(`Initiating "${travisFile}"...`);
+new sh.ShellString(travisInit).to(travisFile);
 
-console.log(`setting up release...
+sh.echo(`setting up release...
 Please provide you github credentials (they won't hit Travis server);
 The file to upload is dist/classmentors.zip;
 Deploy should occure from singpath/classmentors;
 The API key should be encrypted.
 `);
-const release = sh.spawnSync('travis', ['setup', 'releases', '-r', 'singpath/classmentors'], {
-  stdio: [0, 1, 2]
-});
+tools.exec('travis setup releases -r singpath/classmentors');
 
-if (release.status !== 0) {
-  console.error('Failed setup github release.');
-  process.exit(2);
-}
 
-const travisConfig = yaml.safeLoad(fs.readFileSync(travisFile, 'utf8'));
+const travisConfig = yaml.safeLoad(sh.cat(travisFile));
 
 travisConfig.deploy = {
   provider: 'releases',
@@ -55,5 +51,7 @@ travisConfig.deploy = {
   api_key: travisConfig.deploy.api_key
 };
 
-fs.writeFileSync(travisFile, yaml.safeDump(travisConfig).replace(/\'on\':/, 'on:'));
-console.log('Travis release setup.');
+new sh.ShellString(
+  yaml.safeDump(travisConfig).replace(/\'on\':/, 'on:')
+).to(travisFile);
+sh.echo('Travis release setup.');
