@@ -489,7 +489,7 @@
     "clean": "node ./tools/bin/clean.js",
     "cover": "node ./tools/bin/coverage.js",
     "coveralls": "bash ./tools/bin/coveralls.sh",
-    "keygen": "bash ./tools/bin/keygen.sh",
+    "keygen": "node ./tools/bin/keygen.js",
     "lint": "eslint src/",
     "postinstall": "jspm install",
     "serve": "node ./tools/bin/server.js src/",

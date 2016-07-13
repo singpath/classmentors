@@ -89,5 +89,11 @@ exports.build = {
 
 };
 
+exports.serve = {
+  root: pkg.jspm.directories.baseURL,
+  port: config.port,
+  certs: {root: config.certsDir}
+};
+
 exports.coverage = {root: 'coverage/'};
 exports.test = {main: 'classmentors/index.specs.js'};
