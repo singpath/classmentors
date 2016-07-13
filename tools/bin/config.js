@@ -80,7 +80,12 @@ exports.build = {
 
     get tree() {
       return path.join(this.root, 'tree.html');
+    },
+
+    get git() {
+      return path.join(this.root, '.git');
     }
+
   },
 
   get archive() {

@@ -485,7 +485,7 @@
   },
   "scripts": {
     "build": "node ./tools/bin/build.js",
-    "build:gh-pages": "bash ./tools/bin/build-gh-pages.sh",
+    "build:gh-pages": "node ./tools/bin/build-gh-pages.js",
     "clean": "node ./tools/bin/clean.js",
     "cover": "node ./tools/bin/coverage.js",
     "coveralls": "bash ./tools/bin/coveralls.sh",
