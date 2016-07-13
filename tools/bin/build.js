@@ -41,9 +41,14 @@ tools.exec(`${cmd} "${config.build.app.minJs}" ${umdOpts} --minify`);
 sh.echo(`Removing source map directive from ${config.build.app.minJs}...`);
 sh.sed('-i', /^\/\/# sourceMappingURL=.*$/, '', config.build.app.minJs);
 
-sh.echo('Analysing source map...');
-sh.exec(`source-map-explorer --html "${config.build.app.minJs}"{,.map}`, {silent: true})
+sh.echo(`Analysing source map using ${config.build.app.minJs}...`);
+sh.echo(`Will save tree in ${config.build.app.tree}`);
+sh.exec(`source-map-explorer --html "${config.build.app.minJs}"{,.map}`)
   .to(config.build.app.tree);
+
+// sh.exec(`source-map-explorer --html "${config.build.app.minJs}"{,.map}`, {silent: true})
+//   .to(config.build.app.tree);
+
 sh.echo(`open "${config.build.app.tree}" to find weight of each modules.`);
 
 // Archive
