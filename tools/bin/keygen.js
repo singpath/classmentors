@@ -5,7 +5,6 @@
  * Run example-app unit tests.
  */
 
-const path = require('path');
 const config = require('./config.js');
 const sh = require('shelljs');
 const tools = require('@singpath/tools');
@@ -25,11 +24,9 @@ sh.echo(`Setting up "${config.serve.certs.root}/"...`);
 sh.mkdir('-p', config.serve.certs.root);
 
 // creating keys
-const key = path.join(config.serve.certs.root, 'localhost.key');
-const cert = path.join(config.serve.certs.root, 'localhost.cert');
 const subj = '/C=SG/ST=Denial/L=Singapore/O=Dis/CN=localhost';
 const year = 365;
 const opts = `-x509 -nodes -newkey rsa:4096 -new -days ${3 * year} -subj "${subj}"`;
 
 sh.echo('Creating new self-signed SSL certificate...');
-tools.exec(`openssl req ${opts} -keyout ${key} -out ${cert}`);
+tools.exec(`openssl req ${opts} -keyout ${config.serve.certs.key} -out ${config.serve.certs.cert}`);

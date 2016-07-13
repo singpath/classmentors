@@ -90,9 +90,18 @@ exports.build = {
 };
 
 exports.serve = {
-  root: pkg.jspm.directories.baseURL,
+  root: path.resolve(pkg.jspm.directories.baseURL),
   port: config.port,
-  certs: {root: config.certsDir}
+  certs: {
+    root: path.resolve(config.certsDir),
+
+    get key() {
+      return path.join(this.root, 'localhost.key');
+    },
+    get cert() {
+      return path.join(this.root, 'localhost.cert');
+    }
+  }
 };
 
 exports.coverage = {root: 'coverage/'};
