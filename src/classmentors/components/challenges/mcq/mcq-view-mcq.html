@@ -6,7 +6,7 @@
         <br><br>
     </div>
 
-    <form name="continueMCQ">
+    <div name="continueMCQ">
         <!-- toggle buttons -->
 
         <p>
@@ -16,7 +16,7 @@
             <md-input-container >
                 <label for="edit-time-limit">Time Limit (in minute)</label>
                 <input type="number" name="editTimeLimit" id="edit-time-limit"
-                       ng-model=""
+                       ng-model="ctrl.task.timelimit"
                        min="0" step="1"
                        placeholer="Time Limit for the quiz" value=""
                 />
@@ -130,7 +130,10 @@
         </div>
 
         <br>
-        <md-button type="submit" class="md-raised md-primary">Save</md-button>
-        <md-button type="reset" class="md-raised" ng-click="ctrl.discardChanges($event,ctrl.task)">Back</md-button>
+
+        <div align="center">
+            <md-button type="submit" class="md-raised md-primary">Save</md-button>
+            <md-button type="reset" class="md-raised" ng-click="ctrl.discardChanges($event,ctrl.task)">Back</md-button>
+        </div>
     </form>
 </md-content>
