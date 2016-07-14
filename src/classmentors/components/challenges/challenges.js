@@ -22,3 +22,4 @@ configRoute.$inject = ['$routeProvider', 'routes'];
 // export const component = {
 //
 // }
+
