@@ -48,6 +48,7 @@ tools.exec('git commit -m "Deploy to GitHub Pages"');
 // # will be lost, since we are overwriting it.) We redirect any ${BUILD_DEST}put to
 // # /dev/null to hide any sensitive credential data that might otherwise be exposed.
 tools.exec(`git push --force --quiet ${remoteUrl} master:gh-pages`, {
+  printCmd: false,
   ignoreStdout: true,
   ignoreStderr: true
 });
