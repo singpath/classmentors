@@ -694,7 +694,7 @@ function AddEventTaskCtrl(
   this.singPath = initialData.singPath;
   this.savingTask = false;
   this.task = {archived: false};
-  this.enableBeta = false;
+  this.enableBeta = true;
 
   spfNavBarService.update(
     'New Challenge', [{
