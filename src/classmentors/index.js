@@ -14,6 +14,7 @@ import * as profiles from 'classmentors/components/profiles/profiles.js';
 import * as cohort from 'classmentors/components/cohort/cohort.js';
 import * as challenges from 'classmentors/components/challenges/challenges.js';
 // import * as mcq from 'classmentors/components/challenges/mcq/mcq.js';
+import * as surveys from 'classmentors/componenets/challenges/survey/survey.js';
 
 module.factory('clmService', services.clmServiceFactory);
 module.factory('clmDataStore', services.clmDataStoreFactory);
@@ -63,7 +64,8 @@ module.constant('routes', {
   editProfile: '/profile/',
   setProfileCodeCombatId: '/profile/codeCombat',
   cohort: '/cohort',
-  viewMcq: '/challenges/mcq'
+  viewMcq: '/challenges/mcq',
+  viewSurvey: '/challenges/survey'
 });
 
 module.config([
