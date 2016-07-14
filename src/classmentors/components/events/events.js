@@ -754,7 +754,7 @@ function AddEventTaskCtrl(
     }
   }
 
-    //todo: this function double checks with user if he wishes to go back and discard all changes thus far
+    //this function double checks with user if he wishes to go back and discard all changes thus far
     this.discardChanges = function (ev,task){
         var confirm = $mdDialog.confirm()
             .title('Would you like to discard your changes?')
@@ -928,7 +928,7 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBar
     }]
   );
 
-  //todo: this function double checks with user if he wishes to go back and discard all changes thus far
+  //this function double checks with user if he wishes to go back and discard all changes thus far
   this.discardChanges = function (ev,task){
     var confirm = $mdDialog.confirm()
         .title('Would you like to discard your changes?')
