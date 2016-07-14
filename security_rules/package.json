@@ -12,17 +12,21 @@
   "devDependencies": {
     "chai": "3.5.0",
     "coveralls": "^2.11.9",
+    "eslint": "^2.13.1",
+    "eslint-config-singpath": "0.0.3",
     "istanbul": "^0.4.3",
     "istanbul-coveralls": "^1.0.3",
     "mocha": "2.4.5",
     "mocha-lcov-reporter": "^1.2.0",
+    "mockfirebase": "latest",
+    "proxyquire": "latest",
+    "sinon": "latest",
     "superagent": "1.8.3",
-    "targaryen": "^2.1.1",
-    "proxyquire":"latest",
-    "sinon":"latest",
-    "mockfirebase":"latest"
+    "targaryen": "^2.1.1"
   },
   "scripts": {
+    "lint": "eslint test/",
+    "format": "eslint test/ --fix",
     "test": "node ./node_modules/mocha/bin/mocha test",
     "coverage": "node ./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha",
     "travis-ci": "node ./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha && ./node_modules/.bin/istanbul-coveralls;"
