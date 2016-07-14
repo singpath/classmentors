@@ -1,23 +1,19 @@
 #!/usr/bin/env node
+'use strict';
 
+const config = require('./config');
 const finalhandler = require('finalhandler');
 const fs = require('fs');
 const http2 = require('http2');
-const morgan = require('morgan');
-const path = require('path');
-const serveStatic = require('serve-static');
 const https = require('https');
+const morgan = require('morgan');
+const serveStatic = require('serve-static');
+const sh = require('shelljs');
 
-const defaults = {
-  port: 8081,
-  www: path.join(__dirname, '../../src'),
-  certsDir: path.join(__dirname, '../certs')
-};
-const www = process.argv.slice(2).pop() || defaults.www;
-const port = process.env.npm_package_config_port || defaults.port;
-const certsDir = process.env.npm_package_config_certs_dir || defaults.certsDir;
-const cert = fs.readFileSync(path.join(certsDir, 'localhost.cert'));
-const key = fs.readFileSync(path.join(certsDir, 'localhost.key'));
+const www = process.argv.slice(2).pop() || config.serve.root;
+const port = config.serve.port;
+const cert = fs.readFileSync(config.serve.certs.cert);
+const key = fs.readFileSync(config.serve.certs.key);
 
 const logger = morgan('dev');
 const serve = serveStatic(www, {index: ['index.html']});
@@ -50,21 +46,23 @@ const proxy = (req, resp, next) => {
       resp.end();
     });
   });
+
+  return undefined;
 };
 const use = (req, resp, middlewares) => {
   middlewares.reverse().reduce((next, handler) => {
     return err => {
       if (err) {
-        next(err);
+        return next(err);
       }
 
-      handler(req, resp, next);
+      return handler(req, resp, next);
     };
   }, finalhandler(req, resp))();
 };
 
 const server = http2.createServer({key, cert}, (req, resp) => use(req, resp, [logger, proxy, serve]));
 
-server.listen(port, () => console.log(
+server.listen(port, () => sh.echo(
   `Dev server listening on https://localhost:${port} (don't forget to use "HTTPS")`
 ));
