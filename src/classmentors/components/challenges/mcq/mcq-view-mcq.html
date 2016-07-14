@@ -1,3 +1,136 @@
 <md-content flex class="md-padding">
-<h3>Title</h3>
+    <div align="center">
+        <h3>Multiple Choice</h3>
+        <h4>Title {{ctrl.task.title}}</h4>
+        <h4>Description {{ctrl.task.description}}</h4>
+        <br><br>
+    </div>
+
+    <form name="continueMCQ">
+        <!-- toggle buttons -->
+
+        <p>
+            <md-switch class="md-primary" ng-model="ctrl.timelimit" aria-label="">
+                Set time limit for the entire quiz
+            </md-switch>
+            <md-input-container >
+                <label for="edit-time-limit">Time Limit (in minute)</label>
+                <input type="number" name="editTimeLimit" id="edit-time-limit"
+                       ng-model=""
+                       min="0" step="1"
+                       placeholer="Time Limit for the quiz" value=""
+                />
+                <div ng-messages="">
+                    <div ng-message="number">Time limit allowed should be a positive number in minutes.</div>
+                </div>
+            </md-input-container>
+        </p>
+
+        <p>
+            <h5>Pre/Post Quiz Surveys</h5>
+            // Q: will people choose the same pre-post survey?
+
+            <md-switch class="md-primary" ng-model="ctrl.prequiz" aria-label="">
+                Enable pre-quiz survey
+            </md-switch>
+            <!--todo: dropdown list of pre-quiz survey-->
+
+            <md-switch class="md-primary" ng-model="ctrl.postquiz" aria-label="">
+                Enable post-quiz survey
+            </md-switch>
+        <!--todo: dropdown list of post-quiz survey-->
+
+
+        </p>
+
+        <p>
+        <h5>Pre/Post Quiz Video</h5>
+            <md-switch class="md-primary" ng-model="ctrl.previd" aria-label="">
+                Enable pre-quiz video
+            </md-switch>
+            <!--todo: ask for link to the video-->
+
+
+            <md-switch class="md-primary" ng-model="ctrl.postvid" aria-label="">
+                Enable post-quiz video
+            </md-switch>
+            <!--todo: ask for link to the video-->
+
+
+        </p>
+
+        <p>
+            <h5>Questions</h5>
+            <md-switch class="md-primary" ng-model="" aria-label="">
+                Randomise questions order
+            </md-switch>
+
+            <md-switch class="md-primary" ng-model="" aria-label="">
+                Randomise options order
+            </md-switch>
+        </p>
+
+        <p>
+            <h5>Team Mode</h5>
+            <md-switch class="md-primary" ng-model="" aria-label="">
+                Enable team answering mode
+            </md-switch>
+        </p>
+
+        <!--questions-->
+        <div align="center">
+            <h4>Questions</h4>
+        </div>
+
+        <div align="center" layout="row">
+            <md-input-container flex>
+                <label for="edit-question">Question</label>
+                <input type="text" name="editQuestion" id="edit-question"
+                       ng-model="ctrl.task.question"
+                       placeholer="Question" value=""
+                />
+                <div ng-messages="">
+                    <div ng-message="pattern">Some error here.</div>
+                </div>
+            </md-input-container>
+        </div>
+
+        <div align="center" layout="row">
+            <!--single answer or no?-->
+            <md-switch class="md-primary" ng-model="ctrl.isSingleAnswer" aria-label="single answer?">
+                Single answer only
+            </md-switch>
+        </div>
+
+        <!--answer options-->
+        <div align="center" layout="row">
+            <!--todo: enable to add new options -->
+
+
+            <md-input-container flex>
+                <label for="q-option">Option</label>
+                <input type="text" name="editQuestion" id="q-option"
+                       ng-model="ctrl.task.option"
+                       placeholer="Options" value=""
+                />
+                <div ng-messages="">
+                    <div ng-message="pattern">Some error here.</div>
+                </div>
+            </md-input-container>
+        </div>
+
+        <div align="center" layout="row">
+                <md-button type="button" class="md-raised">Add options</md-button>
+        </div>
+
+        <br>
+        <div align="center" layout="row">
+            <!--todo: can add new set of question-->
+            <md-button type="button" class="md-raised">Add questions</md-button>
+        </div>
+
+        <br>
+        <md-button type="submit" class="md-raised">Save</md-button>
+        <md-button type="reset" class="md-raised" ng-click="ctrl.discardChanges($event,ctrl.task)">Back</md-button>
+    </form>
 </md-content>
