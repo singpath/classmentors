@@ -79,7 +79,7 @@
 
         <!--questions-->
         <div align="center">
-            <h4>Questions</h4>
+            <h4>Question Details</h4>
         </div>
 
         <div align="center" layout="row">
@@ -95,7 +95,7 @@
             </md-input-container>
         </div>
 
-        <div align="center" layout="row">
+        <div align="center">
             <!--single answer or no?-->
             <md-switch class="md-primary" ng-model="ctrl.isSingleAnswer" aria-label="single answer?">
                 Single answer only
@@ -119,18 +119,18 @@
             </md-input-container>
         </div>
 
-        <div align="center" layout="row">
-                <md-button type="button" class="md-raised">Add options</md-button>
+        <div align="center" >
+                <md-button type="button" class="md-raised md-primary" ng-disabled="ctrl.isSingleAnswer">Add option</md-button>
         </div>
 
         <br>
-        <div align="center" layout="row">
+        <div align="center">
             <!--todo: can add new set of question-->
-            <md-button type="button" class="md-raised">Add questions</md-button>
+            <md-button type="button" class="md-raised md-primary">Add question</md-button>
         </div>
 
         <br>
-        <md-button type="submit" class="md-raised">Save</md-button>
+        <md-button type="submit" class="md-raised md-primary">Save</md-button>
         <md-button type="reset" class="md-raised" ng-click="ctrl.discardChanges($event,ctrl.task)">Back</md-button>
     </form>
 </md-content>

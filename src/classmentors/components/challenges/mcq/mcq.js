@@ -32,6 +32,8 @@ export function showTmpl(){
 
 // this function controls the view behaviours
 function viewCtrl ($mdDialog,$location,urlFor){
+    this.isSingleAnswer = false;
+
     //this function double checks with user if he wishes to go back and discard all changes thus far
     this.discardChanges = function (ev,task){
         var confirm = $mdDialog.confirm()
