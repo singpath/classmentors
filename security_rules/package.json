@@ -5,6 +5,7 @@
   "author": "Chris Boesch <scboesch@gmail.com>",
   "homepage": "http://chrisboesch.com",
   "dependencies": {
+    "deep-assign": "^2.0.0",
     "firebase": "2.4.2",
     "firebase-queue": "latest",
     "request": "latest"

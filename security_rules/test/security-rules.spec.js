@@ -3,10 +3,39 @@
 var chai = require('chai');
 var expect = chai.expect;
 var targaryen = require('targaryen');
+var deepAssign = require('deep-assign');
 
-var exportData = require('./singpath-play-export.json'); // with path
+var exportData = require('./singpath-play-export.json');
+var rules = require('../security-rules.json');
 
-var rules = require('../security-rules.json'); // with path
+/**
+ * Set targaryen's firebase data by complining singpath-play-export data
+ * with the patch.
+ *
+ * Note with will merge each data node. To remove a node, the patch needs set it
+ * to null:
+ *
+ * @example
+ * // remove user from initial data
+ * setFirebaseData({
+ *   auth : {
+ *     publicIds: {cboesch: null},
+ *     usedPublicIds: {cboesch: null},
+ *     users: {'google:110893970871115341770': null}
+ *   }
+ * });
+ *
+ * @param {Object} patch [description]
+ */
+function setFirebaseData(patch) {
+  var data = exportData;
+
+  if (patch) {
+    data = deepAssign({}, exportData, patch);
+  }
+
+  targaryen.setFirebaseData(data);
+}
 
 chai.use(targaryen.chai);
 
@@ -15,8 +44,11 @@ chai.use(targaryen.chai);
 describe('With current security rules', function() {
 
   before(function() {
-    targaryen.setFirebaseData(exportData);
     targaryen.setFirebaseRules(rules);
+  });
+
+  beforeEach(function() {
+    setFirebaseData();
   });
 
   it('cannot write userActions', function() {
@@ -141,26 +173,30 @@ describe('With current security rules', function() {
 
   describe('Datastore changing authorized users', function() {
 
-   //  New user creation order.
-   //  Write to auth/users/auth.id with publicId
-   //  Write auth/publicIds/$publicId = auth.id
-   //  Write auth/usedPublicIds/$publicId = true
-
-    before(function() {
-
-      // add user to users
-      exportData.auth.users['github:1234'] = {
-        displayName: 'Test User',
-        email: 'someone@smu.edu.sg', pic: 'https://avatars.githubusercontent.com/u/116418?v=3',
-        publicId: 'awesome', username: 'awesome'
-      };
-
-            // allow user to claim public id.
-      exportData.auth.publicIds.awesome = 'github:1234';
-      targaryen.setFirebaseData(exportData);
-    });
+    //  New user creation order.
+    //  Write to auth/users/auth.id with publicId
+    //  Write auth/publicIds/$publicId = auth.id
+    //  Write auth/usedPublicIds/$publicId = true
 
     var theUser = {uid: 'github:1234'};
+
+    beforeEach(function() {
+      setFirebaseData({
+        auth: {
+          publicIds: {awesome: 'github:1234'},
+          usedPublicIds: {awesome: true},
+          users: {
+            'github:1234': {
+              displayName: 'Test User',
+              email: 'someone@smu.edu.sg',
+              pic: 'https://avatars.githubusercontent.com/u/116418?v=3',
+              publicId: 'awesome',
+              username: 'awesome'
+            }
+          }
+        }
+      });
+    });
 
     it('cannot overwrite existing publicIDs entry at auth/publicIds/$publicId', function() {
       expect(theUser).cannot.write('github:1234').path('auth/publicIds/awesome');
@@ -169,6 +205,7 @@ describe('With current security rules', function() {
     it('can uppdate public ID as taken by writing to auth/usedPublicIds/$publicId', function() {
       expect(theUser).can.write(true).path('auth/usedPublicIds/awesome');
     });
+
   });
 
   describe('Specific ClassMentors users', function() {
