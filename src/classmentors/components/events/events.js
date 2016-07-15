@@ -754,15 +754,15 @@ function AddEventTaskCtrl(
     }
   }
 
-    //todo: this function double checks with user if he wishes to go back and discard all changes thus far
-    this.discardNewChallenge = function (ev,task){
+    //this function double checks with user if he wishes to go back and discard all changes thus far
+    this.discardChanges = function (ev,task){
         var confirm = $mdDialog.confirm()
             .title('Would you like to discard your changes?')
             .textContent('All of the information input will be discarded. Are you sure you want to continue?')
             .ariaLabel('Discard changes')
             .targetEvent(ev)
             .ok('Discard All')
-            .cancel('Bring me back');
+            .cancel('Do Not Discard');
         $mdDialog.show(confirm).then(function() {
             // decided to discard data, bring user to previous page
             $location.path(urlFor('editEvent', {eventId: self.event.$id}));
@@ -770,7 +770,14 @@ function AddEventTaskCtrl(
         }), function() {
             //go back to the current page
             //todo: preserve the data that was keyed into form. (data should not be saved into the db yet)
+            this.task.title = task.title
+            this.task.priority = task.priority
+            this.task.description = task.description
+            this.task.link = task.link
 
+            this.task.linkPattern = task.linkPattern
+            this.task.textResponse = task.textResponse
+            this.task.cards = task.cards
         };
     }
 
@@ -877,7 +884,7 @@ editEventTaskCtrlInitialData.$inject = ['$q', '$route', 'spfAuthData', 'clmDataS
  * EditEventTaskCtrl
  *
  */
-function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBarService, clmDataStore) {
+function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBarService, clmDataStore, $mdDialog,$location) {
   var self = this;
 
   this.event = initialData.event;
@@ -920,6 +927,34 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBar
       url: `#${urlFor('editEvent', {eventId: this.event.$id})}`
     }]
   );
+
+  //this function double checks with user if he wishes to go back and discard all changes thus far
+  this.discardChanges = function (ev,task){
+    var confirm = $mdDialog.confirm()
+        .title('Would you like to discard your changes?')
+        .textContent('All of the information input will be discarded. Are you sure you want to continue?')
+        .ariaLabel('Discard changes')
+        .targetEvent(ev)
+        .ok('Discard All')
+        .cancel('Do Not Discard');
+    $mdDialog.show(confirm).then(function() {
+      // decided to discard data, bring user to previous page
+      $location.path(urlFor('editEvent', {eventId: self.event.$id}));
+
+    }), function() {
+      //go back to the current page
+      //todo: preserve the data that was keyed into form. (data should not be saved into the db yet)
+      this.task.title = task.title
+      this.task.priority = task.priority
+      this.task.description = task.description
+      this.task.link = task.link
+
+      this.task.linkPattern = task.linkPattern
+      this.task.textResponse = task.textResponse
+      this.task.cards = task.cards
+
+    };
+  }
 
   this.saveTask = function(event, taskId, task, taskType, isOpen) {
     var copy = spfFirebase.cleanObj(task);
@@ -972,7 +1007,9 @@ EditEventTaskCtrl.$inject = [
   'urlFor',
   'spfFirebase',
   'spfNavBarService',
-  'clmDataStore'
+  'clmDataStore',
+    '$mdDialog',
+    '$location'
 ];
 
 /**

@@ -1,3 +1,189 @@
 <md-content flex class="md-padding">
-<h3>Title</h3>
+    <div align="center">
+        <h3>Multiple Choice</h3>
+        <h4>Title {{ctrl.task.title}}</h4>
+        <h4>Description {{ctrl.task.description}}</h4>
+        <br><br>
+    </div>
+
+    <div name="continueMCQ">
+        <!-- toggle buttons -->
+
+        <p>
+            <md-switch class="md-primary" ng-model="ctrl.timelimit" aria-label="">
+                Set time limit for the entire quiz
+            </md-switch>
+            <md-input-container ng-hide="!ctrl.timelimit" >
+                <label for="edit-time-limit">Time Limit (in minute)</label>
+                <input type="number" name="editTimeLimit" id="edit-time-limit"
+                       ng-model="ctrl.task.timelimit"
+                       min="0" step="1"
+                       placeholer="Time Limit for the quiz" value=""
+                />
+                <div ng-messages="">
+                    <div ng-message="number">Time limit allowed should be a positive number in minutes.</div>
+                </div>
+            </md-input-container>
+        </p>
+
+        <p>
+            <h5>Pre/Post Quiz Surveys</h5>
+            // Q: will people choose the same pre-post survey?
+
+            <md-switch class="md-primary" ng-model="ctrl.prequiz" aria-label="">
+                Enable pre-quiz survey
+            </md-switch>
+            <!--todo: dropdown list of pre-quiz survey-->
+            <md-input-container class="md-block" flex-gt-sm ng-hide="!ctrl.prequiz">
+                <label for="pre-quiz">Pre-quiz Titles</label>
+                <md-select id="pre-quiz" ng-model="task.survey.pre">
+                    <!--
+                    <md-option ng-repeat="state in states" value="{{state.abbrev}}">
+                        {{state.abbrev}}
+                    </md-option>-->
+
+                    <md-option value="hello">
+                        hello
+                    </md-option>
+                    <md-option value="hello2">
+                        hello2
+                    </md-option>
+                </md-select>
+            </md-input-container>
+
+            <md-switch class="md-primary" ng-model="ctrl.postquiz" aria-label="">
+                Enable post-quiz survey
+            </md-switch>
+            <!--todo: dropdown list of post-quiz survey-->
+            <md-input-container class="md-block" flex-gt-sm ng-hide="!ctrl.postquiz">
+                <label for="post-quiz">Post-quiz Titles</label>
+                <md-select id="post-quiz" ng-model="task.survey.post">
+                    <!--
+                    <md-option ng-repeat="state in states" value="{{state.abbrev}}">
+                        {{state.abbrev}}
+                    </md-option>-->
+
+                    <md-option value="hello">
+                        hello
+                    </md-option>
+                    <md-option value="hello2">
+                        hello2
+                    </md-option>
+                </md-select>
+            </md-input-container>
+        </p>
+
+        <p>
+        <h5>Pre/Post Quiz Video</h5>
+            <md-switch class="md-primary" ng-model="ctrl.previd" aria-label="">
+                Enable pre-quiz video
+            </md-switch>
+            <!--todo: ask for link to the video-->
+            <md-input-container ng-hide="!ctrl.previd">
+                <label for="vid-link-pre">Pre Video Link</label>
+                <input type="text" name="vidLinkPre" id="vid-link-pre"
+                       ng-model="ctrl.task.video.pre"
+                       pattern="^(https?://.+|#/).+$"
+                       placeholer="Video Link to Pre Quiz Video" value="{{ctrl.task.video.pre}}"
+                />
+                <!--<div ng-messages="editTask.editTaskLink.$error">
+                    <div ng-message="pattern">Wrong format for an absolute or relative URL.</div>
+                </div>-->
+            </md-input-container>
+
+            <md-switch class="md-primary" ng-model="ctrl.postvid" aria-label="">
+                Enable post-quiz video
+            </md-switch>
+            <!--todo: ask for link to the video-->
+            <md-input-container ng-hide="!ctrl.postvid">
+                <label for="vid-link-post">Post Video Link</label>
+                <input type="text" name="vidLinkPost" id="vid-link-post"
+                       ng-model="ctrl.task.video.post"
+                       pattern="^(https?://.+|#/).+$"
+                       placeholer="Video Link to Post Quiz Video" value="{{ctrl.task.video.post}}"
+                />
+                <!--<div ng-messages="editTask.editTaskLink.$error">
+                    <div ng-message="pattern">Wrong format for an absolute or relative URL.</div>
+                </div>-->
+            </md-input-container>
+
+        </p>
+
+        <p>
+            <h5>Questions</h5>
+            <md-switch class="md-primary" ng-model="ctrl.task.randomQOrder" aria-label="">
+                Randomise questions order
+            </md-switch>
+
+            <md-switch class="md-primary" ng-model="ctrl.task.randomOOrder" aria-label="">
+                Randomise options order
+            </md-switch>
+        </p>
+
+        <p>
+            <h5>Team Mode</h5>
+            <md-switch class="md-primary" ng-model="ctrl.task.enableTeam" aria-label="">
+                Enable team answering mode
+            </md-switch>
+        </p>
+
+        <!--questions-->
+        <div align="center">
+            <h4>Question Details</h4>
+        </div>
+
+        <div align="center" layout="row">
+            <md-input-container flex>
+                <label for="edit-question">Question</label>
+                <input type="text" name="editQuestion" id="edit-question"
+                       ng-model="ctrl.task.question"
+                       placeholer="Question" value=""
+                />
+                <div ng-messages="">
+                    <div ng-message="pattern">Some error here.</div>
+                </div>
+            </md-input-container>
+        </div>
+
+        <div align="center">
+            <!--single answer or no?-->
+            <md-switch class="md-primary" ng-model="ctrl.isSingleAnswer" aria-label="single answer?">
+                Single answer only
+            </md-switch>
+        </div>
+
+        <!--answer options-->
+        <div align="center" layout="row" >
+            <!--todo: enable to add new options -->
+            <md-input-container flex>
+                <label for="q-option">Option</label>
+                <input type="text" name="editQuestion" id="q-option"
+                       ng-model="ctrl.task.option"
+                       placeholer="Options" value=""
+                />
+                <div ng-messages="">
+                    <div ng-message="pattern">Some error here.</div>
+                </div>
+            </md-input-container>
+
+
+        </div>
+
+        <div align="center" >
+                <md-button type="button" class="md-raised md-primary" ng-disabled="ctrl.isSingleAnswer">Add option</md-button>
+        </div>
+
+        <br>
+        <div align="center">
+            <!--todo: can add new set of question-->
+            <md-button type="button" class="md-raised md-primary">Add question</md-button>
+        </div>
+
+        <br>
+
+        <div align="center">
+            <md-button type="submit" class="md-raised md-primary">Save</md-button>
+            <md-button type="reset" class="md-raised" ng-click="ctrl.discardChanges($event,ctrl.task)">Back</md-button>
+        </div>
+    </form>
 </md-content>
