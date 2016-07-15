@@ -17,6 +17,7 @@ import * as challenges from 'classmentors/components/challenges/challenges.js';
 
 module.factory('clmService', services.clmServiceFactory);
 module.factory('clmDataStore', services.clmDataStoreFactory);
+module.factory('eventCaptureService', events.eventServiceFactory);
 
 module.filter('cmTruncate', filters.cmTruncateFilterFactory);
 

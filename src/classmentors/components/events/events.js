@@ -683,7 +683,8 @@ addEventTaskCtrlInitialData.$inject = ['$q', '$route', 'spfAuthData', 'clmDataSt
  *
  */
 function AddEventTaskCtrl(
-  initialData, $location, $log, spfFirebase, spfAlert, urlFor, spfNavBarService, clmDataStore, $mdDialog, $scope
+  initialData, $location, $log, spfFirebase, spfAlert, urlFor, spfNavBarService, clmDataStore, $mdDialog, $scope,
+  eventCaptureService
 ) {
 
   var self = this;
@@ -696,6 +697,9 @@ function AddEventTaskCtrl(
   this.task = {archived: false};
   this.enableBeta = true;
 
+  eventCaptureService(self.event);
+
+  // updates navbar links..
   spfNavBarService.update(
     'New Challenge', [{
       title: 'Events',
@@ -709,11 +713,13 @@ function AddEventTaskCtrl(
     }]
   );
 
+
   this.loadLevels = function(selected) {
     return clmDataStore.singPath.levels(selected.path.id).then(function(levels) {
       self.singPath.levels = levels;
     });
   };
+
 
   this.loadProblems = function(selected) {
     return clmDataStore.singPath.problems(selected.path.id, selected.level.id).then(function(problems) {
@@ -754,61 +760,61 @@ function AddEventTaskCtrl(
     }
   }
 
-    //todo: this function double checks with user if he wishes to go back and discard all changes thus far
-    this.discardNewChallenge = function (ev,task){
-        var confirm = $mdDialog.confirm()
-            .title('Would you like to discard your changes?')
-            .textContent('All of the information input will be discarded. Are you sure you want to continue?')
-            .ariaLabel('Discard changes')
-            .targetEvent(ev)
-            .ok('Discard All')
-            .cancel('Bring me back');
-        $mdDialog.show(confirm).then(function() {
-            // decided to discard data, bring user to previous page
-            $location.path(urlFor('editEvent', {eventId: self.event.$id}));
+  //todo: this function double checks with user if he wishes to go back and discard all changes thus far
+  this.discardNewChallenge = function (ev,task){
+      var confirm = $mdDialog.confirm()
+          .title('Would you like to discard your changes?')
+          .textContent('All of the information input will be discarded. Are you sure you want to continue?')
+          .ariaLabel('Discard changes')
+          .targetEvent(ev)
+          .ok('Discard All')
+          .cancel('Bring me back');
+      $mdDialog.show(confirm).then(function() {
+          // decided to discard data, bring user to previous page
+          $location.path(urlFor('editEvent', {eventId: self.event.$id}));
 
-        }), function() {
-            //go back to the current page
-            //todo: preserve the data that was keyed into form. (data should not be saved into the db yet)
+      }), function() {
+          //go back to the current page
+          //todo: preserve the data that was keyed into form. (data should not be saved into the db yet)
 
-        };
-    }
+      };
+  }
 
-  this.saveTask = function(event, _, task, taskType, isOpen) {
-    var copy = spfFirebase.cleanObj(task);
-
-    if (taskType === 'linkPattern') {
-      delete copy.badge;
-      delete copy.serviceId;
-      delete copy.singPathProblem;
-    } else if (copy.serviceId === 'singPath') {
-      delete copy.badge;
-      if (copy.singPathProblem) {
-        copy.singPathProblem.path = spfFirebase.cleanObj(task.singPathProblem.path);
-        copy.singPathProblem.level = spfFirebase.cleanObj(task.singPathProblem.level);
-        copy.singPathProblem.problem = spfFirebase.cleanObj(task.singPathProblem.problem);
-      }
-    } else {
-      delete copy.singPathProblem;
-      copy.badge = spfFirebase.cleanObj(task.badge);
-    }
-
-    if (!copy.link) {
-      // delete empty link. Can't be empty string
-      delete copy.link;
-    }
-
-    self.creatingTask = true;
-    clmDataStore.events.addTask(event.$id, copy, isOpen).then(function() {
-      spfAlert.success('Task created');
-      $location.path(urlFor('editEvent', {eventId: self.event.$id}));
-    }).catch(function(err) {
-      $log.error(err);
-      spfAlert.error('Failed to created new task');
-    }).finally(function() {
-      self.creatingTask = false;
-    });
-  };
+  // this.saveTask = function(event, _, task, taskType, isOpen) {
+  //   var copy = spfFirebase.cleanObj(task);
+  //
+  //   if (taskType === 'linkPattern') {
+  //     delete copy.badge;
+  //     delete copy.serviceId;
+  //     delete copy.singPathProblem;
+  //   } else if (copy.serviceId === 'singPath') {
+  //     delete copy.badge;
+  //     if (copy.singPathProblem) {
+  //       copy.singPathProblem.path = spfFirebase.cleanObj(task.singPathProblem.path);
+  //       copy.singPathProblem.level = spfFirebase.cleanObj(task.singPathProblem.level);
+  //       copy.singPathProblem.problem = spfFirebase.cleanObj(task.singPathProblem.problem);
+  //     }
+  //   } else {
+  //     delete copy.singPathProblem;
+  //     copy.badge = spfFirebase.cleanObj(task.badge);
+  //   }
+  //
+  //   if (!copy.link) {
+  //     // delete empty link. Can't be empty string
+  //     delete copy.link;
+  //   }
+  //
+  //   self.creatingTask = true;
+  //   clmDataStore.events.addTask(event.$id, copy, isOpen).then(function() {
+  //     spfAlert.success('Task created');
+  //     $location.path(urlFor('editEvent', {eventId: self.event.$id}));
+  //   }).catch(function(err) {
+  //     $log.error(err);
+  //     spfAlert.error('Failed to created new task');
+  //   }).finally(function() {
+  //     self.creatingTask = false;
+  //   });
+  // };
 }
 AddEventTaskCtrl.$inject = [
   'initialData',
@@ -2030,3 +2036,25 @@ function chainComparer(comparerList) {
     return 0;
   };
 }
+
+//Create eventServiceFactory
+export function eventServiceFactory(){
+  var self = this;
+  var captureFormData  = function(
+      name /*, priority, description, helpLink, isOpen, isHidden, isArchived, isShowProgress, isShowSln*/)
+  {
+    this.name = name;
+    // this.priority = priority;
+    // this.description = description;
+    // this.helpLink = helpLink;
+    // this.isOpen = isOpen;
+    // this.isHidden = isHidden;
+    // this.isArchived = isArchived;
+    // this.isShowProgress = isShowProgress;
+    // this.isShowSln = isShowSln;
+  }
+  return{
+    captureFormData: captureFormData
+  };
+}
+eventServiceFactory.$inject;
