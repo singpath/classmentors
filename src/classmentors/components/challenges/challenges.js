@@ -11,7 +11,21 @@ import * as mcq from './mcq/mcq.js';
 export function configRoute($routeProvider, routes){
     $routeProvider
         .when(routes.viewMcq, {
-            template: mcq.showTmpl
+            template: mcq.newMcqTmpl,
+            controller: mcq.viewCtrl,
+            controllerAs: 'ctrl'
+            // resolve: {
+            //     initialData:
+            // }
+        })
+
+        .when(routes.editMcq, {
+            template: mcq.editMcqTmpl,
+            controller: mcq.EditCtrl,
+            controllerAs: 'ctrl'
+            // resolve: {
+            //     initialData:
+            // }
         });
 
 }
