@@ -1,37 +1,23 @@
 
 //TODO: Add imports
 import mcqTmpl from './mcq-view-mcq.html!text';
-import mcqlEditTmpl from './mcq-view-mcq-edit.html!text';
+import mcqEditTmpl from './mcq-view-mcq-edit.html!text';
 
 const noop = () => undefined;
 
-//TODO: implement logic for creating of mcq questions
-export function showTmpl(){
-    console.log('template is returned');
+//this export function return the template when creating a new mcq challenge
+export function newMcqTmpl(){
     return mcqTmpl;
 }
 
-
-//todo: amos to finish up config
-/*export function configRoute($routeProvider, routes) {
-    $routeProvider
-        .when(routes.newMCQ, {
-            template: mcqTmpl,
-            controller: viewCtrl,
-            controllerAs: 'ctrl',
-            resolve: {
-                initialData:
-            }
-        })
-}*/
-
-//inject config route
-//configRoute.$inject = ['$routeProvider', 'routes'];
+export function editMcqTmpl(){
+    return mcqEditTmpl;
+}
 
 //TODO: implement logic for rendering of mcq questions
 
 // this function controls the view behaviours
-function viewCtrl ($mdDialog,$location,urlFor){
+function viewCtrl ($mdDialog,$location,urlFor, $scope){
     this.isSingleAnswer = false;
 
     //this function double checks with user if he wishes to go back and discard all changes thus far
@@ -54,14 +40,21 @@ function viewCtrl ($mdDialog,$location,urlFor){
             //todo: preserve the data that was keyed into form. (data should not be saved into the db yet)
             //eg. this.task.title = task.title
 
-
         };
     }
+
 }
 
 //inject viewctrl
 viewCtrl.$inject = [
     '$mdDialog',
     '$location',
-    'urlFor'
+    'urlFor',
+    '$scope'
 ];
+
+function editCtrl (){
+  console.log("hello. this is edit ctl");
+};
+
+//testing
