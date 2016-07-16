@@ -134,7 +134,12 @@
         </div>
 
         <div ng-repeat="question in questions">
-            <h3>Question {{question.id}}</h3>
+            <h3>
+                Question {{question.id}}
+                <md-button class="md-raised" ng-click="removeQuestion(question,$index)" ng-disabled = "questions.length == 1">Delete this question</md-button>
+            </h3>
+
+
             <div align="center" layout="row" >
                 <md-input-container flex>
                     <label for="edit-question_{{question.id}}">Question</label>
