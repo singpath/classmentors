@@ -343,6 +343,7 @@ function ViewEventCtrl(
   this.canView = initialData.canView;
   this.viewArchived = false;
   this.selected = null;
+  this.isOwner = false;
 
   if (
     self.event &&
@@ -354,6 +355,7 @@ function ViewEventCtrl(
     monitorHandler = clmDataStore.events.monitorEvent(
       this.event, this.tasks, this.participants, this.solutions, this.progress
     );
+    this.isOwner = true;
   } else {
     monitorHandler = {
       update: noop,
