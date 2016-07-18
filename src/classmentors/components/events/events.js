@@ -73,6 +73,23 @@ export function configRoute($routeProvider, routes) {
 
 configRoute.$inject = ['$routeProvider', 'routes'];
 
+
+//Create eventServiceFactory
+//TODO: Edit
+export function eventServiceFactory() {
+  var savedData = {};
+  var eventService = {
+    set: function(data) {
+      savedData = data;
+    },
+    get: function(){
+      return savedData;
+    }
+
+  };
+  return eventService;
+}
+
 /**
  * Used to resolve `initialData` of `ClmListEvent`.
  *
@@ -684,7 +701,7 @@ addEventTaskCtrlInitialData.$inject = ['$q', '$route', 'spfAuthData', 'clmDataSt
  */
 function AddEventTaskCtrl(
   initialData, $location, $log, spfFirebase, spfAlert, urlFor, spfNavBarService, clmDataStore, $mdDialog, $scope,
-  eventCaptureService
+  eventService
 ) {
 
   var self = this;
@@ -696,10 +713,8 @@ function AddEventTaskCtrl(
   this.savingTask = false;
   this.task = {archived: false};
   this.enableBeta = true;
+  var location;
 
-  eventCaptureService(self.event);
-
-  // updates navbar links..
   spfNavBarService.update(
     'New Challenge', [{
       title: 'Events',
@@ -747,7 +762,7 @@ function AddEventTaskCtrl(
 
     }else if(tasktype == 'multipleChoice'){
       console.log('multipleChoice is clicked');
-      return '/challenges/mcq'
+      location = '/challenges/mcq';
 
     }else if(tasktype == 'code'){
       console.log('code is clicked');
@@ -780,6 +795,29 @@ function AddEventTaskCtrl(
       };
   }
 
+  //TODO: Modified saveTask function. Takes it to the next step in the question creation before saving.
+  this.saveTask = function(event, _, task, taskType, isOpen){
+    var data = {
+      taskType: taskType,
+      isOpen: isOpen,
+      event: event,
+      task: task
+    };
+    spfNavBarService.update(
+        'New Challenge Details', [{
+          title: 'Events',
+          url: `#${urlFor('events')}`
+        }, {
+          title: this.event.title,
+          url: `#${urlFor('oneEvent', {eventId: this.event.$id})}`
+        }, {
+          title: 'Challenges',
+          url: `#${urlFor('editEvent', {eventId: this.event.$id})}`
+        }]
+    );
+    eventService.set(data);
+    $location.path(location);
+  }
   // this.saveTask = function(event, _, task, taskType, isOpen) {
   //   var copy = spfFirebase.cleanObj(task);
   //
@@ -826,7 +864,8 @@ AddEventTaskCtrl.$inject = [
   'spfNavBarService',
   'clmDataStore',
   '$mdDialog',
-    '$scope'
+  '$scope',
+  'eventService'
 ];
 
 /**
@@ -2037,24 +2076,4 @@ function chainComparer(comparerList) {
   };
 }
 
-//Create eventServiceFactory
-export function eventServiceFactory(){
-  var self = this;
-  var captureFormData  = function(
-      name /*, priority, description, helpLink, isOpen, isHidden, isArchived, isShowProgress, isShowSln*/)
-  {
-    this.name = name;
-    // this.priority = priority;
-    // this.description = description;
-    // this.helpLink = helpLink;
-    // this.isOpen = isOpen;
-    // this.isHidden = isHidden;
-    // this.isArchived = isArchived;
-    // this.isShowProgress = isShowProgress;
-    // this.isShowSln = isShowSln;
-  }
-  return{
-    captureFormData: captureFormData
-  };
-}
-eventServiceFactory.$inject;
+
