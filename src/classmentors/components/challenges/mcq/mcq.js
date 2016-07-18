@@ -12,4 +12,9 @@ export function showTmpl(){
     console.log('template is returned');
     return mcqTmpl;
 }
+
+export function someController(eventService){
+    this.task = eventService.get();
+}
+someController.$inject = ['eventService'];
 //TODO: implement logic for rendering of mcq questions
