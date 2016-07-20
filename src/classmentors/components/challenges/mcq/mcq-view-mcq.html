@@ -1,3 +1,12 @@
 <md-content flex class="md-padding">
-<h3>{{ctrl.task}}</h3>
+<code>{{ctrl.data | json}}</code>
+<md-button ng-click="
+	ctrl.test(
+		ctrl.data.event,
+		ctrl.data.task.taskId,
+		ctrl.data.task,
+		ctrl.data.taskType,
+		ctrl.data.isOpen
+		)
+"> Save something</md-button>
 </md-content>

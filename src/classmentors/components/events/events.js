@@ -76,7 +76,7 @@ configRoute.$inject = ['$routeProvider', 'routes'];
 
 //Create eventServiceFactory
 //TODO: Edit
-export function eventServiceFactory() {
+export function eventServiceFactory($q, $route, spfAuthData, clmDataStore, spfFirebase, $log, spfAlert) {
   var savedData = {};
   var eventService = {
     set: function(data) {
@@ -84,12 +84,51 @@ export function eventServiceFactory() {
     },
     get: function(){
       return savedData;
-    }
+    },
+    save: function(event, _, task, taskType, isOpen) {
+            var copy = spfFirebase.cleanObj(task);
+            console.log('Copy is.. : ', copy);
+            if (taskType === 'linkPattern') {
+                delete copy.badge;
+                delete copy.serviceId;
+                delete copy.singPathProblem;
+            } else if (copy.serviceId === 'singPath') {
+                delete copy.badge;
+                if (copy.singPathProblem) {
+                  copy.singPathProblem.path = spfFirebase.cleanObj(task.singPathProblem.path);
+                  copy.singPathProblem.level = spfFirebase.cleanObj(task.singPathProblem.level);
+                  copy.singPathProblem.problem = spfFirebase.cleanObj(task.singPathProblem.problem);
+                }
+            } else {
+                delete copy.singPathProblem;
+                copy.badge = spfFirebase.cleanObj(task.badge);
+            }
+
+            if (!copy.link) {
+                // delete empty link. Can't be empty string
+                delete copy.link;
+            }
+
+            self.creatingTask = true;
+            clmDataStore.events.addTask(event.$id, copy, isOpen);
+                // .then(function() {
+                // spfAlert.success('Task created');
+                // $location.path(urlFor('editEvent', {eventId: self.event.$id}));
+                // }).catch(function(err) {
+                //     $log.error(err);
+                //     spfAlert.error('Failed to created new task');
+                // }).finally(function() {
+                //     self.creatingTask = false;
+                // });
+        }
 
   };
   return eventService;
 }
 
+eventServiceFactory.$inject = [
+    '$q', '$route', 'spfAuthData', 'clmDataStore', 'spfFirebase', '$log', 'spfAlert'
+];
 /**
  * Used to resolve `initialData` of `ClmListEvent`.
  *
@@ -803,6 +842,7 @@ function AddEventTaskCtrl(
       event: event,
       task: task
     };
+    console.log('Data shows... ', data);
     spfNavBarService.update(
         'New Challenge Details', [{
           title: 'Events',
@@ -820,7 +860,13 @@ function AddEventTaskCtrl(
   }
   // this.saveTask = function(event, _, task, taskType, isOpen) {
   //   var copy = spfFirebase.cleanObj(task);
-  //
+  //     var data = {
+  //         taskType: taskType,
+  //         isOpen: isOpen,
+  //         event: event,
+  //         task: task
+  //     };
+  //     console.log('LETS SEE... ',data);
   //   if (taskType === 'linkPattern') {
   //     delete copy.badge;
   //     delete copy.serviceId;
@@ -841,7 +887,7 @@ function AddEventTaskCtrl(
   //     // delete empty link. Can't be empty string
   //     delete copy.link;
   //   }
-  //
+  //     console.log('WHAT ABOUT... ',copy);
   //   self.creatingTask = true;
   //   clmDataStore.events.addTask(event.$id, copy, isOpen).then(function() {
   //     spfAlert.success('Task created');

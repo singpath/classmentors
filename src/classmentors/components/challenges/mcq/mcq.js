@@ -9,12 +9,13 @@ import mcqlEditTmpl from './mcq-view-mcq-edit.html!text';
 
 //TODO: implement logic for creating of mcq questions
 export function showTmpl(){
-    console.log('template is returned');
-    return mcqTmpl;
+  console.log('template is returned');
+  return mcqTmpl;
 }
 
-export function someController(eventService){
-    this.task = eventService.get();
+export function someController(eventService, challengeService){
+  this.data = eventService.get();
+  this.test = challengeService.save;
 }
-someController.$inject = ['eventService'];
+someController.$inject = ['eventService', 'challengeService'];
 //TODO: implement logic for rendering of mcq questions

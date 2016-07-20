@@ -20,11 +20,12 @@ export function configRoute($routeProvider, routes){
 configRoute.$inject = ['$routeProvider', 'routes'];
 
 //TODO: Generic save function
-export function challengeFactory($q, $route, spfAuthData, clmDataStore){
-    return {
-        saveTask : function(event, _, task, taskType, isOpen) {
+export function challengeServiceFactory
+  ($q, $route, spfAuthData, clmDataStore, spfFirebase, $log, spfAlert){
+  return {
+    save : function(event, _, task, taskType, isOpen) {
       var copy = spfFirebase.cleanObj(task);
-
+      console.log('COPY IS ... ', copy);
       if (taskType === 'linkPattern') {
         delete copy.badge;
         delete copy.serviceId;
@@ -36,6 +37,9 @@ export function challengeFactory($q, $route, spfAuthData, clmDataStore){
           copy.singPathProblem.level = spfFirebase.cleanObj(task.singPathProblem.level);
           copy.singPathProblem.problem = spfFirebase.cleanObj(task.singPathProblem.problem);
         }
+      }else if (taskType === 'multipleChoice'){
+        delete copy.singPathProblem;
+        delete copy.badge;
       } else {
         delete copy.singPathProblem;
         copy.badge = spfFirebase.cleanObj(task.badge);
@@ -47,16 +51,20 @@ export function challengeFactory($q, $route, spfAuthData, clmDataStore){
       }
 
       self.creatingTask = true;
-      clmDataStore.events.addTask(event.$id, copy, isOpen).then(function() {
-        spfAlert.success('Task created');
-        $location.path(urlFor('editEvent', {eventId: self.event.$id}));
-      }).catch(function(err) {
-        $log.error(err);
-        spfAlert.error('Failed to created new task');
-      }).finally(function() {
-        self.creatingTask = false;
-      });
+      clmDataStore.events.addTask(event.$id, copy, isOpen);
+      console.log('FAILS!');
+      // .then(function() {
+    //   console.log('FAILS!');
+    //   spfAlert.success('Task created');
+    //   $location.path(urlFor('editEvent', {eventId: self.event.$id}));
+    //       }).catch(function(err) {
+    //         $log.error(err);
+    //         spfAlert.error('Failed to created new task');
+    //       }).finally(function() {
+    //         self.creatingTask = false;
+    //       });
     }
-    }
+  }
 }
-challengeFactory.$inject = ['$q', '$route', 'spfAuthData', 'clmDataStore'];
+challengeServiceFactory.$inject =
+    ['$q', '$route', 'spfAuthData', 'clmDataStore', 'spfFirebase', '$log', 'spfAlert'];
