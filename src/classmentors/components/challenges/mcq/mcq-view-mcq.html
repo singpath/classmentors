@@ -1,4 +1,14 @@
 <md-content flex class="md-padding">
+<code>{{ctrl.data | json}}</code>
+<md-button ng-click="
+	ctrl.test(
+		ctrl.data.event,
+		ctrl.data.task.taskId,
+		ctrl.data.task,
+		ctrl.data.taskType,
+		ctrl.data.isOpen
+		)
+"> Save something</md-button>
     <div align="center">
         <h3>Multiple Choice</h3>
         <h4>Title {{ctrl.task.title}}</h4>
@@ -201,4 +211,5 @@
             <md-button type="reset" class="md-raised" ng-click="ctrl.discardChanges($event,ctrl.task)">Back</md-button>
         </div>
     </form>
+	</div>
 </md-content>

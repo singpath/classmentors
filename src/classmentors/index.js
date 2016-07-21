@@ -15,8 +15,11 @@ import * as cohort from 'classmentors/components/cohort/cohort.js';
 import * as challenges from 'classmentors/components/challenges/challenges.js';
 // import * as mcq from 'classmentors/components/challenges/mcq/mcq.js';
 
+
 module.factory('clmService', services.clmServiceFactory);
 module.factory('clmDataStore', services.clmDataStoreFactory);
+module.factory('eventService', events.eventServiceFactory);
+module.factory('challengeService', challenges.challengeServiceFactory);
 
 module.filter('cmTruncate', filters.cmTruncateFilterFactory);
 
