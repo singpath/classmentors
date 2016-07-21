@@ -9,7 +9,7 @@ import mcqlEditTmpl from './mcq-view-mcq-edit.html!text';
 
 //TODO: implement logic for creating of mcq questions
 export function showTmpl(){
-    //console.log('template is returned');
+    console.log('template is returned');
     return mcqTmpl;
 }
 //TODO: implement logic for rendering of mcq questions
