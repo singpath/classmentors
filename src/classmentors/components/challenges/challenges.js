@@ -21,7 +21,7 @@ configRoute.$inject = ['$routeProvider', 'routes'];
 
 //TODO: Generic save function
 export function challengeServiceFactory
-  ($q, $route, spfAuthData, clmDataStore, spfFirebase, $log, spfAlert){
+  ($q, $route, spfAuthData, clmDataStore, spfFirebase, $log, spfAlert, $location, urlFor){
   return {
     save : function(event, _, task, taskType, isOpen) {
       var copy = spfFirebase.cleanObj(task);
@@ -40,6 +40,7 @@ export function challengeServiceFactory
       }else if (taskType === 'multipleChoice'){
         delete copy.singPathProblem;
         delete copy.badge;
+        copy.mcqQuestions = 'test';
       } else {
         delete copy.singPathProblem;
         copy.badge = spfFirebase.cleanObj(task.badge);
@@ -51,20 +52,19 @@ export function challengeServiceFactory
       }
 
       self.creatingTask = true;
-      clmDataStore.events.addTask(event.$id, copy, isOpen);
-      console.log('FAILS!');
-      // .then(function() {
-    //   console.log('FAILS!');
-    //   spfAlert.success('Task created');
-    //   $location.path(urlFor('editEvent', {eventId: self.event.$id}));
-    //       }).catch(function(err) {
-    //         $log.error(err);
-    //         spfAlert.error('Failed to created new task');
-    //       }).finally(function() {
-    //         self.creatingTask = false;
-    //       });
+      clmDataStore.events.addTask(event.$id, copy, isOpen)
+        .then(function() {
+          console.log('FAILS!');
+          spfAlert.success('Task created');
+          $location.path(urlFor('editEvent', {eventId: event.$id}));
+        }).catch(function(err) {
+            $log.error(err);
+            spfAlert.error('Failed to created new task');
+        }).finally(function() {
+            self.creatingTask = false;
+        });
     }
   }
 }
 challengeServiceFactory.$inject =
-    ['$q', '$route', 'spfAuthData', 'clmDataStore', 'spfFirebase', '$log', 'spfAlert'];
+    ['$q', '$route', 'spfAuthData', 'clmDataStore', 'spfFirebase', '$log', 'spfAlert', '$location', 'urlFor'];
