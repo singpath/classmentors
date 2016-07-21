@@ -5,5 +5,6 @@
 import surveyTmpl from './survey-view-surveyform.html!text';
 
 export function showSurveyTmpl(){
+    
     return surveyTmpl;
 }
