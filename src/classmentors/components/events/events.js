@@ -267,7 +267,7 @@ NewEventCtrl.$inject = [
 function viewEventCtrlInitialData($q, $route, spfAuth, spfAuthData, clmDataStore) {
     var errNoEvent = new Error('Event not found');
     var eventId = $route.current.params.eventId;
-    //$cookies.put("eventid", eventId);
+
     var profilePromise = clmDataStore.currentUserProfile().catch(noop);
 
     var eventPromise = clmDataStore.events.get(eventId).then(function (event) {
@@ -548,8 +548,7 @@ function baseEditCtrlInitialData($q, $route, spfAuthData, clmDataStore) {
 
         return result;
     });
-    //console.log("baseEdit current user id: " + data.currentUser.);
-    //spfAuth.user.uid
+
     return data;
 }
 
@@ -674,10 +673,10 @@ addEventTaskCtrlInitialData.$inject = ['$q', '$route', 'spfAuthData', 'clmDataSt
  * AddEventTaskCtrl
  *
  */
-function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, urlFor, spfNavBarService, clmDataStore, $mdDialog, $scope, clmSurvey, spfAuthData) {
+function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, urlFor, spfNavBarService, clmDataStore, $mdDialog, $scope) {
 
     var self = this;
-    console.log("spfAuthData present?: " + spfAuthData.publicId());
+
     this.event = initialData.event;
     this.badges = initialData.badges;
     this.isOpen = true;
@@ -713,8 +712,7 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
 
     //TODO: fill in respective routes for various challenge types.
     //TODO: grab form data.
-    this.challengeRouteProvider = function (eve, event, task, tasktype, isOpen) {
-
+    this.challengeRouteProvider = function (tasktype) {
         if (tasktype == 'service') {
             console.log('service is clicked');
 
@@ -745,9 +743,8 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
 
         } else if (tasktype == 'survey') {
             console.log('survey is clicked');
-            clmSurvey.set(event.$id.toString(),event, task, tasktype, isOpen, spfAuthData);
-            var obj = clmSurvey.get();
             return '/challenges/survey'
+
         }
     }
 
@@ -796,7 +793,6 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
         }
 
         self.creatingTask = true;
-
         clmDataStore.events.addTask(event.$id, copy, isOpen).then(function () {
             spfAlert.success('Task created');
             $location.path(urlFor('editEvent', {eventId: self.event.$id}));
@@ -808,7 +804,6 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
         });
     };
 }
-
 AddEventTaskCtrl.$inject = [
     'initialData',
     '$location',
@@ -819,36 +814,8 @@ AddEventTaskCtrl.$inject = [
     'spfNavBarService',
     'clmDataStore',
     '$mdDialog',
-    '$scope',
-    'clmSurvey',
-    'spfAuthData'
+    '$scope'
 ];
-
-//////////////////////////////testing//////////////////////////////////////
-export function clmSurveyTaskFactory() {
-    var sharedData = {};
-    //console.log("it comes in here");
-    function set(eventId, event, task, tasktype, isOpen, spfAuthData) {
-        sharedData.eventId = eventId;
-        sharedData.event = event;
-        sharedData.task = task;
-        sharedData.taskType = tasktype;
-        sharedData.isOpen = isOpen;
-        sharedData.currentUser = spfAuthData.user();
-
-    }
-
-    function get() {
-        return sharedData;
-    }
-
-    return {
-        set: set,
-        get: get
-    };
-
-}
-
 
 /**
  * Used to resolve `initialData` of `EditEventTaskCtrl`.
