@@ -786,31 +786,41 @@ function AddEventTaskCtrl(
   this.challengeRouteProvider = function(tasktype){
     if(tasktype == 'service'){
       console.log('service is clicked');
-
+      return 'Save';
     }else if(tasktype == 'singPath'){
       console.log('singpath is clicked');
+      return 'Save';
 
     }else if(tasktype == 'linkPattern'){
       console.log('linkPattern is clicked');
+      return 'Save';
 
     }else if(tasktype == 'textResponse'){
       console.log('textResponse is clicked');
+      return 'Save';
 
     }else if(tasktype == 'indexCard'){
       console.log('indexCard is clicked');
+      return 'Save';
 
     }else if(tasktype == 'multipleChoice'){
       console.log('multipleChoice is clicked');
       location = '/challenges/mcq';
+      return 'Continue';
 
     }else if(tasktype == 'code'){
       console.log('code is clicked');
+      return 'Save';
 
     }else if(tasktype == 'video'){
       console.log('video is clicked');
+      return 'Continue';
 
     }else if(tasktype == 'journalling'){
       console.log('journalling is clicked');
+      return 'Continue';
+    }else{
+      return 'Save';
     }
   }
 
@@ -835,70 +845,97 @@ function AddEventTaskCtrl(
   }
 
   //TODO: Modified saveTask function. Takes it to the next step in the question creation before saving.
-  this.saveTask = function(event, _, task, taskType, isOpen){
+  // this.saveTask = function(event, _, task, taskType, isOpen){
+  //   var data = {
+  //     taskType: taskType,
+  //     isOpen: isOpen,
+  //     event: event,
+  //     task: task
+  //   };
+  //   console.log('Data shows... ', data);
+  //   spfNavBarService.update(
+  //       'New Challenge Details', [{
+  //         title: 'Events',
+  //         url: `#${urlFor('events')}`
+  //       }, {
+  //         title: this.event.title,
+  //         url: `#${urlFor('oneEvent', {eventId: this.event.$id})}`
+  //       }, {
+  //         title: 'Challenges',
+  //         url: `#${urlFor('editEvent', {eventId: this.event.$id})}`
+  //       }]
+  //   );
+  //   eventService.set(data);
+  //   $location.path(location);
+  // }
+
+  this.saveTask = function(event, _, task, taskType, isOpen) {
+    var copy = spfFirebase.cleanObj(task);
     var data = {
-      taskType: taskType,
-      isOpen: isOpen,
-      event: event,
-      task: task
+        taskType: taskType,
+        isOpen: isOpen,
+        event: event,
+        task: task
     };
-    console.log('Data shows... ', data);
-    spfNavBarService.update(
-        'New Challenge Details', [{
-          title: 'Events',
-          url: `#${urlFor('events')}`
-        }, {
-          title: this.event.title,
-          url: `#${urlFor('oneEvent', {eventId: this.event.$id})}`
-        }, {
-          title: 'Challenges',
-          url: `#${urlFor('editEvent', {eventId: this.event.$id})}`
-        }]
-    );
-    eventService.set(data);
-    $location.path(location);
-  }
-  // this.saveTask = function(event, _, task, taskType, isOpen) {
-  //   var copy = spfFirebase.cleanObj(task);
-  //     var data = {
-  //         taskType: taskType,
-  //         isOpen: isOpen,
-  //         event: event,
-  //         task: task
-  //     };
-  //     console.log('LETS SEE... ',data);
-  //   if (taskType === 'linkPattern') {
-  //     delete copy.badge;
-  //     delete copy.serviceId;
-  //     delete copy.singPathProblem;
-  //   } else if (copy.serviceId === 'singPath') {
-  //     delete copy.badge;
-  //     if (copy.singPathProblem) {
-  //       copy.singPathProblem.path = spfFirebase.cleanObj(task.singPathProblem.path);
-  //       copy.singPathProblem.level = spfFirebase.cleanObj(task.singPathProblem.level);
-  //       copy.singPathProblem.problem = spfFirebase.cleanObj(task.singPathProblem.problem);
-  //     }
-  //   } else {
-  //     delete copy.singPathProblem;
-  //     copy.badge = spfFirebase.cleanObj(task.badge);
-  //   }
-  //
-  //   if (!copy.link) {
-  //     // delete empty link. Can't be empty string
-  //     delete copy.link;
-  //   }
-  //     console.log('WHAT ABOUT... ',copy);
-  //   self.creatingTask = true;
-  //   clmDataStore.events.addTask(event.$id, copy, isOpen).then(function() {
-  //     spfAlert.success('Task created');
-  //     $location.path(urlFor('editEvent', {eventId: self.event.$id}));
-  //   }).catch(function(err) {
-  //     $log.error(err);
-  //     spfAlert.error('Failed to created new task');
-  //   }).finally(function() {
-  //     self.creatingTask = false;
-  //   });
-  // };
+
+    if (taskType === 'linkPattern') {
+      delete copy.badge;
+      delete copy.serviceId;
+      delete copy.singPathProblem;
+    } else if (copy.serviceId === 'singPath') {
+      delete copy.badge;
+      if (copy.singPathProblem) {
+        copy.singPathProblem.path = spfFirebase.cleanObj(task.singPathProblem.path);
+        copy.singPathProblem.level = spfFirebase.cleanObj(task.singPathProblem.level);
+        copy.singPathProblem.problem = spfFirebase.cleanObj(task.singPathProblem.problem);
+      }
+    } else {
+      delete copy.singPathProblem;
+      copy.badge = spfFirebase.cleanObj(task.badge);
+    }
+
+    if (!copy.link) {
+      // delete empty link. Can't be empty string
+      delete copy.link;
+    }
+
+
+    self.creatingTask = true;
+    if(taskType === 'multipleChoice' || taskType === 'journalling' || taskType === 'video'){
+      var data = {
+        taskType: taskType,
+        isOpen: isOpen,
+        event: event,
+        task: task
+      };
+      console.log('Data shows... ', data);
+      spfNavBarService.update(
+          'New Challenge Details', [{
+            title: 'Events',
+            url: `#${urlFor('events')}`
+          }, {
+            title: this.event.title,
+            url: `#${urlFor('oneEvent', {eventId: this.event.$id})}`
+          }, {
+            title: 'Challenges',
+            url: `#${urlFor('editEvent', {eventId: this.event.$id})}`
+          }]
+      );
+      eventService.set(data);
+      $location.path(location);
+    }else{
+      clmDataStore.events.addTask(event.$id, copy, isOpen).then(function() {
+        spfAlert.success('Task created');
+        $location.path(urlFor('editEvent', {eventId: self.event.$id}));
+      }).catch(function(err) {
+        $log.error(err);
+        spfAlert.error('Failed to created new task');
+      }).finally(function() {
+        self.creatingTask = false;
+      });
+    }
+
+  };
 }
 AddEventTaskCtrl.$inject = [
   'initialData',
