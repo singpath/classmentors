@@ -7,7 +7,7 @@
                     <input type="text" name="editTaskTitle" id="edit-task-name"
                         ng-model="ctrl.task.title"
                         required="required" ng-minLength="3" md-maxLength="30"
-                        placeholer="Challenge name"
+                        placeholer="Challenge name" value="{{ctrl.task.title}}"
                     />
 
                     <div ng-messages="editTask.editTaskTitle.$error">
@@ -21,7 +21,7 @@
                     <input type="number" name="editTaskPriority" id="edit-task-priority"
                         ng-model="ctrl.task.priority"
                         min="0" step="1"
-                        placeholer="Challenge priority"
+                        placeholer="Challenge priority" value="{{ctrl.task.priority}}"
                     />
                     <div ng-messages="editTask.editTaskPriority.$error">
                         <div ng-message="number">The priority should be a positive number.</div>
@@ -37,10 +37,11 @@
                     ng-model="ctrl.task.description"
                     required="required" ng-minLength="3" md-maxLength="200"
                     placeholer="Challenge description"
-                ></textarea>
+                >{{ctrl.task.description}}</textarea>
+
                 <div ng-messages="editTask.editTaskDesc.$error">
                     <div ng-message="required">A challenge needs a description.</div>
-                    <div ng-message="minlength">The descriptiion is too short.</div>
+                    <div ng-message="minlength">The description is too short.</div>
                     <div ng-message="md-maxlength">The description is too long.</div>
                 </div>
             </md-input-container>
@@ -52,7 +53,7 @@
                 <input type="text" name="editTaskLink" id="edit-task-link"
                     ng-model="ctrl.task.link"
                     pattern="^(https?://.+|#/).+$"
-                    placeholer="URL to a challenge help page"
+                    placeholer="URL to a challenge help page" value="{{ctrl.task.link}}"
                 />
                 <div ng-messages="editTask.editTaskLink.$error">
                     <div ng-message="pattern">Wrong format for an absolute or relative URL.</div>
@@ -197,8 +198,9 @@
                 <input type="text" name="editTaskLink" id="edit-link-pattern"
                     ng-model="ctrl.task.linkPattern"
                     required="true"
-                    placeholer="Pattern"
+                    placeholer="Pattern" value="{{ctrl.task.linkPattern}}"
                 />
+
                 <div ng-messages="editTask.editTaskLink.$error">
                     <div ng-message="required">Required.</div>
                 </div>
@@ -207,12 +209,13 @@
 
         <div ng-if="ctrl.taskType == 'textResponse'">
             <md-input-container>
-                <label for="edit-text-esponse">Question</label>
-                <input type="text" name="editTextResponse" id="edit-text-esponse"
+                <label for="edit-text-response">Question</label>
+                <input type="text" name="editTextResponse" id="edit-text-response"
                     ng-model="ctrl.task.textResponse"
                     required="true"
-                    placeholer="Question"
+                    placeholer="Question" value="{{ctrl.task.textResponse}}"
                 />
+
                 <div ng-messages="editTask.editTextResponse.$error">
                     <div ng-message="required">Required.</div>
                 </div>
@@ -223,9 +226,9 @@
             <md-input-container flex>
                 <label for="edit-max-cards">Maximum cards allowed</label>
                 <input type="number" name="editMaxCards" id="edit-max-cards"
-                       ng-model="ctrl.task.priority"
+                       ng-model="ctrl.task.cards"
                        min="0" step="1"
-                       placeholer="Challenge priority"
+                       placeholer="Challenge priority" value="{{ctrl.task.cards}}"
                 />
                 <div ng-messages="editTask.editTaskPriority.$error">
                     <div ng-message="number">The max cards allowed should be a positive number.</div>
@@ -233,9 +236,28 @@
             </md-input-container>
         </div>
 
+        <!-- todo: do you even need this ng-if in this html if you are going to redirect them to somewhere else? -->
         <div ng-if="ctrl.taskType == 'multipleChoice'">
             <md-input-container>
 
+            </md-input-container>
+        </div>
+
+        <div ng-if="ctrl.taskType == 'code'">
+            <md-input-container>
+                Code
+            </md-input-container>
+        </div>
+
+        <div ng-if="ctrl.taskType == 'video'">
+            <md-input-container>
+                Video
+            </md-input-container>
+        </div>
+
+        <div ng-if="ctrl.taskType == 'journalling'">
+            <md-input-container>
+                Journalling
             </md-input-container>
         </div>
 
@@ -246,7 +268,7 @@
 
             <md-button type="button" class="md-raised" ng-disabled="!ctrl.enableBeta" ng-href="#{{ctrl.challengeRouteProvider(ctrl.taskType)}}">Continue</md-button>
             <md-button type="submit" class="md-raised md-primary" ng-disabled="editTask.$invalid || !ctrl.taskType ||ctrl.savingTask">Save</md-button>
-            <md-button type="reset" class="md-raised" ng-click="ctrl.discardNewChallenge($event,ctrl.task)">Back</md-button>
+            <md-button type="reset" class="md-raised" ng-click="ctrl.discardChanges($event,ctrl.task)">Back</md-button>
         </div>
 
     </form>

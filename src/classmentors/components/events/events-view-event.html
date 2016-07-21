@@ -49,7 +49,7 @@
             </md-content>
         </md-tab>
 
-        <md-tab label="Results" ng-disabled="!ctrl.participants">
+        <md-tab label="Results" ng-disabled="!ctrl.participants || !ctrl.isOwner">
             <md-content layout-padding>
                 <md-switch class="md-primary" ng-model="ctrl.viewArchived" aria-label="ViewArchived?">
                     View archived challenges
@@ -74,7 +74,7 @@
                         <!--<div ng-show="ctrl.selected">-->
                             <table class="events tasks">
                                 <thead>
-                                    <tr>
+                                    <tr ng-class="{'reversed': ctrl.orderOptions.reversed}">
                                         <th>Name</th>
                                         <th>Answer</th>
                                     </tr>
@@ -89,16 +89,16 @@
                         <!--</div>-->
                     </md-content>
                 </div>
-                <clm-event-table
-                        ng-if="ctrl.selected"
-                        event="ctrl.event"
-                        participants="ctrl.participants"
-                        tasks="ctrl.tasks"
-                        progress="ctrl.progress"
-                        solutions="ctrl.solutions"
-                        profile="ctrl.profile"
-                >
-                </clm-event-table>
+                <!--<clm-event-table-->
+                        <!--ng-if="ctrl.selected"-->
+                        <!--event="ctrl.event"-->
+                        <!--participants="ctrl.participants"-->
+                        <!--tasks="ctrl.tasks"-->
+                        <!--progress="ctrl.progress"-->
+                        <!--solutions="ctrl.solutions"-->
+                        <!--profile="ctrl.profile"-->
+                <!--&gt;-->
+                <!--</clm-event-table>-->
             </md-content>
         </md-tab>
     </md-tabs>
