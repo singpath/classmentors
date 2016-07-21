@@ -1007,6 +1007,8 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBar
     this.taskType = 'service';
   } else if (this.task.linkPattern) {
     this.taskType = 'linkPattern';
+  } else if (this.task.lang) {
+      this.taskType = 'code';
   } else if (this.task.textResponse) {
     this.taskType = 'textResponse';
   }else if (this.task.multipleChoice) {
