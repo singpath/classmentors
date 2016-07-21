@@ -245,7 +245,27 @@
 
         <div ng-if="ctrl.taskType == 'code'">
             <md-input-container>
-                Code
+                <label for="edit-text-response">Question</label>
+                <input type="text" name="editTextResponse" id="edit-text-response"
+                       ng-model="ctrl.task.textResponse"
+                       required="true"
+                       placeholer="Question" value="{{ctrl.task.textResponse}}"
+                />
+
+                <div ng-messages="editTask.editTextResponse.$error">
+                    <div ng-message="required">Required.</div>
+                </div>
+            </md-input-container>
+            <md-input-container flex layout="column">
+                <md-select flex name="editCodeLang"
+                           ng-model="ctrl.task.lang" required placeholder="Select a Language">
+                    <md-option ng-value="opt" ng-repeat="opt in ['Java', 'Javascript', 'HTML', 'Python']">
+                        {{opt}}
+                    </md-option>
+                </md-select>
+                <div ng-messages="editTask.editTaskServiceId.$error">
+                    <div ng-message="required">A challenge needs a service id.</div>
+                </div>
             </md-input-container>
         </div>
 
