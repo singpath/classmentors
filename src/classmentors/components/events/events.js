@@ -844,31 +844,6 @@ function AddEventTaskCtrl(
       };
   }
 
-  //TODO: Modified saveTask function. Takes it to the next step in the question creation before saving.
-  // this.saveTask = function(event, _, task, taskType, isOpen){
-  //   var data = {
-  //     taskType: taskType,
-  //     isOpen: isOpen,
-  //     event: event,
-  //     task: task
-  //   };
-  //   console.log('Data shows... ', data);
-  //   spfNavBarService.update(
-  //       'New Challenge Details', [{
-  //         title: 'Events',
-  //         url: `#${urlFor('events')}`
-  //       }, {
-  //         title: this.event.title,
-  //         url: `#${urlFor('oneEvent', {eventId: this.event.$id})}`
-  //       }, {
-  //         title: 'Challenges',
-  //         url: `#${urlFor('editEvent', {eventId: this.event.$id})}`
-  //       }]
-  //   );
-  //   eventService.set(data);
-  //   $location.path(location);
-  // }
-
   this.saveTask = function(event, _, task, taskType, isOpen) {
     var copy = spfFirebase.cleanObj(task);
     var data = {
@@ -935,7 +910,7 @@ function AddEventTaskCtrl(
       });
     }
 
-  };
+  }
 }
 AddEventTaskCtrl.$inject = [
   'initialData',
@@ -1005,7 +980,7 @@ editEventTaskCtrlInitialData.$inject = ['$q', '$route', 'spfAuthData', 'clmDataS
  * EditEventTaskCtrl
  *
  */
-function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBarService, clmDataStore) {
+function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBarService, clmDataStore, eventService, $location) {
   var self = this;
 
   this.event = initialData.event;
@@ -1014,6 +989,8 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBar
   this.task = initialData.task;
   this.isOpen = Boolean(this.task.openedAt);
   this.savingTask = false;
+  this.enableBeta = true;
+  var location;
 
   if (this.task.serviceId) {
     this.taskType = 'service';
@@ -1049,8 +1026,75 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBar
     }]
   );
 
+  this.challengeRouteProvider = function(tasktype){
+    if(tasktype == 'service'){
+      console.log('service is clicked');
+      return 'Save';
+    }else if(tasktype == 'singPath'){
+      console.log('singpath is clicked');
+      return 'Save';
+
+    }else if(tasktype == 'linkPattern'){
+      console.log('linkPattern is clicked');
+      return 'Save';
+
+    }else if(tasktype == 'textResponse'){
+      console.log('textResponse is clicked');
+      return 'Save';
+
+    }else if(tasktype == 'indexCard'){
+      console.log('indexCard is clicked');
+      return 'Save';
+
+    }else if(tasktype == 'multipleChoice'){
+      console.log('multipleChoice is clicked');
+      location = '/challenges/mcq';
+      return 'Continue';
+
+    }else if(tasktype == 'code'){
+      console.log('code is clicked');
+      return 'Save';
+
+    }else if(tasktype == 'video'){
+      console.log('video is clicked');
+      return 'Continue';
+
+    }else if(tasktype == 'journalling'){
+      console.log('journalling is clicked');
+      return 'Continue';
+    }else{
+      return 'Save';
+    }
+  }
+
+  //todo: this function double checks with user if he wishes to go back and discard all changes thus far
+  this.discardNewChallenge = function (ev,task){
+    var confirm = $mdDialog.confirm()
+        .title('Would you like to discard your changes?')
+        .textContent('All of the information input will be discarded. Are you sure you want to continue?')
+        .ariaLabel('Discard changes')
+        .targetEvent(ev)
+        .ok('Discard All')
+        .cancel('Bring me back');
+    $mdDialog.show(confirm).then(function() {
+      // decided to discard data, bring user to previous page
+      $location.path(urlFor('editEvent', {eventId: self.event.$id}));
+
+    }), function() {
+      //go back to the current page
+      //todo: preserve the data that was keyed into form. (data should not be saved into the db yet)
+
+    };
+  }
+
   this.saveTask = function(event, taskId, task, taskType, isOpen) {
     var copy = spfFirebase.cleanObj(task);
+    var data = {
+      taskType: taskType,
+      isOpen: isOpen,
+      event: event,
+      task: task
+    };
 
     if (taskType === 'linkPattern') {
       delete copy.badge;
@@ -1073,26 +1117,98 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBar
       delete copy.link;
     }
 
-    self.savingTask = true;
-    clmDataStore.events.updateTask(event.$id, taskId, copy).then(function() {
-      if (
-        (isOpen && task.openedAt) ||
-        (!isOpen && task.closedAt)
-      ) {
-        return;
-      } else if (isOpen) {
-        return clmDataStore.events.openTask(event.$id, taskId);
-      }
 
-      return clmDataStore.events.closeTask(event.$id, taskId);
-    }).then(function() {
-      spfAlert.success('Task saved');
-    }).catch(function() {
-      spfAlert.error('Failed to save the task.');
-    }).finally(function() {
-      self.savingTask = false;
-    });
+    self.creatingTask = true;
+    if(taskType === 'multipleChoice' || taskType === 'journalling' || taskType === 'video'){
+      var data = {
+        taskType: taskType,
+        isOpen: isOpen,
+        event: event,
+        task: task
+      };
+      console.log('Data shows... ', data);
+      spfNavBarService.update(
+          'New Challenge Details', [{
+            title: 'Events',
+            url: `#${urlFor('events')}`
+          }, {
+            title: this.event.title,
+            url: `#${urlFor('oneEvent', {eventId: this.event.$id})}`
+          }, {
+            title: 'Challenges',
+            url: `#${urlFor('editEvent', {eventId: this.event.$id})}`
+          }]
+      );
+      eventService.set(data);
+      $location.path(location);
+    }else{
+      self.savingTask = true;
+      clmDataStore.events.updateTask(event.$id, taskId, copy).then(function() {
+        if (
+            (isOpen && task.openedAt) ||
+            (!isOpen && task.closedAt)
+        ) {
+          return;
+        } else if (isOpen) {
+          return clmDataStore.events.openTask(event.$id, taskId);
+        }
+
+        return clmDataStore.events.closeTask(event.$id, taskId);
+      }).then(function() {
+        spfAlert.success('Task saved');
+      }).catch(function() {
+        spfAlert.error('Failed to save the task.');
+      }).finally(function() {
+        self.savingTask = false;
+      });
+    }
+
   };
+
+  // this.saveTask = function(event, taskId, task, taskType, isOpen) {
+  //   var copy = spfFirebase.cleanObj(task);
+  //
+  //   if (taskType === 'linkPattern') {
+  //     delete copy.badge;
+  //     delete copy.serviceId;
+  //     delete copy.singPathProblem;
+  //   } else if (copy.serviceId === 'singPath') {
+  //     delete copy.badge;
+  //     if (copy.singPathProblem) {
+  //       copy.singPathProblem.path = spfFirebase.cleanObj(task.singPathProblem.path);
+  //       copy.singPathProblem.level = spfFirebase.cleanObj(task.singPathProblem.level);
+  //       copy.singPathProblem.problem = spfFirebase.cleanObj(task.singPathProblem.problem);
+  //     }
+  //   } else {
+  //     delete copy.singPathProblem;
+  //     copy.badge = spfFirebase.cleanObj(task.badge);
+  //   }
+  //
+  //   if (!copy.link) {
+  //     // delete empty link. Can't be empty string
+  //     delete copy.link;
+  //   }
+  //
+  //   self.savingTask = true;
+  //   clmDataStore.events.updateTask(event.$id, taskId, copy).then(function() {
+  //     if (
+  //       (isOpen && task.openedAt) ||
+  //       (!isOpen && task.closedAt)
+  //     ) {
+  //       return;
+  //     } else if (isOpen) {
+  //       return clmDataStore.events.openTask(event.$id, taskId);
+  //     }
+  //
+  //     return clmDataStore.events.closeTask(event.$id, taskId);
+  //   }).then(function() {
+  //     spfAlert.success('Task saved');
+  //   }).catch(function() {
+  //     spfAlert.error('Failed to save the task.');
+  //   }).finally(function() {
+  //     self.savingTask = false;
+  //   });
+  // };
 }
 EditEventTaskCtrl.$inject = [
   'initialData',
@@ -1100,7 +1216,9 @@ EditEventTaskCtrl.$inject = [
   'urlFor',
   'spfFirebase',
   'spfNavBarService',
-  'clmDataStore'
+  'clmDataStore',
+  'eventService',
+  '$location'
 ];
 
 /**
