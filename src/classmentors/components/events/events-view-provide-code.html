@@ -1,20 +1,41 @@
-<md-dialog aria-label="{{ctrl.task.title}}">
+<md-dialog aria-label="{{ctrl.task.title}}" class="enlarged-dialog">
     <form name="provideResponseForm" ng-submit="ctrl.save(ctrl.solution)">
         <md-dialog-content class="sticky-container">
             <md-subheader class="md-sticky-no-effect">{{ctrl.task.title}}</md-subheader>
             <div>
                 <p>{{ctrl.task.description}}</p>
-                <md-input-container>
-                    <label for="edit-solution-response">{{ctrl.task.textResponse}}</label>
-                    <input type="text" name="linkSolution" id="edit-solution-response"
-                           ng-model="ctrl.solution"
-                           required="true"
-                           placeholer="URL to provide"
-                    />
-                    <div ng-messages="provideResponseForm.linkSolution.$error">
-                        <div ng-message="required">Required.</div>
-                    </div>
-                </md-input-container>
+                <p>{{ctrl.task.lang}}</p>
+                <!--<md-input-container>-->
+                    <!--<label for="edit-solution-response">{{ctrl.task.textResponse}}</label>-->
+                    <!--<input type="text" name="linkSolution" id="edit-solution-response"-->
+                           <!--ng-model="ctrl.solution"-->
+                           <!--required="true"-->
+                           <!--placeholer="URL to provide"-->
+                    <!--/>-->
+                    <!--<div ng-messages="provideResponseForm.linkSolution.$error">-->
+                        <!--<div ng-message="required">Required.</div>-->
+                    <!--</div>-->
+                <!--</md-input-container>-->
+                <style type="text/css" media="screen">
+                    #editor {
+                        /*position: absolute;*/
+                        top: 0;
+                        right: 0;
+                        bottom: 0;
+                        left: 0;
+                    }
+                </style>
+
+                <div id="editor">function foo(items) {
+                    var x = "All this is syntax highlighted";
+                    return x;
+                }</div>
+                <!--<script src="../../../jspm_packages/github/ajaxorg/ace-builds@1.2.3/ace.js" type="text/javascript" charset="utf-8"></script>-->
+                <script>
+                    var editor = ace.edit("editor");
+                    editor.setTheme("ace/theme/monokai");
+                    editor.getSession().setMode("ace/mode/javascript");
+                </script>
             </div>
         </md-dialog-content>
         <div class="md-actions" layout="row">

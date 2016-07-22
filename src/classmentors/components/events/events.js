@@ -1632,11 +1632,11 @@ function ClmEventTableCtrl(
         $mdDialog.show({
             parent: $document.body,
             template: codeTmpl,
-            controller: DialogController,
+            controller: CodeController,
             controllerAs: 'ctrl'
         });
 
-        function DialogController() {
+        function CodeController() {
             this.task = task;
             if (
                 userSolution &&
