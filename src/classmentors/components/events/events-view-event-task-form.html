@@ -5,9 +5,11 @@
                 <md-input-container flex>
                     <label for="edit-task-name">Name</label>
                     <input type="text" name="editTaskTitle" id="edit-task-name"
+
                         ng-model="ctrl.task.title"
                         required="required" ng-minLength="3" md-maxLength="30"
                         placeholer="Challenge name" value="{{ctrl.task.title}}"
+
                     />
 
                     <div ng-messages="editTask.editTaskTitle.$error">
@@ -19,9 +21,11 @@
                 <md-input-container flex>
                     <label for="edit-task-priority">Priority</label>
                     <input type="number" name="editTaskPriority" id="edit-task-priority"
+
                         ng-model="ctrl.task.priority"
                         min="0" step="1"
                         placeholer="Challenge priority" value="{{ctrl.task.priority}}"
+
                     />
                     <div ng-messages="editTask.editTaskPriority.$error">
                         <div ng-message="number">The priority should be a positive number.</div>
@@ -34,10 +38,12 @@
             <md-input-container>
                 <label for="edit-task-desc">Description</label>
                 <textarea name="editTaskDesc" id="edit-task-desc"
+
                     ng-model="ctrl.task.description"
                     required="required" ng-minLength="3" md-maxLength="200"
                     placeholer="Challenge description"
                 >{{ctrl.task.description}}</textarea>
+
 
                 <div ng-messages="editTask.editTaskDesc.$error">
                     <div ng-message="required">A challenge needs a description.</div>
@@ -51,9 +57,11 @@
             <md-input-container>
                 <label for="edit-task-link">Help Link</label>
                 <input type="text" name="editTaskLink" id="edit-task-link"
+
                     ng-model="ctrl.task.link"
                     pattern="^(https?://.+|#/).+$"
                     placeholer="URL to a challenge help page" value="{{ctrl.task.link}}"
+
                 />
                 <div ng-messages="editTask.editTaskLink.$error">
                     <div ng-message="pattern">Wrong format for an absolute or relative URL.</div>
@@ -87,7 +95,7 @@
                     Show all participant progress.
                 </md-switch>
             </p>
-            
+
             <p>
                 <md-switch class="md-primary" ng-model="ctrl.task.showLinks" aria-label="closed?">
                     Show all participant solutions.
@@ -111,19 +119,21 @@
                         </td>
                         <td style='padding-left:20px; padding-bottom:40px;'>
 
+
                             <md-radio-button ng-disabled="!ctrl.enableBeta" value="code" class="md-primary">Code*</md-radio-button>
                             <md-radio-button ng-disabled="!ctrl.enableBeta" value="video" class="md-primary">Video*</md-radio-button>
                             <md-radio-button ng-disabled="!ctrl.enableBeta" value="journalling" class="md-primary">Journalling*</md-radio-button>
+                            <md-radio-button ng-disabled="!ctrl.enableBeta" value="survey" class="md-primary">Survey*</md-radio-button>
+
                         </td>
                     </tr>
                 </table>
             </md-radio-group>
         </div>
-
         <div layout="row" ng-if="ctrl.taskType == 'service'">
             <md-input-container flex layout="column">
                 <md-select flex name="editTaskServiceId"
-                    ng-model="ctrl.task.serviceId" required placeholder="Select a Service">
+                           ng-model="ctrl.task.serviceId" required placeholder="Select a Service">
                     <md-option ng-value="opt" ng-repeat="opt in ['codeSchool', 'codeCombat', 'treeHouse', 'singPath']">
                         {{opt}}
                     </md-option>
@@ -134,8 +144,8 @@
             </md-input-container>
             <md-input-container flex layout="column" ng-if="ctrl.task.serviceId &amp;&amp; ctrl.task.serviceId != 'singPath'">
                 <md-select flex name="editTaskBadge"
-                    ng-model="ctrl.task.badge"
-                    placeholder="Select a badge (optional)"
+                           ng-model="ctrl.task.badge"
+                           placeholder="Select a badge (optional)"
                 >
                     <md-option ng-value="badge" ng-repeat="badge in ctrl.badges[ctrl.task.serviceId]">
                         {{badge.name}}
@@ -147,8 +157,8 @@
         <div layout="row" ng-if="ctrl.task.serviceId == 'singPath'">
             <md-input-container flex layout="column">
                 <md-select flex name="editTaskSingPathPath"
-                    ng-model="ctrl.task.singPathProblem.path"
-                    placeholder="Select a Path (optional)"
+                           ng-model="ctrl.task.singPathProblem.path"
+                           placeholder="Select a Path (optional)"
                 >
                     <md-option ng-value="opt" ng-repeat="opt in ctrl.singPath.paths">
                         {{opt.title}}
@@ -157,10 +167,10 @@
             </md-input-container>
             <md-input-container flex layout="column" ng-if="ctrl.task.singPathProblem.path">
                 <md-select flex name="editTaskSingPathLevel"
-                    ng-model="ctrl.task.singPathProblem.level"
-                    required
-                    md-on-open="ctrl.loadLevels(ctrl.task.singPathProblem)"
-                    placeholder="Select a Level"
+                           ng-model="ctrl.task.singPathProblem.level"
+                           required
+                           md-on-open="ctrl.loadLevels(ctrl.task.singPathProblem)"
+                           placeholder="Select a Level"
                 >
                     <md-option ng-value="opt" ng-repeat="opt in ctrl.singPath.levels">
                         {{opt.title}}
@@ -172,10 +182,10 @@
             </md-input-container>
             <md-input-container flex layout="column" ng-if="ctrl.task.singPathProblem.level">
                 <md-select flex name="editTaskSingPathProblem"
-                    ng-model="ctrl.task.singPathProblem.problem"
-                    required
-                    md-on-open="ctrl.loadProblems(ctrl.task.singPathProblem)"
-                    placeholder="Select a Problem"
+                           ng-model="ctrl.task.singPathProblem.problem"
+                           required
+                           md-on-open="ctrl.loadProblems(ctrl.task.singPathProblem)"
+                           placeholder="Select a Problem"
                 >
                     <md-option ng-value="opt" ng-repeat="opt in ctrl.singPath.problems">
                         {{opt.title}}
@@ -191,9 +201,11 @@
             <md-input-container>
                 <label for="edit-link-pattern">Link pattern</label>
                 <input type="text" name="editTaskLink" id="edit-link-pattern"
+
                     ng-model="ctrl.task.linkPattern"
                     required="true"
                     placeholer="Pattern" value="{{ctrl.task.linkPattern}}"
+
                 />
 
                 <div ng-messages="editTask.editTaskLink.$error">
@@ -204,11 +216,13 @@
 
         <div ng-if="ctrl.taskType == 'textResponse'">
             <md-input-container>
+
                 <label for="edit-text-response">Question</label>
                 <input type="text" name="editTextResponse" id="edit-text-response"
                     ng-model="ctrl.task.textResponse"
                     required="true"
                     placeholer="Question" value="{{ctrl.task.textResponse}}"
+
                 />
 
                 <div ng-messages="editTask.editTextResponse.$error">
@@ -283,10 +297,12 @@
 
 
             <!--<md-button type="button" class="md-raised" ng-disabled="!ctrl.enableBeta" ng-href="#{{ctrl.challengeRouteProvider(ctrl.taskType)}}">Continue*</md-button>-->
-            <md-button type="submit" class="md-raised md-primary" ng-disabled="editTask.$invalid || !ctrl.taskType ||ctrl.savingTask">{{ ctrl.challengeRouteProvider(ctrl.taskType)}}</md-button>
+            <!--<md-button type="submit" class="md-raised md-primary" ng-disabled="editTask.$invalid || !ctrl.taskType ||ctrl.savingTask">{{ ctrl.challengeRouteProvider($event, ctrl.event, ctrl.task, ctrl.taskType, ctrl.isOpen)}}">Save</md-button>-->
+            <md-button type="submit" class="md-raised" ng-disabled="!ctrl.enableBeta" ng-href="#{{ctrl.challengeRouteProvider($event, ctrl.event, ctrl.task, ctrl.taskType, ctrl.isOpen)}}">Save</md-button>
             <md-button type="reset" class="md-raised" ng-click="ctrl.discardChanges($event,ctrl.task)">Back</md-button>
 
         </div>
 
     </form>
 </md-content>
+

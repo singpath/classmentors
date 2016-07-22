@@ -1,0 +1,22 @@
+<md-content flex class="md-padding">
+    <form name="surveyForm" ng-submit="">
+        <div align="center">
+            <h2>Survey Challenge</h2>
+            <br>
+            <h3>End of class survey</h3>
+            <br>
+            <b>How did you find this class? Take the following survey and provide feedback about what you liked
+                or <br> disliked the class and classmentors as an in-class tool
+            </b>
+            <br>
+            <br>
+            <md-select ng-model="chosenSurveyTmpl">
+                <md-optgroup label="surveyItems">
+                    <md-option ng-value="EduWithLearning">Education vs Dissatisfaction with learning</md-option>
+                    <md-option ng-value="MotivatedStrategies">Motivated strategies for learning</md-option>
+                    <md-option ng-value="SchoolEngagement">School engagement scale</md-option>
+                </md-optgroup>
+            </md-select>
+        </div>
+    </form>
+</md-content>
