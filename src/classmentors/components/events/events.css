@@ -41,7 +41,7 @@ th.secondaryOrderer .md-button:after {
     height: 250px;
     width: 15000px;
     max-height: 90%;
-    max-width: 90%;
+    max-width: 100%;
 }
 
 md-dialog.enlarged-dialog {
