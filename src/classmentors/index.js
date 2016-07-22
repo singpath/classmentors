@@ -44,6 +44,8 @@ module.directive('clmPager', events.clmPagerFactory);
 module.factory('clmRowPerPage', events.clmRowPerPageFactory);
 module.factory('clmPagerOption', events.clmPagerOptionFactory);
 
+//added new survey factory for tryout purpose
+module.factory('clmSurvey',events.clmSurveyTaskFactory);
 /**
  * Label route paths.
  *
@@ -66,7 +68,8 @@ module.constant('routes', {
   editProfile: '/profile/',
   setProfileCodeCombatId: '/profile/codeCombat',
   cohort: '/cohort',
-  viewMcq: '/challenges/mcq'
+  viewMcq: '/challenges/mcq',
+  viewSurvey: '/challenges/survey'
 });
 
 module.config([
