@@ -38,10 +38,10 @@ th.secondaryOrderer .md-button:after {
     right: 0;
     bottom: 0;
     left: 0;
-    height: 100px;
-    width: 700px;
+    height: 200px;
+    width: 1500px;
     max-height: 90%;
-    max-width: 90%;
+    max-width: 100%;
 }
 
 md-dialog.enlarged-dialog {
