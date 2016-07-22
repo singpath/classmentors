@@ -2,7 +2,6 @@ node_modules/
 src/jspm_packages/
 dist/
 coverage/
-.idea/
 *.sublime-project
 *.sublime-workspace
 npm-debug.log
