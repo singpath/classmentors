@@ -12,6 +12,8 @@ import linkTmpl from './events-view-provide-link.html!text';
 import responseTmpl from './events-view-provide-response.html!text';
 import codeTmpl from './events-view-provide-code.html!text';
 import './events.css!';
+import ace from '../../../jspm_packages/github/ajaxorg/ace-builds@1.2.3/ace.js';
+import monokai from '../../../jspm_packages/github/ajaxorg/ace-builds@1.2.3/theme-monokai.js';
 
 const noop = () => undefined;
 
@@ -1630,11 +1632,26 @@ function ClmEventTableCtrl(
 
     this.promptForCodeResponse = function(eventId, taskId, task, participant, userSolution) {
         $mdDialog.show({
-            parent: $document.body,
+            clickOutsideToClose: true,
+            // parent: $document.body,
+            parent: angular.element(document.body),
             template: codeTmpl,
+            // contentElement: document.querySelector('#myStaticDialog'),
+            onComplete: loadEditor,
             controller: CodeController,
             controllerAs: 'ctrl'
         });
+
+        function loadEditor() {
+            console.log(document);
+            var editor = ace.edit(document.querySelector('#editor'));
+            console.log(document.querySelector('#editor'));
+            console.log(editor);
+            // ace.require("ace/ext/language_tools");
+            // // editor.setTheme(monokai);
+            // editor.setTheme("ace/theme/monokai");
+            // editor.getSession().setMode("ace/mode/javascript");
+        }
 
         function CodeController() {
             this.task = task;

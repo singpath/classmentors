@@ -33,11 +33,15 @@ th.secondaryOrderer .md-button:after {
 }
 
 #editor{
-    position: absolute;
+    /*position: absolute;*/
     top: 0;
     right: 0;
     bottom: 0;
     left: 0;
+    height: 100px;
+    width: 700px;
+    max-height: 90%;
+    max-width: 90%;
 }
 
 md-dialog.enlarged-dialog {
