@@ -111,7 +111,7 @@
                             <span ng-if="!ctrl.currentUserSolutions[task.$id]">
                                 <md-button class="md-raised md-primary"
                                            aria-label="Submit response"
-                                           ng-click="ctrl.promptForTextResponse(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant, ctrl.currentUserSolutions)"
+                                           ng-click="ctrl.promptForCodeResponse(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant, ctrl.currentUserSolutions)"
                                            ng-disabled="task.closedAt"
                                 >
                                     Submit Code

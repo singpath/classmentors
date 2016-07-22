@@ -10,6 +10,7 @@ import pagerTmpl from './events-view-pager.html!text';
 import passwordTmpl from './events-view-password.html!text';
 import linkTmpl from './events-view-provide-link.html!text';
 import responseTmpl from './events-view-provide-response.html!text';
+import codeTmpl from './events-view-provide-code.html!text';
 import './events.css!';
 
 const noop = () => undefined;
@@ -1626,6 +1627,40 @@ function ClmEventTableCtrl(
       };
     }
   };
+
+    this.promptForCodeResponse = function(eventId, taskId, task, participant, userSolution) {
+        $mdDialog.show({
+            parent: $document.body,
+            template: codeTmpl,
+            controller: DialogController,
+            controllerAs: 'ctrl'
+        });
+
+        function DialogController() {
+            this.task = task;
+            if (
+                userSolution &&
+                userSolution[taskId]
+            ) {
+                this.solution = userSolution[taskId];
+            }
+
+            this.save = function(response) {
+                clmDataStore.events.submitSolution(eventId, taskId, participant.$id, response).then(function() {
+                    $mdDialog.hide();
+                    spfAlert.success('Response is saved.');
+                }).catch(function(err) {
+                    $log.error(err);
+                    spfAlert.error('Failed to save your response.');
+                    return err;
+                });
+            };
+
+            this.cancel = function() {
+                $mdDialog.hide();
+            };
+        }
+    };
 
   this.update = function() {};
   /*
