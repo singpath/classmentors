@@ -14,6 +14,10 @@ import codeTmpl from './events-view-provide-code.html!text';
 import './events.css!';
 import ace from '../../../jspm_packages/github/ajaxorg/ace-builds@1.2.3/ace.js';
 import monokai from '../../../jspm_packages/github/ajaxorg/ace-builds@1.2.3/theme-monokai.js';
+import javascript from '../../../jspm_packages/github/ajaxorg/ace-builds@1.2.3/mode-javascript.js';
+import html from '../../../jspm_packages/github/ajaxorg/ace-builds@1.2.3/mode-html.js';
+import java from '../../../jspm_packages/github/ajaxorg/ace-builds@1.2.3/mode-java.js';
+import python from '../../../jspm_packages/github/ajaxorg/ace-builds@1.2.3/mode-python.js';
 
 const noop = () => undefined;
 
@@ -1649,8 +1653,8 @@ function ClmEventTableCtrl(
             console.log(editor);
             // ace.require("ace/ext/language_tools");
             // // editor.setTheme(monokai);
-            // editor.setTheme("ace/theme/monokai");
-            // editor.getSession().setMode("ace/mode/javascript");
+            editor.setTheme("ace/theme/monokai");
+            editor.getSession().setMode("ace/mode/"+task.lang.toLowerCase());
         }
 
         function CodeController() {
