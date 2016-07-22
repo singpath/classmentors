@@ -590,7 +590,8 @@ export function clmDataStoreFactory(
 
       addTask: function(eventId, task, isOpen) {
         var priority = task.priority || 0;
-
+        console.log('Eventid is ? ', eventId);
+        console.log('task is : ', task);
         if (isOpen) {
           task.openedAt = {'.sv': 'timestamp'};
           task.closedAt = null;
@@ -601,6 +602,7 @@ export function clmDataStoreFactory(
 
         return spfFirebase.push(['classMentors/eventTasks', eventId], task).then(function(ref) {
           ref.setPriority(priority);
+          console.log(ref);
           return ref;
         });
       },
