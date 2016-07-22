@@ -1673,12 +1673,10 @@ function ClmEventTableCtrl(
         });
 
         function loadEditor() {
-            console.log(document);
             var editor = ace.edit(document.querySelector('#editor'));
-            console.log(document.querySelector('#editor'));
-            console.log(editor);
             editor.setTheme("ace/theme/monokai");
             editor.getSession().setMode("ace/mode/"+task.lang.toLowerCase());
+            editor.getSession().setUseWrapMode(true);
         }
 
         function CodeController() {
