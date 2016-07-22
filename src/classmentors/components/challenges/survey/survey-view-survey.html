@@ -1,0 +1,30 @@
+<md-content flex class="md-padding">
+    <form name="surveyTask" ng-submit="ctrl.saveSurveyTask(ctrl.surveyType.name)">
+        <div align="center">
+            <h2>Survey Challenge</h2>
+        </div>
+        <div align="center">
+            <h3>End of class survey</h3>
+        </div>
+        <div align="center">
+            <h3><i>How did you find this class? Take the following survey and provide feedback about what you liked
+                or</i>
+            </h3>
+            <h3><i>disliked the class and classmentors as an in-class tool</i></h3>
+        </div>
+        <br>
+        <div align="center" class="md-padding">
+            <md-input-container align="center">
+                <md-select ng-model="ctrl.surveyType" style="width: 500px" placeholder="Please select a form">
+                    <md-optgroup label="Upload Standard Template">
+                        <md-option ng-value="survey" ng-repeat="survey in ctrl.surveys">{{survey.name}}</md-option>
+                    </md-optgroup>
+                </md-select>
+            </md-input-container>
+        </div>
+
+        <div layout="row" layout-align="center center">
+            <md-button type="submit" class="md-raised">Submit</md-button>
+        </div>
+    </form>
+</md-content>
