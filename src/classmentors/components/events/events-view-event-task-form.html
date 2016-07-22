@@ -128,6 +128,7 @@
                             <md-radio-button ng-disabled="!ctrl.enableBeta" value="code" class="md-primary">Code*</md-radio-button>
                             <md-radio-button ng-disabled="!ctrl.enableBeta" value="video" class="md-primary">Video*</md-radio-button>
                             <md-radio-button ng-disabled="!ctrl.enableBeta" value="journalling" class="md-primary">Journalling*</md-radio-button>
+                            <md-radio-button ng-disabled="!ctrl.enableBeta" value="survey" class="md-primary">Survey*</md-radio-button>
 
                         </td>
                     </tr>
@@ -281,7 +282,8 @@
 
 
             <!--<md-button type="button" class="md-raised" ng-disabled="!ctrl.enableBeta" ng-href="#{{ctrl.challengeRouteProvider(ctrl.taskType)}}">Continue*</md-button>-->
-            <md-button type="submit" class="md-raised md-primary" ng-disabled="editTask.$invalid || !ctrl.taskType ||ctrl.savingTask">{{ ctrl.challengeRouteProvider(ctrl.taskType)}}</md-button>
+            <!--<md-button type="submit" class="md-raised md-primary" ng-disabled="editTask.$invalid || !ctrl.taskType ||ctrl.savingTask">{{ ctrl.challengeRouteProvider($event, ctrl.event, ctrl.task, ctrl.taskType, ctrl.isOpen)}}">Save</md-button>-->
+            <md-button type="submit" class="md-raised" ng-disabled="!ctrl.enableBeta" ng-href="#{{ctrl.challengeRouteProvider($event, ctrl.event, ctrl.task, ctrl.taskType, ctrl.isOpen)}}">Save</md-button>
             <md-button type="reset" class="md-raised" ng-click="ctrl.discardChanges($event,ctrl.task)">Back</md-button>
 
         </div>
