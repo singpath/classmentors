@@ -749,7 +749,7 @@ addEventTaskCtrlInitialData.$inject = ['$q', '$route', 'spfAuthData', 'clmDataSt
  */
 function AddEventTaskCtrl(
   initialData, $location, $log, spfFirebase, spfAlert, urlFor, spfNavBarService, clmDataStore, $mdDialog, $scope,
-  eventService
+  eventService, clmSurvey
 ) {
 
   var self = this;
@@ -792,7 +792,7 @@ function AddEventTaskCtrl(
 
   //TODO: fill in respective routes for various challenge types.
   //TODO: grab form data.
-  this.challengeRouteProvider = function(tasktype){
+  this.challengeRouteProvider = function(eve, event, task, tasktype, isOpen){
     if(tasktype == 'service'){
       console.log('service is clicked');
       return 'Save';
@@ -828,8 +828,10 @@ function AddEventTaskCtrl(
     }else if(tasktype == 'journalling'){
       console.log('journalling is clicked');
       return 'Continue';
-    }else{
-      return 'Save';
+    }else if (tasktype == 'survey'){
+        clmSurvey.set(event.$id.toString(),event, task, tasktype, isOpen);
+        var obj = clmSurvey.get();
+        return '/challenges/survey'
     }
   }
 
@@ -940,8 +942,34 @@ AddEventTaskCtrl.$inject = [
   'clmDataStore',
   '$mdDialog',
   '$scope',
-  'eventService'
+  'eventService',
+  'clmSurvey'
 ];
+
+//////////////////////////////implemented survey challenge//////////////////////////////////////
+export function clmSurveyTaskFactory() {
+    var sharedData = {};
+    //console.log("it comes in here");
+      function set(eventId, event, task, tasktype, isOpen) {
+            sharedData.eventId = eventId;
+            sharedData.event = event;
+            sharedData.task = task;
+            sharedData.taskType = tasktype;
+            sharedData.isOpen = isOpen;
+            //sharedData.currentUser = spfAuthData.user();
+
+                }
+
+    function get() {
+        return sharedData;
+    }
+
+    return {
+        set: set,
+        get: get
+    };
+}
+
 
 /**
  * Used to resolve `initialData` of `EditEventTaskCtrl`.
