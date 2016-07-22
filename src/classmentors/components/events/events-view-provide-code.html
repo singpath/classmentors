@@ -1,39 +1,27 @@
 <md-dialog aria-label="{{ctrl.task.title}}" class="enlarged-dialog">
-    <form name="provideResponseForm" ng-submit="ctrl.save(ctrl.solution)">
+    <form name="provideResponseForm" ng-submit="ctrl.save()">
         <md-dialog-content class="sticky-container">
             <md-subheader class="md-sticky-no-effect">{{ctrl.task.title}}</md-subheader>
             <div>
                 <p>{{ctrl.task.description}}</p>
-                <p>{{ctrl.task.lang}}</p>
+                <p>{{ctrl.task.textResponse}}</p>
+                <p>Language: {{ctrl.task.lang}}</p>
                 <!--<md-input-container>-->
                     <!--<label for="edit-solution-response">{{ctrl.task.textResponse}}</label>-->
                     <!--<input type="text" name="linkSolution" id="edit-solution-response"-->
                            <!--ng-model="ctrl.solution"-->
                            <!--required="true"-->
-                           <!--placeholer="URL to provide"-->
                     <!--/>-->
                     <!--<div ng-messages="provideResponseForm.linkSolution.$error">-->
-                        <!--<div ng-message="required">Required.</div>-->
+                    <!--<div ng-message="required">Required.</div>-->
                     <!--</div>-->
                 <!--</md-input-container>-->
-                <style type="text/css" media="screen">
-                    #editor {
-                        /*position: absolute;*/
-                        top: 0;
-                        right: 0;
-                        bottom: 0;
-                        left: 0;
-                    }
-                </style>
-
-                <div id="editor">function foo(items) {
-    var x = "All this is syntax highlighted";
-    return x;
-}               </div>
+                <div id="editor">{{ctrl.solution}}
+                </div>
             </div>
             <md-dialog-actions layout="row" layout-align="center end">
                 <div>
-                    <md-button class="md-primary md-raised" ng-disabled="!provideResponseForm.$valid">
+                    <md-button type="submit" class="md-primary md-raised" ng-disabled="!provideResponseForm.$valid">
                         Save
                     </md-button>
                 </div>

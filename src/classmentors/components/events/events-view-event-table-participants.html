@@ -101,7 +101,7 @@
                                 {{ ctrl.currentUserSolutions[task.$id] | cmTruncate: 10 }}<span ng-if="!ctrl.currentUserProgress[task.$id].completed"></span>
                                 <md-button class="md-icon-button md-primary small-icon"
                                            aria-label="Update response"
-                                           ng-click="ctrl.promptForTextResponse(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant, ctrl.currentUserSolutions)"
+                                           ng-click="ctrl.promptForCodeResponse(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant, ctrl.currentUserSolutions)"
                                            ng-if="task.openedAt"
                                 >
                                     <md-icon md-svg-icon="create"></md-icon>

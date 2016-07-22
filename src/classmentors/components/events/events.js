@@ -1665,10 +1665,8 @@ function ClmEventTableCtrl(
     this.promptForCodeResponse = function(eventId, taskId, task, participant, userSolution) {
         $mdDialog.show({
             clickOutsideToClose: true,
-            // parent: $document.body,
             parent: angular.element(document.body),
             template: codeTmpl,
-            // contentElement: document.querySelector('#myStaticDialog'),
             onComplete: loadEditor,
             controller: CodeController,
             controllerAs: 'ctrl'
@@ -1679,8 +1677,6 @@ function ClmEventTableCtrl(
             var editor = ace.edit(document.querySelector('#editor'));
             console.log(document.querySelector('#editor'));
             console.log(editor);
-            // ace.require("ace/ext/language_tools");
-            // // editor.setTheme(monokai);
             editor.setTheme("ace/theme/monokai");
             editor.getSession().setMode("ace/mode/"+task.lang.toLowerCase());
         }
@@ -1694,7 +1690,10 @@ function ClmEventTableCtrl(
                 this.solution = userSolution[taskId];
             }
 
-            this.save = function(response) {
+            this.save = function() {
+                var editor = ace.edit(document.querySelector('#editor'));
+                var response = editor.getValue();
+                console.log("Function submitted for answer "+response);
                 clmDataStore.events.submitSolution(eventId, taskId, participant.$id, response).then(function() {
                     $mdDialog.hide();
                     spfAlert.success('Response is saved.');
