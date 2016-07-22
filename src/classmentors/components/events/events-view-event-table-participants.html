@@ -73,7 +73,7 @@
                             </span>
                         </div>
 
-                        <div ng-if="task.textResponse">
+                        <div ng-if="task.textResponse && !task.lang">
                             <span ng-if="ctrl.currentUserSolutions[task.$id]">
                                 {{ ctrl.currentUserSolutions[task.$id] | cmTruncate: 10 }}<span ng-if="!ctrl.currentUserProgress[task.$id].completed"></span>
                                 <md-button class="md-icon-button md-primary small-icon"
@@ -92,6 +92,29 @@
                                     ng-disabled="task.closedAt"
                                 >
                                     Submit Response
+                                </md-button>
+                            </span>
+                        </div>
+
+                        <div ng-if="task.textResponse && task.lang">
+                            <span ng-if="ctrl.currentUserSolutions[task.$id]">
+                                {{ ctrl.currentUserSolutions[task.$id] | cmTruncate: 10 }}<span ng-if="!ctrl.currentUserProgress[task.$id].completed"></span>
+                                <md-button class="md-icon-button md-primary small-icon"
+                                           aria-label="Update response"
+                                           ng-click="ctrl.promptForTextResponse(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant, ctrl.currentUserSolutions)"
+                                           ng-if="task.openedAt"
+                                >
+                                    <md-icon md-svg-icon="create"></md-icon>
+                                </md-button>
+                            </span>
+
+                            <span ng-if="!ctrl.currentUserSolutions[task.$id]">
+                                <md-button class="md-raised md-primary"
+                                           aria-label="Submit response"
+                                           ng-click="ctrl.promptForCodeResponse(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant, ctrl.currentUserSolutions)"
+                                           ng-disabled="task.closedAt"
+                                >
+                                    Submit Code
                                 </md-button>
                             </span>
                         </div>
@@ -161,5 +184,4 @@
     </md-content>
 
     <clm-pager options="ctrl.pagerOptions" class="md-padding"></clm-pager>
-
 </div>

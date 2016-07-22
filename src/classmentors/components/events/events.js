@@ -10,8 +10,14 @@ import pagerTmpl from './events-view-pager.html!text';
 import passwordTmpl from './events-view-password.html!text';
 import linkTmpl from './events-view-provide-link.html!text';
 import responseTmpl from './events-view-provide-response.html!text';
-
+import codeTmpl from './events-view-provide-code.html!text';
 import './events.css!';
+import ace from '../../../jspm_packages/github/ajaxorg/ace-builds@1.2.3/ace.js';
+import monokai from '../../../jspm_packages/github/ajaxorg/ace-builds@1.2.3/theme-monokai.js';
+import javascript from '../../../jspm_packages/github/ajaxorg/ace-builds@1.2.3/mode-javascript.js';
+import html from '../../../jspm_packages/github/ajaxorg/ace-builds@1.2.3/mode-html.js';
+import java from '../../../jspm_packages/github/ajaxorg/ace-builds@1.2.3/mode-java.js';
+import python from '../../../jspm_packages/github/ajaxorg/ace-builds@1.2.3/mode-python.js';
 
 const noop = () => undefined;
 
@@ -52,7 +58,6 @@ export function configRoute($routeProvider, routes) {
         initialData: editEventCtrllInitialData
       }
     })
-
 
     .when(routes.addEventTask, {
       template: eventTaskFormTmpl,
@@ -790,36 +795,43 @@ function AddEventTaskCtrl(
   this.challengeRouteProvider = function(eve, event, task, tasktype, isOpen){
     if(tasktype == 'service'){
       console.log('service is clicked');
-
+      return 'Save';
     }else if(tasktype == 'singPath'){
       console.log('singpath is clicked');
+      return 'Save';
 
     }else if(tasktype == 'linkPattern'){
       console.log('linkPattern is clicked');
+      return 'Save';
 
     }else if(tasktype == 'textResponse'){
       console.log('textResponse is clicked');
+      return 'Save';
 
     }else if(tasktype == 'indexCard'){
       console.log('indexCard is clicked');
+      return 'Save';
 
     }else if(tasktype == 'multipleChoice'){
       console.log('multipleChoice is clicked');
-      return '/challenges/mcq'
+      location = '/challenges/mcq';
+      return 'Continue';
 
     }else if(tasktype == 'code'){
       console.log('code is clicked');
+      return 'Save';
 
     }else if(tasktype == 'video'){
       console.log('video is clicked');
+      return 'Continue';
 
     }else if(tasktype == 'journalling'){
       console.log('journalling is clicked');
-
+      return 'Continue';
     }else if (tasktype == 'survey'){
-      clmSurvey.set(event.$id.toString(),event, task, tasktype, isOpen);
-      var obj = clmSurvey.get();
-      return '/challenges/survey'
+        clmSurvey.set(event.$id.toString(),event, task, tasktype, isOpen);
+        var obj = clmSurvey.get();
+        return '/challenges/survey'
     }
   }
 
@@ -934,31 +946,30 @@ AddEventTaskCtrl.$inject = [
   'clmSurvey'
 ];
 
-
 //////////////////////////////implemented survey challenge//////////////////////////////////////
 export function clmSurveyTaskFactory() {
-  var sharedData = {};
-  //console.log("it comes in here");
-  function set(eventId, event, task, tasktype, isOpen) {
-    sharedData.eventId = eventId;
-    sharedData.event = event;
-    sharedData.task = task;
-    sharedData.taskType = tasktype;
-    sharedData.isOpen = isOpen;
-    //sharedData.currentUser = spfAuthData.user();
+    var sharedData = {};
+    //console.log("it comes in here");
+      function set(eventId, event, task, tasktype, isOpen) {
+            sharedData.eventId = eventId;
+            sharedData.event = event;
+            sharedData.task = task;
+            sharedData.taskType = tasktype;
+            sharedData.isOpen = isOpen;
+            //sharedData.currentUser = spfAuthData.user();
 
-  }
+                }
 
-  function get() {
-    return sharedData;
-  }
+    function get() {
+        return sharedData;
+    }
 
-  return {
-    set: set,
-    get: get
-  };
-
+    return {
+        set: set,
+        get: get
+    };
 }
+
 
 /**
  * Used to resolve `initialData` of `EditEventTaskCtrl`.
@@ -1031,6 +1042,8 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBar
     this.taskType = 'service';
   } else if (this.task.linkPattern) {
     this.taskType = 'linkPattern';
+  } else if (this.task.lang) {
+      this.taskType = 'code';
   } else if (this.task.textResponse) {
     this.taskType = 'textResponse';
   }else if (this.task.multipleChoice) {
@@ -1648,6 +1661,55 @@ function ClmEventTableCtrl(
       };
     }
   };
+
+    this.promptForCodeResponse = function(eventId, taskId, task, participant, userSolution) {
+        $mdDialog.show({
+            clickOutsideToClose: true,
+            // parent: $document.body,
+            parent: angular.element(document.body),
+            template: codeTmpl,
+            // contentElement: document.querySelector('#myStaticDialog'),
+            onComplete: loadEditor,
+            controller: CodeController,
+            controllerAs: 'ctrl'
+        });
+
+        function loadEditor() {
+            console.log(document);
+            var editor = ace.edit(document.querySelector('#editor'));
+            console.log(document.querySelector('#editor'));
+            console.log(editor);
+            // ace.require("ace/ext/language_tools");
+            // // editor.setTheme(monokai);
+            editor.setTheme("ace/theme/monokai");
+            editor.getSession().setMode("ace/mode/"+task.lang.toLowerCase());
+        }
+
+        function CodeController() {
+            this.task = task;
+            if (
+                userSolution &&
+                userSolution[taskId]
+            ) {
+                this.solution = userSolution[taskId];
+            }
+
+            this.save = function(response) {
+                clmDataStore.events.submitSolution(eventId, taskId, participant.$id, response).then(function() {
+                    $mdDialog.hide();
+                    spfAlert.success('Response is saved.');
+                }).catch(function(err) {
+                    $log.error(err);
+                    spfAlert.error('Failed to save your response.');
+                    return err;
+                });
+            };
+
+            this.cancel = function() {
+                $mdDialog.hide();
+            };
+        }
+    };
 
   this.update = function() {};
   /*
