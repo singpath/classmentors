@@ -8,11 +8,47 @@ const noop = () => undefined;
 
 //TODO: implement logic for creating of mcq questions
 
-export function newMcqController(eventService, challengeService){
-  this.data = eventService.get();
-  this.test = challengeService.save;
+export function newMcqController(initialData, challengeService){
+  // this.data = eventService.get();
+  var self = this;
+  self.data = initialData.data;
+  self.task = {
+    title: initialData.title,
+    description: initialData.desc
+  }
+  self.test = challengeService.save;
+  self.questions = [];
+
+  self.addQuestion = function(){
+    var question = {
+
+    }
+    self.questions.push(question);
+    console.log('Length of questions, ', self.questions.length);
+  }
+
+  self.removeQuestion = function(itemIndex){
+    if(itemIndex > -1){
+      var removed = self.mcqList.splice(itemIndex,1);
+      console.log('Removed : ', removed);
+    }
+  }
+
+  self.addOption = function () {
+
+  }
+
+  self.removeOption = function () {
+
+  }
+
+
+
 }
-newMcqController.$inject = ['eventService', 'challengeService'];
+newMcqController.$inject = [
+  'initialData',
+  'challengeService'
+];
 
 //this export function return the template when creating a new mcq challenge
 export function newMcqTmpl(){

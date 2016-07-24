@@ -88,6 +88,7 @@ export function eventServiceFactory($q, $route, spfAuthData, clmDataStore, spfFi
   var eventService = {
     set: function(data) {
       savedData = data;
+      console.log(savedData);
     },
     get: function(){
       return savedData;
@@ -829,9 +830,12 @@ function AddEventTaskCtrl(
       console.log('journalling is clicked');
       return 'Continue';
     }else if (tasktype == 'survey'){
+        //TODO: Refactor this to reuse existing methods.
         clmSurvey.set(event.$id.toString(),event, task, tasktype, isOpen);
         var obj = clmSurvey.get();
         return '/challenges/survey'
+    }else{
+        return 'Save'; // by default should show 'save'
     }
   }
 
@@ -865,12 +869,6 @@ function AddEventTaskCtrl(
 
   this.saveTask = function(event, _, task, taskType, isOpen) {
     var copy = spfFirebase.cleanObj(task);
-    var data = {
-        taskType: taskType,
-        isOpen: isOpen,
-        event: event,
-        task: task
-    };
 
     if (taskType === 'linkPattern') {
       delete copy.badge;
@@ -1146,12 +1144,6 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBar
 
   this.saveTask = function(event, taskId, task, taskType, isOpen) {
     var copy = spfFirebase.cleanObj(task);
-    var data = {
-      taskType: taskType,
-      isOpen: isOpen,
-      event: event,
-      task: task
-    };
 
     if (taskType === 'linkPattern') {
       delete copy.badge;
@@ -1196,6 +1188,7 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBar
             url: `#${urlFor('editEvent', {eventId: this.event.$id})}`
           }]
       );
+      console.log(data)
       eventService.set(data);
       $location.path(location);
     }else{
