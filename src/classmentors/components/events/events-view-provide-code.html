@@ -1,0 +1,23 @@
+<md-dialog aria-label="{{ctrl.task.title}}" class="enlarged-dialog">
+    <form name="provideResponseForm" ng-submit="ctrl.save()">
+        <md-dialog-content class="sticky-container">
+            <md-subheader class="md-sticky-no-effect">{{ctrl.task.title}}</md-subheader>
+            <div>
+                <p>{{ctrl.task.description}}</p>
+                <p>{{ctrl.task.textResponse}}</p>
+                <p>Language: {{ctrl.task.lang}}</p>
+                <div id="editor">{{ctrl.solution}}</div>
+            </div>
+            <md-dialog-actions layout="row" layout-align="center end">
+                <div>
+                    <md-button type="submit" class="md-primary md-raised" ng-disabled="!provideResponseForm.$valid">
+                        Save
+                    </md-button>
+                </div>
+                <div>
+                    <md-button ng-click="ctrl.cancel()" type="button" class="md-accent">Cancel</md-button>
+                </div>
+            </md-dialog-actions>
+        </md-dialog-content>
+    </form>
+</md-dialog>
