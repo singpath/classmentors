@@ -69,7 +69,8 @@ module.constant('routes', {
   setProfileCodeCombatId: '/profile/codeCombat',
   cohort: '/cohort',
   viewMcq: '/challenges/mcq',
-  viewSurvey: '/challenges/survey'
+  viewSurvey: '/challenges/survey',
+  //viewSchEngageScale: '/events/:eventId/survey-task'
 });
 
 module.config([

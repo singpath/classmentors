@@ -19,6 +19,8 @@ import html from '../../../jspm_packages/github/ajaxorg/ace-builds@1.2.3/mode-ht
 import java from '../../../jspm_packages/github/ajaxorg/ace-builds@1.2.3/mode-java.js';
 import python from '../../../jspm_packages/github/ajaxorg/ace-builds@1.2.3/mode-python.js';
 
+import schEngageScaleTmpl from './events-view-schEngageScale-task-form.html!text';
+
 const noop = () => undefined;
 
 export function configRoute($routeProvider, routes) {
@@ -75,6 +77,14 @@ export function configRoute($routeProvider, routes) {
       resolve: {
         initialData: editEventTaskCtrlInitialData
       }
+    })
+
+    .when('/events/:eventId/survey-task', {
+
+      template: schEngageScaleTmpl,
+      //controller: SurveyFormFillCtrl,
+      //controllerAs: 'ctrl'
+
     });
 }
 
@@ -331,7 +341,7 @@ NewEventCtrl.$inject = [
  *
  */
 function viewEventCtrlInitialData($q, $route, spfAuth, spfAuthData, clmDataStore) {
-  var errNoEvent = new Error('Event not found');
+  var errNoEvent = new Error('Event not found-1');
   var eventId = $route.current.params.eventId;
 
   var profilePromise = clmDataStore.currentUserProfile().catch(noop);
@@ -591,7 +601,7 @@ ViewEventCtrl.$inject = [
  *
  */
 function baseEditCtrlInitialData($q, $route, spfAuthData, clmDataStore) {
-  var errNoEvent = new Error('Event not found');
+  var errNoEvent = new Error('Event not found-2');
   var errNotAuthaurized = new Error('You cannot edit this event');
   var eventId = $route.current.params.eventId;
 
@@ -793,6 +803,7 @@ function AddEventTaskCtrl(
   //TODO: fill in respective routes for various challenge types.
   //TODO: grab form data.
   this.challengeRouteProvider = function(eve, event, task, tasktype, isOpen){
+
     if(tasktype == 'service'){
       console.log('service is clicked');
       return 'Save';
@@ -830,6 +841,7 @@ function AddEventTaskCtrl(
       return 'Continue';
     }else if (tasktype == 'survey'){
         clmSurvey.set(event.$id.toString(),event, task, tasktype, isOpen);
+        this.task.survey = task.survey;
         var obj = clmSurvey.get();
         return '/challenges/survey'
     }
@@ -858,6 +870,7 @@ function AddEventTaskCtrl(
 
           this.task.linkPattern = task.linkPattern
           this.task.textResponse = task.textResponse
+
           this.task.cards = task.cards
       };
   }
@@ -958,7 +971,7 @@ export function clmSurveyTaskFactory() {
             sharedData.isOpen = isOpen;
             //sharedData.currentUser = spfAuthData.user();
 
-                }
+      }
 
     function get() {
         return sharedData;
@@ -976,8 +989,8 @@ export function clmSurveyTaskFactory() {
  *
  */
 function editEventTaskCtrlInitialData($q, $route, spfAuthData, clmDataStore) {
-  var errNoEvent = new Error('Event not found');
-  var errNoTask = new Error('Event not found');
+  var errNoEvent = new Error('Event not found-3');
+  var errNoTask = new Error('Event not found-4');
   var errNotAuthaurized = new Error('You cannot edit this event');
   var eventId = $route.current.params.eventId;
   var taskId = $route.current.params.taskId;
@@ -1305,7 +1318,7 @@ export function clmEventTableFactory() {
 
 function ClmEventTableCtrl(
   $scope, $q, $log, $mdDialog, $document,
-  urlFor, spfAlert, clmServicesUrl, clmDataStore, clmPagerOption
+  urlFor, spfAlert, clmServicesUrl, clmDataStore, clmPagerOption, $location, routes, $route
 ) {
   var self = this;
   var unwatchers = [];
@@ -1337,6 +1350,7 @@ function ClmEventTableCtrl(
     }
 
     self.currentUserParticipant = self.participants.$getRecord(self.profile.$id);
+    console.log("this profile id is " + self.profile.$id);
   }
 
   /**
@@ -1628,6 +1642,24 @@ function ClmEventTableCtrl(
     }
   };
 
+  //////////////added survey/////////////////////
+  this.promptForSurvey = function(eventId, taskId, task, participant, userSolution){
+    //mdDialog opens the dialog over the app aka modal popup
+    console.log("prompt for survey task : ", task.survey);
+
+    if(task.survey === "School engagement scale"){
+      //TODO: implement config route to route to survey form template
+      console.log("school engagement came in here");
+      console.log("routes is: ", routes);
+      console.log("my eventid is: ", eventId);
+
+
+      $location.path('/events/' + eventId + '/survey-task');
+
+    }
+
+  };
+
   this.promptForTextResponse = function(eventId, taskId, task, participant, userSolution) {
     $mdDialog.show({
       parent: $document.body,
@@ -1813,7 +1845,14 @@ ClmEventTableCtrl.$inject = [
   'spfAlert',
   'clmServicesUrl',
   'clmDataStore',
-  'clmPagerOption'
+  'clmPagerOption',
+  '$location',
+  'routes',
+  '$route'
+
+
+
+
 ];
 
 export function clmEventRankTableFactory() {
