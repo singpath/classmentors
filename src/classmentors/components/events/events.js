@@ -2513,7 +2513,7 @@ function ClmEventResultsTableCtrl(
         }
     };
 
-    this.promptForTextResponse = function(eventId, taskId, task, participant, userSolution) {
+    this.viewTextResponse = function(eventId, taskId, task, participant, userSolution) {
         $mdDialog.show({
             parent: $document.body,
             template: responseTmpl,
@@ -2523,12 +2523,12 @@ function ClmEventResultsTableCtrl(
 
         function DialogController() {
             this.task = task;
-            if (
-                userSolution &&
-                userSolution[taskId]
-            ) {
-                this.solution = userSolution[taskId];
-            }
+            // if (
+            //     userSolution &&
+            //     userSolution[taskId]
+            // ) {
+                this.solution = userSolution;
+            // }
 
             this.save = function(response) {
                 clmDataStore.events.submitSolution(eventId, taskId, participant.$id, response).then(function() {

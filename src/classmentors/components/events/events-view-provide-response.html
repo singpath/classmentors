@@ -6,11 +6,10 @@
                 <p>{{ctrl.task.description}}</p>
                 <md-input-container>
                     <label for="edit-solution-response">{{ctrl.task.textResponse}}</label>
-                    <input type="text" name="linkSolution" id="edit-solution-response"
-                        ng-model="ctrl.solution"
-                        required="true"
-                        placeholer="URL to provide"
-                    />
+                    <textarea name="linkSolution" id="edit-solution-response"
+                              ng-model="ctrl.solution"
+                              required="true"
+                              placeholer="URL to provide"></textarea>
                     <div ng-messages="provideResponseForm.linkSolution.$error">
                         <div ng-message="required">Required.</div>
                     </div>
