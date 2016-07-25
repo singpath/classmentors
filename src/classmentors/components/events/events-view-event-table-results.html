@@ -23,6 +23,9 @@
                     Submission
                     {{ctrl.taskCompletion[ctrl.selected.$id] | number: 0}} %
                 </th>
+                <th rowspan="8">
+                    Allocated Points
+                </th>
             </tr>
             <!--<tr>-->
                 <!--<th ng-if="ctrl.visibleTasks.length == 0"></th>-->
@@ -39,8 +42,8 @@
             </thead>
             <tbody>
 
-            <tr ng-if="ctrl.currentUserParticipant">
-                <th layout="row" layout-align="start center">
+            <tr ng-repeat="participant in ctrl.participantsView track by participant.$id" ng-class="'index-' + $index + ' ' + ($odd ? 'odd' : 'even')">
+                <th layout="row" layout-align="start center" ng-if="ctrl.currentUserParticipant.$id === participant.$id">
                     <md-button class="name-button" ng-href="#{{ 'profile' | urlFor:{'publicId': ctrl.currentUserParticipant.$id} }}">
                         Yourself
                     </md-button>
@@ -48,7 +51,18 @@
                     <md-button class="md-icon-button md-primary small-icon" aria-label="Update" ng-click="ctrl.update(ctrl.event, ctrl.tasks, ctrl.currentUserSolutions, ctrl.profile)">
                         <md-icon md-svg-icon="loop"></md-icon>
                     </md-button>
+                </th>
 
+                <th layout="row" layout-align="start center" ng-if="ctrl.currentUserParticipant.$id !== participant.$id">
+                    <md-button class="name-button" ng-href="#{{ 'profile' | urlFor:{'publicId': participant.$id} }}">
+                        {{ participant.user.displayName }}
+                    </md-button>
+
+                    <span ng-if="ctrl.profile.$id == ctrl.event.owner.publicId &amp;&amp; participant.$id != ctrl.profile.$id">
+                            <md-button class="md-icon-button md-primary small-icon" aria-label="Delete" ng-click="ctrl.removeParticipant($event, ctrl.event, participant)">
+                                <md-icon md-svg-icon="clear"></md-icon>
+                            </md-button>
+                        </span>
                 </th>
 
                 <!--<td ng-repeat="task in ctrl.visibleTasks track by task.$id">-->
@@ -73,33 +87,31 @@
                     <!--</div>-->
 
                     <div ng-if="ctrl.selected.textResponse && !ctrl.selected.lang">
-                        <span ng-if="ctrl.currentUserSolutions[ctrl.selected.$id]">
-                            <span ng-if="!ctrl.currentUserProgress[ctrl.selected.$id].completed"></span>
+                        <span ng-if="ctrl.solutions[participant.$id][ctrl.selected.$id]">
                             <md-button class="md-raised md-primary"
                                        aria-label="Update response"
-                                       ng-click="ctrl.viewTextResponse(ctrl.event.$id, ctrl.selected.$id, ctrl.selected, ctrl.currentUserParticipant, ctrl.currentUserSolutions)"
+                                       ng-click="ctrl.viewTextResponse(ctrl.event.$id, ctrl.selected.$id, ctrl.selected, participant, ctrl.solutions[participant.$id])"
                                        ng-if="ctrl.selected.openedAt"
                             >View Response
                             </md-button>
                         </span>
 
-                        <span ng-if="!ctrl.currentUserSolutions[ctrl.selected.$id]">
+                        <span ng-if="!ctrl.solutions[participant.$id][ctrl.selected.$id]">
                             No Submission
                         </span>
                     </div>
 
                     <div ng-if="ctrl.selected.textResponse && ctrl.selected.lang">
-                        <span ng-if="ctrl.currentUserSolutions[ctrl.selected.$id]">
-                            <span ng-if="!ctrl.currentUserProgress[ctrl.selected.$id].completed"></span>
+                        <span ng-if="ctrl.solutions[participant.$id][ctrl.selected.$id]">
                             <md-button class="md-raised md-primary"
                                        aria-label="Update response"
-                                       ng-click="ctrl.viewCodeResponse(ctrl.event.$id, ctrl.selected.$id, ctrl.selected, ctrl.currentUserParticipant, ctrl.currentUserSolutions)"
+                                       ng-click="ctrl.viewCodeResponse(ctrl.event.$id, ctrl.selected.$id, ctrl.selected, participant, ctrl.solutions[participant.$id])"
                                        ng-if="ctrl.selected.openedAt"
                             >View Code
                             </md-button>
                         </span>
 
-                        <span ng-if="!ctrl.currentUserSolutions[ctrl.selected.$id]">
+                        <span ng-if="!ctrl.solutions[participant.$id][ctrl.selected.$id]">
                             No Submission
                         </span>
                     </div>
@@ -126,58 +138,6 @@
                                 <!--</md-button>-->
                             <!--</span>-->
                     <!--</div>-->
-                </td>
-            </tr>
-
-            <tr ng-repeat="participant in ctrl.participantsView track by participant.$id" ng-class="'index-' + $index + ' ' + ($odd ? 'odd' : 'even')">
-
-                <th layout="row" layout-align="start center">
-                    <md-button class="name-button" ng-href="#{{ 'profile' | urlFor:{'publicId': participant.$id} }}">
-                        {{ participant.user.displayName }}
-                    </md-button>
-
-                    <span ng-if="ctrl.profile.$id == ctrl.event.owner.publicId &amp;&amp; participant.$id != ctrl.profile.$id">
-                            <md-button class="md-icon-button md-primary small-icon" aria-label="Delete" ng-click="ctrl.removeParticipant($event, ctrl.event, participant)">
-                                <md-icon md-svg-icon="clear"></md-icon>
-                            </md-button>
-                        </span>
-                </th>
-
-                <td>
-                    <div ng-if="ctrl.progress[participant.$id][ctrl.selected.$id].completed &amp;&amp; (ctrl.profile.$id == ctrl.event.owner.publicId || ctrl.selected.showProgress)">
-                            <span ng-if="(!ctrl.selected.textResponse &amp;&amp; !ctrl.selected.linkPattern) || (!ctrl.selected.showLinks &amp;&amp; ctrl.profile.$id != ctrl.event.owner.publicId)">
-                                Completed
-                            </span>
-
-                        <span ng-if="ctrl.selected.showLinks || ctrl.profile.$id == ctrl.event.owner.publicId">
-                                <span ng-if="ctrl.selected.linkPattern">
-                                    <a ng-href="{{ctrl.solutions[participant.$id][ctrl.selected.$id]}}" target="_blank">Completed</a>
-                                </span>
-                                <span ng-if="ctrl.selected.textResponse && !ctrl.selected.lang">
-                                    <!--{{ ctrl.solutions[participant.$id][ctrl.selected.$id] | cmTruncate: 10 }}-->
-                                    <md-button class="md-raised md-primary"
-                                               aria-label="Update response"
-                                               ng-click="ctrl.viewTextResponse(ctrl.event.$id, ctrl.selected.$id, ctrl.selected, participant, ctrl.solutions[participant.$id])"
-                                               ng-if="ctrl.selected.openedAt"
-                                    >View Response
-                                    </md-button>
-                                </span>
-                                <span ng-if="ctrl.selected.textResponse && ctrl.selected.lang">
-                                    <!--{{ ctrl.solutions[participant.$id][ctrl.selected.$id] | cmTruncate: 10 }}-->
-                                    <md-button class="md-raised md-primary"
-                                               aria-label="Update response"
-                                               ng-click="ctrl.viewCodeResponse(ctrl.event.$id, ctrl.selected.$id, ctrl.selected, participant, ctrl.solutions[participant.$id])"
-                                               ng-if="ctrl.selected.openedAt"
-                                    >View Code
-                                    </md-button>
-                                </span>
-                            </span>
-                    </div>
-                    <div ng-if="!ctrl.progress[participant.$id][ctrl.selected.$id].completed &amp;&amp; (ctrl.profile.$id == ctrl.event.owner.publicId || ctrl.selected.showProgress)">
-                            <span>
-                                No Submission
-                            </span>
-                    </div>
                 </td>
             </tr>
 

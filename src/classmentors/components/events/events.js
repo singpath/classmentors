@@ -2195,6 +2195,7 @@ function ClmEventResultsTableCtrl(
     var self = this;
     var unwatchers = [];
 
+
     this.currentUserParticipant = undefined;
     this.participantsView = [];
     this.visibleTasks = [];
@@ -2380,6 +2381,7 @@ function ClmEventResultsTableCtrl(
         var rows = sortedParticipants(self.participants, self.orderOptions);
 
         self.participantsView = rows.slice(self.pagerOptions.range.start, self.pagerOptions.range.end);
+        self.participantsView.unshift(self.currentUserParticipant);
     }
 
     /**
@@ -2520,6 +2522,7 @@ function ClmEventResultsTableCtrl(
             controller: DialogController,
             controllerAs: 'ctrl'
         });
+        console.log(this.currentUserProgress);
 
         function DialogController() {
             this.task = task;
