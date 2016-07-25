@@ -6,3 +6,7 @@ coverage/
 *.sublime-workspace
 npm-debug.log
 worker/*.env
+.idea/classmentors.iml
+*.xml
+.idea/vcs.xml
+.idea/modules.xml

@@ -1,6 +1,7 @@
 import editTmpl from './events-view-event-edit.html!text';
 import eventTableParticipantsTmpl from './events-view-event-table-participants.html!text';
 import eventTableRankTmpl from './events-view-event-table-rank.html!text';
+import eventTableResultsTmpl from './events-view-event-table-results.html!text';
 import eventTaskFormTmpl from './events-view-event-task-form.html!text';
 import eventTmpl from './events-view-event.html!text';
 import listTmpl from './events-view-list.html!text';
@@ -9,7 +10,14 @@ import pagerTmpl from './events-view-pager.html!text';
 import passwordTmpl from './events-view-password.html!text';
 import linkTmpl from './events-view-provide-link.html!text';
 import responseTmpl from './events-view-provide-response.html!text';
+import codeTmpl from './events-view-provide-code.html!text';
 import './events.css!';
+import ace from '../../../jspm_packages/github/ajaxorg/ace-builds@1.2.3/ace.js';
+import monokai from '../../../jspm_packages/github/ajaxorg/ace-builds@1.2.3/theme-monokai.js';
+import javascript from '../../../jspm_packages/github/ajaxorg/ace-builds@1.2.3/mode-javascript.js';
+import html from '../../../jspm_packages/github/ajaxorg/ace-builds@1.2.3/mode-html.js';
+import java from '../../../jspm_packages/github/ajaxorg/ace-builds@1.2.3/mode-java.js';
+import python from '../../../jspm_packages/github/ajaxorg/ace-builds@1.2.3/mode-python.js';
 
 const noop = () => undefined;
 
@@ -72,6 +80,62 @@ export function configRoute($routeProvider, routes) {
 
 configRoute.$inject = ['$routeProvider', 'routes'];
 
+
+//Create eventServiceFactory
+//TODO: Edit
+export function eventServiceFactory($q, $route, spfAuthData, clmDataStore, spfFirebase, $log, spfAlert) {
+  var savedData = {};
+  var eventService = {
+    set: function(data) {
+      savedData = data;
+    },
+    get: function(){
+      return savedData;
+    },
+    save: function(event, _, task, taskType, isOpen) {
+            var copy = spfFirebase.cleanObj(task);
+            console.log('Copy is.. : ', copy);
+            if (taskType === 'linkPattern') {
+                delete copy.badge;
+                delete copy.serviceId;
+                delete copy.singPathProblem;
+            } else if (copy.serviceId === 'singPath') {
+                delete copy.badge;
+                if (copy.singPathProblem) {
+                  copy.singPathProblem.path = spfFirebase.cleanObj(task.singPathProblem.path);
+                  copy.singPathProblem.level = spfFirebase.cleanObj(task.singPathProblem.level);
+                  copy.singPathProblem.problem = spfFirebase.cleanObj(task.singPathProblem.problem);
+                }
+            } else {
+                delete copy.singPathProblem;
+                copy.badge = spfFirebase.cleanObj(task.badge);
+            }
+
+            if (!copy.link) {
+                // delete empty link. Can't be empty string
+                delete copy.link;
+            }
+
+            self.creatingTask = true;
+            clmDataStore.events.addTask(event.$id, copy, isOpen);
+                // .then(function() {
+                // spfAlert.success('Task created');
+                // $location.path(urlFor('editEvent', {eventId: self.event.$id}));
+                // }).catch(function(err) {
+                //     $log.error(err);
+                //     spfAlert.error('Failed to created new task');
+                // }).finally(function() {
+                //     self.creatingTask = false;
+                // });
+        }
+
+  };
+  return eventService;
+}
+
+eventServiceFactory.$inject = [
+    '$q', '$route', 'spfAuthData', 'clmDataStore', 'spfFirebase', '$log', 'spfAlert'
+];
 /**
  * Used to resolve `initialData` of `ClmListEvent`.
  *
@@ -342,6 +406,7 @@ function ViewEventCtrl(
   this.canView = initialData.canView;
   this.viewArchived = false;
   this.selected = null;
+  this.isOwner = false;
 
   if (
     self.event &&
@@ -353,6 +418,7 @@ function ViewEventCtrl(
     monitorHandler = clmDataStore.events.monitorEvent(
       this.event, this.tasks, this.participants, this.solutions, this.progress
     );
+    this.isOwner = true;
   } else {
     monitorHandler = {
       update: noop,
@@ -682,8 +748,10 @@ addEventTaskCtrlInitialData.$inject = ['$q', '$route', 'spfAuthData', 'clmDataSt
  *
  */
 function AddEventTaskCtrl(
-  initialData, $location, $log, spfFirebase, spfAlert, urlFor, spfNavBarService, clmDataStore
+  initialData, $location, $log, spfFirebase, spfAlert, urlFor, spfNavBarService, clmDataStore, $mdDialog, $scope,
+  eventService, clmSurvey
 ) {
+
   var self = this;
 
   this.event = initialData.event;
@@ -692,6 +760,8 @@ function AddEventTaskCtrl(
   this.singPath = initialData.singPath;
   this.savingTask = false;
   this.task = {archived: false};
+  this.enableBeta = true;
+  var location;
 
   spfNavBarService.update(
     'New Challenge', [{
@@ -706,11 +776,13 @@ function AddEventTaskCtrl(
     }]
   );
 
+
   this.loadLevels = function(selected) {
     return clmDataStore.singPath.levels(selected.path.id).then(function(levels) {
       self.singPath.levels = levels;
     });
   };
+
 
   this.loadProblems = function(selected) {
     return clmDataStore.singPath.problems(selected.path.id, selected.level.id).then(function(problems) {
@@ -718,8 +790,87 @@ function AddEventTaskCtrl(
     });
   };
 
+  //TODO: fill in respective routes for various challenge types.
+  //TODO: grab form data.
+  this.challengeRouteProvider = function(eve, event, task, tasktype, isOpen){
+    if(tasktype == 'service'){
+      console.log('service is clicked');
+      return 'Save';
+    }else if(tasktype == 'singPath'){
+      console.log('singpath is clicked');
+      return 'Save';
+
+    }else if(tasktype == 'linkPattern'){
+      console.log('linkPattern is clicked');
+      return 'Save';
+
+    }else if(tasktype == 'textResponse'){
+      console.log('textResponse is clicked');
+      return 'Save';
+
+    }else if(tasktype == 'indexCard'){
+      console.log('indexCard is clicked');
+      return 'Save';
+
+    }else if(tasktype == 'multipleChoice'){
+      console.log('multipleChoice is clicked');
+      location = '/challenges/mcq';
+      return 'Continue';
+
+    }else if(tasktype == 'code'){
+      console.log('code is clicked');
+      return 'Save';
+
+    }else if(tasktype == 'video'){
+      console.log('video is clicked');
+      return 'Continue';
+
+    }else if(tasktype == 'journalling'){
+      console.log('journalling is clicked');
+      return 'Continue';
+    }else if (tasktype == 'survey'){
+        clmSurvey.set(event.$id.toString(),event, task, tasktype, isOpen);
+        var obj = clmSurvey.get();
+        return '/challenges/survey'
+    }
+  }
+
+  //this function double checks with user if he wishes to go back and discard all changes thus far
+  this.discardChanges = function (ev,task){
+      var confirm = $mdDialog.confirm()
+          .title('Would you like to discard your changes?')
+          .textContent('All of the information input will be discarded. Are you sure you want to continue?')
+          .ariaLabel('Discard changes')
+          .targetEvent(ev)
+          .ok('Discard All')
+          .cancel('Do Not Discard');
+      $mdDialog.show(confirm).then(function() {
+          // decided to discard data, bring user to previous page
+          $location.path(urlFor('editEvent', {eventId: self.event.$id}));
+
+      }), function() {
+          //go back to the current page
+          //todo: preserve the data that was keyed into form. (data should not be saved into the db yet)
+          this.task.title = task.title
+          this.task.priority = task.priority
+          this.task.description = task.description
+          this.task.link = task.link
+
+          this.task.linkPattern = task.linkPattern
+          this.task.textResponse = task.textResponse
+          this.task.cards = task.cards
+      };
+  }
+
+
   this.saveTask = function(event, _, task, taskType, isOpen) {
     var copy = spfFirebase.cleanObj(task);
+    var data = {
+        taskType: taskType,
+        isOpen: isOpen,
+        event: event,
+        task: task
+    };
 
     if (taskType === 'linkPattern') {
       delete copy.badge;
@@ -742,17 +893,43 @@ function AddEventTaskCtrl(
       delete copy.link;
     }
 
+
     self.creatingTask = true;
-    clmDataStore.events.addTask(event.$id, copy, isOpen).then(function() {
-      spfAlert.success('Task created');
-      $location.path(urlFor('editEvent', {eventId: self.event.$id}));
-    }).catch(function(err) {
-      $log.error(err);
-      spfAlert.error('Failed to created new task');
-    }).finally(function() {
-      self.creatingTask = false;
-    });
-  };
+    if(taskType === 'multipleChoice' || taskType === 'journalling' || taskType === 'video'){
+      var data = {
+        taskType: taskType,
+        isOpen: isOpen,
+        event: event,
+        task: task
+      };
+      console.log('Data shows... ', data);
+      spfNavBarService.update(
+          'New Challenge Details', [{
+            title: 'Events',
+            url: `#${urlFor('events')}`
+          }, {
+            title: this.event.title,
+            url: `#${urlFor('oneEvent', {eventId: this.event.$id})}`
+          }, {
+            title: 'Challenges',
+            url: `#${urlFor('editEvent', {eventId: this.event.$id})}`
+          }]
+      );
+      eventService.set(data);
+      $location.path(location);
+    }else{
+      clmDataStore.events.addTask(event.$id, copy, isOpen).then(function() {
+        spfAlert.success('Task created');
+        $location.path(urlFor('editEvent', {eventId: self.event.$id}));
+      }).catch(function(err) {
+        $log.error(err);
+        spfAlert.error('Failed to created new task');
+      }).finally(function() {
+        self.creatingTask = false;
+      });
+    }
+
+  }
 }
 AddEventTaskCtrl.$inject = [
   'initialData',
@@ -762,8 +939,37 @@ AddEventTaskCtrl.$inject = [
   'spfAlert',
   'urlFor',
   'spfNavBarService',
-  'clmDataStore'
+  'clmDataStore',
+  '$mdDialog',
+  '$scope',
+  'eventService',
+  'clmSurvey'
 ];
+
+//////////////////////////////implemented survey challenge//////////////////////////////////////
+export function clmSurveyTaskFactory() {
+    var sharedData = {};
+    //console.log("it comes in here");
+      function set(eventId, event, task, tasktype, isOpen) {
+            sharedData.eventId = eventId;
+            sharedData.event = event;
+            sharedData.task = task;
+            sharedData.taskType = tasktype;
+            sharedData.isOpen = isOpen;
+            //sharedData.currentUser = spfAuthData.user();
+
+                }
+
+    function get() {
+        return sharedData;
+    }
+
+    return {
+        set: set,
+        get: get
+    };
+}
+
 
 /**
  * Used to resolve `initialData` of `EditEventTaskCtrl`.
@@ -819,7 +1025,8 @@ editEventTaskCtrlInitialData.$inject = ['$q', '$route', 'spfAuthData', 'clmDataS
  * EditEventTaskCtrl
  *
  */
-function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBarService, clmDataStore) {
+
+function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBarService, clmDataStore, eventService, $mdDialog,$location) {
   var self = this;
 
   this.event = initialData.event;
@@ -828,13 +1035,19 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBar
   this.task = initialData.task;
   this.isOpen = Boolean(this.task.openedAt);
   this.savingTask = false;
+  this.enableBeta = true;
+  var location;
 
   if (this.task.serviceId) {
     this.taskType = 'service';
   } else if (this.task.linkPattern) {
     this.taskType = 'linkPattern';
+  } else if (this.task.lang) {
+      this.taskType = 'code';
   } else if (this.task.textResponse) {
     this.taskType = 'textResponse';
+  }else if (this.task.multipleChoice) {
+    this.taskType = 'multipleChoice';
   }
 
   // md-select badge list and the the ng-model are compared
@@ -861,8 +1074,84 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBar
     }]
   );
 
+
+  this.challengeRouteProvider = function(tasktype){
+    if(tasktype == 'service'){
+      console.log('service is clicked');
+      return 'Save';
+    }else if(tasktype == 'singPath'){
+      console.log('singpath is clicked');
+      return 'Save';
+
+    }else if(tasktype == 'linkPattern'){
+      console.log('linkPattern is clicked');
+      return 'Save';
+
+    }else if(tasktype == 'textResponse'){
+      console.log('textResponse is clicked');
+      return 'Save';
+
+    }else if(tasktype == 'indexCard'){
+      console.log('indexCard is clicked');
+      return 'Save';
+
+    }else if(tasktype == 'multipleChoice'){
+      console.log('multipleChoice is clicked');
+      location = '/challenges/mcq';
+      return 'Continue';
+
+    }else if(tasktype == 'code'){
+      console.log('code is clicked');
+      return 'Save';
+
+    }else if(tasktype == 'video'){
+      console.log('video is clicked');
+      return 'Continue';
+
+    }else if(tasktype == 'journalling'){
+      console.log('journalling is clicked');
+      return 'Continue';
+    }else{
+      return 'Save';
+    }
+  }
+
+
+  //this function double checks with user if he wishes to go back and discard all changes thus far
+  this.discardChanges = function (ev,task){
+    var confirm = $mdDialog.confirm()
+        .title('Would you like to discard your changes?')
+        .textContent('All of the information input will be discarded. Are you sure you want to continue?')
+        .ariaLabel('Discard changes')
+        .targetEvent(ev)
+        .ok('Discard All')
+        .cancel('Do Not Discard');
+    $mdDialog.show(confirm).then(function() {
+      // decided to discard data, bring user to previous page
+      $location.path(urlFor('editEvent', {eventId: self.event.$id}));
+
+    }), function() {
+      //go back to the current page
+      //todo: preserve the data that was keyed into form. (data should not be saved into the db yet)
+      this.task.title = task.title
+      this.task.priority = task.priority
+      this.task.description = task.description
+      this.task.link = task.link
+
+      this.task.linkPattern = task.linkPattern
+      this.task.textResponse = task.textResponse
+      this.task.cards = task.cards
+    };
+  }
+
   this.saveTask = function(event, taskId, task, taskType, isOpen) {
     var copy = spfFirebase.cleanObj(task);
+    var data = {
+      taskType: taskType,
+      isOpen: isOpen,
+      event: event,
+      task: task
+    };
 
     if (taskType === 'linkPattern') {
       delete copy.badge;
@@ -885,26 +1174,98 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBar
       delete copy.link;
     }
 
-    self.savingTask = true;
-    clmDataStore.events.updateTask(event.$id, taskId, copy).then(function() {
-      if (
-        (isOpen && task.openedAt) ||
-        (!isOpen && task.closedAt)
-      ) {
-        return;
-      } else if (isOpen) {
-        return clmDataStore.events.openTask(event.$id, taskId);
-      }
 
-      return clmDataStore.events.closeTask(event.$id, taskId);
-    }).then(function() {
-      spfAlert.success('Task saved');
-    }).catch(function() {
-      spfAlert.error('Failed to save the task.');
-    }).finally(function() {
-      self.savingTask = false;
-    });
+    self.creatingTask = true;
+    if(taskType === 'multipleChoice' || taskType === 'journalling' || taskType === 'video'){
+      var data = {
+        taskType: taskType,
+        isOpen: isOpen,
+        event: event,
+        task: task
+      };
+      console.log('Data shows... ', data);
+      spfNavBarService.update(
+          'New Challenge Details', [{
+            title: 'Events',
+            url: `#${urlFor('events')}`
+          }, {
+            title: this.event.title,
+            url: `#${urlFor('oneEvent', {eventId: this.event.$id})}`
+          }, {
+            title: 'Challenges',
+            url: `#${urlFor('editEvent', {eventId: this.event.$id})}`
+          }]
+      );
+      eventService.set(data);
+      $location.path(location);
+    }else{
+      self.savingTask = true;
+      clmDataStore.events.updateTask(event.$id, taskId, copy).then(function() {
+        if (
+            (isOpen && task.openedAt) ||
+            (!isOpen && task.closedAt)
+        ) {
+          return;
+        } else if (isOpen) {
+          return clmDataStore.events.openTask(event.$id, taskId);
+        }
+
+        return clmDataStore.events.closeTask(event.$id, taskId);
+      }).then(function() {
+        spfAlert.success('Task saved');
+      }).catch(function() {
+        spfAlert.error('Failed to save the task.');
+      }).finally(function() {
+        self.savingTask = false;
+      });
+    }
+
   };
+
+  // this.saveTask = function(event, taskId, task, taskType, isOpen) {
+  //   var copy = spfFirebase.cleanObj(task);
+  //
+  //   if (taskType === 'linkPattern') {
+  //     delete copy.badge;
+  //     delete copy.serviceId;
+  //     delete copy.singPathProblem;
+  //   } else if (copy.serviceId === 'singPath') {
+  //     delete copy.badge;
+  //     if (copy.singPathProblem) {
+  //       copy.singPathProblem.path = spfFirebase.cleanObj(task.singPathProblem.path);
+  //       copy.singPathProblem.level = spfFirebase.cleanObj(task.singPathProblem.level);
+  //       copy.singPathProblem.problem = spfFirebase.cleanObj(task.singPathProblem.problem);
+  //     }
+  //   } else {
+  //     delete copy.singPathProblem;
+  //     copy.badge = spfFirebase.cleanObj(task.badge);
+  //   }
+  //
+  //   if (!copy.link) {
+  //     // delete empty link. Can't be empty string
+  //     delete copy.link;
+  //   }
+  //
+  //   self.savingTask = true;
+  //   clmDataStore.events.updateTask(event.$id, taskId, copy).then(function() {
+  //     if (
+  //       (isOpen && task.openedAt) ||
+  //       (!isOpen && task.closedAt)
+  //     ) {
+  //       return;
+  //     } else if (isOpen) {
+  //       return clmDataStore.events.openTask(event.$id, taskId);
+  //     }
+  //
+  //     return clmDataStore.events.closeTask(event.$id, taskId);
+  //   }).then(function() {
+  //     spfAlert.success('Task saved');
+  //   }).catch(function() {
+  //     spfAlert.error('Failed to save the task.');
+  //   }).finally(function() {
+  //     self.savingTask = false;
+  //   });
+  // };
 }
 EditEventTaskCtrl.$inject = [
   'initialData',
@@ -912,7 +1273,12 @@ EditEventTaskCtrl.$inject = [
   'urlFor',
   'spfFirebase',
   'spfNavBarService',
-  'clmDataStore'
+  'clmDataStore',
+  'eventService',
+  '$location',
+  '$mdDialog',
+  '$location',
+  'eventService'
 ];
 
 /**
@@ -1294,6 +1660,52 @@ function ClmEventTableCtrl(
         $mdDialog.hide();
       };
     }
+  };
+
+  this.promptForCodeResponse = function(eventId, taskId, task, participant, userSolution) {
+        $mdDialog.show({
+            clickOutsideToClose: true,
+            parent: angular.element(document.body),
+            template: codeTmpl,
+            onComplete: loadEditor,
+            controller: CodeController,
+            controllerAs: 'ctrl'
+        });
+
+        function loadEditor() {
+            var editor = ace.edit(document.querySelector('#editor'));
+            editor.setTheme("ace/theme/monokai");
+            editor.getSession().setMode("ace/mode/"+task.lang.toLowerCase());
+            editor.getSession().setUseWrapMode(true);
+        }
+
+        function CodeController() {
+            this.task = task;
+            if (
+                userSolution &&
+                userSolution[taskId]
+            ) {
+                this.solution = userSolution[taskId];
+            }
+
+            this.save = function() {
+                var editor = ace.edit(document.querySelector('#editor'));
+                var response = editor.getValue();
+                console.log("Function submitted for answer "+response);
+                clmDataStore.events.submitSolution(eventId, taskId, participant.$id, response).then(function() {
+                    $mdDialog.hide();
+                    spfAlert.success('Response is saved.');
+                }).catch(function(err) {
+                    $log.error(err);
+                    spfAlert.error('Failed to save your response.');
+                    return err;
+                });
+            };
+
+            this.cancel = function() {
+                $mdDialog.hide();
+            };
+        }
   };
 
   this.update = function() {};
@@ -1756,6 +2168,546 @@ ClmEventRankTableCtrl.$inject = [
   'clmPagerOption'
 ];
 
+// Show event participants and submissions in a paged table
+export function clmEventResultsTableFactory() {
+    return {
+        template: eventTableResultsTmpl,
+        restrict: 'E',
+        bindToController: true,
+        scope: {
+            event: '=',
+            profile: '=',
+            participants: '=',
+            tasks: '=',
+            progress: '=',
+            solutions: '=',
+            selected: '='
+        },
+        controller: ClmEventResultsTableCtrl,
+        controllerAs: 'ctrl'
+    };
+}
+
+function ClmEventResultsTableCtrl(
+    $scope, $q, $log, $mdDialog, $document,
+    urlFor, spfAlert, clmServicesUrl, clmDataStore, clmPagerOption
+) {
+    var self = this;
+    var unwatchers = [];
+
+    this.currentUserParticipant = undefined;
+    this.participantsView = [];
+    this.visibleTasks = [];
+    this.taskCompletion = {};
+
+    this.orderOptions = {
+        key: undefined,
+        reversed: false
+    };
+
+    this.pagerOptions = clmPagerOption();
+    unwatchers.push(self.pagerOptions.$destroy.bind(self.pagerOptions));
+
+    /**
+     * Get current user participant row
+     */
+    function currentUserParticipant() {
+        if (
+            !self.participants ||
+            !self.participants.$getRecord ||
+            !self.profile ||
+            !self.profile.$id
+        ) {
+            self.currentUserParticipant = undefined;
+        }
+
+        self.currentUserParticipant = self.participants.$getRecord(self.profile.$id);
+    }
+
+    /**
+     * Set list of visible tasks and the % completion.
+     *
+     */
+    function visibleTasks() {
+        if (!self.tasks || !self.tasks.filter) {
+            self.visibleTasks = [];
+            return;
+        }
+
+        self.visibleTasks = self.tasks.filter(function(t) {
+            return !t.hidden && !t.archived;
+        });
+
+        taskCompletion();
+    }
+
+    /**
+     * Calculate all visible tasks completion rate.
+     *
+     */
+    function taskCompletion() {
+        self.taskCompletion = self.visibleTasks.reduce(function(all, task) {
+            all[task.$id] = _taskCompletion(task.$id);
+            return all;
+        }, {});
+    }
+
+    /**
+     * Return the completion rate of a task.
+     *
+     */
+    function _taskCompletion(taskId) {
+        var participantCount, participantsIds;
+
+        if (!self.participants || !self.progress) {
+            return 0;
+        }
+
+        participantCount = self.participants.length;
+        participantsIds = self.participants.reduce(function(all, participant) {
+            if (participant.$id) {
+                all[participant.$id] = true;
+            }
+            return all;
+        }, {});
+
+        if (participantCount < 1) {
+            return 0;
+        }
+
+        return Object.keys(self.progress).filter(function(publicId) {
+                return (
+                    participantsIds[publicId] && // Make sure user is still participating
+                    // (user progress is kept when they leave)
+                    self.progress[publicId] &&
+                    self.progress[publicId][taskId] &&
+                    self.progress[publicId][taskId].completed
+                );
+            }).length / participantCount * 100;
+    }
+
+    function _completionComparer(options) {
+        var taskId = options.key;
+
+        return function(a, b) {
+            var aP = (
+                self.progress &&
+                self.progress[a.$id] &&
+                self.progress[a.$id][taskId] &&
+                self.progress[a.$id][taskId].completed
+            );
+            var bP = (
+                self.progress &&
+                self.progress[b.$id] &&
+                self.progress[b.$id][taskId] &&
+                self.progress[b.$id][taskId].completed
+            );
+
+            if (aP === bP) {
+                return 0;
+            } else if (aP) {
+                return 1;
+            }
+
+            return -1;
+        };
+    }
+
+    function _solutionComparer(options) {
+        var taskId = options.key;
+        var task = self.tasks.$getRecord(taskId);
+
+        if (!task || (!task.textResponse && !task.linkPattern)) {
+            return noop;
+        }
+
+        return function(a, b) {
+            var aS = (
+                    self.solutions &&
+                    self.solutions[a.$id] &&
+                    self.solutions[a.$id][taskId]
+                ) || '';
+            var bS = (
+                    self.solutions &&
+                    self.solutions[b.$id] &&
+                    self.solutions[b.$id][taskId]
+                ) || '';
+
+            return aS.localeCompare(bS);
+        };
+    }
+
+    function _compareName(a, b) {
+        var aN = (a.user && a.user.displayName) || '';
+        var bN = (b.user && b.user.displayName) || '';
+
+        return aN.localeCompare(bN);
+    }
+
+    function sortedParticipants(participants, options) {
+        var rows = participants.filter(function(p) {
+            return p.$id !== self.profile.$id;
+        });
+        var comparer;
+
+        if (options.key) {
+            comparer = chainComparer([_completionComparer(options), _solutionComparer(options), _compareName]);
+        } else {
+            comparer = _compareName;
+        }
+
+        rows.sort(reverseComparer(options.reversed, comparer));
+        return rows;
+    }
+
+    // Update the pager rowCount
+    // (the pager should trigger a range update which will call participantsView)
+    function updateParticipantRowCount() {
+        currentUserParticipant();
+
+        if (self.currentUserParticipant) {
+            self.pagerOptions.setRowCount(self.participants.length - 1);
+        } else {
+            self.pagerOptions.setRowCount(self.participants.length);
+        }
+    }
+
+    /**
+     * Set the slice of participant to show.
+     *
+     */
+    function participantsView() {
+        var rows = sortedParticipants(self.participants, self.orderOptions);
+
+        self.participantsView = rows.slice(self.pagerOptions.range.start, self.pagerOptions.range.end);
+    }
+
+    /**
+     * Switch ordering key or ordering direction.
+     *
+     * If the ordering key is changing, the ordering direction should be
+     * ascendent.
+     *
+     * If the order key is not changing, the direction should be switched.
+     *
+     */
+    this.orderBy = function(taskId) {
+        self.orderOptions.reversed = (
+            !self.orderOptions.reversed &&
+            (self.orderOptions.key === taskId)
+        );
+        self.orderOptions.key = taskId;
+        participantsView();
+    };
+
+    function defaultLinker(task, serviceProfile) {
+        if (
+            !serviceProfile ||
+            !serviceProfile.details ||
+            !serviceProfile.details.id ||
+            !task ||
+            !task.badge ||
+            !task.badge.url
+        ) {
+            return `#${urlFor('editProfile')}`;
+        }
+
+        return task.badge.url;
+    }
+
+    var linkers = {
+        codeSchool: defaultLinker,
+        codeCombat: defaultLinker,
+
+        singPath: function(task) {
+            if (!task || task.serviceId !== 'singPath') {
+                return '';
+            }
+
+            if (
+                !task.singPathProblem ||
+                !task.singPathProblem.path ||
+                !task.singPathProblem.path.id ||
+                !task.singPathProblem.level ||
+                !task.singPathProblem.level.id ||
+                !task.singPathProblem.problem ||
+                !task.singPathProblem.problem.id
+            ) {
+                return clmServicesUrl.singPath;
+            }
+
+            return (
+                clmServicesUrl.singPath + '/#' +
+                '/paths/' + task.singPathProblem.path.id +
+                '/levels/' + task.singPathProblem.level.id +
+                '/problems/' + task.singPathProblem.problem.id + '/play'
+            ).replace(/\/+/, '/');
+        }
+    };
+
+    this.startLink = function(task, profile) {
+        var serviceProfile;
+
+        if (
+            !task ||
+            !task.serviceId ||
+            !linkers[task.serviceId]
+        ) {
+            return '';
+        }
+
+        serviceProfile = profile && profile.services && profile.services[task.serviceId];
+        return linkers[task.serviceId](task, serviceProfile);
+    };
+
+    var trackedServices = {
+        codeSchool: true,
+        codeCombat: true
+    };
+
+    this.mustRegister = function(task, profile) {
+        return Boolean(
+            task &&
+            task.serviceId &&
+            trackedServices[task.serviceId] && (
+                !profile ||
+                !profile.services ||
+                !profile.services[task.serviceId] ||
+                !profile.services[task.serviceId].details ||
+                !profile.services[task.serviceId].details.id
+            )
+        );
+    };
+
+    this.promptForLink = function(eventId, taskId, task, participant, userSolution) {
+        $mdDialog.show({
+            parent: $document.body,
+            template: linkTmpl,
+            controller: DialogController,
+            controllerAs: 'ctrl'
+        });
+
+        function DialogController() {
+            this.task = task;
+            if (
+                userSolution &&
+                userSolution[taskId]
+            ) {
+                this.solution = userSolution[taskId];
+            }
+
+            this.save = function(link) {
+                clmDataStore.events.submitSolution(eventId, taskId, participant.$id, link).then(function() {
+                    $mdDialog.hide();
+                    spfAlert.success('Link is saved.');
+                }).catch(function(err) {
+                    $log.error(err);
+                    spfAlert.error('Failed to save the link.');
+                    return err;
+                });
+            };
+
+            this.cancel = function() {
+                $mdDialog.hide();
+            };
+        }
+    };
+
+    this.viewTextResponse = function(eventId, taskId, task, participant, userSolution) {
+        $mdDialog.show({
+            parent: $document.body,
+            template: responseTmpl,
+            controller: DialogController,
+            controllerAs: 'ctrl'
+        });
+
+        function DialogController() {
+            this.task = task;
+            this.viewOnly = true;
+            if (
+                userSolution &&
+                userSolution[taskId]
+            ) {
+                this.solution = userSolution[taskId];
+            }
+
+            this.save = function(response) {
+                clmDataStore.events.submitSolution(eventId, taskId, participant.$id, response).then(function() {
+                    $mdDialog.hide();
+                    spfAlert.success('Response is saved.');
+                }).catch(function(err) {
+                    $log.error(err);
+                    spfAlert.error('Failed to save your response.');
+                    return err;
+                });
+            };
+
+            this.cancel = function() {
+                $mdDialog.hide();
+            };
+        }
+    };
+
+    this.viewCodeResponse = function(eventId, taskId, task, participant, userSolution) {
+        $mdDialog.show({
+            clickOutsideToClose: true,
+            parent: angular.element(document.body),
+            template: codeTmpl,
+            onComplete: loadEditor,
+            controller: CodeController,
+            controllerAs: 'ctrl'
+        });
+
+        function loadEditor() {
+            var editor = ace.edit(document.querySelector('#editor'));
+            editor.setTheme("ace/theme/monokai");
+            editor.getSession().setMode("ace/mode/"+task.lang.toLowerCase());
+            editor.getSession().setUseWrapMode(true);
+            editor.setOptions({
+                readOnly: true,
+                highlightActiveLine: false,
+                highlightGutterLine: false
+            })
+        }
+
+        function CodeController() {
+            this.task = task;
+            this.viewOnly = true;
+            if (
+                userSolution &&
+                userSolution[taskId]
+            ) {
+                this.solution = userSolution[taskId];
+            }
+
+            this.save = function() {
+                var editor = ace.edit(document.querySelector('#editor'));
+                var response = editor.getValue();
+                console.log("Function submitted for answer "+response);
+                clmDataStore.events.submitSolution(eventId, taskId, participant.$id, response).then(function() {
+                    $mdDialog.hide();
+                    spfAlert.success('Response is saved.');
+                }).catch(function(err) {
+                    $log.error(err);
+                    spfAlert.error('Failed to save your response.');
+                    return err;
+                });
+            };
+
+            this.cancel = function() {
+                $mdDialog.hide();
+            };
+        }
+    };
+
+    this.update = function() {};
+    /*
+     this.update = function(event, tasks, userSolutions, profile) {
+     return clmDataStore.events.updateCurrentUserProfile(
+     event, tasks, userSolutions, profile
+     ).then(function() {
+     spfAlert.success('Profile updated');
+     }).catch(function(err) {
+     $log.error(err);
+     spfAlert.error('Failed to update profile');
+     });
+     };*/
+
+    this.removeParticipant = function(e, event, participant) {
+        var confirm = $mdDialog.confirm()
+            .parent($document.body)
+            .title(`Would you like to remove ${participant.user.displayName}?`)
+            .content('The participant progress will be kept but he/she will not show as participant')
+            .ariaLabel('Remove participant')
+            .ok('Remove')
+            .cancel('Cancel')
+            .targetEvent(e);
+
+        $mdDialog.show(confirm).then(function() {
+            clmDataStore.events.removeParticpants(event.$id, participant.$id);
+        });
+    };
+
+    // load up resources and start firebase watcher
+    this.loading = true;
+    $q.all({
+        userProgress: clmDataStore.events.getUserProgress(this.event.$id, this.profile.$id).then(function(progress) {
+            self.currentUserProgress = progress;
+            unwatchers.push(progress.$destroy.bind(progress));
+            return progress;
+        }),
+        userSolution: clmDataStore.events.getUserSolutions(this.event.$id, this.profile.$id).then(function(solutions) {
+            self.currentUserSolutions = solutions;
+            unwatchers.push(solutions.$destroy.bind(solutions));
+            return solutions;
+        }),
+        singpathQueuedSolution: clmDataStore.singPath.queuedSolutions(this.profile.$id).then(function(paths) {
+            unwatchers.push(paths.$destroy.bind(paths));
+            return paths;
+        })
+    }).then(function(results) {
+        visibleTasks();
+
+        // Set the participant view (via the pager range update event)
+        unwatchers.push(self.pagerOptions.onChange(participantsView));
+        updateParticipantRowCount();
+
+        // Monitor updates on task progress and participants list.
+        unwatchers.push(self.tasks.$watch(visibleTasks));
+        unwatchers.push(self.progress.$watch(taskCompletion));
+        unwatchers.push(self.participants.$watch(taskCompletion));
+        unwatchers.push(self.participants.$watch(updateParticipantRowCount));
+
+        return results;
+    }).finally(function() {
+        self.loading = false;
+    }).then(function(results) {
+        var update = function() {
+            // Removed due to June 2016 profile updating process change.
+            /*
+             return clmDataStore.events.updateCurrentUserProfile(
+             self.event,
+             self.tasks,
+             results.userSolution,
+             self.profile
+             );
+             */
+        };
+
+        // Watch for singpath problem getting updated
+        unwatchers.push(results.singpathQueuedSolution.$watch(update));
+
+        return update();
+    }).catch(function(err) {
+        $log.error(err);
+    });
+
+    // clean up.
+    $scope.$on('$destroy', function() {
+        unwatchers.forEach(function(f) {
+            if (f) {
+                try {
+                    f();
+                } catch (err) {
+                    $log.error(err);
+                }
+            }
+        });
+    });
+}
+ClmEventResultsTableCtrl.$inject = [
+    '$scope',
+    '$q',
+    '$log',
+    '$mdDialog',
+    '$document',
+    'urlFor',
+    'spfAlert',
+    'clmServicesUrl',
+    'clmDataStore',
+    'clmPagerOption'
+];
+
 export function clmPagerFactory() {
   return {
     template: pagerTmpl,
@@ -1970,3 +2922,5 @@ function chainComparer(comparerList) {
     return 0;
   };
 }
+
+
