@@ -297,13 +297,10 @@
 
 
             <!--<md-button type="button" class="md-raised" ng-disabled="!ctrl.enableBeta" ng-href="#{{ctrl.challengeRouteProvider(ctrl.taskType)}}">Continue*</md-button>-->
-            <!--<md-button type="submit" class="md-raised md-primary" ng-disabled="editTask.$invalid || !ctrl.taskType ||ctrl.savingTask">{{ ctrl.challengeRouteProvider($event, ctrl.event, ctrl.task, ctrl.taskType, ctrl.isOpen)}}">Save</md-button>-->
-            <!--TODO: Refactor survey function, current survey functionality will break as the href has been removed.-->
-            <md-button type="submit" class="md-raised">{{ctrl.challengeRouteProvider(1,1,1,ctrl.taskType, true)}}</md-button>
+            <md-button type="submit" class="md-raised md-primary" ng-disabled="editTask.$invalid || !ctrl.taskType ||ctrl.savingTask">{{ ctrl.challengeRouteProvider($event, ctrl.event, ctrl.task, ctrl.taskType, ctrl.isOpen)}}</md-button>
             <md-button type="reset" class="md-raised" ng-click="ctrl.discardChanges($event,ctrl.task)">Back</md-button>
 
         </div>
-
     </form>
 </md-content>
 
