@@ -1,7 +1,6 @@
 import editTmpl from './events-view-event-edit.html!text';
 import eventTableParticipantsTmpl from './events-view-event-table-participants.html!text';
 import eventTableRankTmpl from './events-view-event-table-rank.html!text';
-import eventTableResultTmpl from './events-view-event-table-result.html!text';
 import eventTaskFormTmpl from './events-view-event-task-form.html!text';
 import eventTmpl from './events-view-event.html!text';
 import listTmpl from './events-view-list.html!text';
