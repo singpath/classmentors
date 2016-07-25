@@ -117,26 +117,20 @@
                     </div>
 
                     <div ng-if="ctrl.selected.linkPattern">
-                            <span ng-if="ctrl.solutions[participant.$id][task.$id]">
-                                <a ng-href="{{ctrl.solutions[participant.$id][task.$id]}}" target="_blank">Completed</a>
-                                <md-button class="md-icon-button md-primary small-icon"
-                                           aria-label="Update link"
-                                           ng-click="ctrl.viewLink(ctrl.event.$id, ctrl.selected.$id, ctrl.selected, participant, ctrl.solutions[participant.$id])"
-                                           ng-if="task.openedAt"
-                                >
-                                    <md-icon md-svg-icon="create"></md-icon>
-                                </md-button>
-                            </span>
+                        <span ng-if="ctrl.solutions[participant.$id][ctrl.selected.$id]">
+                            <!--<a ng-href="{{ctrl.solutions[participant.$id][ctrl.selected.$id]}}" target="_blank">Completed</a>-->
+                            <md-button class="md-raised md-primary"
+                                       aria-label="Update link"
+                                       ng-click="ctrl.viewLink(ctrl.event.$id, ctrl.selected.$id, ctrl.selected, participant, ctrl.solutions[participant.$id])"
+                                       ng-if="ctrl.selected.openedAt"
+                            >
+                                View Link
+                            </md-button>
+                        </span>
 
-                        <span ng-if="!ctrl.solutions[participant.$id][task.$id]">
-                                <md-button class="md-raised md-primary"
-                                           aria-label="Submit link"
-                                           ng-click="ctrl.viewLink(ctrl.event.$id, ctrl.selected.$id, ctrl.selected, participant, ctrl.solutions[participant.$id])"
-                                           ng-disabled="task.closedAt"
-                                >
-                                    View Link
-                                </md-button>
-                            </span>
+                        <span ng-if="!ctrl.solutions[participant.$id][ctrl.selected.$id]">
+                                No Submission
+                        </span>
                     </div>
                 </td>
             </tr>

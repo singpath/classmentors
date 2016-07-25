@@ -2484,6 +2484,7 @@ function ClmEventResultsTableCtrl(
     this.viewLink = function(eventId, taskId, task, participant, userSolution) {
         console.log(participant);
         $mdDialog.show({
+            clickOutsideToClose: true,
             parent: $document.body,
             template: linkTmpl,
             controller: DialogController,
@@ -2492,6 +2493,7 @@ function ClmEventResultsTableCtrl(
 
         function DialogController() {
             this.task = task;
+            this.review = true;
             if (
                 userSolution &&
                 userSolution[taskId]
