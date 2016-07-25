@@ -70,35 +70,40 @@
                     Event Answers:
                 </div>
                 <div ng-show="ctrl.selected">
-                    <md-content class="md-padding">
-                        <!--<div ng-show="ctrl.selected">-->
-                            <table class="events tasks">
-                                <thead>
-                                    <tr ng-class="{'reversed': ctrl.orderOptions.reversed}">
-                                        <th>Name</th>
-                                        <th>Answer</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr ng-repeat="participant in ctrl.participants">
-                                        <td>{{participant.user.displayName}}</td>
-                                        <td>{{ctrl.solutions[participant.$id][ctrl.selected.$id]}}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        <!--</div>-->
+                    <!--Manually written result table-->
+
+                    <!--<md-content class="md-padding">-->
+                            <!--<table class="events tasks">-->
+                                <!--<thead>-->
+                                    <!--<tr ng-class="{'reversed': ctrl.orderOptions.reversed}">-->
+                                        <!--<th>Name</th>-->
+                                        <!--<th>Answer</th>-->
+                                    <!--</tr>-->
+                                <!--</thead>-->
+                                <!--<tbody>-->
+                                    <!--<tr ng-repeat="participant in ctrl.participants">-->
+                                        <!--<td>{{participant.user.displayName}}</td>-->
+                                        <!--<td>{{ctrl.solutions[participant.$id][ctrl.selected.$id]}}</td>-->
+                                    <!--</tr>-->
+                                <!--</tbody>-->
+                            <!--</table>-->
+                    <!--</md-content>-->
+
+                    <!--Attempt at create own table directive for results-->
+                    <md-content layout-padding>
+                        <clm-event-results-table
+                                ng-if="ctrl.canView"
+                                event="ctrl.event"
+                                participants="ctrl.participants"
+                                tasks="ctrl.tasks"
+                                progress="ctrl.progress"
+                                solutions="ctrl.solutions"
+                                profile="ctrl.profile"
+                                selected="ctrl.selected"
+                        >
+                        </clm-event-results-table>
                     </md-content>
                 </div>
-                <!--<clm-event-table-->
-                        <!--ng-if="ctrl.selected"-->
-                        <!--event="ctrl.event"-->
-                        <!--participants="ctrl.participants"-->
-                        <!--tasks="ctrl.tasks"-->
-                        <!--progress="ctrl.progress"-->
-                        <!--solutions="ctrl.solutions"-->
-                        <!--profile="ctrl.profile"-->
-                <!--&gt;-->
-                <!--</clm-event-table>-->
             </md-content>
         </md-tab>
     </md-tabs>

@@ -168,7 +168,10 @@
                                 <span ng-if="task.linkPattern">
                                     <a ng-href="{{ctrl.solutions[participant.$id][task.$id]}}" target="_blank">completed</a>
                                 </span>
-                                <span ng-if="task.textResponse">
+                                <span ng-if="task.textResponse && !task.lang">
+                                    {{ ctrl.solutions[participant.$id][task.$id] | cmTruncate: 10 }}
+                                </span>
+                                <span ng-if="task.textResponse && task.lang">
                                     {{ ctrl.solutions[participant.$id][task.$id] | cmTruncate: 10 }}
                                 </span>
                             </span>
