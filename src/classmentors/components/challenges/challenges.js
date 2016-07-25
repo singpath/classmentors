@@ -44,15 +44,15 @@ configRoute.$inject = ['$routeProvider', 'routes'];
 //default initial data for each route
 function initialData($q, eventService){
   var data =  eventService.get();
-  var title = data.task.title;
-  var desc = data.task.description;
+  // var title = data.task.title;
+  // var desc = data.task.description;
   // this.title = data.task.title;
   // this.desc = data.task.description;
   // return data;
-  return {
-    title: title,
-    desc: desc
-  }
+  // return {
+  //   title: title,
+  //   desc: desc
+  // }
 }
 initialData.$inject = [
     '$q',
