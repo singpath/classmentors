@@ -116,28 +116,28 @@
                         </span>
                     </div>
 
-                    <!--<div ng-if="task.linkPattern">-->
-                            <!--<span ng-if="ctrl.currentUserSolutions[task.$id]">-->
-                                <!--<a ng-href="{{ctrl.currentUserSolutions[task.$id]}}" target="_blank">Completed<span ng-if="!ctrl.currentUserProgress[task.$id].completed"></span></a>-->
-                                <!--<md-button class="md-icon-button md-primary small-icon"-->
-                                           <!--aria-label="Update link"-->
-                                           <!--ng-click="ctrl.promptForLink(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant, ctrl.currentUserSolutions)"-->
-                                           <!--ng-if="task.openedAt"-->
-                                <!--&gt;-->
-                                    <!--<md-icon md-svg-icon="create"></md-icon>-->
-                                <!--</md-button>-->
-                            <!--</span>-->
+                    <div ng-if="ctrl.selected.linkPattern">
+                            <span ng-if="ctrl.solutions[participant.$id][task.$id]">
+                                <a ng-href="{{ctrl.solutions[participant.$id][task.$id]}}" target="_blank">Completed</a>
+                                <md-button class="md-icon-button md-primary small-icon"
+                                           aria-label="Update link"
+                                           ng-click="ctrl.viewLink(ctrl.event.$id, ctrl.selected.$id, ctrl.selected, participant, ctrl.solutions[participant.$id])"
+                                           ng-if="task.openedAt"
+                                >
+                                    <md-icon md-svg-icon="create"></md-icon>
+                                </md-button>
+                            </span>
 
-                        <!--<span ng-if="!ctrl.currentUserSolutions[task.$id]">-->
-                                <!--<md-button class="md-raised md-primary"-->
-                                           <!--aria-label="Submit link"-->
-                                           <!--ng-click="ctrl.promptForLink(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant, ctrl.currentUserSolutions)"-->
-                                           <!--ng-disabled="task.closedAt"-->
-                                <!--&gt;-->
-                                    <!--Submit Link-->
-                                <!--</md-button>-->
-                            <!--</span>-->
-                    <!--</div>-->
+                        <span ng-if="!ctrl.solutions[participant.$id][task.$id]">
+                                <md-button class="md-raised md-primary"
+                                           aria-label="Submit link"
+                                           ng-click="ctrl.viewLink(ctrl.event.$id, ctrl.selected.$id, ctrl.selected, participant, ctrl.solutions[participant.$id])"
+                                           ng-disabled="task.closedAt"
+                                >
+                                    View Link
+                                </md-button>
+                            </span>
+                    </div>
                 </td>
             </tr>
 

@@ -2481,7 +2481,8 @@ function ClmEventResultsTableCtrl(
         );
     };
 
-    this.promptForLink = function(eventId, taskId, task, participant, userSolution) {
+    this.viewLink = function(eventId, taskId, task, participant, userSolution) {
+        console.log(participant);
         $mdDialog.show({
             parent: $document.body,
             template: linkTmpl,

@@ -18,12 +18,12 @@
                     </div>
                 </md-input-container>
             </div>
+            <div class="md-dialog-actions" layout="row">
+                <md-button type="submit" class="md-primary md-raised" ng-disabled="!provideLinkForm.$valid">
+                    Save
+                </md-button>
+                <md-button ng-click="ctrl.cancel()" type="button" class="md-accent">Cancel</md-button>
+            </div>
         </md-dialog-content>
-        <div class="md-actions" layout="row">
-            <md-button type="submit" class="md-primary md-raised" ng-disabled="!provideLinkForm.$valid">
-                Save
-            </md-button>
-            <md-button ng-click="ctrl.cancel()" type="button" class="md-accent">Cancel</md-button>
-        </div>
     </form>
 </md-dialog>
