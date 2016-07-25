@@ -6,10 +6,14 @@
                 <p>{{ctrl.task.description}}</p>
                 <md-input-container>
                     <label for="edit-solution-response">{{ctrl.task.textResponse}}</label>
+                    <textarea name="linkSolution"
+                              ng-model="ctrl.solution"
+                              required="true"
+                              placeholer="URL to provide" ng-show="ctrl.viewOnly" readonly></textarea>
                     <textarea name="linkSolution" id="edit-solution-response"
                               ng-model="ctrl.solution"
                               required="true"
-                              placeholer="URL to provide"></textarea>
+                              placeholer="URL to provide" ng-show="!ctrl.viewOnly"></textarea>
                     <div ng-messages="provideResponseForm.linkSolution.$error">
                         <div ng-message="required">Required.</div>
                     </div>
@@ -17,7 +21,7 @@
             </div>
         </md-dialog-content>
         <div class="md-actions" layout="row">
-            <md-button type="submit" class="md-primary md-raised" ng-disabled="!provideResponseForm.$valid">
+            <md-button type="submit" class="md-primary md-raised" ng-hide="ctrl.viewOnly" ng-disabled="!provideResponseForm.$valid">
                 Save
             </md-button>
             <md-button ng-click="ctrl.cancel()" type="button" class="md-accent">Cancel</md-button>

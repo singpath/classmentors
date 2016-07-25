@@ -2523,12 +2523,13 @@ function ClmEventResultsTableCtrl(
 
         function DialogController() {
             this.task = task;
-            // if (
-            //     userSolution &&
-            //     userSolution[taskId]
-            // ) {
-                this.solution = userSolution;
-            // }
+            this.viewOnly = true;
+            if (
+                userSolution &&
+                userSolution[taskId]
+            ) {
+                this.solution = userSolution[taskId];
+            }
 
             this.save = function(response) {
                 clmDataStore.events.submitSolution(eventId, taskId, participant.$id, response).then(function() {

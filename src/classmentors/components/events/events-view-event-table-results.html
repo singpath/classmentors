@@ -157,7 +157,7 @@
                                     <!--{{ ctrl.solutions[participant.$id][ctrl.selected.$id] | cmTruncate: 10 }}-->
                                     <md-button class="md-raised md-primary"
                                                aria-label="Update response"
-                                               ng-click="ctrl.viewTextResponse(ctrl.event.$id, ctrl.selected.$id, ctrl.selected, participant, ctrl.solutions[participant.$id][ctrl.selected.$id])"
+                                               ng-click="ctrl.viewTextResponse(ctrl.event.$id, ctrl.selected.$id, ctrl.selected, participant, ctrl.solutions[participant.$id])"
                                                ng-if="ctrl.selected.openedAt"
                                     >View Response
                                     </md-button>
@@ -166,7 +166,7 @@
                                     <!--{{ ctrl.solutions[participant.$id][ctrl.selected.$id] | cmTruncate: 10 }}-->
                                     <md-button class="md-raised md-primary"
                                                aria-label="Update response"
-                                               ng-click="ctrl.viewCodeResponse(ctrl.event.$id, ctrl.selected.$id, ctrl.selected, ctrl.currentUserParticipant, ctrl.currentUserSolutions)"
+                                               ng-click="ctrl.viewCodeResponse(ctrl.event.$id, ctrl.selected.$id, ctrl.selected, participant, ctrl.solutions[participant.$id])"
                                                ng-if="ctrl.selected.openedAt"
                                     >View Code
                                     </md-button>
