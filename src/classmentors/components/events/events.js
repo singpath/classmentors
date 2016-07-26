@@ -82,8 +82,12 @@ export function configRoute($routeProvider, routes) {
     .when('/events/:eventId/survey-task', {
 
       template: schEngageScaleTmpl,
-      //controller: SurveyFormFillCtrl,
-      //controllerAs: 'ctrl'
+      controller: SurveyFormFillCtrl,
+      controllerAs: 'ctrl',
+      resolve: {
+        initialData: addSurveyEventTaskCtrlInitialData
+      }
+
 
     });
 }
@@ -191,7 +195,7 @@ function ClmListEvent(initialData, spfNavBarService, urlFor) {
     });
   }
 
-  spfNavBarService.update('Events', undefined, opts);
+  spfNavBarService.update('Event', undefined, opts);
 }
 ClmListEvent.$inject = ['initialData', 'spfNavBarService', 'urlFor'];
 
@@ -767,7 +771,7 @@ function AddEventTaskCtrl(
   initialData, $location, $log, spfFirebase, spfAlert, urlFor, spfNavBarService, clmDataStore, $mdDialog, $scope,
   eventService, clmSurvey
 ) {
-
+  console.log("Initial data is...", initialData);
   var self = this;
 
   this.event = initialData.event;
@@ -1202,7 +1206,7 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBar
         event: event,
         task: task
       };
-      console.log('Data shows... ', data);
+
       spfNavBarService.update(
           'New Challenge Details', [{
             title: 'Events',
@@ -1667,6 +1671,7 @@ function ClmEventTableCtrl(
   };
 
   this.promptForTextResponse = function(eventId, taskId, task, participant, userSolution) {
+    console.log("What is this: ", this);
     $mdDialog.show({
       parent: $document.body,
       template: responseTmpl,
@@ -1684,6 +1689,8 @@ function ClmEventTableCtrl(
       }
 
       this.save = function(response) {
+        console.log("this response is: ", response);
+        //this line adds solution to firebase
         clmDataStore.events.submitSolution(eventId, taskId, participant.$id, response).then(function() {
           $mdDialog.hide();
           spfAlert.success('Response is saved.');
@@ -1860,6 +1867,80 @@ ClmEventTableCtrl.$inject = [
 
 
 ];
+
+//TODO: include the event to load initial data into surveyformfillctrl
+function addSurveyEventTaskCtrlInitialData($q, $route, spfAuthData, clmDataStore){
+  //TODO: load and assign initial data for the survey form
+  // var eventId = $route.current.params.eventId
+  // var eventPromise = clmDataStore.events.get(eventId);
+
+  var errNoEvent = new Error('Event not found-1');
+  var eventId = $route.current.params.eventId;
+
+  var profilePromise = clmDataStore.currentUserProfile().catch(noop);
+
+  var eventPromise = clmDataStore.events.get(eventId).then(function(event) {
+    if (event.$value === null) {
+      return $q.reject(errNoEvent);
+    }
+    return event;
+  });
+
+  var canviewPromise = $q.all({
+    event: eventPromise,
+    profile: profilePromise
+  }).then(function(data) {
+    return $q.when(data.profile && data.profile.canView(data.event));
+  });
+
+  return $q.all({
+    currentUser: spfAuthData.user().catch(noop),
+    profile: profilePromise,
+    event: eventPromise,
+    canView: canviewPromise,
+    tasks: canviewPromise.then(function(canView) {
+      if (canView) {
+        return clmDataStore.events.getTasks(eventId);
+      }
+    }),
+    participants: canviewPromise.then(function(canView) {
+      if (canView) {
+        return clmDataStore.events.participants(eventId);
+      }
+    }),
+    progress: canviewPromise.then(function(canView) {
+      if (canView) {
+        return clmDataStore.events.getProgress(eventId);
+      }
+    }),
+    solutions: canviewPromise.then(function(canView) {
+      if (canView) {
+        return clmDataStore.events.getSolutions(eventId);
+      }
+    })
+  });
+
+}
+
+addSurveyEventTaskCtrlInitialData.$inject = ['$q', '$route', 'spfAuthData', 'clmDataStore'];
+
+//TODO: include controller for the survey
+function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData){
+  console.log("surveyformfillctrl event", initialData);
+  this.event = initialData.event;
+
+  spfNavBarService.update(
+      'Survey', [{
+        title: 'Events',
+        url: `#${urlFor('events')}`
+      }, {
+        title: this.event.title,
+        url: `#${urlFor('oneEvent', {eventId: event.$id})}`
+      }]
+  );
+
+}
+SurveyFormFillCtrl.$inject=['spfNavBarService', '$location', 'urlFor', 'initialData'];
 
 export function clmEventRankTableFactory() {
   return {
