@@ -11,7 +11,7 @@ import * as app from 'classmentors/components/classmentors/classmentors.js';
 import * as ace from 'classmentors/components/ace/ace.js';
 import * as events from 'classmentors/components/events/events.js';
 import * as profiles from 'classmentors/components/profiles/profiles.js';
-import * as cohort from 'classmentors/components/cohort/cohort.js';
+import * as cohorts from 'classmentors/components/cohorts/cohorts.js';
 import * as challenges from 'classmentors/components/challenges/challenges.js';
 // import * as mcq from 'classmentors/components/challenges/mcq/mcq.js';
 
@@ -31,7 +31,7 @@ module.component('ace', ace.component);
 module.constant('aceStatsUrl', ace.ACE_STATS_URL);
 module.factory('aceStats', ace.factory);
 
-module.component('cohort', cohort.component);
+module.component('cohorts', cohorts.component);
 // module.component('challenges'. challenges.component);
 
 module.directive('clmProfile', profiles.clmProfileFactory);
@@ -68,7 +68,7 @@ module.constant('routes', {
   profile: '/profile/:publicId',
   editProfile: '/profile/',
   setProfileCodeCombatId: '/profile/codeCombat',
-  cohort: '/cohort',
+  cohorts: '/cohorts',
   viewMcq: '/challenges/mcq',
   viewSurvey: '/challenges/survey'
 });
@@ -84,8 +84,8 @@ module.config([
           stats: ace.getStats
         }
       })
-      .when(routes.cohort, {
-        template: '<cohort></cohort>'
+      .when(routes.cohorts, {
+        template: '<cohorts></cohorts>'
       })
       .otherwise(routes.home);
   }

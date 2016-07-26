@@ -1,14 +1,14 @@
 /**
- * classmentors/components/cohort/cohort.js- define cohort component.
+ * classmentors/components/cohorts/cohorts.js- define cohort component.
  */
 
-import cohortTmpl from './cohort-view.html!text';
-// import './cohort.css!';
+import cohortTmpl from './cohorts-view.html!text';
+// import './cohorts.css!';
 
 class CohortCtrl {
 
   constructor(spfNavBarService) {
-    const title = 'Cohort';
+    const title = 'Cohorts';
     // e.g.: [{title: 'profile', url: '#' + urlFor(editProfile)}]
     const parentPages = [];
     // e.g.: [{title: 'edit profile', url: '#' + urlFor(editProfile), icon: 'settings'}]

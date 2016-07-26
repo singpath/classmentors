@@ -4,9 +4,9 @@
 import {expect} from 'chai';
 import sinon from 'sinon';
 
-import * as cohort from './cohort.js';
+import * as cohort from './cohorts.js';
 
-describe('cohort component', function() {
+describe('cohorts component', function() {
 
   describe('controller', function() {
     let ctrl, navBarService;
