@@ -284,7 +284,20 @@
           ".read": "auth !== null && (\n  root.child('classMentors/events').child($eventId).child('owner/publicId').val() === root.child('auth/users').child(auth.uid).child('publicId').val()\n  || root.child('classMentors/eventApplications/').child($eventId).child(auth.uid).exists()\n)", 
           ".write": "auth !== null && root.child('classMentors/events').child($eventId).child('owner/publicId').val() === root.child('auth/users').child(auth.uid).child('publicId').val()"
         }
-      }, 
+      },
+      "eventScores": {
+        "$eventId": {
+          "$publicId": {
+            "$taskId": {
+              ".validate": true,
+              ".write": true
+            },
+            ".write": true
+          },
+          ".read": true,
+          ".write": true
+        }
+      },
       "eventTasks": {
         "$eventId": {
           "$taskId": {

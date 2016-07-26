@@ -374,7 +374,12 @@ function viewEventCtrlInitialData($q, $route, spfAuth, spfAuthData, clmDataStore
       if (canView) {
         return clmDataStore.events.getSolutions(eventId);
       }
-    })
+    }),
+    // scores: canviewPromise.then(function(canView) {
+    //   if (canView) {
+    //     return clmDataStore.events.getScores(eventId);
+    //   }
+    // })
   });
 }
 viewEventCtrlInitialData.$inject = [
@@ -403,6 +408,7 @@ function ViewEventCtrl(
   this.tasks = initialData.tasks;
   this.progress = initialData.progress;
   this.solutions = initialData.solutions;
+  // this.scores = initialData.scores;
   this.canView = initialData.canView;
   this.viewArchived = false;
   this.selected = null;
@@ -2182,6 +2188,7 @@ export function clmEventResultsTableFactory() {
             progress: '=',
             solutions: '=',
             selected: '='
+            // scores: '='
         },
         controller: ClmEventResultsTableCtrl,
         controllerAs: 'ctrl'
@@ -2520,6 +2527,7 @@ function ClmEventResultsTableCtrl(
 
     this.viewTextResponse = function(eventId, taskId, task, participant, userSolution) {
         $mdDialog.show({
+            clickOutsideToClose: true,
             parent: $document.body,
             template: responseTmpl,
             controller: DialogController,
@@ -2605,6 +2613,16 @@ function ClmEventResultsTableCtrl(
             };
         }
     };
+
+    this.saveAllocatedPoints = function(eventId, taskId, task, participant, score) {
+        clmDataStore.events.saveScore(eventId, participant.$id, taskId, score).then(function () {
+            spfAlert.success('Score has been saved.');
+        }).catch(function (err) {
+            $log.error(err);
+            spfAlert.error('Failed to save score.');
+            return err;
+        });
+    }
 
     this.update = function() {};
     /*

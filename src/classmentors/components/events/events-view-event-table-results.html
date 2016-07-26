@@ -11,14 +11,6 @@
                 <th rowspan="4" ng-class="{orderer: !ctrl.orderOptions.key}">
                     <md-button ng-click="ctrl.orderBy()">Participants</md-button>
                 </th>
-                <!--<th ng-if="ctrl.visibleTasks.length == 0">-->
-                    <!--<em>No challenge</em>-->
-                <!--</th>-->
-                <!--<th ng-repeat="task in ctrl.visibleTasks track by task.$id"-->
-                    <!--ng-class="{orderer: ctrl.orderOptions.key == task.$id}"-->
-                <!--&gt;-->
-                    <!--<md-button ng-click="ctrl.orderBy(task.$id)">{{ task.title }}</md-button>-->
-                <!--</th>-->
                 <th rowspan="8">
                     Submission
                     {{ctrl.taskCompletion[ctrl.selected.$id] | number: 0}} %
@@ -27,18 +19,6 @@
                     Allocated Points
                 </th>
             </tr>
-            <!--<tr>-->
-                <!--<th ng-if="ctrl.visibleTasks.length == 0"></th>-->
-                <!--<th ng-repeat="task in ctrl.visibleTasks track by task.$id">-->
-                    <!--{{ task.description }}-->
-                <!--</th>-->
-            <!--</tr>-->
-            <!--<tr>-->
-                <!--<th ng-if="ctrl.visibleTasks.length == 0"></th>-->
-                <!--<th ng-repeat="task in ctrl.visibleTasks track by task.$id">-->
-                    <!--<a ng-href="{{task.link}}" ng-if="task.link" target="_blank">More details</a>-->
-                <!--</th>-->
-            <!--</tr>-->
             </thead>
             <tbody>
 
@@ -65,7 +45,6 @@
                         </span>
                 </th>
 
-                <!--<td ng-repeat="task in ctrl.visibleTasks track by task.$id">-->
                 <td>
                     <!--<div ng-if="ctrl.selected.serviceId">-->
                             <!--<span ng-if="ctrl.currentUserSolutions[task.$id]">-->
@@ -132,6 +111,21 @@
                                 No Submission
                         </span>
                     </div>
+                </td>
+                <td>
+                    <md-input-container flex>
+                        <label for="edit-task-score">Score</label>
+                        <input type="number" name="editTaskScore" id="edit-task-score"
+
+                               ng-model="ctrl.task.score"
+                               min="0" step="1"
+                               placeholer="Challenge priority" value="{{ctrl.task.priority}}"
+
+                        />
+                        <div ng-messages="editTask.editTaskPriority.$error">
+                            <div ng-message="number">The priority should be a positive number.</div>
+                        </div>
+                    </md-input-container>
                 </td>
             </tr>
 
