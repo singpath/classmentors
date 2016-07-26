@@ -2615,6 +2615,7 @@ function ClmEventResultsTableCtrl(
     };
 
     this.saveAllocatedPoints = function(eventId, taskId, task, participant, score) {
+        console.log(Number.isInteger(score));
         clmDataStore.events.saveScore(eventId, participant.$id, taskId, score).then(function () {
             spfAlert.success('Score has been saved.');
         }).catch(function (err) {
