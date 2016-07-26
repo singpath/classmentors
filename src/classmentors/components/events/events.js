@@ -374,6 +374,11 @@ function viewEventCtrlInitialData($q, $route, spfAuth, spfAuthData, clmDataStore
       if (canView) {
         return clmDataStore.events.getSolutions(eventId);
       }
+    }),
+    scores: canviewPromise.then(function(canView) {
+      if (canView) {
+        return clmDataStore.events.getScores(eventId);
+      }
     })
   });
 }
@@ -403,6 +408,7 @@ function ViewEventCtrl(
   this.tasks = initialData.tasks;
   this.progress = initialData.progress;
   this.solutions = initialData.solutions;
+  this.scores = initialData.scores;
   this.canView = initialData.canView;
   this.viewArchived = false;
   this.selected = null;
@@ -2181,7 +2187,8 @@ export function clmEventResultsTableFactory() {
             tasks: '=',
             progress: '=',
             solutions: '=',
-            selected: '='
+            selected: '=',
+            scores: '='
         },
         controller: ClmEventResultsTableCtrl,
         controllerAs: 'ctrl'
@@ -2194,6 +2201,7 @@ function ClmEventResultsTableCtrl(
 ) {
     var self = this;
     var unwatchers = [];
+
 
     this.currentUserParticipant = undefined;
     this.participantsView = [];
@@ -2380,6 +2388,7 @@ function ClmEventResultsTableCtrl(
         var rows = sortedParticipants(self.participants, self.orderOptions);
 
         self.participantsView = rows.slice(self.pagerOptions.range.start, self.pagerOptions.range.end);
+        self.participantsView.unshift(self.currentUserParticipant);
     }
 
     /**
@@ -2479,8 +2488,10 @@ function ClmEventResultsTableCtrl(
         );
     };
 
-    this.promptForLink = function(eventId, taskId, task, participant, userSolution) {
+    this.viewLink = function(eventId, taskId, task, participant, userSolution) {
+        console.log(participant);
         $mdDialog.show({
+            clickOutsideToClose: true,
             parent: $document.body,
             template: linkTmpl,
             controller: DialogController,
@@ -2489,6 +2500,7 @@ function ClmEventResultsTableCtrl(
 
         function DialogController() {
             this.task = task;
+            this.review = true;
             if (
                 userSolution &&
                 userSolution[taskId]
@@ -2515,11 +2527,13 @@ function ClmEventResultsTableCtrl(
 
     this.viewTextResponse = function(eventId, taskId, task, participant, userSolution) {
         $mdDialog.show({
+            clickOutsideToClose: true,
             parent: $document.body,
             template: responseTmpl,
             controller: DialogController,
             controllerAs: 'ctrl'
         });
+        console.log(this.currentUserProgress);
 
         function DialogController() {
             this.task = task;
@@ -2599,6 +2613,17 @@ function ClmEventResultsTableCtrl(
             };
         }
     };
+
+    this.saveAllocatedPoints = function(eventId, taskId, task, participant, score) {
+        console.log(Number.isInteger(score));
+        clmDataStore.events.saveScore(eventId, participant.$id, taskId, score).then(function () {
+            spfAlert.success('Score has been saved.');
+        }).catch(function (err) {
+            $log.error(err);
+            spfAlert.error('Failed to save score.');
+            return err;
+        });
+    }
 
     this.update = function() {};
     /*

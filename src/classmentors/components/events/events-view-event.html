@@ -64,8 +64,8 @@
                 </md-input-container>
                 <div ng-show="ctrl.selected">
                     <h2 align="center">Showing Results for {{ctrl.selected.title}}</h2>
-                    <div align="center">Description: {{ctrl.selected.description}}</br>
-                    Question: {{ctrl.selected.textResponse}}</div>
+                    <div align="center">Description: {{ctrl.selected.description}}</div></br>
+                    <div ng-if="ctrl.selected.textResponse" align="center">Question: {{ctrl.selected.textResponse}}</div>
                     </br></br>
                     Event Answers:
                 </div>
@@ -100,6 +100,7 @@
                                 solutions="ctrl.solutions"
                                 profile="ctrl.profile"
                                 selected="ctrl.selected"
+                                scores="ctrl.scores"
                         >
                         </clm-event-results-table>
                     </md-content>
