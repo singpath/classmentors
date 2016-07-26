@@ -136,7 +136,7 @@ function NewCohortCtrl(
     this.save = function(currentUser, newEvent, password) {
         var next;
 
-        self.creatingEvent = true;
+        self.creatingCohort = true;
 
         if (!self.profile) {
             cleanProfile();
@@ -172,14 +172,13 @@ function NewCohortCtrl(
         }).catch(function(e) {
             spfAlert.error(e.toString());
         }).finally(function() {
-            self.creatingEvent = false;
+            self.creatingCohort = false;
         });
     };
 
     this.reset = function(eventForm) {
         this.newEvent = {
-            data: {},
-            password: ''
+            data: {}
         };
 
         if (eventForm && eventForm.$setPristine) {

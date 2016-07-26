@@ -401,6 +401,39 @@ export function clmDataStoreFactory(
       });
     },
 
+    cohorts: {
+        errNoPublicId: new Error('You should have a public id to join a cohort'),
+
+        create: function(cohort) {
+            var hash, eventId;
+
+            return spfFirebase.push(['classMentors/cohorts'], event).then(function(ref) {
+                cohortId = ref.key();
+                // hash = spfCrypto.password.newHash(password);
+                // var opts = {
+                //     hash: hash.value,
+                //     options: hash.options
+                // };
+                // return spfFirebase.set(['classMentors/eventPasswords', eventId], opts);
+            }).then(function() {
+                return clmDataStore.cohorts.get(cohortId);
+            }).then(function(cohortObj) {
+                return spfFirebase.set([
+                    'classMentors/userProfiles',
+                    cohortObj.owner.publicId,
+                    'createdCohorts',
+                    cohortObj.$id
+                ], {
+                    createdAt: cohortObj.createdAt,
+                    title: cohortObj.title,
+                    featured: cohortObj.featured || false
+                });
+            }).then(function() {
+                return cohortId;
+            });
+        }
+    },
+
     events: {
       errNoPublicId: new Error('You should have a public id to join an event'),
 
