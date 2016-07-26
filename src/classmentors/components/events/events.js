@@ -76,6 +76,7 @@ export function configRoute($routeProvider, routes) {
         initialData: editEventTaskCtrlInitialData
       }
     });
+    console.log("routes configured");
 }
 
 configRoute.$inject = ['$routeProvider', 'routes'];

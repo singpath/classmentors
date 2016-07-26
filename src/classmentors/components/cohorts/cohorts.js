@@ -5,25 +5,63 @@
 import cohortTmpl from './cohorts-view.html!text';
 // import './cohorts.css!';
 
-class CohortCtrl {
+const noop = () => undefined;
 
-  constructor(spfNavBarService) {
+export function configRoute($routeProvider, routes) {
+    $routeProvider
+        .when(routes.cohorts, {
+            template: cohortTmpl,
+            controller: ClmListCohorts,
+            controllerAs: 'ctrl',
+            resolve: {
+                initialData: classMentorsEventResolver
+            }
+        });
+    console.log("configRoute Executed");
+}
+configRoute.$inject = ['$routeProvider', 'routes'];
+
+function ClmListCohorts (initialData, spfNavBarService, urlFor) {
+
     const title = 'Cohorts';
-    // e.g.: [{title: 'profile', url: '#' + urlFor(editProfile)}]
     const parentPages = [];
-    // e.g.: [{title: 'edit profile', url: '#' + urlFor(editProfile), icon: 'settings'}]
-    // icon id from icon set from
-    // src/jspm_packages/github/singpath/singpath-core@x.x.x/services/icons/icons.specs.js
     const menuItems = [];
 
+    this.currentUser = initialData.currentUser;
+    this.profile = initialData.profile;
+    this.events = initialData.events;
+    this.createdEvents = initialData.createdEvents;
+    this.joinedEvents = initialData.joinedEvents;
+    this.auth = initialData.auth;
+
+    console.log("Controller executed");
+
+    if (
+        this.profile &&
+        this.profile.user &&
+        this.profile.user.isPremium
+    ) {
+        menuItems.push({
+            title: 'New event',
+            url: `#${urlFor('newEvent')}`,
+            icon: 'add'
+        });
+    }
+
     spfNavBarService.update(title, parentPages, menuItems);
-  }
-
 }
+ClmListCohorts.$inject = ['initialData', 'spfNavBarService', 'urlFor'];
 
-CohortCtrl.$inject = ['spfNavBarService'];
-
-export const component = {
-  template: cohortTmpl,
-  controller: CohortCtrl
-};
+function classMentorsEventResolver($q, spfAuth, spfAuthData, clmDataStore) {
+    return $q.all({
+        events: clmDataStore.events.list(),
+        auth: spfAuth,
+        currentUser: spfAuthData.user().catch(function() {
+            return;
+        }),
+        profile: clmDataStore.currentUserProfile(),
+        createdEvents: clmDataStore.events.listCreatedEvents(),
+        joinedEvents: clmDataStore.events.listJoinedEvents()
+    });
+}
+classMentorsEventResolver.$inject = ['$q', 'spfAuth', 'spfAuthData', 'clmDataStore'];

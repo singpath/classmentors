@@ -92,6 +92,7 @@ module.config([
 ]);
 
 // TODO: convert those view controller/template to component and move them above
+module.config(cohorts.configRoute);
 module.config(events.configRoute);
 module.config(profiles.configRoute);
 module.config(challenges.configRoute);
