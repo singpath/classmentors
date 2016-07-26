@@ -10,7 +10,7 @@
             </div>
             <md-dialog-actions layout="row" layout-align="center end">
                 <div>
-                    <md-button type="submit" class="md-primary md-raised" ng-disabled="!provideResponseForm.$valid">
+                    <md-button type="submit" class="md-primary md-raised" ng-hide="ctrl.viewOnly" ng-disabled="!provideResponseForm.$valid">
                         Save
                     </md-button>
                 </div>

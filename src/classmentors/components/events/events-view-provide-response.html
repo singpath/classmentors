@@ -4,24 +4,30 @@
             <md-subheader class="md-sticky-no-effect">{{ctrl.task.title}}</md-subheader>
             <div>
                 <p>{{ctrl.task.description}}</p>
-                <md-input-container>
+                <md-input-container class="md-block" ng-show="!ctrl.viewOnly">
                     <label for="edit-solution-response">{{ctrl.task.textResponse}}</label>
-                    <input type="text" name="linkSolution" id="edit-solution-response"
-                        ng-model="ctrl.solution"
-                        required="true"
-                        placeholer="URL to provide"
-                    />
+                    <textarea name="solution" id="edit-solution-response"
+                              ng-model="ctrl.solution"
+                              required rows="5" md-select-on-focus>
+                    </textarea>
                     <div ng-messages="provideResponseForm.linkSolution.$error">
                         <div ng-message="required">Required.</div>
                     </div>
                 </md-input-container>
             </div>
+            <div ng-show="ctrl.viewOnly">
+                <label for="view-solution-response">{{ctrl.task.textResponse}}</label><br><br>
+                <textarea name="linkSolution" id="view-solution-response"
+                          ng-model="ctrl.solution"
+                          required rows="3" readonly>
+                </textarea>
+            </div>
+            <div class="md-dialog-actions" layout="row">
+                <md-button type="submit" class="md-primary md-raised" ng-hide="ctrl.viewOnly" ng-disabled="!provideResponseForm.$valid">
+                    Save
+                </md-button>
+                <md-button ng-click="ctrl.cancel()" type="button" class="md-accent">Cancel</md-button>
+            </div>
         </md-dialog-content>
-        <div class="md-actions" layout="row">
-            <md-button type="submit" class="md-primary md-raised" ng-disabled="!provideResponseForm.$valid">
-                Save
-            </md-button>
-            <md-button ng-click="ctrl.cancel()" type="button" class="md-accent">Cancel</md-button>
-        </div>
     </form>
 </md-dialog>
