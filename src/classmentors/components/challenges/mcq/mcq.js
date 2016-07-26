@@ -30,12 +30,11 @@ export function newMcqController(initialData, challengeService){
   // }
   self.test = challengeService.save;
   self.questions = [{
-    id: 0,
     text:"",
     options:[
       {
-        id:0,
-        text:""
+        text:"",
+        isAns:false
       }
     ]
 
@@ -43,9 +42,17 @@ export function newMcqController(initialData, challengeService){
 
   self.addQuestion = function(){
     var question = {
-
-      options:[]
+      text:"",
+      options:[
+        {
+          text:"",
+          isAns:false
+        }
+      ],
+      isMultiAns: false
     }
+    console.log('Added: ');
+    console.log(question.id);
     self.questions.push(question);
     console.log('Length of questions, ', self.questions.length);
   }
@@ -54,16 +61,44 @@ export function newMcqController(initialData, challengeService){
     if(itemIndex > -1){
       var removed = self.questions.splice(itemIndex,1);
       console.log('Removed : ', removed);
-      console.log(questions);
+      console.log(self.questions);
     }
   }
 
-  self.addOption = function () {
-
+  self.toggleOption = function(option){
+    if(option.isAns){
+      option.isAns = false;
+      console.log(option.isAns);
+    }else{
+      option.isAns = true;
+      console.log(option.isAns);
+    }
   }
 
-  self.removeOption = function () {
+  self.toggleStyle = function(isAns){
+    if(isAns){
+      console.log('YES');
+      return 'md-ascent';
+    }else{
+      console.log('NO');
+      return 'md-warn';
+    }
+  }
 
+  self.addOption = function (question) {
+    // Get options
+    question.options.push({
+      text:"",
+      isAns:false
+    });
+  }
+
+  self.removeOption = function (question, itemIndex) {
+    if(itemIndex > -1){
+      var removed = question.options.splice(itemIndex,1);
+      console.log('Removed : ', removed);
+      console.log(question.options);
+    }
   }
 
 
