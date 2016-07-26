@@ -2623,7 +2623,7 @@ function ClmEventResultsTableCtrl(
             spfAlert.error('Failed to save score.');
             return err;
         });
-    }
+    };
 
     this.update = function() {};
     /*
