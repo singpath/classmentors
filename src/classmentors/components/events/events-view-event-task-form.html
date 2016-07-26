@@ -120,7 +120,7 @@
                         <td style='padding-left:20px; padding-bottom:40px;'>
 
 
-                            <md-radio-button ng-disabled="!ctrl.enableBeta" value="code" class="md-primary">Code*</md-radio-button>
+                            <md-radio-button value="code" class="md-primary">Code</md-radio-button>
                             <md-radio-button ng-disabled="!ctrl.enableBeta" value="video" class="md-primary">Video*</md-radio-button>
                             <md-radio-button ng-disabled="!ctrl.enableBeta" value="journalling" class="md-primary">Journalling*</md-radio-button>
                             <md-radio-button ng-disabled="!ctrl.enableBeta" value="survey" class="md-primary">Survey*</md-radio-button>
@@ -255,10 +255,10 @@
         <div ng-if="ctrl.taskType == 'code'">
             <md-input-container>
                 <label for="edit-text-response">Question</label>
-                <input type="text" name="editTextResponse" id="edit-text-response"
+                <input type="text" name="editCodeQuestion" id="edit-code-question"
                        ng-model="ctrl.task.textResponse"
-                       required="true"
-                       placeholer="Question" value="{{ctrl.task.textResponse}}"
+                       required
+                       placeholder="Question" value="{{ctrl.task.textResponse}}"
                 />
 
                 <div ng-messages="editTask.editTextResponse.$error">
@@ -272,9 +272,6 @@
                         {{opt}}
                     </md-option>
                 </md-select>
-                <div ng-messages="editTask.editTaskServiceId.$error">
-                    <div ng-message="required">A challenge needs a service id.</div>
-                </div>
             </md-input-container>
         </div>
 
