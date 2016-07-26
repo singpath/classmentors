@@ -8,7 +8,7 @@
 
                         ng-model="ctrl.task.title"
                         required="required" ng-minLength="3" md-maxLength="30"
-                        placeholer="Challenge name" value="{{ctrl.task.title}}"
+                        placeholder="Challenge name" value="{{ctrl.task.title}}"
 
                     />
 
@@ -41,7 +41,7 @@
 
                     ng-model="ctrl.task.description"
                     required="required" ng-minLength="3" md-maxLength="200"
-                    placeholer="Challenge description"
+                    placeholder="Challenge description"
                 >{{ctrl.task.description}}</textarea>
 
 
@@ -60,7 +60,7 @@
 
                     ng-model="ctrl.task.link"
                     pattern="^(https?://.+|#/).+$"
-                    placeholer="URL to a challenge help page" value="{{ctrl.task.link}}"
+                    placeholder="URL to a challenge help page" value="{{ctrl.task.link}}"
 
                 />
                 <div ng-messages="editTask.editTaskLink.$error">
@@ -261,7 +261,7 @@
                        placeholder="Question" value="{{ctrl.task.textResponse}}"
                 />
 
-                <div ng-messages="editTask.editTextResponse.$error">
+                <div ng-messages="editTask.editCodeQuestion.$error">
                     <div ng-message="required">Required.</div>
                 </div>
             </md-input-container>
