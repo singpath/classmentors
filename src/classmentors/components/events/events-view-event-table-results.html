@@ -15,8 +15,8 @@
                     Submission
                     {{ctrl.taskCompletion[ctrl.selected.$id] | number: 0}} %
                 </th>
-                <th rowspan="8">
-                    Allocated Points
+                <th rowspan="8" ng-class="{orderer: ctrl.orderOptions.key == ctrl.selected.$id}">
+                    <md-button ng-click="ctrl.orderBy(ctrl.selected.$id)">Allocated Points</md-button>
                 </th>
             </tr>
             </thead>
