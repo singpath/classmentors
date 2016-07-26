@@ -375,11 +375,11 @@ function viewEventCtrlInitialData($q, $route, spfAuth, spfAuthData, clmDataStore
         return clmDataStore.events.getSolutions(eventId);
       }
     }),
-    // scores: canviewPromise.then(function(canView) {
-    //   if (canView) {
-    //     return clmDataStore.events.getScores(eventId);
-    //   }
-    // })
+    scores: canviewPromise.then(function(canView) {
+      if (canView) {
+        return clmDataStore.events.getScores(eventId);
+      }
+    })
   });
 }
 viewEventCtrlInitialData.$inject = [
@@ -408,7 +408,7 @@ function ViewEventCtrl(
   this.tasks = initialData.tasks;
   this.progress = initialData.progress;
   this.solutions = initialData.solutions;
-  // this.scores = initialData.scores;
+  this.scores = initialData.scores;
   this.canView = initialData.canView;
   this.viewArchived = false;
   this.selected = null;
@@ -2187,8 +2187,8 @@ export function clmEventResultsTableFactory() {
             tasks: '=',
             progress: '=',
             solutions: '=',
-            selected: '='
-            // scores: '='
+            selected: '=',
+            scores: '='
         },
         controller: ClmEventResultsTableCtrl,
         controllerAs: 'ctrl'

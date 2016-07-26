@@ -574,9 +574,9 @@ export function clmDataStoreFactory(
         return spfFirebase.loadedObj(['classMentors/eventSolutions', eventId]);
       },
 
-      // getScores: function(eventId) {
-      //   return spfFirebase.loadedObj(['classmentors/eventScores', eventId]);
-      // },
+      getScores: function(eventId) {
+        return spfFirebase.loadedObj(['classMentors/eventScores', eventId]);
+      },
 
       getUserSolutions: function(eventId, publicId) {
         return spfFirebase.loadedObj(['classMentors/eventSolutions', eventId, publicId]);
@@ -1067,7 +1067,7 @@ export function clmDataStoreFactory(
         }
 
         if (!publicId) {
-          return $q.reject(new Error('No task id provided'));
+          return $q.reject(new Error('No public id provided'));
         }
 
         return spfFirebase.set([
@@ -1085,7 +1085,7 @@ export function clmDataStoreFactory(
           }
 
           if (!publicId) {
-              return $q.reject(new Error('No task id provided'));
+              return $q.reject(new Error('No public id provided'));
           }
 
           return spfFirebase.set([

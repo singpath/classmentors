@@ -113,19 +113,26 @@
                     </div>
                 </td>
                 <td>
+                    <!--{{ctrl.scores[participant.$id][ctrl.selected.$id]}}-->
                     <md-input-container flex>
                         <label for="edit-task-score">Score</label>
                         <input type="number" name="editTaskScore" id="edit-task-score"
 
-                               ng-model="ctrl.task.score"
+                               ng-model="ctrl.scores[participant.$id][ctrl.selected.$id]"
                                min="0" step="1"
-                               placeholer="Challenge priority" value="{{ctrl.task.priority}}"
+                               placeholder="Allocate task score"
 
                         />
-                        <div ng-messages="editTask.editTaskPriority.$error">
+                        <div ng-messages="editTask.editTaskScore.$error">
                             <div ng-message="number">The priority should be a positive number.</div>
                         </div>
                     </md-input-container>
+                    <md-button class="md-raised md-primary"
+                               aria-label="Save Score"
+                               ng-click="ctrl.saveAllocatedPoints(ctrl.event.$id, ctrl.selected.$id, ctrl.selected, participant, ctrl.scores[participant.$id][ctrl.selected.$id])"
+                    >
+                        Save
+                    </md-button>
                 </td>
             </tr>
 
@@ -138,3 +145,5 @@
 
     <clm-pager options="ctrl.pagerOptions" class="md-padding"></clm-pager>
 </div>
+
+<!--value=ctrl.scores[participant.$id][ctrl.selected.$id]-->
