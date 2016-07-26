@@ -31,7 +31,6 @@ module.component('ace', ace.component);
 module.constant('aceStatsUrl', ace.ACE_STATS_URL);
 module.factory('aceStats', ace.factory);
 
-module.component('cohorts', cohorts.component);
 // module.component('challenges'. challenges.component);
 
 module.directive('clmProfile', profiles.clmProfileFactory);
@@ -69,6 +68,7 @@ module.constant('routes', {
   editProfile: '/profile/',
   setProfileCodeCombatId: '/profile/codeCombat',
   cohorts: '/cohorts',
+  newCohort: '/new-cohort',
   viewMcq: '/challenges/mcq',
   viewSurvey: '/challenges/survey'
 });

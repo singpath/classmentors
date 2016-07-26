@@ -1,0 +1,52 @@
+<md-content class="md-padding">
+    <form name="newCohortForm" ng-submit="ctrl.save(ctrl.currentUser, ctrl.newEvent.data, ctrl.newEvent.password, newEventForm)">
+        <spf-sign-form current-user="ctrl.currentUser" ng-if="ctrl.profileNeedsUpdate"></spf-sign-form>
+
+        <md-input-container>
+            <label for="cohort-name">Cohort Name</label>
+            <input name="cohortName" type="text" id="cohort-name" ng-model="ctrl.newEvent.data.title" ng-minlength="3" ng-maxlength="60" required/>
+            <div ng-messages="newCohortForm.cohortName.$error">
+                <div ng-message="required">A cohort must have a name.</div>
+                <div ng-message="minlength">A cohort name shouldn't be shorter than 3 characters.</div>
+                <div ng-message="maxlength">A cohort name shouldn't be longer than 60 characters.</div>
+            </div>
+        </md-input-container>
+        <md-switch class="md-primary" ng-model="ctrl.includeCreated" aria-label="includeCreated?">
+            Include created events
+        </md-switch>
+        <md-switch class="md-primary" ng-model="ctrl.includeJoined" aria-label="includeJoined?">
+            Include joined events
+        </md-switch>
+
+        <h3>Select events to add to your cohort</h3>
+
+        <md-list class="path-list" ng-repeat="e in (ctrl.events | orderBy:'createdAt':true) track by e.$id">
+            <md-checkbox ng-checked="ctrl.exists(e.$id, ctrl.selectedEvents)" ng-click="ctrl.toggle(e.$id, ctrl.selectedEvents)">
+                {{e.title}}</br><div class="subhead">created by {{e.owner.displayName}} ({{e.createdAt|date}})</div>
+            </md-checkbox>
+        </md-list>
+
+        <md-list ng-if="ctrl.includeCreated" class="path-list" ng-repeat="e in (ctrl.createdEvents | orderBy:'createdAt':true) track by e.$id">
+            <md-checkbox ng-checked="ctrl.exists(e.$id, ctrl.selectedEvents)" ng-click="ctrl.toggle(e.$id, ctrl.selectedEvents)">
+                {{e.title}}</br><div class="subhead">created by {{e.owner.displayName}} ({{e.createdAt|date}})</div>
+            </md-checkbox>
+        </md-list>
+
+        <md-list ng-if="ctrl.includeJoined" class="path-list" ng-repeat="e in (ctrl.joinedEvents | orderBy:'createdAt':true) track by e.$id">
+            <md-checkbox ng-if="!ctrl.populatedEvents.contains(e)" ng-checked="ctrl.exists(e.$id, ctrl.selectedEvents)" ng-click="ctrl.toggle(e.$id, ctrl.selectedEvents)">
+                {{e.title}}</br><div class="subhead">created by {{e.owner.displayName}} ({{e.createdAt|date}})</div>
+            </md-checkbox>
+        </md-list>
+
+        <md-progress-circular ng-show="ctrl.creatingEvent" md-mode="indeterminate" style="margin: 16px auto"></md-progress-circular>
+
+        <div layout="row" layout-align="center center">
+            <md-button type="submit" class="md-primary" ng-disabled="newEventForm.$invalid || ctrl.creatingEvent">Create</md-button>
+            <md-button type="reset" ng-click="ctrl.reset(newEventForm)" ng-disabled="ctrl.creatingEvent || newEventForm.$pristine">Reset</md-button>
+        </div>
+    </form>
+    <div flex="100">
+        <h2 class="md-title">Selected Items</h2>
+        <code style="display: block; padding: 8px;">{{ctrl.selectedEvents | json}}</code>
+    </div>
+</md-content>
