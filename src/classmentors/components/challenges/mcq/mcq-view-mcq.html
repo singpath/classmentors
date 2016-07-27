@@ -1,5 +1,5 @@
 <md-content flex class="md-padding">
-<code>{{ctrl.data | json}}</code>
+<!--<code>{{ctrl.data | json}}</code>-->
 <md-button ng-click="
 	ctrl.test(
 		ctrl.data.event,
@@ -9,16 +9,16 @@
 		ctrl.data.isOpen
 		)
 "> Save something</md-button>
+    {{ctrl.data}}
     <div align="center">
         <h3>Multiple Choice</h3>
-        <h4>Title {{ctrl.task.title}}</h4>
-        <h4>Description {{ctrl.task.description}}</h4>
+        <h4>Title: {{ctrl.task.title}}</h4>
+        <h4>Description: {{ctrl.task.description}}</h4>
         <br><br>
     </div>
 
     <div name="continueMCQ">
         <!-- toggle buttons -->
-
         <p>
             <md-switch class="md-primary" ng-model="ctrl.timelimit" aria-label="">
                 Set time limit for the entire quiz
@@ -143,17 +143,17 @@
             <h4>Question Details</h4>
         </div>
 
-        <div ng-repeat="question in questions">
+        <div ng-repeat="question in ctrl.questions">
             <h3>
-                Question {{question.id}}
-                <md-button class="md-raised" ng-click="removeQuestion(question,$index)" ng-disabled = "questions.length == 1">Delete this question</md-button>
+                Question {{$index + 1}}
+                <md-button class="md-raised" ng-click="ctrl.removeQuestion($index)" ng-disabled = "ctrl.questions.length == 1">Delete this question</md-button>
             </h3>
 
 
             <div align="center" layout="row" >
                 <md-input-container flex>
-                    <label for="edit-question_{{question.id}}">Question</label>
-                    <input type="text" name="editQuestion" id="edit-question_{{question.id}}"
+                    <label for="edit-question_{{$index}}">Question</label>
+                    <input type="text" name="editQuestion" id="edit-question_{{$index}}"
                            ng-model="question.text"
                            placeholer="Question"
                     />
@@ -169,13 +169,16 @@
                     Single answer only
                 </md-switch>
             </div>
+            <md-input-container >
+                <md-button type="button" class="md-raised md-primary" ng-click="ctrl.addOption(question)">Add option</md-button>
+            </md-input-container>
 
             <!--answer options-->
             <div align="center" layout="row" ng-repeat="option in question.options" >
                 <!--todo: enable to add new options -->
                 <md-input-container flex >
-                    <label for="q-option_{{option.id}}">Option </label>
-                    <input type="text" name="editQuestion" id="q-option_{{option.id}}"
+                    <label for="q-option_{{$index}}">Option </label>
+                    <input type="text" name="editQuestion" id="q-option_{{$index}}"
                            ng-model="option.text"
                            placeholer="Options"
                     />
@@ -184,14 +187,14 @@
                     <!--<div ng-message="pattern">Some error here.</div>-->
                     <!--</div>-->
                 </md-input-container>
-
+                <!--single answer or no?-->
+                <md-input-container>
+                    <md-button ng-class="option.isAns ? 'md-raised md-primary' : 'md-raised'" ng-click="ctrl.toggleOption(option)">Answer</md-button>
+                </md-input-container>
                 <md-input-container >
-                    <md-button class="md-raised" ng-click="removeOption(question,$index)" ng-disabled = "question.options.length == 1">Delete</md-button>
+                    <md-button class="md-raised" ng-click="ctrl.removeOption(question,$index)" ng-disabled = "question.options.length == 1">Delete</md-button>
                 </md-input-container>
 
-                <md-input-container >
-                    <md-button type="button" class="md-raised md-primary" ng-click="addOption(question)" ng-disabled="question.isSingleAnswer">Add option</md-button>
-                </md-input-container>
 
             </div>
 
@@ -201,7 +204,7 @@
         <br>
         <div align="center">
             <!--todo: can add new set of question-->
-            <md-button type="button" class="md-raised md-primary" ng-click ="addQuestion()">Add question</md-button>
+            <md-button type="button" class="md-raised md-primary" ng-click ="ctrl.addQuestion()">Add question</md-button>
         </div>
 
         <br>

@@ -15,7 +15,10 @@ export function configRoute($routeProvider, routes){
             controllerAs: 'ctrl',
             template: mcq.newMcqTmpl,
             controller: mcq.newMcqController,
-            controllerAs: 'ctrl'
+            controllerAs: 'ctrl',
+            resolve:{
+              initialData: initialData
+            }
         })
 
         .when(routes.editMcq, {
@@ -37,6 +40,24 @@ export function configRoute($routeProvider, routes){
 
 }
 configRoute.$inject = ['$routeProvider', 'routes'];
+
+//default initial data for each route
+function initialData($q, eventService){
+  var data =  eventService.get();
+  // var title = data.task.title;
+  // var desc = data.task.description;
+  // this.title = data.task.title;
+  // this.desc = data.task.description;
+  // return data;
+  // return {
+  //   title: title,
+  //   desc: desc
+  // }
+}
+initialData.$inject = [
+    '$q',
+    'eventService'
+]
 
 //TODO: Generic save function
 export function challengeServiceFactory
