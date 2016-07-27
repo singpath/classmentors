@@ -8,13 +8,14 @@
         <md-tab label="Featured Cohorts">
             <md-content>
                 <md-list class="path-list">
-                    <md-subheader class="md-no-sticky">{{ ctrl.events.length }} featured event(s)</md-subheader>
-                    <md-list-item class="md-2-line" ng-repeat="e in (ctrl.events | orderBy:'createdAt':true) track by e.$id">
+                    <md-subheader class="md-no-sticky">{{ ctrl.featuredCohorts.length }} featured cohort(s)</md-subheader>
+                    <md-list-item class="md-2-line" ng-repeat="c in (ctrl.featuredCohorts | orderBy:'createdAt':true) track by c.$id">
                         <div class="md-list-item-text">
                             <h3>
-                                <a href="#{{ 'oneEvent' | urlFor: {eventId: e.$id} }}">{{e.title}}</a>
+                                <!--<a href="#{{ 'oneEvent' | urlFor: {eventId: e.$id} }}">{{e.title}}</a>-->
+                                {{c.title}}
                             </h3>
-                            <h4>created by {{e.owner.displayName}} ({{e.createdAt|date}})</h4>
+                            <h4>created by {{c.owner.displayName}} ({{c.createdAt|date}})</h4>
                         </div>
                         <md-divider ng-if="!$last"></md-divider>
                     </md-list-item>
@@ -25,13 +26,14 @@
         <md-tab label="Created Cohorts">
             <md-content>
                 <md-list class="path-list">
-                    <md-subheader class="md-no-sticky">{{ ctrl.createdEvents.length }} created event(s)</md-subheader>
-                    <md-list-item class="md-2-line" ng-repeat="e in (ctrl.createdEvents | orderBy:'createdAt':true) track by e.$id">
+                    <md-subheader class="md-no-sticky">{{ ctrl.createdCohorts.length }} created cohort(s)</md-subheader>
+                    <md-list-item class="md-2-line" ng-repeat="c in (ctrl.createdCohorts | orderBy:'createdAt':true) track by c.$id">
                         <div class="md-list-item-text">
                             <h3>
-                                <a href="#{{ 'oneEvent' | urlFor: {eventId: e.$id} }}">{{e.title}}</a>
+                                <!--<a href="#{{ 'oneEvent' | urlFor: {eventId: e.$id} }}">{{e.title}}</a>-->
+                                {{c.title}}
                             </h3>
-                            <h4>created by {{ctrl.currentUser.displayName}} ({{e.createdAt|date}})</h4>
+                            <h4>created by {{ctrl.currentUser.displayName}} ({{c.createdAt|date}})</h4>
                         </div>
                         <md-divider ng-if="!$last"></md-divider>
                     </md-list-item>
@@ -42,13 +44,14 @@
         <md-tab label="Joined Cohorts">
             <md-content>
                 <md-list class="path-list">
-                    <md-subheader class="md-no-sticky">{{ ctrl.joinedEvents.length }} joined event(s)</md-subheader>
-                    <md-list-item class="md-2-line" ng-repeat="e in (ctrl.joinedEvents | orderBy:'createdAt':true) track by e.$id">
+                    <md-subheader class="md-no-sticky">{{ ctrl.joinedCohorts.length }} joined cohort(s)</md-subheader>
+                    <md-list-item class="md-2-line" ng-repeat="c in (ctrl.joinedCohorts | orderBy:'createdAt':true) track by c.$id">
                         <div class="md-list-item-text">
                             <h3>
-                                <a href="#{{ 'oneEvent' | urlFor: {eventId: e.$id} }}">{{e.title}}</a>
+                                <!--<a href="#{{ 'oneEvent' | urlFor: {eventId: e.$id} }}">{{e.title}}</a>-->
+                                {{c.title}}
                             </h3>
-                            <h4>created by {{e.owner.displayName}} ({{e.createdAt|date}})</h4>
+                            <h4>created by {{c.owner.displayName}} ({{c.createdAt|date}})</h4>
                         </div>
                         <md-divider ng-if="!$last"></md-divider>
                     </md-list-item>

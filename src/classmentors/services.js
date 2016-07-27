@@ -405,9 +405,9 @@ export function clmDataStoreFactory(
         errNoPublicId: new Error('You should have a public id to join a cohort'),
 
         create: function(cohort) {
-            var hash, eventId;
+            var cohortId;
 
-            return spfFirebase.push(['classMentors/cohorts'], event).then(function(ref) {
+            return spfFirebase.push(['classMentors/cohorts'], cohort).then(function(ref) {
                 cohortId = ref.key();
                 // hash = spfCrypto.password.newHash(password);
                 // var opts = {
@@ -430,6 +430,41 @@ export function clmDataStoreFactory(
                 });
             }).then(function() {
                 return cohortId;
+            });
+        },
+
+        get: function(cohortId) {
+            return spfFirebase.loadedObj(['classMentors/cohorts', cohortId]);
+        },
+
+        listAllCohorts: function() {
+            return spfFirebase.loadedArray(['classMentors/cohorts'], {
+                orderByChild: 'createdAt',
+                limitToLast: 50
+            });
+        },
+
+        listFeaturedCohorts: function() {
+            return spfFirebase.loadedArray(['classMentors/cohorts'], {
+                orderByChild: 'featured',
+                equalTo: true,
+                limitToLast: 50
+            });
+        },
+
+        listCreatedCohorts: function() {
+            return spfAuthData.user().then(function(authData) {
+                if (!authData.publicId) {
+                    return [];
+                }
+
+                return spfFirebase.loadedArray(['classMentors/userProfiles', authData.publicId, 'createdCohorts'], {
+                    orderByChild: 'createdAt',
+                    limitToLast: 50
+                });
+            }).catch(function(err) {
+                $log.error(`Failed to list created cohorts: ${err}`);
+                return [];
             });
         }
     },

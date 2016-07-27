@@ -31,7 +31,7 @@ export function configRoute($routeProvider, routes) {
 }
 configRoute.$inject = ['$routeProvider', 'routes'];
 
-function ClmListCohorts (initialData, spfNavBarService, urlFor) {
+function ClmListCohorts (initialData, spfNavBarService, urlFor, spfFirebase, spfAuthData) {
 
     const title = 'Cohorts';
     const parentPages = [];
@@ -39,12 +39,30 @@ function ClmListCohorts (initialData, spfNavBarService, urlFor) {
 
     this.currentUser = initialData.currentUser;
     this.profile = initialData.profile;
-    this.events = initialData.events;
-    this.createdEvents = initialData.createdEvents;
+    this.allCohorts = initialData.allCohorts;
+    this.featuredCohorts = initialData.featuredCohorts;
+    this.createdCohorts = initialData.createdCohorts;
     this.joinedEvents = initialData.joinedEvents;
     this.auth = initialData.auth;
 
-    console.log("Controller executed");
+    // *** Populate joined cohorts out-of-DB
+
+    this.joinedCohorts = [];
+
+    for(var i=0; i<this.allCohorts.length; i++) {
+        var cohort = this.allCohorts[i];
+        var cohortEvents = cohort.events;
+        for(var j=0; j<this.joinedEvents.length; j++) {
+            var eventId = this.joinedEvents[j].$id;
+            if(cohortEvents.indexOf(eventId) > -1) {
+                this.joinedCohorts.push(cohort);
+                break;
+            }
+        }
+    }
+
+    // ***
+
 
     if (
         this.profile &&
@@ -60,18 +78,19 @@ function ClmListCohorts (initialData, spfNavBarService, urlFor) {
 
     spfNavBarService.update('Cohorts', undefined, menuItems);
 }
-ClmListCohorts.$inject = ['initialData', 'spfNavBarService', 'urlFor'];
+ClmListCohorts.$inject = ['initialData', 'spfNavBarService', 'urlFor', 'spfFirebase', 'spfAuthData'];
 
 function classMentorsCohortResolver($q, spfAuth, spfAuthData, clmDataStore) {
     return $q.all({
-        events: clmDataStore.events.list(),
+        featuredCohorts: clmDataStore.cohorts.listFeaturedCohorts(),
         auth: spfAuth,
         currentUser: spfAuthData.user().catch(function() {
             return;
         }),
         profile: clmDataStore.currentUserProfile(),
-        createdEvents: clmDataStore.events.listCreatedEvents(),
-        joinedEvents: clmDataStore.events.listJoinedEvents()
+        createdCohorts: clmDataStore.cohorts.listCreatedCohorts(),
+        joinedEvents: clmDataStore.events.listJoinedEvents(),
+        allCohorts: clmDataStore.cohorts.listAllCohorts()
     });
 }
 classMentorsCohortResolver.$inject = ['$q', 'spfAuth', 'spfAuthData', 'clmDataStore'];
@@ -99,7 +118,7 @@ function NewCohortCtrl(
     this.creatingEvent = false;
     this.profileNeedsUpdate = !this.currentUser.$completed();
 
-    console.log(this.populatedEvents);
+    // console.log(this.populatedEvents);
 
     spfNavBarService.update(
         'New Cohorts',
@@ -133,7 +152,7 @@ function NewCohortCtrl(
         self.profile = profile;
         self.profileNeedsUpdate = !self.currentUser.$completed();
     }
-    this.save = function(currentUser, newEvent, password) {
+    this.save = function(currentUser, newCohort, events) {
         var next;
 
         self.creatingCohort = true;
@@ -162,13 +181,16 @@ function NewCohortCtrl(
                 },
                 createdAt: {
                     '.sv': 'timestamp'
-                }
-            }, newEvent);
+                },
+                events: events
+            }, newCohort);
 
-            return clmDataStore.events.create(data, password);
+            console.log(data);
+
+            return clmDataStore.cohorts.create(data);
         }).then(function() {
-            spfAlert.success('New event created.');
-            $location.path(urlFor('events'));
+            spfAlert.success('New cohort created.');
+            $location.path(urlFor('cohorts'));
         }).catch(function(e) {
             spfAlert.error(e.toString());
         }).finally(function() {
@@ -176,13 +198,13 @@ function NewCohortCtrl(
         });
     };
 
-    this.reset = function(eventForm) {
-        this.newEvent = {
+    this.reset = function(cohortForm) {
+        this.newCohort = {
             data: {}
         };
 
-        if (eventForm && eventForm.$setPristine) {
-            eventForm.$setPristine();
+        if (cohortForm && cohortForm.$setPristine) {
+            cohortForm.$setPristine();
         }
     };
 
