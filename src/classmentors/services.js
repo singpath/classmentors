@@ -496,6 +496,7 @@ export function clmDataStoreFactory(
                 limitToLast: 50
             });
         },
+
     },
 
     events: {

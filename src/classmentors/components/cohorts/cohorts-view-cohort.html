@@ -30,23 +30,34 @@
 
         <md-tab label="Announcements">
             <md-content layout-padding>
-                <!--<clm-event-rank-table-->
-                        <!--event="ctrl.event"-->
-                        <!--profile="ctrl.profile"-->
-                <!--&gt;</clm-event-rank-table>-->
+                Events within this cohort:
+                <code style="display: block; padding: 8px;">{{ctrl.cohort.events | json}}</code>
                 <h3>Featured Announcements</h3>
                 <md-list>
-                    <md-list-item ng-repeat="a in ctrl.announcements">
-                        {{a.content}}
-                        {{a.madeBy}} at {{a.madeAt}}
+                    <md-list-item class="md-2-line" ng-repeat="a in ctrl.announcements">
+                        <div layout="column" ng-if="a.featured">
+                            <h4>{{a.content}}</h4>
+                            <p class="subhead">By {{a.madeBy}} at {{a.madeAt|date:'yyyy-MM-dd HH:mm'}}</p>
+                        </div>
+                        <md-divider ng-if="!$last"></md-divider>
                     </md-list-item>
                 </md-list>
                 <h3>Announcements</h3>
+                <md-list>
+                    <md-list-item class="md-2-line" ng-repeat="a in ctrl.announcements">
+                        <div layout="column">
+                            <h4>{{a.content}}</h4>
+                            <p class="subhead">By {{a.madeBy}} at {{a.madeAt|date:'yyyy-MM-dd HH:mm'}}</p>
+                        </div>
+                        <md-divider ng-if="!$last"></md-divider>
+                    </md-list-item>
+                </md-list>
             </md-content>
         </md-tab>
 
         <md-tab label="Ranking">
             <md-content layout-padding>
+                This is a placeholder for the cohort ranking page
                 <!--<clm-event-table-->
                         <!--ng-if="ctrl.canView"-->
                         <!--event="ctrl.event"-->
@@ -61,6 +72,7 @@
         </md-tab>
 
         <md-tab label="Stats">
+            This is a placeholder for the cohort stats page
             <!--<md-content layout-padding>-->
                 <!--<md-switch class="md-primary" ng-model="ctrl.viewArchived" aria-label="ViewArchived?">-->
                     <!--View archived challenges-->

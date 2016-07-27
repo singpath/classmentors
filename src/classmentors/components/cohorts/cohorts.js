@@ -314,7 +314,12 @@ function viewCohortCtrlInitialData($q, $route, spfAuth, spfAuthData, clmDataStor
             if(canView) {
                 return clmDataStore.cohorts.getAnnouncements(cohortId);
             }
-        })
+        }),
+        // events: canviewPromise.then(function (canView) {
+        //     if(canView) {
+        //         return clmDataStore.cohorts.
+        //     }
+        // })
         // events: canviewPromise.then(function(canView) {
         //     if(canView) {
         //         return clmDataStore.cohorts.getEvents(cohortId);
