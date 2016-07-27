@@ -592,61 +592,69 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
         // }]
     );
 
-    // this.save = function(currentUser, event, newPassword, editEventForm) {
-    //     self.savingEvent = true;
-    //     event.owner.publicId = currentUser.publicId;
-    //     event.owner.displayName = currentUser.displayName;
-    //     event.owner.gravatar = currentUser.gravatar;
-    //     return clmDataStore.events.updateEvent(event, newPassword).then(function() {
-    //         spfAlert.success('Event saved.');
-    //         self.newPassword = '';
-    //         editEventForm.$setPristine(true);
-    //     }).catch(function() {
-    //         spfAlert.error('Failed to save event.');
-    //     }).finally(function() {
-    //         self.savingEvent = false;
-    //     });
-    // };
-    //
-    // this.openTask = function(eventId, taskId) {
-    //     clmDataStore.events.openTask(eventId, taskId).then(function() {
-    //         spfAlert.success('Task opened.');
-    //     }).catch(function() {
-    //         spfAlert.error('Failed to open task');
-    //     });
-    // };
-    //
-    // this.closeTask = function(eventId, taskId) {
-    //     clmDataStore.events.closeTask(eventId, taskId).then(function() {
-    //         spfAlert.success('Task closed.');
-    //     }).catch(function() {
-    //         spfAlert.error('Failed to close task.');
-    //     });
-    // };
-    //
-    // this.showTask = function(eventId, taskId) {
-    //     clmDataStore.events.showTask(eventId, taskId).then(function() {
-    //         spfAlert.success('Task visible.');
-    //     }).catch(function() {
-    //         spfAlert.error('Failed to make task visible.');
-    //     });
-    // };
-    //
-    // this.hideTask = function(eventId, taskId) {
-    //     clmDataStore.events.hideTask(eventId, taskId).then(function() {
-    //         spfAlert.success('Task hidden.');
-    //     }).catch(function() {
-    //         spfAlert.error('Failed to make task hidden.');
-    //     });
-    // };
-    //
-    // this.archiveTask = function(eventId, taskId) {
-    //     clmDataStore.events.archiveTask(eventId, taskId).then(function() {
-    //         spfAlert.success('Task archived.');
-    //     }).catch(function() {
-    //         spfAlert.error('Failed to archive task.');
-    //     });
-    // };
+    this.save = function(currentUser, event, newPassword, editEventForm) {
+        self.savingEvent = true;
+        event.owner.publicId = currentUser.publicId;
+        event.owner.displayName = currentUser.displayName;
+        event.owner.gravatar = currentUser.gravatar;
+        return clmDataStore.events.updateEvent(event, newPassword).then(function() {
+            spfAlert.success('Event saved.');
+            self.newPassword = '';
+            editEventForm.$setPristine(true);
+        }).catch(function() {
+            spfAlert.error('Failed to save event.');
+        }).finally(function() {
+            self.savingEvent = false;
+        });
+    };
+
+    this.saveAnnouncement = function(cohortId) {
+        clmDataStore.cohorts.addAnnouncement(cohortId, this.currentUser, this.newAnnouncement, false).then(function() {
+            spfAlert.success('Announcement created');
+        }).catch(function () {
+            spfAlert.error('Failed to create announcement');
+        })
+    };
+
+    this.openTask = function(eventId, taskId) {
+        clmDataStore.events.openTask(eventId, taskId).then(function() {
+            spfAlert.success('Task opened.');
+        }).catch(function() {
+            spfAlert.error('Failed to open task');
+        });
+    };
+
+    this.closeTask = function(eventId, taskId) {
+        clmDataStore.events.closeTask(eventId, taskId).then(function() {
+            spfAlert.success('Task closed.');
+        }).catch(function() {
+            spfAlert.error('Failed to close task.');
+        });
+    };
+
+    this.showTask = function(eventId, taskId) {
+        clmDataStore.events.showTask(eventId, taskId).then(function() {
+            spfAlert.success('Task visible.');
+        }).catch(function() {
+            spfAlert.error('Failed to make task visible.');
+        });
+    };
+
+    this.hideTask = function(eventId, taskId) {
+        clmDataStore.events.hideTask(eventId, taskId).then(function() {
+            spfAlert.success('Task hidden.');
+        }).catch(function() {
+            spfAlert.error('Failed to make task hidden.');
+        });
+    };
+
+    this.archiveTask = function(eventId, taskId) {
+        clmDataStore.events.archiveTask(eventId, taskId).then(function() {
+            spfAlert.success('Task archived.');
+        }).catch(function() {
+            spfAlert.error('Failed to archive task.');
+        });
+    };
 }
 EditCohortCtrl.$inject = ['initialData', 'spfNavBarService', 'urlFor', 'spfAlert', 'clmDataStore'];
 

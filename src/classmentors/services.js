@@ -466,7 +466,35 @@ export function clmDataStoreFactory(
                 $log.error(`Failed to list created cohorts: ${err}`);
                 return [];
             });
-        }
+        },
+
+        addAnnouncement: function(cohortId, madeBy, announcement, isArchived) {
+            var priority = announcement.priority || 0;
+
+            // if (isOpen) {
+            //     task.openedAt = {'.sv': 'timestamp'};
+            //     task.closedAt = null;
+            // } else {
+            //     task.closedAt = {'.sv': 'timestamp'};
+            //     task.openedAt = null;
+            // }
+
+            announcement.madeAt = {'.sv': 'timestamp'};
+            announcement.madeBy = madeBy.publicId;
+
+
+            console.log(announcement);
+            return spfFirebase.push(['classMentors/cohortAnnouncements', cohortId], announcement).then(function(ref) {
+                ref.setPriority(priority);
+                return ref;
+            });
+        },
+
+        // getTasks: function(eventId) {
+        //     return spfFirebase.loadedArray(['classMentors/eventTasks', eventId], {
+        //         orderByPriority: true
+        //     });
+        // },
     },
 
     events: {

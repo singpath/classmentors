@@ -426,6 +426,22 @@
         ".indexOn": "featured", 
         ".read": true
       },
+      "cohortAnnouncements": {
+        "$cohortId": {
+          "$announcementId": {
+            ".validate": true,
+            "madeAt": {
+              ".validate": "(data.exists() && data.val() === newData.val()) || (!data.exists() && newData.val() === now)"
+            },
+            "content": {
+              ".validate": "newData.isString()"
+            }
+          },
+          ".indexOn": "archived",
+          ".read": true,
+          ".write": true
+        }
+      },
       "cohorts": {
         "$cohortId": {
           ".validate": "newData.hasChildren(['createdAt', 'owner', 'title']) && (\n  data.exists()\n  || root.child('classMentors/premiumUsers').child(auth.uid).val() === true\n)",
