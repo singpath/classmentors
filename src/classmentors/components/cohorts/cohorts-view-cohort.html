@@ -34,6 +34,14 @@
                         <!--event="ctrl.event"-->
                         <!--profile="ctrl.profile"-->
                 <!--&gt;</clm-event-rank-table>-->
+                <h3>Featured Announcements</h3>
+                <md-list>
+                    <md-list-item ng-repeat="a in ctrl.announcements">
+                        {{a.content}}
+                        {{a.madeBy}} at {{a.madeAt}}
+                    </md-list-item>
+                </md-list>
+                <h3>Announcements</h3>
             </md-content>
         </md-tab>
 

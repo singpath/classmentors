@@ -490,11 +490,12 @@ export function clmDataStoreFactory(
             });
         },
 
-        // getTasks: function(eventId) {
-        //     return spfFirebase.loadedArray(['classMentors/eventTasks', eventId], {
-        //         orderByPriority: true
-        //     });
-        // },
+        getAnnouncements: function(cohortId) {
+            return spfFirebase.loadedArray(['classMentors/cohortAnnouncements', cohortId], {
+                orderByChild: "createdAt",
+                limitToLast: 50
+            });
+        },
     },
 
     events: {
