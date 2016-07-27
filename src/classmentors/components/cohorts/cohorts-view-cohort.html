@@ -1,0 +1,105 @@
+<md-content flex class="md-padding">
+    <h3>
+        <!--{{ctrl.event.message.comment}}-->
+    </h3>
+
+    <!--<div ng-hide="ctrl.profile.joinedEvents[ctrl.event.$id]">-->
+        <!--Click +JOIN from the menu above to join this event.-->
+        <!--<span ng-if="ctrl.event.message.password">-->
+            <!--The password is <b>{{ctrl.event.message.password}}</b>.-->
+        <!--</span>-->
+    <!--</div>-->
+
+    <!-- Users must finish registering before joining events -->
+    <!--<md-content ng-if="ctrl.currentUser &amp;&amp; !ctrl.profile" layout-padding>-->
+        <!--<md-divider></md-divider>-->
+        <!--<p>To join this event, you first need to finish registering:</p>-->
+
+        <!--<form name="registerForm" ng-submit="ctrl.register(ctrl.currentUser, registerForm)">-->
+            <!--<spf-sign-form current-user="ctrl.currentUser"></spf-sign-form>-->
+
+            <!--<div layout="row" layout-align="center center">-->
+                <!--<md-button type="submit" class="md-raised md-primary" ng-disabled="registerForm.$invalid">-->
+                    <!--Save-->
+                <!--</md-button>-->
+            <!--</div>-->
+        <!--</form>-->
+    <!--</md-content>-->
+
+    <md-tabs md-dynamic-height="true" md-border-bottom="true">
+
+        <md-tab label="Announcements">
+            <md-content layout-padding>
+                <!--<clm-event-rank-table-->
+                        <!--event="ctrl.event"-->
+                        <!--profile="ctrl.profile"-->
+                <!--&gt;</clm-event-rank-table>-->
+                <h3>Featured Announcements</h3>
+                <md-list>
+                    <md-list-item ng-repeat="a in ctrl.announcements">
+                        {{a.content}}
+                        {{a.madeBy}} at {{a.madeAt}}
+                    </md-list-item>
+                </md-list>
+                <h3>Announcements</h3>
+            </md-content>
+        </md-tab>
+
+        <md-tab label="Ranking">
+            <md-content layout-padding>
+                <!--<clm-event-table-->
+                        <!--ng-if="ctrl.canView"-->
+                        <!--event="ctrl.event"-->
+                        <!--participants="ctrl.participants"-->
+                        <!--tasks="ctrl.tasks"-->
+                        <!--progress="ctrl.progress"-->
+                        <!--solutions="ctrl.solutions"-->
+                        <!--profile="ctrl.profile"-->
+                <!--&gt;-->
+                <!--</clm-event-table>-->
+            </md-content>
+        </md-tab>
+
+        <md-tab label="Stats">
+            <!--<md-content layout-padding>-->
+                <!--<md-switch class="md-primary" ng-model="ctrl.viewArchived" aria-label="ViewArchived?">-->
+                    <!--View archived challenges-->
+                <!--</md-switch>-->
+                <!--<md-input-container flex layout="column">-->
+                    <!--<md-select flex name="selectChallengeResult"-->
+                               <!--ng-model="ctrl.selected" required placeholder="Select a challenge to view results">-->
+                        <!--<md-option ng-value="task" ng-repeat="task in ctrl.tasks" ng-if="!task.archived || ctrl.viewArchived">-->
+                            <!--{{task.title}}-->
+                        <!--</md-option>-->
+                    <!--</md-select>-->
+                <!--</md-input-container>-->
+                <!--<div ng-show="ctrl.selected">-->
+                    <!--<h2 align="center">Showing Results for {{ctrl.selected.title}}</h2>-->
+                    <!--<div align="center">Description: {{ctrl.selected.description}}</div></br>-->
+                    <!--<div ng-if="ctrl.selected.textResponse" align="center">Question: {{ctrl.selected.textResponse}}</div>-->
+                    <!--</br></br>-->
+                    <!--Event Answers:-->
+                <!--</div>-->
+                <!--<div ng-show="ctrl.selected">-->
+
+                    <!--&lt;!&ndash;Attempt at create own table directive for results&ndash;&gt;-->
+                    <!--<md-content layout-padding>-->
+                        <!--<clm-event-results-table-->
+                                <!--ng-if="ctrl.canView"-->
+                                <!--event="ctrl.event"-->
+                                <!--participants="ctrl.participants"-->
+                                <!--tasks="ctrl.tasks"-->
+                                <!--progress="ctrl.progress"-->
+                                <!--solutions="ctrl.solutions"-->
+                                <!--profile="ctrl.profile"-->
+                                <!--selected="ctrl.selected"-->
+                                <!--scores="ctrl.scores"-->
+                        <!--&gt;-->
+                        <!--</clm-event-results-table>-->
+                    <!--</md-content>-->
+                <!--</div>-->
+            <!--</md-content>-->
+        </md-tab>
+    </md-tabs>
+
+</md-content>

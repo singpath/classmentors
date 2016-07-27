@@ -1,0 +1,39 @@
+<md-content flex class="md-padding">
+    <h2 hide show-sm>
+        {{ ctrl.event.title }}
+    </h2>
+
+    <form name="editCohortForm" ng-submit="ctrl.save(ctrl.currentUser, ctrl.event, ctrl.newPassword, editEventForm)">
+        <md-input-container>
+            <label for="cohort-title">Cohort Name</label>
+            <input name="cohortTitle" type="text" id="cohort-title" ng-model="ctrl.cohort.title" ng-minlength="3" ng-maxlength="60" required="true"/>
+            <div ng-messages="editCohortForm.cohortTitle.$error">
+                <div ng-message="required">A cohort must have a name.</div>
+                <div ng-message="minlength">A cohort name shouldn't be shorter than 3 characters.</div>
+                <div ng-message="maxlength">A cohort name shouldn't be longer than 60 characters.</div>
+            </div>
+        </md-input-container>
+
+        <md-progress-circular ng-show="ctrl.savingCohort" md-mode="indeterminate" style="margin: 16px auto"></md-progress-circular>
+
+        <div layout="row" layout-align="center center">
+            <md-button type="submit" class="md-raised md-primary" ng-disabled="editCohortForm.$pristine || editCohortForm.$invalid || ctrl.savingCohort">Save</md-button>
+            <md-button type="reset" class="md-raised" ng-click="ctrl.reset(editCohortForm)" ng-disabled="ctrl.savingCohort || editCohortForm.$pristine">Reset</md-button>
+        </div>
+    </form>
+
+    <md-divider></md-divider>
+    <md-input-container>
+        <textarea name="newAnnouncement" id="new-announcement"
+                  ng-model="ctrl.newAnnouncement.content" rows="3">
+        </textarea>
+        <md-button ng-click="ctrl.saveAnnouncement(ctrl.cohort.$id)">Save Announcement</md-button>
+    </md-input-container>
+    <!--<md-list>-->
+        <!--<md-subheader class="md-no-sticky">{{ ctrl.tasks | spfLength }} challenges</md-subheader>-->
+        <!--<md-list-item class="md-3-line" ng-repeat="task in ctrl.tasks track by task.$id" ng-if="!task.archived">-->
+            <!---->
+        <!--</md-list-item>-->
+    <!--</md-list>-->
+
+</md-content>
