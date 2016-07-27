@@ -4,6 +4,7 @@
 
 import cohortTmpl from './cohorts-view.html!text';
 import newCohortTmpl from './cohorts-new-cohort.html!text';
+import cohortViewTmpl from './cohorts-view-cohort.html!text';
 import './cohorts.css!';
 // import './cohorts.css!';
 
@@ -26,8 +27,15 @@ export function configRoute($routeProvider, routes) {
             resolve: {
                 initialData: newCohortCtrlInitialData
             }
+        })
+        .when(routes.viewCohort, {
+            template: cohortViewTmpl,
+            controller: ViewCohortCtrl,
+            controllerAs: 'ctrl',
+            resolve: {
+                initialData: viewCohortCtrlInitialData
+            }
         });
-    console.log("configRoute Executed");
 }
 configRoute.$inject = ['$routeProvider', 'routes'];
 
@@ -263,3 +271,270 @@ function newCohortCtrlInitialData($q, spfAuth, spfAuthData, clmDataStore) {
     });
 }
 newCohortCtrlInitialData.$inject = ['$q', 'spfAuth', 'spfAuthData', 'clmDataStore'];
+
+/**
+ * Used to resolve `initialData` of `ViewEventCtrl`.
+ *
+ */
+function viewCohortCtrlInitialData($q, $route, spfAuth, spfAuthData, clmDataStore) {
+    var errNoCohort = new Error('Cohort not found');
+    var cohortId = $route.current.params.cohortId;
+
+    var profilePromise = clmDataStore.currentUserProfile().catch(noop);
+
+    var cohortPromise = clmDataStore.cohorts.get(cohortId).then(function(cohort) {
+        if (cohort.$value === null) {
+            return $q.reject(errNoCohort);
+        }
+        return cohort;
+    });
+
+    var canviewPromise = $q.all({
+        cohort: cohortPromise,
+        profile: profilePromise
+    }).then(function(data) {
+        return $q.when(data.profile && data.profile.canView(data.cohort));
+    });
+
+    return $q.all({
+        currentUser: spfAuthData.user().catch(noop),
+        profile: profilePromise,
+        cohort: cohortPromise,
+        canView: canviewPromise
+        // events: canviewPromise.then(function(canView) {
+        //     if(canView) {
+        //         return clmDataStore.cohorts.getEvents(cohortId);
+        //     }
+        // }),
+        // tasks: canviewPromise.then(function(canView) {
+        //     if (canView) {
+        //         return clmDataStore.events.getTasks(eventId);
+        //     }
+        // }),
+        // participants: canviewPromise.then(function(canView) {
+        //     if (canView) {
+        //         return clmDataStore.events.participants(eventId);
+        //     }
+        // }),
+        // progress: canviewPromise.then(function(canView) {
+        //     if (canView) {
+        //         return clmDataStore.events.getProgress(eventId);
+        //     }
+        // }),
+        // solutions: canviewPromise.then(function(canView) {
+        //     if (canView) {
+        //         return clmDataStore.events.getSolutions(eventId);
+        //     }
+        // }),
+        // scores: canviewPromise.then(function(canView) {
+        //     if (canView) {
+        //         return clmDataStore.events.getScores(eventId);
+        //     }
+        // })
+    });
+}
+viewCohortCtrlInitialData.$inject = [
+    '$q',
+    '$route',
+    'spfAuth',
+    'spfAuthData',
+    'clmDataStore'
+];
+
+/**
+ * ViewEventCtrl
+ *
+ */
+function ViewCohortCtrl(
+    $scope, initialData, $document, $mdDialog, $route,
+    spfAlert, urlFor, spfFirebase, spfAuthData, spfNavBarService, clmDataStore
+) {
+    var self = this;
+    var monitorHandler;
+
+    this.currentUser = initialData.currentUser;
+    this.cohort = initialData.cohort;
+    this.participants = initialData.participants;
+    this.profile = initialData.profile;
+    // this.tasks = initialData.tasks;
+    // this.progress = initialData.progress;
+    // this.solutions = initialData.solutions;
+    // this.scores = initialData.scores;
+    // this.canView = initialData.canView;
+    // this.viewArchived = false;
+    // this.selected = null;
+    this.isOwner = false;
+
+    if (
+        self.event &&
+        self.event.owner &&
+        self.event.owner.publicId &&
+        self.currentUser &&
+        self.event.owner.publicId === self.currentUser.publicId
+    ) {
+        monitorHandler = clmDataStore.events.monitorEvent(
+            this.event, this.tasks, this.participants, this.solutions, this.progress
+        );
+        this.isOwner = true;
+    } else {
+        monitorHandler = {
+            update: noop,
+            unwatch: noop
+        };
+    }
+
+    $scope.$on('$destroy', function() {
+        /* eslint no-unused-expressions: 0 */
+        monitorHandler.unwatch();
+        self.event && self.event.$destroy && self.event.$destroy();
+        self.participants && self.participants.$destroy && self.participants.$destroy();
+        self.profile && self.profile.$destroy && self.profile.$destroy();
+        self.progress && self.progress.$destroy && self.progress.$destroy();
+        self.solutions && self.solutions.$destroy && self.solutions.$destroy();
+    });
+
+    updateNavbar();
+
+    function updateNavbar() {
+        spfNavBarService.update(
+            self.cohort.title, {
+                title: 'Cohorts',
+                url: `#${urlFor('cohorts')}`
+            }, getOptions()
+        );
+    }
+
+    function getOptions() {
+        var options = [];
+
+        if (!self.currentUser || !self.currentUser.publicId) {
+            return options;
+        }
+
+        // add join/leave button
+        // if (
+        //     self.participants &&
+        //     self.participants.$indexFor(self.currentUser.publicId) > -1
+        // ) {
+        //     options.push({
+        //         title: 'Leave',
+        //         onClick: function() {
+        //             clmDataStore.events.leave(self.event.$id).then(function() {
+        //                 $route.reload();
+        //             });
+        //         },
+        //         icon: 'clear'
+        //     });
+        // } else {
+        //     options.push({
+        //         title: 'Join',
+        //         onClick: promptPassword,
+        //         icon: 'add'
+        //     });
+        // }
+
+        // Add edit and update button
+        // if (self.event.owner.publicId === self.currentUser.publicId) {
+        //     options.push({
+        //         title: 'Edit',
+        //         url: `#${urlFor('editEvent', {eventId: self.event.$id})}`,
+        //         icon: 'create'
+        //     });
+        //     options.push({
+        //         title: 'Update',
+        //         onClick: function() {
+        //             monitorHandler.update();
+        //         },
+        //         icon: 'loop'
+        //     });
+        // }
+
+        return options;
+    }
+
+    //
+    // function promptPassword() {
+    //     if (
+    //         self.event.schoolEvent && (
+    //             !self.profile ||
+    //             !self.profile.user ||
+    //             !self.profile.user.school
+    //         )
+    //     ) {
+    //         spfAlert.warning(
+    //             'Only Students from Singapore can join this event. ' +
+    //             'Maybe you profile needs to be updated.');
+    //         return;
+    //     }
+    //     $mdDialog.show({
+    //         parent: $document.body,
+    //         template: passwordTmpl,
+    //         controller: DialogController,
+    //         controllerAs: 'ctrl'
+    //     });
+    //
+    //     function DialogController() {
+    //         this.pw = '';
+    //
+    //         this.join = function(pw) {
+    //             clmDataStore.events.join(self.event, pw).then(function() {
+    //                 spfAlert.success('You joined this event');
+    //                 $mdDialog.hide();
+    //                 $route.reload();
+    //             }).catch(function(err) {
+    //                 spfAlert.error(`Failed to add you: ${err}`);
+    //             });
+    //         };
+    //
+    //         this.closeDialog = function() {
+    //             $mdDialog.hide();
+    //         };
+    //     }
+    // }
+    //
+    // function cleanProfile(currentUser) {
+    //     currentUser.country = spfFirebase.cleanObj(currentUser.country);
+    //     currentUser.school = spfFirebase.cleanObj(currentUser.school);
+    // }
+    //
+    // this.register = function(currentUser) {
+    //     cleanProfile(currentUser);
+    //     spfAuthData.publicId(currentUser).then(function() {
+    //         spfAlert.success('Public id and display name saved');
+    //         return clmDataStore.initProfile();
+    //     }).then(function() {
+    //         $route.reload();
+    //     }).catch(function(err) {
+    //         spfAlert.error('Failed to save public id');
+    //         return err;
+    //     });
+    // };
+    //
+    // this.removeParticipant = function(e, event, participant) {
+    //     var confirm = $mdDialog.confirm()
+    //         .parent($document.body)
+    //         .title(`Would you like to remove ${participant.user.displayName}?`)
+    //         .content('The participant progress will be kept but he/she will not show as participant')
+    //         .ariaLabel('Remove participant')
+    //         .ok('Remove')
+    //         .cancel('Cancel')
+    //         .targetEvent(e);
+    //
+    //     $mdDialog.show(confirm).then(function() {
+    //         clmDataStore.events.removeParticpants(event.$id, participant.$id);
+    //     });
+    // };
+}
+ViewCohortCtrl.$inject = [
+    '$scope',
+    'initialData',
+    '$document',
+    '$mdDialog',
+    '$route',
+    'spfAlert',
+    'urlFor',
+    'spfFirebase',
+    'spfAuthData',
+    'spfNavBarService',
+    'clmDataStore'
+];

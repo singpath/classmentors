@@ -69,6 +69,7 @@ module.constant('routes', {
   setProfileCodeCombatId: '/profile/codeCombat',
   cohorts: '/cohorts',
   newCohort: '/new-cohort',
+  viewCohort: '/cohorts/:cohortId',
   viewMcq: '/challenges/mcq',
   viewSurvey: '/challenges/survey'
 });
@@ -83,9 +84,6 @@ module.config([
         resolve: {
           stats: ace.getStats
         }
-      })
-      .when(routes.cohorts, {
-        template: '<cohorts></cohorts>'
       })
       .otherwise(routes.home);
   }
