@@ -5,6 +5,7 @@
 import cohortTmpl from './cohorts-view.html!text';
 import newCohortTmpl from './cohorts-new-cohort.html!text';
 import cohortViewTmpl from './cohorts-view-cohort.html!text';
+import cohortEditTmpl from './cohorts-edit-cohort.html!text';
 import './cohorts.css!';
 // import './cohorts.css!';
 
@@ -34,6 +35,14 @@ export function configRoute($routeProvider, routes) {
             controllerAs: 'ctrl',
             resolve: {
                 initialData: viewCohortCtrlInitialData
+            }
+        })
+        .when(routes.editCohort, {
+            template: cohortEditTmpl,
+            controller: EditCohortCtrl,
+            controllerAs: 'ctrl',
+            resolve: {
+                initialData: editCohortCtrlInitialData
             }
         });
 }
@@ -433,21 +442,22 @@ function ViewCohortCtrl(
         //     });
         // }
 
-        // Add edit and update button
-        // if (self.event.owner.publicId === self.currentUser.publicId) {
-        //     options.push({
-        //         title: 'Edit',
-        //         url: `#${urlFor('editEvent', {eventId: self.event.$id})}`,
-        //         icon: 'create'
-        //     });
-        //     options.push({
-        //         title: 'Update',
-        //         onClick: function() {
-        //             monitorHandler.update();
-        //         },
-        //         icon: 'loop'
-        //     });
-        // }
+        // Add edit button
+        if (self.cohort.owner.publicId === self.currentUser.publicId) {
+            options.push({
+                title: 'Edit',
+                url: `#${urlFor('editCohort', {cohortId: self.cohort.$id})}`,
+                icon: 'create'
+            });
+            // Add update button (May not be necessary for cohorts)
+            // options.push({
+            //     title: 'Update',
+            //     onClick: function() {
+            //         monitorHandler.update();
+            //     },
+            //     icon: 'loop'
+            // });
+        }
 
         return options;
     }
@@ -538,3 +548,149 @@ ViewCohortCtrl.$inject = [
     'spfNavBarService',
     'clmDataStore'
 ];
+
+/**
+ * Used to resolve `initialData` for `EditCtrl`
+ *
+ */
+function editCohortCtrlInitialData($q, $route, spfAuthData, clmDataStore) {
+    var data = baseEditCtrlInitialData($q, $route, spfAuthData, clmDataStore);
+
+    // data.tasks = data.event.then(function(event) {
+    //     return clmDataStore.events.getTasks(event.$id);
+    // });
+
+    return $q.all(data);
+}
+editCohortCtrlInitialData.$inject = ['$q', '$route', 'spfAuthData', 'clmDataStore'];
+
+/**
+ * EditEventCtrl
+ *
+ */
+function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataStore) {
+    var self = this;
+
+    this.currentUser = initialData.currentUser;
+    this.cohort = initialData.cohort;
+    // this.tasks = initialData.tasks;
+    // this.newPassword = '';
+    this.savingCohort = false;
+
+    spfNavBarService.update(
+        'Edit', [{
+            title: 'Cohorts',
+            url: `#${urlFor('cohorts')}`
+        }, {
+            title: this.cohort.title,
+            url: `#${urlFor('viewCohort', {cohortId: this.cohort.$id})}`
+        }]
+        // [{
+        //     title: 'New Challenge',
+        //     url: `#${urlFor('addEventTask', {eventId: this.event.$id})}`,
+        //     icon: 'create'
+        // }]
+    );
+
+    // this.save = function(currentUser, event, newPassword, editEventForm) {
+    //     self.savingEvent = true;
+    //     event.owner.publicId = currentUser.publicId;
+    //     event.owner.displayName = currentUser.displayName;
+    //     event.owner.gravatar = currentUser.gravatar;
+    //     return clmDataStore.events.updateEvent(event, newPassword).then(function() {
+    //         spfAlert.success('Event saved.');
+    //         self.newPassword = '';
+    //         editEventForm.$setPristine(true);
+    //     }).catch(function() {
+    //         spfAlert.error('Failed to save event.');
+    //     }).finally(function() {
+    //         self.savingEvent = false;
+    //     });
+    // };
+    //
+    // this.openTask = function(eventId, taskId) {
+    //     clmDataStore.events.openTask(eventId, taskId).then(function() {
+    //         spfAlert.success('Task opened.');
+    //     }).catch(function() {
+    //         spfAlert.error('Failed to open task');
+    //     });
+    // };
+    //
+    // this.closeTask = function(eventId, taskId) {
+    //     clmDataStore.events.closeTask(eventId, taskId).then(function() {
+    //         spfAlert.success('Task closed.');
+    //     }).catch(function() {
+    //         spfAlert.error('Failed to close task.');
+    //     });
+    // };
+    //
+    // this.showTask = function(eventId, taskId) {
+    //     clmDataStore.events.showTask(eventId, taskId).then(function() {
+    //         spfAlert.success('Task visible.');
+    //     }).catch(function() {
+    //         spfAlert.error('Failed to make task visible.');
+    //     });
+    // };
+    //
+    // this.hideTask = function(eventId, taskId) {
+    //     clmDataStore.events.hideTask(eventId, taskId).then(function() {
+    //         spfAlert.success('Task hidden.');
+    //     }).catch(function() {
+    //         spfAlert.error('Failed to make task hidden.');
+    //     });
+    // };
+    //
+    // this.archiveTask = function(eventId, taskId) {
+    //     clmDataStore.events.archiveTask(eventId, taskId).then(function() {
+    //         spfAlert.success('Task archived.');
+    //     }).catch(function() {
+    //         spfAlert.error('Failed to archive task.');
+    //     });
+    // };
+}
+EditCohortCtrl.$inject = ['initialData', 'spfNavBarService', 'urlFor', 'spfAlert', 'clmDataStore'];
+
+/**
+ * Minimal resolver for `EditCtrl` and `AddEventTaskCtrl`.
+ *
+ * Load the event data and the current user data.
+ *
+ * The promise will resolved to an error if the the current user
+ * is not the owner of the event.
+ *
+ */
+function baseEditCtrlInitialData($q, $route, spfAuthData, clmDataStore) {
+    var errNoCohort = new Error('Cohort not found');
+    var errNotAuthorized = new Error('You cannot edit this cohort');
+    var cohortId = $route.current.params.cohortId;
+
+    var cohortPromise = clmDataStore.cohorts.get(cohortId).then(function(cohort) {
+        if (cohort.$value === null) {
+            return $q.reject(errNoCohort);
+        }
+        return cohort;
+    });
+
+    var data = {
+        currentUser: spfAuthData.user(),
+        cohort: cohortPromise
+    };
+
+    data.canEdit = $q.all({
+        currentUser: spfAuthData.user(),
+        cohort: cohortPromise
+    }).then(function(result) {
+        if (
+            !result.currentUser.publicId ||
+            !result.cohort.owner ||
+            !result.cohort.owner.publicId ||
+            result.cohort.owner.publicId !== result.currentUser.publicId
+        ) {
+            return $q.reject(errNotAuthorized);
+        }
+
+        return result;
+    });
+
+    return data;
+}
