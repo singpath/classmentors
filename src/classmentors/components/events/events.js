@@ -1667,9 +1667,9 @@ function ClmEventTableCtrl(
             clickOutsideToClose: true,
             parent: angular.element(document.body),
             template: codeTmpl,
-            onComplete: loadEditor,
             controller: CodeController,
-            controllerAs: 'ctrl'
+            controllerAs: 'ctrl',
+            onComplete: loadEditor
         });
 
         function loadEditor() {
@@ -1677,10 +1677,13 @@ function ClmEventTableCtrl(
             editor.setTheme("ace/theme/monokai");
             editor.getSession().setMode("ace/mode/"+task.lang.toLowerCase());
             editor.getSession().setUseWrapMode(true);
+            // this.loadingEditor = false;
         }
 
         function CodeController() {
             this.task = task;
+            this.loadingEditor = false;
+
             if (
                 userSolution &&
                 userSolution[taskId]
