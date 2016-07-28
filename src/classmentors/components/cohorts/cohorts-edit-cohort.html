@@ -24,11 +24,14 @@
 
     <md-divider></md-divider>
     <md-input-container>
-        <textarea name="newAnnouncement" id="new-announcement"
+        <input type="text" ng-model="ctrl.newAnnouncement.title" id="new-announcement-title" name="newAnnouncementTitle">
+    </md-input-container>
+    <md-input-container>
+        <textarea name="newAnnouncementContent" id="new-announcement-content"
                   ng-model="ctrl.newAnnouncement.content" rows="3">
         </textarea>
-        <md-button ng-click="ctrl.saveAnnouncement(ctrl.cohort.$id)">Save Announcement</md-button>
     </md-input-container>
+    <md-button ng-click="ctrl.saveAnnouncement(ctrl.cohort.$id)">Save Announcement</md-button>
     <!--<md-list>-->
         <!--<md-subheader class="md-no-sticky">{{ ctrl.tasks | spfLength }} challenges</md-subheader>-->
         <!--<md-list-item class="md-3-line" ng-repeat="task in ctrl.tasks track by task.$id" ng-if="!task.archived">-->
