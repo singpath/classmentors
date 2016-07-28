@@ -433,6 +433,29 @@ export function clmDataStoreFactory(
             });
         },
 
+        updateCohort: function(cohort) {
+            if (!event || !event.$id || !event.$save) {
+              return $q.reject(new Error('Event is not a firebase object'));
+            }
+
+            return event.$save().then(function() {
+              if (!password) {
+                return;
+              }
+
+              var eventId = event.$id;
+              var hash = spfCrypto.password.newHash(password);
+              var opts = {
+                hash: hash.value,
+                options: hash.options
+              };
+              return spfFirebase.set(['classMentors/eventPasswords', eventId], opts);
+            }).catch(function(err) {
+              $log.error(err);
+              return err;
+            });
+        },
+
         get: function(cohortId) {
             return spfFirebase.loadedObj(['classMentors/cohorts', cohortId]);
         },

@@ -3,7 +3,7 @@
         {{ ctrl.event.title }}
     </h2>
 
-    <form name="editCohortForm" ng-submit="ctrl.save(ctrl.currentUser, ctrl.event, ctrl.newPassword, editEventForm)">
+    <form name="editCohortForm" ng-submit="ctrl.save(ctrl.currentUser, ctrl.cohort, editCohortForm)">
         <md-input-container>
             <label for="cohort-title">Cohort Name</label>
             <input name="cohortTitle" type="text" id="cohort-title" ng-model="ctrl.cohort.title" ng-minlength="3" ng-maxlength="60" required="true"/>
