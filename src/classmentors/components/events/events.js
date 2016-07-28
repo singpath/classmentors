@@ -76,6 +76,7 @@ export function configRoute($routeProvider, routes) {
         initialData: editEventTaskCtrlInitialData
       }
     });
+    console.log("routes configured");
 }
 
 configRoute.$inject = ['$routeProvider', 'routes'];
@@ -2190,7 +2191,7 @@ export function clmEventResultsTableFactory() {
 
 function ClmEventResultsTableCtrl(
     $scope, $q, $log, $mdDialog, $document,
-    urlFor, spfAlert, clmServicesUrl, clmDataStore, clmPagerOption
+    urlFor, spfAlert, clmServicesUrl, clmDataStore, clmPagerOption, $sce
 ) {
     var self = this;
     var unwatchers = [];
@@ -2498,7 +2499,7 @@ function ClmEventResultsTableCtrl(
                 userSolution &&
                 userSolution[taskId]
             ) {
-                this.solution = userSolution[taskId];
+                this.solution = $sce.trustAsResourceUrl(userSolution[taskId]);
             }
 
             this.save = function(link) {
@@ -2616,7 +2617,7 @@ function ClmEventResultsTableCtrl(
             spfAlert.error('Failed to save score.');
             return err;
         });
-    }
+    };
 
     this.update = function() {};
     /*
@@ -2723,7 +2724,8 @@ ClmEventResultsTableCtrl.$inject = [
     'spfAlert',
     'clmServicesUrl',
     'clmDataStore',
-    'clmPagerOption'
+    'clmPagerOption',
+    '$sce'
 ];
 
 export function clmPagerFactory() {

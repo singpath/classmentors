@@ -401,6 +401,103 @@ export function clmDataStoreFactory(
       });
     },
 
+    cohorts: {
+        errNoPublicId: new Error('You should have a public id to join a cohort'),
+
+        create: function(cohort) {
+            var cohortId;
+
+            return spfFirebase.push(['classMentors/cohorts'], cohort).then(function(ref) {
+                cohortId = ref.key();
+                // hash = spfCrypto.password.newHash(password);
+                // var opts = {
+                //     hash: hash.value,
+                //     options: hash.options
+                // };
+                // return spfFirebase.set(['classMentors/eventPasswords', eventId], opts);
+            }).then(function() {
+                return clmDataStore.cohorts.get(cohortId);
+            }).then(function(cohortObj) {
+                return spfFirebase.set([
+                    'classMentors/userProfiles',
+                    cohortObj.owner.publicId,
+                    'createdCohorts',
+                    cohortObj.$id
+                ], {
+                    createdAt: cohortObj.createdAt,
+                    title: cohortObj.title,
+                    featured: cohortObj.featured || false
+                });
+            }).then(function() {
+                return cohortId;
+            });
+        },
+
+        get: function(cohortId) {
+            return spfFirebase.loadedObj(['classMentors/cohorts', cohortId]);
+        },
+
+        listAllCohorts: function() {
+            return spfFirebase.loadedArray(['classMentors/cohorts'], {
+                orderByChild: 'createdAt',
+                limitToLast: 50
+            });
+        },
+
+        listFeaturedCohorts: function() {
+            return spfFirebase.loadedArray(['classMentors/cohorts'], {
+                orderByChild: 'featured',
+                equalTo: true,
+                limitToLast: 50
+            });
+        },
+
+        listCreatedCohorts: function() {
+            return spfAuthData.user().then(function(authData) {
+                if (!authData.publicId) {
+                    return [];
+                }
+
+                return spfFirebase.loadedArray(['classMentors/userProfiles', authData.publicId, 'createdCohorts'], {
+                    orderByChild: 'createdAt',
+                    limitToLast: 50
+                });
+            }).catch(function(err) {
+                $log.error(`Failed to list created cohorts: ${err}`);
+                return [];
+            });
+        },
+
+        addAnnouncement: function(cohortId, madeBy, announcement, isArchived) {
+            var priority = announcement.priority || 0;
+
+            // if (isOpen) {
+            //     task.openedAt = {'.sv': 'timestamp'};
+            //     task.closedAt = null;
+            // } else {
+            //     task.closedAt = {'.sv': 'timestamp'};
+            //     task.openedAt = null;
+            // }
+
+            announcement.madeAt = {'.sv': 'timestamp'};
+            announcement.madeBy = madeBy.publicId;
+
+
+            console.log(announcement);
+            return spfFirebase.push(['classMentors/cohortAnnouncements', cohortId], announcement).then(function(ref) {
+                ref.setPriority(priority);
+                return ref;
+            });
+        },
+
+        getAnnouncements: function(cohortId) {
+            return spfFirebase.loadedArray(['classMentors/cohortAnnouncements', cohortId], {
+                orderByChild: "createdAt",
+                limitToLast: 50
+            });
+        },
+    },
+
     events: {
       errNoPublicId: new Error('You should have a public id to join an event'),
 

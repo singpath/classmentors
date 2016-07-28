@@ -1,0 +1,59 @@
+<md-content flex class="md-padding">
+    <!--<md-content layout-align="center">-->
+        <!--<h1>Hey there!</h1>-->
+        <!--<h2>Check back later for more cool stuff! (:</h2>-->
+    <!--</md-content>-->
+    <md-tabs md-dynamic-height="true" md-border-bottom="true">
+
+        <md-tab label="Featured Cohorts">
+            <md-content>
+                <md-list class="path-list">
+                    <md-subheader class="md-no-sticky">{{ ctrl.featuredCohorts.length }} featured cohort(s)</md-subheader>
+                    <md-list-item class="md-2-line" ng-repeat="c in (ctrl.featuredCohorts | orderBy:'createdAt':true) track by c.$id">
+                        <div class="md-list-item-text">
+                            <h3>
+                                <a href="#{{ 'viewCohort' | urlFor: {cohortId: c.$id} }}">{{c.title}}</a>
+                            </h3>
+                            <h4>created by {{c.owner.displayName}} ({{c.createdAt|date}})</h4>
+                        </div>
+                        <md-divider ng-if="!$last"></md-divider>
+                    </md-list-item>
+                </md-list>
+            </md-content>
+        </md-tab>
+
+        <md-tab label="Created Cohorts">
+            <md-content>
+                <md-list class="path-list">
+                    <md-subheader class="md-no-sticky">{{ ctrl.createdCohorts.length }} created cohort(s)</md-subheader>
+                    <md-list-item class="md-2-line" ng-repeat="c in (ctrl.createdCohorts | orderBy:'createdAt':true) track by c.$id">
+                        <div class="md-list-item-text">
+                            <h3>
+                                <a href="#{{ 'viewCohort' | urlFor: {cohortId: c.$id} }}">{{c.title}}</a>
+                            </h3>
+                            <h4>created by {{ctrl.currentUser.displayName}} ({{c.createdAt|date}})</h4>
+                        </div>
+                        <md-divider ng-if="!$last"></md-divider>
+                    </md-list-item>
+                </md-list>
+            </md-content>
+        </md-tab>
+
+        <md-tab label="Joined Cohorts">
+            <md-content>
+                <md-list class="path-list">
+                    <md-subheader class="md-no-sticky">{{ ctrl.joinedCohorts.length }} joined cohort(s)</md-subheader>
+                    <md-list-item class="md-2-line" ng-repeat="c in (ctrl.joinedCohorts | orderBy:'createdAt':true) track by c.$id">
+                        <div class="md-list-item-text">
+                            <h3>
+                                <a href="#{{ 'viewCohort' | urlFor: {cohortId: c.$id} }}">{{c.title}}</a>
+                            </h3>
+                            <h4>created by {{c.owner.displayName}} ({{c.createdAt|date}})</h4>
+                        </div>
+                        <md-divider ng-if="!$last"></md-divider>
+                    </md-list-item>
+                </md-list>
+            </md-content>
+        </md-tab>
+    </md-tabs>
+</md-content>
