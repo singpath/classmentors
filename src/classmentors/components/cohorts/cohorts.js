@@ -360,10 +360,6 @@ viewCohortCtrlInitialData.$inject = [
     'clmDataStore'
 ];
 
-/**
- * ViewEventCtrl
- *
- */
 function ViewCohortCtrl(
     $scope, initialData, $document, $mdDialog, $route,
     spfAlert, urlFor, spfFirebase, spfAuthData, spfNavBarService, clmDataStore

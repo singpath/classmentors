@@ -1672,17 +1672,24 @@ function ClmEventTableCtrl(
             onComplete: loadEditor
         });
 
-        function loadEditor() {
-            var editor = ace.edit(document.querySelector('#editor'));
-            editor.setTheme("ace/theme/monokai");
-            editor.getSession().setMode("ace/mode/"+task.lang.toLowerCase());
-            editor.getSession().setUseWrapMode(true);
-            // this.loadingEditor = false;
-        }
+      this.loadingEditor = true;
+      var parent = this;
+
+      function loadEditor() {
+          var editor = ace.edit(document.querySelector('#editor'));
+          editor.setTheme("ace/theme/monokai");
+          editor.getSession().setMode("ace/mode/"+task.lang.toLowerCase());
+          editor.getSession().setUseWrapMode(true);
+          parent.loadingEditor = false;
+      }
 
         function CodeController() {
             this.task = task;
-            this.loadingEditor = false;
+
+            this.checkEditor = function() {
+                return parent.loadingEditor;
+                console.log(parent.loadingEditor);
+            };
 
             if (
                 userSolution &&
@@ -2569,6 +2576,9 @@ function ClmEventResultsTableCtrl(
             controllerAs: 'ctrl'
         });
 
+        this.loadingEditor = true;
+        var parent = this;
+
         function loadEditor() {
             var editor = ace.edit(document.querySelector('#editor'));
             editor.setTheme("ace/theme/monokai");
@@ -2578,12 +2588,19 @@ function ClmEventResultsTableCtrl(
                 readOnly: true,
                 highlightActiveLine: false,
                 highlightGutterLine: false
-            })
+            });
+            parent.loadingEditor = false;
         }
 
         function CodeController() {
             this.task = task;
             this.viewOnly = true;
+
+            this.checkEditor = function() {
+                return parent.loadingEditor;
+                console.log(parent.loadingEditor);
+            };
+
             if (
                 userSolution &&
                 userSolution[taskId]
@@ -2612,7 +2629,6 @@ function ClmEventResultsTableCtrl(
     };
 
     this.saveAllocatedPoints = function(eventId, taskId, task, participant, score) {
-        console.log(Number.isInteger(score));
         clmDataStore.events.saveScore(eventId, participant.$id, taskId, score).then(function () {
             spfAlert.success('Score has been saved.');
         }).catch(function (err) {
