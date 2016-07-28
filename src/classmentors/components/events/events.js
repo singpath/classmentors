@@ -2537,7 +2537,6 @@ function ClmEventResultsTableCtrl(
             controller: DialogController,
             controllerAs: 'ctrl'
         });
-        console.log(this.currentUserProgress);
 
         function DialogController() {
             this.task = task;
