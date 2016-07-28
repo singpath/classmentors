@@ -423,7 +423,7 @@
             ".validate": "newData.isString() && newData.val().length >= 3 && newData.val().length <= 60"
           }
         }, 
-        ".indexOn": "featured", 
+        ".indexOn": ["featured", "createdAt"],
         ".read": true
       },
       "cohortAnnouncements": {

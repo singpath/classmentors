@@ -315,11 +315,11 @@ function viewCohortCtrlInitialData($q, $route, spfAuth, spfAuthData, clmDataStor
                 return clmDataStore.cohorts.getAnnouncements(cohortId);
             }
         }),
-        // events: canviewPromise.then(function (canView) {
-        //     if(canView) {
-        //         return clmDataStore.cohorts.
-        //     }
-        // })
+        events: canviewPromise.then(function (canView) {
+            if(canView) {
+                return clmDataStore.events.listAll();
+            }
+        })
         // events: canviewPromise.then(function(canView) {
         //     if(canView) {
         //         return clmDataStore.cohorts.getEvents(cohortId);
@@ -372,6 +372,8 @@ function ViewCohortCtrl(
     this.participants = initialData.participants;
     this.profile = initialData.profile;
     this.announcements = initialData.announcements;
+    this.events = initialData.events;
+    console.log(self.events);
     // this.tasks = initialData.tasks;
     // this.progress = initialData.progress;
     // this.solutions = initialData.solutions;
