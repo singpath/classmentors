@@ -437,7 +437,7 @@
               ".validate": "newData.isString()"
             }
           },
-          ".indexOn": "archived",
+          ".indexOn": ["archived", "createdAt"],
           ".read": true,
           ".write": true
         }
