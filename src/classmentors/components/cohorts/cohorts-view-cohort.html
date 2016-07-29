@@ -10,10 +10,8 @@
                         {{ctrl.events[event].title}}
                     </md-option>
                 </md-select>
-                <!--<code style="display: block; padding: 8px;">{{ctrl.cohort.events | json}}</code>-->
                 <h3>Featured Announcements</h3>
                 <md-card ng-repeat="a in ctrl.announcements" ng-if="a.featured">
-                    <!--<img ng-src="" class="md-card-image" alt="Washed Out">-->
                     <md-toolbar>
                         <md-card-title>
                             <md-card-title-text>
@@ -29,7 +27,6 @@
                 <h3>Announcements</h3>
                 <md-content layout="row" layout-wrap>
                     <md-card ng-repeat="a in ctrl.announcements" ng-if="!a.featured" flex="49" style="min-width: 400px;">
-                        <!--<img src="" class="md-card-image" alt="Washed Out">-->
                         <md-toolbar>
                             <md-card-title>
                                 <md-card-title-text>
@@ -39,7 +36,8 @@
                         </md-toolbar>
                         <md-card-content>
                             <p class="subhead">By {{a.madeBy}} at {{a.madeAt|date:'yyyy-MM-dd HH:mm'}}</p>
-                            <p>{{a.content}}</p>
+                            <p>{{(a.content | cmTruncated: 300).content}}</p>
+                            <md-icon ng-if="(a.content | cmTruncated: 300).truncated" md-svg-icon="timeline"></md-icon>
                         </md-card-content>
                     </md-card>
                 </md-content>

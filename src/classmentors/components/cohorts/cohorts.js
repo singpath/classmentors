@@ -569,6 +569,8 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
     // this.tasks = initialData.tasks;
     // this.newPassword = '';
     this.savingCohort = false;
+    this.creatingNewAnnouncement = false;
+    this.newAnnouncement = {};
 
     spfNavBarService.update(
         'Edit', [{
@@ -584,6 +586,12 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
         //     icon: 'create'
         // }]
     );
+
+    this.createNewAnnouncement = function () {
+        self.creatingNewAnnouncement = true;
+        self.newAnnouncement.featured = false;
+        self.newAnnouncement.visible = true;
+    };
 
     this.save = function(currentUser, cohort, editCohortForm) {
         self.savingCohort = true;
@@ -605,6 +613,9 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
             spfAlert.success('Announcement created');
         }).catch(function () {
             spfAlert.error('Failed to create announcement');
+        }).finally(function () {
+            self.creatingNewAnnouncement = false;
+            self.newAnnouncement = {};
         })
     };
 
@@ -616,7 +627,7 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
 
     };
 
-    this.unfeatureAnnouncement = function(annoucnementId) {
+    this.unfeatureAnnouncement = function(announcementId) {
 
     };
 

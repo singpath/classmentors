@@ -21,22 +21,24 @@
             <md-button type="reset" class="md-raised" ng-click="ctrl.reset(editCohortForm)" ng-disabled="ctrl.savingCohort || editCohortForm.$pristine">Reset</md-button>
         </div>
     </form>
-
     <md-divider></md-divider>
-    <md-input-container>
-        <input type="text" ng-model="ctrl.newAnnouncement.title" id="new-announcement-title" name="newAnnouncementTitle">
-    </md-input-container>
-    <md-input-container>
-        <textarea name="newAnnouncementContent" id="new-announcement-content"
-                  ng-model="ctrl.newAnnouncement.content" rows="3">
-        </textarea>
-    </md-input-container>
-    <md-button ng-click="ctrl.saveAnnouncement(ctrl.cohort.$id)">Save Announcement</md-button>
-    <!--<md-list>-->
-        <!--<md-subheader class="md-no-sticky">{{ ctrl.tasks | spfLength }} challenges</md-subheader>-->
-        <!--<md-list-item class="md-3-line" ng-repeat="task in ctrl.tasks track by task.$id" ng-if="!task.archived">-->
-            <!---->
-        <!--</md-list-item>-->
-    <!--</md-list>-->
-
+    <h3>Cohort Announcements</h3>
+    <md-button class="md-raised md-primary" ng-click="ctrl.createNewAnnouncement()">New Announcement</md-button>
+    <form name="addAnnouncementForm" ng-submit="ctrl.saveAnnouncement(ctrl.cohort.$id)">
+        <md-card ng-if="ctrl.creatingNewAnnouncement">
+            <md-input-container>
+                <input aria-label="Announcement title" required placeholder="Announcement title" type="text" ng-model="ctrl.newAnnouncement.title" id="new-announcement-title" name="newAnnouncementTitle">
+            </md-input-container>
+            <textarea aria-label="Announcement content" required placeholder="Announcement content" name="newAnnouncementContent" id="new-announcement-content"
+                      ng-model="ctrl.newAnnouncement.content" rows="3">
+            </textarea>
+            <md-switch ng-model="ctrl.newAnnouncement.featured" aria-label="Featured?">
+                Featured: {{ ctrl.newAnnouncement.featured }}
+            </md-switch>
+            <md-switch ng-model="ctrl.newAnnouncement.visible" aria-label="Visibility">
+                Visible: {{ ctrl.newAnnouncement.visible }}
+            </md-switch>
+            <md-button class="md-raised md-primary" type="submit" ng-disabled="addAnnouncementForm.$pristine || addAnnouncementForm.$invalid">Save Announcement</md-button>
+        </md-card>
+    </form>
 </md-content>

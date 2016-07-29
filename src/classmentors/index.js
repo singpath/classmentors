@@ -22,6 +22,7 @@ module.factory('eventService', events.eventServiceFactory);
 module.factory('challengeService', challenges.challengeServiceFactory);
 
 module.filter('cmTruncate', filters.cmTruncateFilterFactory);
+module.filter('cmTruncated', filters.cmTruncateFilterBooleanFactory);
 
 module.directive('cmContains', directives.cmContainsFactory);
 

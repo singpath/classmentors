@@ -433,6 +433,12 @@
             "madeAt": {
               ".validate": "(data.exists() && data.val() === newData.val()) || (!data.exists() && newData.val() === now)"
             },
+            "featured": {
+              ".validate": "newData.isBoolean()"
+            },
+            "visible": {
+              ".validate": "newData.isBoolean()"
+            },
             "content": {
               ".validate": "newData.isString()"
             }
