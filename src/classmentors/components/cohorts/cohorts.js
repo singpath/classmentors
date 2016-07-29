@@ -459,6 +459,32 @@ function ViewCohortCtrl(
         return options;
     }
 
+    this.viewFullAnnouncement = function(content) {
+        $mdDialog.show({
+            clickOutsideToClose: true,
+            parent: $document.body,
+            template: '<md-dialog aria-label="Announcement dialog" class="announcement-dialog">' +
+            '  <md-dialog-content class="sticky-container">'+
+            '    <div><p>{{ctrl.content}}</p></div>'+
+            '  </md-dialog-content>' +
+            '  <md-dialog-actions>' +
+            '    <md-button ng-click="ctrl.closeDialog()" class="md-primary">' +
+            '      Close' +
+            '    </md-button>' +
+            '  </md-dialog-actions>' +
+            '</md-dialog>',
+            controller: viewAnnouncementController,
+            controllerAs: 'ctrl'
+        });
+
+        function viewAnnouncementController() {
+            this.content = content;
+            this.closeDialog = function() {
+                $mdDialog.hide();
+            };
+        }
+    };
+
     //
     // function promptPassword() {
     //     if (
@@ -592,6 +618,10 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
         self.newAnnouncement.featured = false;
         self.newAnnouncement.visible = true;
     };
+
+    this.closeNewAnnouncement = function() {
+        self.creatingNewAnnouncement = false;
+    }
 
     this.save = function(currentUser, cohort, editCohortForm) {
         self.savingCohort = true;

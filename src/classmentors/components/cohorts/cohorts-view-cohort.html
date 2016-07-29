@@ -1,5 +1,6 @@
 <md-content flex class="md-padding">
-
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+          rel="stylesheet">
     <md-tabs md-dynamic-height="true" md-border-bottom="true">
 
         <md-tab label="Announcements">
@@ -35,9 +36,9 @@
                             </md-card-title>
                         </md-toolbar>
                         <md-card-content>
-                            <p class="subhead">By {{a.madeBy}} at {{a.madeAt|date:'yyyy-MM-dd HH:mm'}}</p>
-                            <p>{{(a.content | cmTruncated: 300).content}}</p>
-                            <md-icon ng-if="(a.content | cmTruncated: 300).truncated" md-svg-icon="timeline"></md-icon>
+                            <p class="subhead">By {{a.madeBy}} at {{a.madeAt|date:'yyyy-MM-dd HH:mm'}}<md-button ng-if="(a.content | cmTruncated: 300).truncated" class="material-icons" ng-click="ctrl.viewFullAnnouncement(a.content)">visibility</md-button></p>
+                            <p>{{(a.content | cmTruncated: 140).content}}</p>
+
                         </md-card-content>
                     </md-card>
                 </md-content>

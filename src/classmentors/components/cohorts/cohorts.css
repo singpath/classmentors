@@ -2,3 +2,11 @@ div.subhead {
     font-style: italic;
     font-size: 10px;
 }
+
+md-dialog.announcement-dialog {
+    max-width: 40%;
+    max-height: 70%;
+    width: 40%;
+    height: 70%;
+    border-radius: 0;
+}

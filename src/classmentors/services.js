@@ -494,11 +494,11 @@ export function clmDataStoreFactory(
         },
 
         getAnnouncements: function(cohortId) {
-            return spfFirebase.loadedArray(['classMentors/cohortAnnouncements', cohortId], {
+            return spfFirebase.loadedObj(['classMentors/cohortAnnouncements', cohortId], {
                 orderByChild: "createdAt",
                 limitToLast: 50
             });
-        },
+        }
 
     },
 

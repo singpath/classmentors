@@ -39,6 +39,7 @@
                 Visible: {{ ctrl.newAnnouncement.visible }}
             </md-switch>
             <md-button class="md-raised md-primary" type="submit" ng-disabled="addAnnouncementForm.$pristine || addAnnouncementForm.$invalid">Save Announcement</md-button>
+            <md-button class="md-raised" ng-click="ctrl.closeNewAnnouncement()">Cancel</md-button>
         </md-card>
     </form>
 </md-content>
