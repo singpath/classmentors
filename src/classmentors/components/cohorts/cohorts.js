@@ -592,6 +592,7 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
 
     this.currentUser = initialData.currentUser;
     this.cohort = initialData.cohort;
+    this.announcements = initialData.announcements;
     // this.tasks = initialData.tasks;
     // this.newPassword = '';
     this.savingCohort = false;
@@ -621,7 +622,7 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
 
     this.closeNewAnnouncement = function() {
         self.creatingNewAnnouncement = false;
-    }
+    };
 
     this.save = function(currentUser, cohort, editCohortForm) {
         self.savingCohort = true;
@@ -717,11 +718,13 @@ function baseEditCtrlInitialData($q, $route, spfAuthData, clmDataStore) {
 
     var data = {
         currentUser: spfAuthData.user(),
+        announcements: clmDataStore.cohorts.getAnnouncements(cohortId),
         cohort: cohortPromise
     };
 
     data.canEdit = $q.all({
         currentUser: spfAuthData.user(),
+        announcements: clmDataStore.cohorts.getAnnouncements(cohortId),
         cohort: cohortPromise
     }).then(function(result) {
         if (
@@ -732,9 +735,7 @@ function baseEditCtrlInitialData($q, $route, spfAuthData, clmDataStore) {
         ) {
             return $q.reject(errNotAuthorized);
         }
-
         return result;
     });
-
     return data;
 }
