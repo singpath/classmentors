@@ -239,10 +239,6 @@ NewCohortCtrl.$inject = [
     'clmDataStore'
 ];
 
-/**
- * Used to resolve `initialData` of `NewEventCtrl`.
- *
- */
 function newCohortCtrlInitialData($q, spfAuth, spfAuthData, clmDataStore) {
     var profilePromise;
     var errLoggedOff = new Error('The user should be logged in to create an event.');
@@ -373,14 +369,6 @@ function ViewCohortCtrl(
     this.profile = initialData.profile;
     this.announcements = initialData.announcements;
     this.events = initialData.events;
-    console.log(self.events);
-    // this.tasks = initialData.tasks;
-    // this.progress = initialData.progress;
-    // this.solutions = initialData.solutions;
-    // this.scores = initialData.scores;
-    // this.canView = initialData.canView;
-    // this.viewArchived = false;
-    // this.selected = null;
     this.isOwner = false;
 
     if (
@@ -573,10 +561,6 @@ function editCohortCtrlInitialData($q, $route, spfAuthData, clmDataStore) {
 }
 editCohortCtrlInitialData.$inject = ['$q', '$route', 'spfAuthData', 'clmDataStore'];
 
-/**
- * EditEventCtrl
- *
- */
 function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataStore) {
     var self = this;
 
@@ -624,6 +608,18 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
         })
     };
 
+    this.archiveAnnouncement = function(announcementId) {
+
+    };
+
+    this.featureAnnouncement = function(announcementId) {
+
+    };
+
+    this.unfeatureAnnouncement = function(annoucnementId) {
+
+    };
+
     // this.openTask = function(eventId, taskId) {
     //     clmDataStore.events.openTask(eventId, taskId).then(function() {
     //         spfAlert.success('Task opened.');
@@ -666,15 +662,6 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
 }
 EditCohortCtrl.$inject = ['initialData', 'spfNavBarService', 'urlFor', 'spfAlert', 'clmDataStore'];
 
-/**
- * Minimal resolver for `EditCtrl` and `AddEventTaskCtrl`.
- *
- * Load the event data and the current user data.
- *
- * The promise will resolved to an error if the the current user
- * is not the owner of the event.
- *
- */
 function baseEditCtrlInitialData($q, $route, spfAuthData, clmDataStore) {
     var errNoCohort = new Error('Cohort not found');
     var errNotAuthorized = new Error('You cannot edit this cohort');
