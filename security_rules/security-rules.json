@@ -289,7 +289,7 @@
         "$eventId": {
           "$publicId": {
             "$taskId": {
-              ".validate": "root.child('classMentors/eventTasks').child($eventId).child($taskId).child('openedAt').exists() && Number.isInteger(newData)",
+              ".validate": "root.child('classMentors/eventTasks').child($eventId).child($taskId).child('openedAt').exists()",
               ".write": "auth !== null && root.child('auth/publicIds').child($publicId).val() === auth.uid && root.child('classMentors/eventTasks').child($eventId).child($taskId).child('openedAt').exists()"
             },
             ".write": "auth !== null && root.child('auth/publicIds').child($publicId).val() === auth.uid"

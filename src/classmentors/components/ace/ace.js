@@ -1,7 +1,7 @@
 /**
  * classmentors/components/ace/ace.js - Define the ace component.
  */
-import template from './2015-ace-view.html!text';
+import template from './ace-view.html!text';
 
 /**
  * Update navBar with a title and no action.
@@ -28,7 +28,7 @@ export const component = {
   controller: AceController
 };
 
-export const ACE_STATS_URL = 'https://dl.dropboxusercontent.com/u/4972572/ace_of_coders_stats.json';
+export const ACE_STATS_URL = 'https://dl.dropboxusercontent.com/u/4972572/ace_of_coders_2016_stats.json';
 
 /**
  * Route resolver helper.
