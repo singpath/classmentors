@@ -593,6 +593,7 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
     this.currentUser = initialData.currentUser;
     this.cohort = initialData.cohort;
     this.announcements = initialData.announcements;
+    console.log(this.announcements);
     // this.tasks = initialData.tasks;
     // this.newPassword = '';
     this.savingCohort = false;
@@ -650,16 +651,36 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
         })
     };
 
-    this.archiveAnnouncement = function(announcementId) {
-
+    this.featureAnnouncement = function(cohortId, announcementId) {
+        clmDataStore.cohorts.featureAnnouncement(cohortId, announcementId).then(function() {
+            spfAlert.success('Announcement featured.');
+        }).catch(function() {
+            spfAlert.error('Failed to feature announcement');
+        });
     };
 
-    this.featureAnnouncement = function(announcementId) {
-
+    this.unfeatureAnnouncement = function(cohortId, announcementId) {
+        clmDataStore.cohorts.unfeatureAnnouncement(cohortId, announcementId).then(function() {
+            spfAlert.success('Announcement un-featured.');
+        }).catch(function() {
+            spfAlert.error('Failed to un-feature announcement');
+        });
     };
 
-    this.unfeatureAnnouncement = function(announcementId) {
+    this.showAnnouncement = function(cohortId, announcementId) {
+        clmDataStore.cohorts.showAnnouncement(cohortId, announcementId).then(function() {
+            spfAlert.success('Announcement is now visible.');
+        }).catch(function() {
+            spfAlert.error('Failed to make announcement visible');
+        });
+    };
 
+    this.hideAnnouncement = function(cohortId, announcementId) {
+        clmDataStore.cohorts.hideAnnouncement(cohortId, announcementId).then(function() {
+            spfAlert.success('Announcement is now hidden.');
+        }).catch(function() {
+            spfAlert.error('Failed to hide announcement');
+        });
     };
 
     // this.openTask = function(eventId, taskId) {

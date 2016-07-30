@@ -494,9 +494,61 @@ export function clmDataStoreFactory(
         },
 
         getAnnouncements: function(cohortId) {
-            return spfFirebase.loadedObj(['classMentors/cohortAnnouncements', cohortId], {
+            return spfFirebase.loadedArray(['classMentors/cohortAnnouncements', cohortId], {
                 orderByChild: "createdAt",
                 limitToLast: 50
+            });
+        },
+
+        featureAnnouncement: function(cohortId, announcementId) {
+            var url = ['classMentors/cohortAnnouncements', cohortId, announcementId];
+
+            return spfFirebase.transaction(url, function(announcement) {
+                if (announcement.featured) {
+                    return;
+                }
+
+                announcement.featured = true;
+                return announcement;
+            });
+        },
+
+        unfeatureAnnouncement: function(cohortId, announcementId) {
+            var url = ['classMentors/cohortAnnouncements', cohortId, announcementId];
+
+            return spfFirebase.transaction(url, function(announcement) {
+                if (!announcement.featured) {
+                    return;
+                }
+
+                announcement.featured = false;
+                return announcement;
+            });
+        },
+
+        showAnnouncement: function(cohortId, announcementId) {
+            var url = ['classMentors/cohortAnnouncements', cohortId, announcementId];
+
+            return spfFirebase.transaction(url, function(announcement) {
+                if (announcement.visible) {
+                    return;
+                }
+
+                announcement.visible = true;
+                return announcement;
+            });
+        },
+
+        hideAnnouncement: function(cohortId, announcementId) {
+            var url = ['classMentors/cohortAnnouncements', cohortId, announcementId];
+
+            return spfFirebase.transaction(url, function(announcement) {
+                if (!announcement.visible) {
+                    return;
+                }
+
+                announcement.visible = false;
+                return announcement;
             });
         }
 

@@ -12,7 +12,7 @@
                     </md-option>
                 </md-select>
                 <h3>Featured Announcements</h3>
-                <md-card ng-repeat="a in ctrl.announcements" ng-if="a.featured">
+                <md-card ng-repeat="a in ctrl.announcements" ng-if="a.featured && a.visible">
                     <md-toolbar>
                         <md-card-title>
                             <md-card-title-text>
@@ -27,7 +27,7 @@
                 </md-card>
                 <h3>Announcements</h3>
                 <md-content layout="row" layout-wrap>
-                    <md-card ng-repeat="a in ctrl.announcements" ng-if="!a.featured" flex="49" style="min-width: 400px;">
+                    <md-card ng-repeat="a in ctrl.announcements" ng-if="!a.featured && a.visible" flex="49" style="min-width: 400px;">
                         <md-toolbar>
                             <md-card-title>
                                 <md-card-title-text>
