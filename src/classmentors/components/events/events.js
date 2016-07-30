@@ -771,7 +771,7 @@ function AddEventTaskCtrl(
   initialData, $location, $log, spfFirebase, spfAlert, urlFor, spfNavBarService, clmDataStore, $mdDialog, $scope,
   eventService, clmSurvey
 ) {
-  console.log("Initial data is...", initialData);
+
   var self = this;
 
   this.event = initialData.event;
@@ -812,7 +812,8 @@ function AddEventTaskCtrl(
 
   //TODO: fill in respective routes for various challenge types.
   //TODO: grab form data.
-  this.challengeRouteProvider = function(eve, event, task, tasktype, isOpen){
+  //TODO: change the parameters for adding surveys
+  this.challengeRouteProvider = function(tasktype, task, isOpen){
 
     if(tasktype == 'service'){
       console.log('service is clicked');
@@ -850,8 +851,8 @@ function AddEventTaskCtrl(
       console.log('journalling is clicked');
       return 'Continue';
     }else if (tasktype == 'survey'){
-        clmSurvey.set(event.$id.toString(),event, task, tasktype, isOpen);
-        this.task.survey = task.survey;
+        console.log("clicked clmdata: ", initialData.event);
+        clmSurvey.set(initialData.event.$id , initialData.event, task, tasktype, isOpen);
         var obj = clmSurvey.get();
         return '/challenges/survey'
     }
@@ -888,6 +889,7 @@ function AddEventTaskCtrl(
 
   this.saveTask = function(event, _, task, taskType, isOpen) {
     var copy = spfFirebase.cleanObj(task);
+    console.log("what is this copy?: ", copy );
     var data = {
         taskType: taskType,
         isOpen: isOpen,
@@ -1926,7 +1928,7 @@ addSurveyEventTaskCtrlInitialData.$inject = ['$q', '$route', 'spfAuthData', 'clm
 
 //TODO: include controller for the survey
 function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData){
-  console.log("surveyformfillctrl event", initialData);
+  console.log("surveyformfillctrl initialData", initialData);
   this.event = initialData.event;
 
   spfNavBarService.update(
@@ -1938,7 +1940,14 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData){
         url: `#${urlFor('oneEvent', {eventId: event.$id})}`
       }]
   );
-
+  this.saveSurveyResponse = function(response, item){
+    console.log("I have reached response function");
+    console.log("my response is: ", response);
+    console.log("current question number is: ", item.currentTarget.getAttribute("data-id"));
+    var questionNumber = item.currentTarget.getAttribute("data-id");
+    
+    
+  }
 }
 SurveyFormFillCtrl.$inject=['spfNavBarService', '$location', 'urlFor', 'initialData'];
 

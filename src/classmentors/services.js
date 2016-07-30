@@ -606,7 +606,6 @@ export function clmDataStoreFactory(
 
         return spfFirebase.push(['classMentors/eventTasks', eventId], task).then(function(ref) {
           ref.setPriority(priority);
-          console.log("this ref issss... " + ref);
           return ref;
         });
       },

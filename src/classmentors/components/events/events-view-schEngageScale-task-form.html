@@ -14,7 +14,7 @@
             <br>
             <b><label>1. I pay attention in class</label></b>
             <br><br>
-            <md-radio-group id="Q1"  layout="row">
+            <md-radio-group id="Q1" ng-model="ctrl.q1Ans"  layout="row">
                 <md-radio-button value="never" class="md-primary">Never</md-radio-button>
                 <md-radio-button value="onoccasion" class="md-primary">On Occasion</md-radio-button>
                 <md-radio-button value="someofthetime" class="md-primary">Some of the Time</md-radio-button>
@@ -22,7 +22,9 @@
                 <md-radio-button value="allofthetime" class="md-primary">All of the Time</md-radio-button>
             </md-radio-group>
             <br>
-            <div><md-button class="md-raised md-primary">Save</md-button></div>
+            <div><md-button class="md-raised md-primary" data-id="Q1"
+                ng-click = "ctrl.saveSurveyResponse(ctrl.q1Ans, $event)"
+            >Save</md-button></div>
             <br>
 
 

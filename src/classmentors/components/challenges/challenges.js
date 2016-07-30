@@ -44,7 +44,6 @@ export function challengeServiceFactory
   return {
     save : function(event, _, task, taskType, isOpen) {
       var copy = spfFirebase.cleanObj(task);
-      console.log('COPY IS ... ', copy);
       if (taskType === 'linkPattern') {
         delete copy.badge;
         delete copy.serviceId;
@@ -196,7 +195,7 @@ function surveyFormEvent($scope, clmSurvey, spfFirebase, clmDataStore, $log, spf
     /////////
     this.saveSurveyTask = function (surveyType) {
         var copy = spfFirebase.cleanObj(getTask);
-        //console.log('What is survey? ', surveyType);
+        console.log('my copy is ', copy);
         if (sharedData.taskType === 'linkPattern') {
             delete copy.badge;
             delete copy.serviceId;
