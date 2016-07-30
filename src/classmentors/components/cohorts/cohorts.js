@@ -6,6 +6,7 @@ import cohortTmpl from './cohorts-view.html!text';
 import newCohortTmpl from './cohorts-new-cohort.html!text';
 import cohortViewTmpl from './cohorts-view-cohort.html!text';
 import cohortEditTmpl from './cohorts-edit-cohort.html!text';
+import cohortStatsPageTmpl from './cohorts-view-cohort-stats-page.html!text';
 import './cohorts.css!';
 // import './cohorts.css!';
 
@@ -759,4 +760,24 @@ function baseEditCtrlInitialData($q, $route, spfAuthData, clmDataStore) {
         return result;
     });
     return data;
+}
+
+export function clmCohortsStatsPageFactory() {
+    return {
+        template: cohortStatsPageTmpl,
+        restrict: 'E',
+        // bindToController: true,
+        // scope: {
+        //     event: '=',
+        //     profile: '=',
+        //     participants: '=',
+        //     tasks: '=',
+        //     progress: '=',
+        //     solutions: '=',
+        //     selected: '=',
+        //     scores: '='
+        // },
+        // controller: ClmEventResultsTableCtrl,
+        // controllerAs: 'ctrl'
+    };
 }
