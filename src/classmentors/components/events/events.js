@@ -79,7 +79,7 @@ export function configRoute($routeProvider, routes) {
       }
     })
 
-    .when('/events/:eventId/survey-task', {
+    .when('/events/:eventId/:taskId/:surveyTask', {
 
       template: schEngageScaleTmpl,
       controller: SurveyFormFillCtrl,
@@ -1666,7 +1666,7 @@ function ClmEventTableCtrl(
       console.log("my eventid is: ", eventId);
 
 
-      $location.path('/events/' + eventId + '/survey-task');
+      $location.path('/events/' + eventId + '/' + taskId + '/' + task.survey);
 
     }
 
@@ -1927,8 +1927,9 @@ function addSurveyEventTaskCtrlInitialData($q, $route, spfAuthData, clmDataStore
 addSurveyEventTaskCtrlInitialData.$inject = ['$q', '$route', 'spfAuthData', 'clmDataStore'];
 
 //TODO: include controller for the survey
-function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData){
-  console.log("surveyformfillctrl initialData", initialData);
+function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $routeParams, clmDataStore){
+  console.log("publicId:: ", $routeParams.surveyTask);
+
   this.event = initialData.event;
 
   spfNavBarService.update(
@@ -1940,16 +1941,25 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData){
         url: `#${urlFor('oneEvent', {eventId: event.$id})}`
       }]
   );
-  this.saveSurveyResponse = function(response, item){
-    console.log("I have reached response function");
-    console.log("my response is: ", response);
-    console.log("current question number is: ", item.currentTarget.getAttribute("data-id"));
+  this.saveSurveyResponse = function(response, item, task){
+    //console.log("I have reached response function");
+    //console.log("my response is: ", response);
+    //console.log("my task is: ", task);
+    //console.log("current question number is: ", item.currentTarget.getAttribute("data-id"));
+    //retrieve all required data to be put into firebase
+    var surveyResp = response;
     var questionNumber = item.currentTarget.getAttribute("data-id");
-    
+    var taskId = $routeParams.taskId;
+    var eventId = initialData.event.$id;
+    var userId = initialData.currentUser.publicId;
+    var surveyType = $routeParams.surveyTask;
+    clmDataStore.events.saveSurveyResponse(surveyResp, questionNumber, taskId, eventId, userId, surveyType);
+    //var surveyType =
+    //console.log("i have reached initialdata", $routeParams.taskId);
     
   }
 }
-SurveyFormFillCtrl.$inject=['spfNavBarService', '$location', 'urlFor', 'initialData'];
+SurveyFormFillCtrl.$inject=['spfNavBarService', '$location', 'urlFor', 'initialData', '$routeParams', 'clmDataStore'];
 
 export function clmEventRankTableFactory() {
   return {

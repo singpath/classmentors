@@ -1056,6 +1056,29 @@ export function clmDataStoreFactory(
         });
       },
 
+      //newly added codes by ky
+      saveSurveyResponse: function(surveyResp, questionNumber, taskId, eventId, userId, surveyTask){
+        if (!surveyResp) {
+          return $q.reject(new Error('No responses provided'));
+        }
+        if (!questionNumber) {
+          return $q.reject(new Error('Invalid survey question'));
+        }
+        if (!taskId) {
+          return $q.reject(new Error('No task id provided'));
+        }
+        if (!eventId) {
+          return $q.reject(new Error('No event id provided'));
+        }
+        if (!userId) {
+          return $q.reject(new Error('No user id provided'));
+        }
+
+        return spfFirebase.set([
+        'classMentors/surveyResponse', eventId, taskId, surveyTask, userId, questionNumber], surveyResp);
+
+      },
+
       submitSolution: function(eventId, taskId, publicId, link) {
         if (!eventId) {
           return $q.reject(new Error('No event id provided'));
