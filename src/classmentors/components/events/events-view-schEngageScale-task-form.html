@@ -14,7 +14,7 @@
             <br>
             <b><label>1. I pay attention in class</label></b>
             <br><br>
-            <md-radio-group id="Q1" ng-model="ctrl.q1Ans"  layout="row">
+            <md-radio-group id="Q1" ng-model="ctrl.q1Ans" layout="row">
                 <md-radio-button value="never" class="md-primary">Never</md-radio-button>
                 <md-radio-button value="onoccasion" class="md-primary">On Occasion</md-radio-button>
                 <md-radio-button value="someofthetime" class="md-primary">Some of the Time</md-radio-button>
@@ -22,15 +22,18 @@
                 <md-radio-button value="allofthetime" class="md-primary">All of the Time</md-radio-button>
             </md-radio-group>
             <br>
-            <div><md-button class="md-raised md-primary" data-id="Q1"
-                ng-click = "ctrl.saveSurveyResponse(ctrl.q1Ans, $event, task.$id)"
-            >Save</md-button></div>
+            <div>
+                <md-button class="md-raised md-primary" data-id="Q1"
+                           ng-click="ctrl.saveSurveyResponse(ctrl.q1Ans, $event, task.$id)">
+                    Save
+                </md-button>
+            </div>
             <br>
 
 
             <b><label>2. When I am in class I just act as if I am working</label></b>
             <br><br>
-            <md-radio-group id="Q2" layout="row">
+            <md-radio-group id="Q2" ng-model="ctrl.q2Ans" layout="row">
                 <md-radio-button value="never" class="md-primary">Never</md-radio-button>
                 <md-radio-button value="onoccasion" class="md-primary">On Occasion</md-radio-button>
                 <md-radio-button value="someofthetime" class="md-primary">Some of the Time</md-radio-button>
@@ -38,13 +41,18 @@
                 <md-radio-button value="allofthetime" class="md-primary">All of the Time</md-radio-button>
             </md-radio-group>
             <br>
-            <div><md-button class="md-raised md-primary" data-id="Q2">Save</md-button></div>
+            <div>
+                <md-button class="md-raised md-primary" data-id="Q2"
+                           ng-click="ctrl.saveSurveyResponse(ctrl.q2Ans, $event, task.$id)">
+                    Save
+                </md-button>
+            </div>
             <br>
 
 
             <b><label>3. I follow the rules at school</label></b>
             <br><br>
-            <md-radio-group id="Q3" layout="row">
+            <md-radio-group id="Q3" ng-model="ctrl.q3Ans" layout="row">
                 <md-radio-button value="never3" class="md-primary">Never</md-radio-button>
                 <md-radio-button value="onoccasion" class="md-primary">On Occasion</md-radio-button>
                 <md-radio-button value="someofthetime" class="md-primary">Some of the Time</md-radio-button>
@@ -52,13 +60,18 @@
                 <md-radio-button value="allofthetime" class="md-primary">All of the Time</md-radio-button>
             </md-radio-group>
             <br>
-            <div><md-button class="md-raised md-primary" data-id="Q3">Save</md-button></div>
+            <div>
+                <md-button class="md-raised md-primary" data-id="Q3"
+                           ng-click="ctrl.saveSurveyResponse(ctrl.q3Ans, $event, task.$id)">
+                    Save
+                </md-button>
+            </div>
             <br>
 
 
             <b><label>4. I get in trouble at school</label></b>
             <br><br>
-            <md-radio-group id="Q4" layout="row">
+            <md-radio-group id="Q4" ng-model="ctrl.q4Ans" layout="row">
                 <md-radio-button value="never" class="md-primary">Never</md-radio-button>
                 <md-radio-button value="onoccasion" class="md-primary">On Occasion</md-radio-button>
                 <md-radio-button value="someofthetime" class="md-primary">Some of the Time</md-radio-button>
@@ -66,7 +79,12 @@
                 <md-radio-button value="allofthetime" class="md-primary">All of the Time</md-radio-button>
             </md-radio-group>
             <br>
-            <div><md-button class="md-raised md-primary" data-id="Q4">Save</md-button></div>
+            <div>
+                <md-button class="md-raised md-primary" data-id="Q4"
+                           ng-click="ctrl.saveSurveyResponse(ctrl.q4Ans, $event, task.$id)">
+                    Save
+                </md-button>
+            </div>
             <br>
             <hr style="background: #808080; border: 0; height: 3px"/>
 
@@ -74,7 +92,7 @@
 
             <b><label>5. I feel happy in school</label></b>
             <br><br>
-            <md-radio-group id="Q5" layout="row">
+            <md-radio-group id="Q5" ng-model="ctrl.q5Ans" layout="row">
                 <md-radio-button value="never" class="md-primary">Never</md-radio-button>
                 <md-radio-button value="onoccasion" class="md-primary">On Occasion</md-radio-button>
                 <md-radio-button value="someofthetime" class="md-primary">Some of the Time</md-radio-button>
@@ -82,12 +100,17 @@
                 <md-radio-button value="allofthetime" class="md-primary">All of the Time</md-radio-button>
             </md-radio-group>
             <br>
-            <div><md-button class="md-raised md-primary" data-id="Q5">Save</md-button></div>
+            <div>
+                <md-button class="md-raised md-primary" data-id="Q5"
+                           ng-click="ctrl.saveSurveyResponse(ctrl.q5Ans, $event, task.$id)">
+                    Save
+                </md-button>
+            </div>
             <br>
 
             <b><label>6. I feel bored in school</label></b>
             <br><br>
-            <md-radio-group id="Q6"  layout="row">
+            <md-radio-group id="Q6" ng-model="ctrl.q6Ans" layout="row">
                 <md-radio-button value="never" class="md-primary">Never</md-radio-button>
                 <md-radio-button value="onoccasion" class="md-primary">On Occasion</md-radio-button>
                 <md-radio-button value="someofthetime" class="md-primary">Some of the Time</md-radio-button>
@@ -95,12 +118,17 @@
                 <md-radio-button value="allofthetime" class="md-primary">All of the Time</md-radio-button>
             </md-radio-group>
             <br>
-            <div><md-button class="md-raised md-primary" data-id="Q6">Save</md-button></div>
+            <div>
+                <md-button class="md-raised md-primary" data-id="Q6"
+                           ng-click="ctrl.saveSurveyResponse(ctrl.q6Ans, $event, task.$id)">
+                    Save
+                </md-button>
+            </div>
             <br>
 
             <b><label>7. I feel excited by the work in school</label></b>
             <br><br>
-            <md-radio-group id="Q7" layout="row">
+            <md-radio-group id="Q7" ng-model="ctrl.q7Ans" layout="row">
                 <md-radio-button value="never" class="md-primary">Never</md-radio-button>
                 <md-radio-button value="onoccasion" class="md-primary">On Occasion</md-radio-button>
                 <md-radio-button value="someofthetime" class="md-primary">Some of the Time</md-radio-button>
@@ -108,13 +136,18 @@
                 <md-radio-button value="allofthetime" class="md-primary">All of the Time</md-radio-button>
             </md-radio-group>
             <br>
-            <div><md-button class="md-raised md-primary">Save</md-button></div>
+            <div>
+                <md-button class="md-raised md-primary" data-id="Q7"
+                           ng-click="ctrl.saveSurveyResponse(ctrl.q7Ans, $event, task.$id)">
+                    Save
+                </md-button>
+            </div>
             <br>
 
 
             <b><label>8. I like being at school</label></b>
             <br><br>
-            <md-radio-group id="Q8" layout="row">
+            <md-radio-group id="Q8" ng-model="ctrl.q8Ans" layout="row">
                 <md-radio-button value="never" class="md-primary">Never</md-radio-button>
                 <md-radio-button value="onoccasion" class="md-primary">On Occasion</md-radio-button>
                 <md-radio-button value="someofthetime" class="md-primary">Some of the Time</md-radio-button>
@@ -122,13 +155,18 @@
                 <md-radio-button value="allofthetime" class="md-primary">All of the Time</md-radio-button>
             </md-radio-group>
             <br>
-            <div><md-button class="md-raised md-primary">Save</md-button></div>
+            <div>
+                <md-button class="md-raised md-primary" data-id="Q8"
+                           ng-click="ctrl.saveSurveyResponse(ctrl.q8Ans, $event, task.$id)">
+                    Save
+                </md-button>
+            </div>
             <br>
 
 
             <b><label>9. I am interested in the work at school</label></b>
             <br><br>
-            <md-radio-group id="Q9" layout="row">
+            <md-radio-group id="Q9" ng-model="ctrl.q9Ans" layout="row">
                 <md-radio-button value="never" class="md-primary">Never</md-radio-button>
                 <md-radio-button value="onoccasion" class="md-primary">On Occasion</md-radio-button>
                 <md-radio-button value="someofthetime" class="md-primary">Some of the Time</md-radio-button>
@@ -136,20 +174,30 @@
                 <md-radio-button value="allofthetime" class="md-primary">All of the Time</md-radio-button>
             </md-radio-group>
             <br>
-            <div><md-button class="md-raised md-primary">Save</md-button></div>
+            <div>
+                <md-button class="md-raised md-primary" data-id="Q9"
+                           ng-click="ctrl.saveSurveyResponse(ctrl.q9Ans, $event, task.$id)">
+                    Save
+                </md-button>
+            </div>
             <br>
 
 
             <b><label>10. My classroom is a fun place to be</label></b>
             <br><br>
-            <md-radio-group id="Q10" layout="row">
+            <md-radio-group id="Q10" ng-model="ctrl.q10Ans" layout="row">
                 <md-radio-button value="never" class="md-primary">Never</md-radio-button>
                 <md-radio-button value="onoccasion" class="md-primary">On Occasion</md-radio-button>
                 <md-radio-button value="someofthetime" class="md-primary">Some of the Time</md-radio-button>
                 <md-radio-button value="mostofthetime" class="md-primary">Most of the Time</md-radio-button>
                 <md-radio-button value="allofthetime" class="md-primary">All of the Time</md-radio-button>
             </md-radio-group>
-            <div><md-button class="md-raised md-primary">Save</md-button></div>
+            <div>
+                <md-button class="md-raised md-primary" data-id="Q10"
+                           ng-click="ctrl.saveSurveyResponse(ctrl.q10Ans, $event, task.$id)">
+                    Save
+                </md-button>
+            </div>
             <br>
             <hr style="background: #808080; border: 0; height: 3px"/>
 
@@ -157,59 +205,79 @@
 
             <b><label>11. When I read a book, I ask myself questions to make sure I understand what it is about</label></b>
             <br><br>
-            <md-radio-group id="Q11" layout="row">
+            <md-radio-group id="Q11" ng-model="ctrl.q11Ans" layout="row">
                 <md-radio-button value="never" class="md-primary">Never</md-radio-button>
                 <md-radio-button value="onoccasion" class="md-primary">On Occasion</md-radio-button>
                 <md-radio-button value="someofthetime" class="md-primary">Some of the Time</md-radio-button>
                 <md-radio-button value="mostofthetime" class="md-primary">Most of the Time</md-radio-button>
                 <md-radio-button value="allofthetime" class="md-primary">All of the Time</md-radio-button>
             </md-radio-group>
-            <div><md-button class="md-raised md-primary">Save</md-button></div>
+            <div>
+                <md-button class="md-raised md-primary" data-id="Q11"
+                           ng-click="ctrl.saveSurveyResponse(ctrl.q11Ans, $event, task.$id)">
+                    Save
+                </md-button>
+            </div>
             <br>
 
 
             <b><label>12. I study at home even when I don’t have a test</label></b>
             <br><br>
-            <md-radio-group id="Q12" layout="row">
+            <md-radio-group id="Q12" ng-model="ctrl.q12Ans" layout="row">
                 <md-radio-button value="never" class="md-primary">Never</md-radio-button>
                 <md-radio-button value="onoccasion" class="md-primary">On Occasion</md-radio-button>
                 <md-radio-button value="someofthetime" class="md-primary">Some of the Time</md-radio-button>
                 <md-radio-button value="mostofthetime" class="md-primary">Most of the Time</md-radio-button>
                 <md-radio-button value="allofthetime" class="md-primary">All of the Time</md-radio-button>
             </md-radio-group>
-            <div><md-button class="md-raised md-primary">Save</md-button></div>
+            <div>
+                <md-button class="md-raised md-primary" data-id="Q12"
+                           ng-click="ctrl.saveSurveyResponse(ctrl.q12Ans, $event, task.$id)">
+                    Save
+                </md-button>
+            </div>
             <br>
 
 
             <b><label>13. I try to watch TV shows about things we are doing in school</label></b>
             <br><br>
-            <md-radio-group id="Q13" layout="row">
+            <md-radio-group id="Q13" ng-model="ctrl.q13Ans" layout="row">
                 <md-radio-button value="never" class="md-primary">Never</md-radio-button>
                 <md-radio-button value="onoccasion" class="md-primary">On Occasion</md-radio-button>
                 <md-radio-button value="someofthetime" class="md-primary">Some of the Time</md-radio-button>
                 <md-radio-button value="mostofthetime" class="md-primary">Most of the Time</md-radio-button>
                 <md-radio-button value="allofthetime" class="md-primary">All of the Time</md-radio-button>
             </md-radio-group>
-            <div><md-button class="md-raised md-primary">Save</md-button></div>
+            <div>
+                <md-button class="md-raised md-primary" data-id="Q13"
+                           ng-click="ctrl.saveSurveyResponse(ctrl.q13Ans, $event, task.$id)">
+                    Save
+                </md-button>
+            </div>
             <br>
 
 
             <b><label>14. I check my schoolwork for mistakes</label></b>
             <br><br>
-            <md-radio-group id="Q14" layout="row">
+            <md-radio-group id="Q14" ng-model="ctrl.q14Ans" layout="row">
                 <md-radio-button value="never" class="md-primary">Never</md-radio-button>
                 <md-radio-button value="onoccasion" class="md-primary">On Occasion</md-radio-button>
                 <md-radio-button value="someofthetime" class="md-primary">Some of the Time</md-radio-button>
                 <md-radio-button value="mostofthetime" class="md-primary">Most of the Time</md-radio-button>
                 <md-radio-button value="allofthetime" class="md-primary">All of the Time</md-radio-button>
             </md-radio-group>
-            <div><md-button class="md-raised md-primary">Save</md-button></div>
+            <div>
+                <md-button class="md-raised md-primary" data-id="Q14"
+                           ng-click="ctrl.saveSurveyResponse(ctrl.q14Ans, $event, task.$id)">
+                    Save
+                </md-button>
+            </div>
             <br>
 
 
             <b><label>15. I read extra books to learn more about things we do in school</label></b>
             <br><br>
-            <md-radio-group id="Q15" layout="row">
+            <md-radio-group id="Q15" ng-model="ctrl.q15Ans" layout="row">
                 <md-radio-button value="never" class="md-primary">Never</md-radio-button>
                 <md-radio-button value="onoccasion" class="md-primary">On Occasion</md-radio-button>
                 <md-radio-button value="someofthetime" class="md-primary">Some of the Time</md-radio-button>
@@ -217,9 +285,16 @@
                 <md-radio-button value="allofthetime" class="md-primary">All of the Time</md-radio-button>
             </md-radio-group>
             <br>
-            <div><md-button class="md-raised md-primary">Save</md-button></div>
+            <div>
+                <md-button class="md-raised md-primary" data-id="Q15"
+                           ng-click="ctrl.saveSurveyResponse(ctrl.q15Ans, $event, task.$id)">
+                    Save
+                </md-button>
+            </div>
             <br>
-            <div><md-button type="submit" class="md-raised md-primary" style="width: 150px;">Submit</md-button></div>
+            <div>
+                <md-button type="submit" class="md-raised md-primary" style="width: 150px;">Submit</md-button>
+            </div>
         </md-input>
     </form>
 </md-content>
