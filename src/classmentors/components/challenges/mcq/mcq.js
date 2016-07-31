@@ -31,25 +31,28 @@ export function newMcqController(initialData, challengeService){
   self.test = challengeService.save;
   self.questions = [{
     text:"",
+    answers:[],
     options:[
       {
         text:"",
         isAns:false
       }
-    ]
+    ],
+    singleAns: false
 
   }];
 
   self.addQuestion = function(){
     var question = {
       text:"",
+      answers:[],
       options:[
         {
           text:"",
           isAns:false
         }
       ],
-      isMultiAns: false
+      singleAns: false
     }
     console.log('Added: ');
     console.log(question.id);
@@ -65,26 +68,22 @@ export function newMcqController(initialData, challengeService){
     }
   }
 
-  self.toggleOption = function(option){
-    if(option.isAns){
-      option.isAns = false;
-      console.log(option.isAns);
+
+  self.toggleOption = function(question, itemIndex, singleAns){
+    if(question.answers.indexOf(itemIndex) != -1){
+      var removed = question.answers.splice(itemIndex,1);
+      console.log(removed);
     }else{
-      option.isAns = true;
-      console.log(option.isAns);
+      if(singleAns){
+        question.answers = [itemIndex];
+      }else{
+        question.answers.push(itemIndex);
+      }
     }
   }
-
-  self.toggleStyle = function(isAns){
-    if(isAns){
-      console.log('YES');
-      return 'md-ascent';
-    }else{
-      console.log('NO');
-      return 'md-warn';
-    }
+  self.clearAnswers = function(question){
+    question.answers = [];
   }
-
   self.addOption = function (question) {
     // Get options
     question.options.push({
@@ -93,9 +92,10 @@ export function newMcqController(initialData, challengeService){
     });
   }
 
-  self.removeOption = function (question, itemIndex) {
+  self.removeOption = function(question, itemIndex) {
     if(itemIndex > -1){
       var removed = question.options.splice(itemIndex,1);
+      question.answers.splice(itemIndex,1);
       console.log('Removed : ', removed);
       console.log(question.options);
     }

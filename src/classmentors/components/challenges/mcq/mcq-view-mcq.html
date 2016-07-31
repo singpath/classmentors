@@ -165,9 +165,11 @@
 
             <div align="center">
                 <!--single answer or no?-->
-                <md-switch class="md-primary" ng-model="question.isSingleAnswer" aria-label="single answer?">
+                <md-switch class="md-primary" ng-model="question.singleAns" ng-click="ctrl.clearAnswers(question)" answer?">
                     Single answer only
                 </md-switch>
+                {{question.singleAns}}
+                <label>{{question.answers}}</label>
             </div>
             <md-input-container >
                 <md-button type="button" class="md-raised md-primary" ng-click="ctrl.addOption(question)">Add option</md-button>
@@ -175,27 +177,22 @@
 
             <!--answer options-->
             <div align="center" layout="row" ng-repeat="option in question.options" >
-                <!--todo: enable to add new options -->
+
                 <md-input-container flex >
                     <label for="q-option_{{$index}}">Option </label>
                     <input type="text" name="editQuestion" id="q-option_{{$index}}"
                            ng-model="option.text"
                            placeholer="Options"
                     />
-
-                    <!--<div ng-messages="">-->
-                    <!--<div ng-message="pattern">Some error here.</div>-->
-                    <!--</div>-->
                 </md-input-container>
                 <!--single answer or no?-->
                 <md-input-container>
-                    <md-button ng-class="option.isAns ? 'md-raised md-primary' : 'md-raised'" ng-click="ctrl.toggleOption(option)">Answer</md-button>
+                    <md-button ng-model="question.answers" ng-class="question.answers.indexOf($index) != -1 ? 'md-raised md-primary' : 'md-raised'"
+                               ng-click="ctrl.toggleOption(question, $index, question.singleAns)">Answer</md-button>
                 </md-input-container>
                 <md-input-container >
                     <md-button class="md-raised" ng-click="ctrl.removeOption(question,$index)" ng-disabled = "question.options.length == 1">Delete</md-button>
                 </md-input-container>
-
-
             </div>
 
         </div>
