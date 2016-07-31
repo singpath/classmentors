@@ -1,10 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-YOURE ON THE STATS PAGE!
-</body>
-</html>
+<md-content flex class="md-padding">
+
+    <md-select flex ng-model="ctrl.selectedStatistic" name="selectStatistic" placeholder="Select statistic to view">
+        <md-option ng-repeat="statistic in ['General event statistics', 'ClickStream Stats']">
+            {{statistic}}
+        </md-option>
+    </md-select>
+
+    YOU'RE ON THE STATS CUSTOM DIRECTORY PAGE!
+
+</md-content>
