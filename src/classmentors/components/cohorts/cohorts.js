@@ -8,6 +8,9 @@ import cohortViewTmpl from './cohorts-view-cohort.html!text';
 import cohortEditTmpl from './cohorts-edit-cohort.html!text';
 import cohortStatsPageTmpl from './cohorts-view-cohort-stats-page.html!text';
 import './cohorts.css!';
+// import d3 from '../../../jspm_packages/graphing/d3.min.js';
+// import '../../../jspm_packages/graphing/c3.min.css';
+// import c3 from '../../../jspm_packages/graphing/c3.min.js';
 // import './cohorts.css!';
 
 const noop = () => undefined;
@@ -777,7 +780,7 @@ export function clmCohortsStatsPageFactory() {
 
 function ClmCohortStatsPageCtrl(
     $scope, $q, $log, $mdDialog, $document,
-    urlFor, spfAlert, clmServicesUrl, clmDataStore, clmPagerOption, $sce
+    urlFor, spfAlert, clmServicesUrl, clmDataStore
 ) {
     var self = this;
     this.selectedStatistic = null;
@@ -786,6 +789,24 @@ function ClmCohortStatsPageCtrl(
     console.log(this.profile);
     console.log(this.selectedStatistic);
 
+    this.renderDashboard = function() {
+        console.log(self.selectedStatistic);
+        if(self.selectedStatistic) {
+            var dataString = JSON.parse('{"Sprint 1": [10, 20, 30, 40, 50],"Sprint 2": [2, 4, 6, 8, 10],"Sprint 3": [5, 10, 15, 20, 25]}');
+            var chart = c3.generate({
+                bindto: "#chart",
+                data: {
+                    //Test data
+                    // columns: [
+                    // 	['data1', 50, 70, 30, 20, 10],
+                    // 	['data2', 14, 56, 88, 34, 100]
+                    // ],
+                    json: dataString,
+                    type: "spline"
+                }
+            });
+        }
+    };
 
     // this.currentUserParticipant = undefined;
     // this.participantsView = [];
@@ -1321,6 +1342,5 @@ ClmCohortStatsPageCtrl.$inject = [
     'urlFor',
     'spfAlert',
     'clmServicesUrl',
-    'clmDataStore',
-    'clmPagerOption'
+    'clmDataStore'
 ];
