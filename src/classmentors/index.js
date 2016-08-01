@@ -57,7 +57,7 @@ module.factory('clmSurvey',events.clmSurveyTaskFactory);
  *
  */
 module.constant('routes', {
-  home: '/profile/', // The default route
+  home: '/ace-of-coders', // The default route
   aceOfCoders: '/ace-of-coders',
   events: '/events',
   newEvent: '/new-event',
