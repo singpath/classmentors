@@ -289,7 +289,7 @@
         "$eventId": {
           "$publicId": {
             "$taskId": {
-              ".validate": "root.child('classMentors/eventTasks').child($eventId).child($taskId).child('openedAt').exists()",
+              ".validate": "root.child('classMentors/eventTasks').child($eventId).child($taskId).child('openedAt').exists() && newData.isNumber()",
               ".write": "auth !== null && root.child('auth/publicIds').child($publicId).val() === auth.uid && root.child('classMentors/eventTasks').child($eventId).child($taskId).child('openedAt').exists()"
             },
             ".write": "auth !== null && root.child('auth/publicIds').child($publicId).val() === auth.uid"
@@ -423,9 +423,63 @@
             ".validate": "newData.isString() && newData.val().length >= 3 && newData.val().length <= 60"
           }
         }, 
-        ".indexOn": "featured", 
+        ".indexOn": ["featured", "createdAt"],
         ".read": true
-      }, 
+      },
+      "cohortAnnouncements": {
+        "$cohortId": {
+          "$announcementId": {
+            ".validate": true,
+            "madeAt": {
+              ".validate": "(data.exists() && data.val() === newData.val()) || (!data.exists() && newData.val() === now)"
+            },
+            "featured": {
+              ".validate": "newData.isBoolean()"
+            },
+            "visible": {
+              ".validate": "newData.isBoolean()"
+            },
+            "content": {
+              ".validate": "newData.isString()"
+            }
+          },
+          ".indexOn": ["archived", "createdAt"],
+          ".read": true,
+          ".write": true
+        }
+      },
+      "cohorts": {
+        "$cohortId": {
+          ".validate": "newData.hasChildren(['createdAt', 'owner', 'title']) && (\n  data.exists()\n  || root.child('classMentors/premiumUsers').child(auth.uid).val() === true\n)",
+          ".write": "auth !== null && (\n  data.exists() === false\n  || root.child('classMentors/admins').child(auth.uid).val() === true\n  || (\n    root.child('auth/publicIds').child(data.child('owner/publicId').val()).val() === auth.uid\n    && (\n      newData.hasChildren(['featured']) === false\n      || newData.child('featured').val() === false\n      || data.child('featured').val() === true\n    )\n  )\n)",
+          "createdAt": {
+            ".validate": "(data.exists() && data.val() === newData.val()) || (!data.exists() && newData.val() === now)"
+          },
+          "featured": {
+            ".validate": "newData.isBoolean()"
+          },
+          "owner": {
+            ".validate": "newData.hasChildren(['displayName', 'publicId', 'gravatar'])",
+            "displayName": {
+              ".validate": "newData.isString() && newData.val().length >= 3"
+            },
+            "gravatar": {
+              ".validate": "newData.isString() && newData.val().matches(/(https?\\:)?\\/\\/.+/)"
+            },
+            "publicId": {
+              ".validate": "auth !== null && root.child('classMentors/userProfiles/' + newData.val()).exists() && root.child('auth/publicIds').child(newData.val()).val() === auth.uid"
+            }
+          },
+          "schoolEvent": {
+            ".validate": "newData.isBoolean()"
+          },
+          "title": {
+            ".validate": "newData.isString() && newData.val().length >= 3 && newData.val().length <= 60"
+          }
+        },
+        ".indexOn": ["createdAt", "featured"],
+        ".read": true
+      },
       "premiumUsers": {
         "$userId": {
           ".validate": "newData.isBoolean() && root.child('auth/users/' + $userId).exists()"
@@ -559,7 +613,22 @@
               }
             }, 
             ".indexOn": "createdAt"
-          }, 
+          },
+          "createdCohorts": {
+            "$cohortId": {
+              ".validate": "newData.hasChildren(['createdAt', 'title']) && root.child('classMentors/cohorts').child($cohortId).child('owner/publicId').val() === $publicId",
+              "createdAt": {
+                ".validate": "root.child('classMentors/cohorts').child($cohortId).child('createdAt').val() === newData.val()"
+              },
+              "featured": {
+                ".validate": "root.child('classMentors/cohorts').child($cohortId).child('featured').val() === newData.val() || newData.val() === false"
+              },
+              "title": {
+                ".validate": "root.child('classMentors/cohorts').child($cohortId).child('title').val() === newData.val()"
+              }
+            },
+            ".indexOn": "createdAt"
+          },
           "joinedEvents": {
             "$eventId": {
               ".validate": "newData.hasChildren(['createdAt', 'owner', 'title']) && root.child('classMentors/eventParticipants').child($eventId).child($publicId).exists()", 
