@@ -15,6 +15,11 @@ import './cohorts.css!';
 
 const noop = () => undefined;
 
+export const component = {
+    template,
+    controller: ViewCohortCtrl
+};
+
 export function configRoute($routeProvider, routes) {
     $routeProvider
         .when(routes.cohorts, {
