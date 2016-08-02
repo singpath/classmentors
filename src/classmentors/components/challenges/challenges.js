@@ -48,7 +48,7 @@ function initialData($q, eventService){
   // var desc = data.task.description;
   // this.title = data.task.title;
   // this.desc = data.task.description;
-  // return data;
+  return data;
   // return {
   //   title: title,
   //   desc: desc

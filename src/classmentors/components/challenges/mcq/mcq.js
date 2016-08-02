@@ -22,7 +22,7 @@ function mcqQuestionFactory(){
 
 export function newMcqController(initialData, challengeService){
   var self = this;
-
+  self.task = initialData.task;
   self.test = challengeService.save;
   self.questions = [{
     text:"",
