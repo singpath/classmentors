@@ -612,7 +612,8 @@ function baseEditCtrlInitialData($q, $route, spfAuthData, clmDataStore) {
 
   var data = {
     currentUser: spfAuthData.user(),
-    event: eventPromise
+    event: eventPromise,
+    participants: clmDataStore.events.participants(eventId)
   };
 
   data.canEdit = $q.all({
@@ -657,19 +658,44 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
   var self = this;
 
   this.currentUser = initialData.currentUser;
+  this.participants = initialData.participants;
   this.event = initialData.event;
   this.tasks = initialData.tasks;
   this.newPassword = '';
   this.savingEvent = false;
 
   this.addingNewAssistant = false;
-  this.newAssistant = {};
+  this.newAssistant = {
+      canEdit: false,
+      canReview: true
+  };
 
   // Search form variables
-    this.users        = loadAll();
+    this.users        = mapAllUsers();
     this.selectedUser  = null;
     this.searchUser    = null;
     this.querySearch   = querySearch;
+
+    function querySearch (query) {
+        return query ? self.users.filter( createFilterFor(query) ) : self.users;
+    }
+
+    function mapAllUsers() {
+        return self.participants.map( function (user) {
+            return {
+                id: user.$id,
+                value: user.user.displayName.toLowerCase(),
+                displayName: user.user.displayName
+            };
+        });
+    }
+
+    function createFilterFor(query) {
+        var lowercaseQuery = angular.lowercase(query);
+        return function filterFn(user) {
+            return (user.value.indexOf(lowercaseQuery) >= 0);
+        };
+    }
 
   spfNavBarService.update(
     'Edit', [{
@@ -690,6 +716,7 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
   };
 
   this.saveNewAssistant = function(eventId) {
+    self.newAssistant.name = self.selectedUser.displayName;
     console.log(self.newAssistant);
     self.addingNewAssistant = false;
   };

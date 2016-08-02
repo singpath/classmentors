@@ -41,6 +41,7 @@
 
     <form name="addAssistantForm" ng-submit="ctrl.saveNewAssistant(ctrl.event.$id)">
         <md-card ng-if="ctrl.addingNewAssistant">
+
             <md-autocomplete flex required
                              md-input-name="assistantName"
                              md-input-minlength="1"
@@ -61,6 +62,7 @@
                     No users matching "{{ctrl.searchUser}}" were found.
                 </md-not-found>
             </md-autocomplete>
+
             <md-switch ng-model="ctrl.newAssistant.canEdit" aria-label="canEdit?">
                 Can Edit Events: {{ ctrl.newAssistant.canEdit }}
             </md-switch>
@@ -68,7 +70,7 @@
                 Can Review Event Submissions: {{ ctrl.newAssistant.canReview }}
             </md-switch>
             <md-card-actions layout="row" layout-align="start center">
-                <md-button class="md-raised md-primary" type="submit" ng-disabled="addAssistantForm.$pristine || addAssistantForm.$invalid">Approve Assistant</md-button>
+                <md-button class="md-raised md-primary" type="submit" ng-disabled="addAssistantForm.$pristine || addAssistantForm.$invalid || !ctrl.selectedUser">Approve Assistant</md-button>
                 <md-button class="md-raised" ng-click="ctrl.closeNewAssistant()">Cancel</md-button>
             </md-card-actions>
         </md-card>
