@@ -21,13 +21,8 @@ function mcqQuestionFactory(){
 //TODO: implement logic for creating of mcq question
 
 export function newMcqController(initialData, challengeService){
-  // this.data = eventService.get();
   var self = this;
-  // self.data = initialData.data;
-  // self.task = {
-  //   title: initialData.title,
-  //   description: initialData.desc
-  // }
+
   self.test = challengeService.save;
   self.questions = [{
     text:"",
