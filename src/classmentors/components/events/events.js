@@ -76,6 +76,7 @@ export function configRoute($routeProvider, routes) {
         initialData: editEventTaskCtrlInitialData
       }
     });
+    console.log("routes configured");
 }
 
 configRoute.$inject = ['$routeProvider', 'routes'];
@@ -1666,20 +1667,30 @@ function ClmEventTableCtrl(
             clickOutsideToClose: true,
             parent: angular.element(document.body),
             template: codeTmpl,
-            onComplete: loadEditor,
             controller: CodeController,
-            controllerAs: 'ctrl'
+            controllerAs: 'ctrl',
+            onComplete: loadEditor
         });
 
-        function loadEditor() {
-            var editor = ace.edit(document.querySelector('#editor'));
-            editor.setTheme("ace/theme/monokai");
-            editor.getSession().setMode("ace/mode/"+task.lang.toLowerCase());
-            editor.getSession().setUseWrapMode(true);
-        }
+      this.loadingEditor = true;
+      var parent = this;
+
+      function loadEditor() {
+          var editor = ace.edit(document.querySelector('#editor'));
+          editor.setTheme("ace/theme/monokai");
+          editor.getSession().setMode("ace/mode/"+task.lang.toLowerCase());
+          editor.getSession().setUseWrapMode(true);
+          parent.loadingEditor = false;
+      }
 
         function CodeController() {
             this.task = task;
+
+            this.checkEditor = function() {
+                return parent.loadingEditor;
+                console.log(parent.loadingEditor);
+            };
+
             if (
                 userSolution &&
                 userSolution[taskId]
@@ -2190,7 +2201,7 @@ export function clmEventResultsTableFactory() {
 
 function ClmEventResultsTableCtrl(
     $scope, $q, $log, $mdDialog, $document,
-    urlFor, spfAlert, clmServicesUrl, clmDataStore, clmPagerOption
+    urlFor, spfAlert, clmServicesUrl, clmDataStore, clmPagerOption, $sce
 ) {
     var self = this;
     var unwatchers = [];
@@ -2498,7 +2509,7 @@ function ClmEventResultsTableCtrl(
                 userSolution &&
                 userSolution[taskId]
             ) {
-                this.solution = userSolution[taskId];
+                this.solution = $sce.trustAsResourceUrl(userSolution[taskId]);
             }
 
             this.save = function(link) {
@@ -2526,7 +2537,6 @@ function ClmEventResultsTableCtrl(
             controller: DialogController,
             controllerAs: 'ctrl'
         });
-        console.log(this.currentUserProgress);
 
         function DialogController() {
             this.task = task;
@@ -2565,6 +2575,9 @@ function ClmEventResultsTableCtrl(
             controllerAs: 'ctrl'
         });
 
+        this.loadingEditor = true;
+        var parent = this;
+
         function loadEditor() {
             var editor = ace.edit(document.querySelector('#editor'));
             editor.setTheme("ace/theme/monokai");
@@ -2574,12 +2587,19 @@ function ClmEventResultsTableCtrl(
                 readOnly: true,
                 highlightActiveLine: false,
                 highlightGutterLine: false
-            })
+            });
+            parent.loadingEditor = false;
         }
 
         function CodeController() {
             this.task = task;
             this.viewOnly = true;
+
+            this.checkEditor = function() {
+                return parent.loadingEditor;
+                console.log(parent.loadingEditor);
+            };
+
             if (
                 userSolution &&
                 userSolution[taskId]
@@ -2608,7 +2628,6 @@ function ClmEventResultsTableCtrl(
     };
 
     this.saveAllocatedPoints = function(eventId, taskId, task, participant, score) {
-        console.log(Number.isInteger(score));
         clmDataStore.events.saveScore(eventId, participant.$id, taskId, score).then(function () {
             spfAlert.success('Score has been saved.');
         }).catch(function (err) {
@@ -2616,7 +2635,7 @@ function ClmEventResultsTableCtrl(
             spfAlert.error('Failed to save score.');
             return err;
         });
-    }
+    };
 
     this.update = function() {};
     /*
@@ -2723,7 +2742,8 @@ ClmEventResultsTableCtrl.$inject = [
     'spfAlert',
     'clmServicesUrl',
     'clmDataStore',
-    'clmPagerOption'
+    'clmPagerOption',
+    '$sce'
 ];
 
 export function clmPagerFactory() {

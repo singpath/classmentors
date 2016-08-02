@@ -6,7 +6,10 @@
                 <p>{{ctrl.task.description}}</p>
                 <p>{{ctrl.task.textResponse}}</p>
                 <p>Language: {{ctrl.task.lang}}</p>
-                <div id="editor">{{ctrl.solution}}</div>
+                <div layout="row" layout-sm="column" layout-align="space-around" ng-if="ctrl.checkEditor()">
+                    <md-progress-circular md-mode="indeterminate"></md-progress-circular>
+                </div>
+                <div id="editor" ng-show="!ctrl.checkEditor()">{{ctrl.solution}}</div>
             </div>
             <md-dialog-actions layout="row" layout-align="center end">
                 <div>

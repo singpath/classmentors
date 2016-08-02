@@ -67,6 +67,7 @@
 
                     <div ng-if="ctrl.selected.textResponse && !ctrl.selected.lang">
                         <span ng-if="ctrl.solutions[participant.$id][ctrl.selected.$id]">
+                            {{ ctrl.solutions[participant.$id][ctrl.selected.$id] | cmTruncate: 140 }}<br>
                             <md-button class="md-raised md-primary"
                                        aria-label="Update response"
                                        ng-click="ctrl.viewTextResponse(ctrl.event.$id, ctrl.selected.$id, ctrl.selected, participant, ctrl.solutions[participant.$id])"
@@ -82,6 +83,7 @@
 
                     <div ng-if="ctrl.selected.textResponse && ctrl.selected.lang">
                         <span ng-if="ctrl.solutions[participant.$id][ctrl.selected.$id]">
+                            {{ ctrl.solutions[participant.$id][ctrl.selected.$id] | cmTruncate: 140 }}<br>
                             <md-button class="md-raised md-primary"
                                        aria-label="Update response"
                                        ng-click="ctrl.viewCodeResponse(ctrl.event.$id, ctrl.selected.$id, ctrl.selected, participant, ctrl.solutions[participant.$id])"
@@ -97,7 +99,7 @@
 
                     <div ng-if="ctrl.selected.linkPattern">
                         <span ng-if="ctrl.solutions[participant.$id][ctrl.selected.$id]">
-                            <!--<a ng-href="{{ctrl.solutions[participant.$id][ctrl.selected.$id]}}" target="_blank">Completed</a>-->
+                            {{ ctrl.solutions[participant.$id][ctrl.selected.$id] | cmTruncate: 140 }}<br>
                             <md-button class="md-raised md-primary"
                                        aria-label="Update link"
                                        ng-click="ctrl.viewLink(ctrl.event.$id, ctrl.selected.$id, ctrl.selected, participant, ctrl.solutions[participant.$id])"
@@ -145,5 +147,3 @@
 
     <clm-pager options="ctrl.pagerOptions" class="md-padding"></clm-pager>
 </div>
-
-<!--value=ctrl.scores[participant.$id][ctrl.selected.$id]-->
