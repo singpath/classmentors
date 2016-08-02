@@ -23,6 +23,35 @@
 
         <md-progress-circular ng-show="ctrl.savingEvent" md-mode="indeterminate" style="margin: 16px auto"></md-progress-circular>
 
+        <md-subheader class="md-sticky-no-effect">Created by {{ctrl.event.owner.displayName}} on ({{ctrl.event.createdAt|date}})</md-subheader>
+        <md-subheader class="md-sticky-no-effect">Assistants:<md-button ng-click="ctrl.addAssistant()">
+            <md-icon md-svg-icon="add"></md-icon>
+            <md-tooltip>
+                Add assistant
+            </md-tooltip>
+        </md-button></md-subheader>
+
+        <form name="addAnnouncementForm" ng-submit="ctrl.saveNewAssistant(ctrl.event.$id)">
+            <md-card ng-if="ctrl.addingNewAssistant">
+                <md-input-container>
+                    <input aria-label="Announcement title" required placeholder="Announcement title" type="text" ng-model="ctrl.newAnnouncement.title" id="new-announcement-title" name="newAnnouncementTitle">
+                    <div ng-messages="addAnnouncementForm.newAnnouncementTitle.$error">
+                        <div ng-message="required">An announcement must have a title.</div>
+                    </div>
+                </md-input-container>
+                <md-switch ng-model="ctrl.newAnnouncement.featured" aria-label="Featured?">
+                    Featured: {{ ctrl.newAnnouncement.featured }}
+                </md-switch>
+                <md-switch ng-model="ctrl.newAnnouncement.visible" aria-label="Visibility">
+                    Visible: {{ ctrl.newAnnouncement.visible }}
+                </md-switch>
+                <md-card-actions layout="row" layout-align="start center">
+                    <md-button class="md-raised md-primary" type="submit" ng-disabled="addAnnouncementForm.$pristine || addAnnouncementForm.$invalid">Save Announcement</md-button>
+                    <md-button class="md-raised" ng-click="ctrl.closeNewAnnouncement()">Cancel</md-button>
+                </md-card-actions>
+            </md-card>
+        </form>
+
         <div layout="row" layout-align="center center">
             <md-button type="submit" class="md-raised md-primary" ng-disabled="editEventForm.$pristine || editEventForm.$invalid || ctrl.savingEvent">Save</md-button>
             <md-button type="reset" class="md-raised" ng-click="ctrl.reset(editEventForm)" ng-disabled="ctrl.savingEvent || editEventForm.$pristine">Reset</md-button>

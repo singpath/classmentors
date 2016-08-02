@@ -662,6 +662,9 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
   this.newPassword = '';
   this.savingEvent = false;
 
+  this.addingNewAssistant = false;
+  this.newAssistant = {};
+
   spfNavBarService.update(
     'Edit', [{
       title: 'Events',
@@ -675,6 +678,14 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
       icon: 'create'
     }]
   );
+
+  this.addAssistant = function() {
+    self.addingNewAssistant = true;
+  };
+
+  this.saveNewAssistant = function(eventId) {
+    console.log(self.newAssistant);
+  };
 
   this.save = function(currentUser, event, newPassword, editEventForm) {
     self.savingEvent = true;
