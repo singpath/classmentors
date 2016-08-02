@@ -289,7 +289,7 @@
         "$eventId": {
           "$publicId": {
             "$taskId": {
-              ".validate": "root.child('classMentors/eventTasks').child($eventId).child($taskId).child('openedAt').exists()",
+              ".validate": "root.child('classMentors/eventTasks').child($eventId).child($taskId).child('openedAt').exists() && newData.isNumber()",
               ".write": "auth !== null && root.child('auth/publicIds').child($publicId).val() === auth.uid && root.child('classMentors/eventTasks').child($eventId).child($taskId).child('openedAt').exists()"
             },
             ".write": "auth !== null && root.child('auth/publicIds').child($publicId).val() === auth.uid"
@@ -423,7 +423,7 @@
             ".validate": "newData.isString() && newData.val().length >= 3 && newData.val().length <= 60"
           }
         }, 
-        ".indexOn": "featured", 
+        ".indexOn": ["featured", "createdAt"],
         ".read": true
       },
       "cohortAnnouncements": {
@@ -433,11 +433,17 @@
             "madeAt": {
               ".validate": "(data.exists() && data.val() === newData.val()) || (!data.exists() && newData.val() === now)"
             },
+            "featured": {
+              ".validate": "newData.isBoolean()"
+            },
+            "visible": {
+              ".validate": "newData.isBoolean()"
+            },
             "content": {
               ".validate": "newData.isString()"
             }
           },
-          ".indexOn": "archived",
+          ".indexOn": ["archived", "createdAt"],
           ".read": true,
           ".write": true
         }

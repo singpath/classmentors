@@ -22,6 +22,7 @@ module.factory('eventService', events.eventServiceFactory);
 module.factory('challengeService', challenges.challengeServiceFactory);
 
 module.filter('cmTruncate', filters.cmTruncateFilterFactory);
+module.filter('cmTruncated', filters.cmTruncateFilterBooleanFactory);
 
 module.directive('cmContains', directives.cmContainsFactory);
 
@@ -40,6 +41,9 @@ module.directive('clmServiceUserIdExists', profiles.clmServiceUserIdExistsFactor
 module.directive('clmEventTable', events.clmEventTableFactory);
 module.directive('clmEventRankTable', events.clmEventRankTableFactory);
 module.directive('clmEventResultsTable', events.clmEventResultsTableFactory);
+
+module.directive('clmCohortsStatsPage', cohorts.clmCohortsStatsPageFactory);
+
 module.directive('clmPager', events.clmPagerFactory);
 module.factory('clmRowPerPage', events.clmRowPerPageFactory);
 module.factory('clmPagerOption', events.clmPagerOptionFactory);
