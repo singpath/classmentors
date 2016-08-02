@@ -1892,10 +1892,10 @@ function ClmEventRankTableCtrl($scope, $log, spfFirebase, clmDataStore, clmPager
     } else { // load the default services to list in ranking table.
       parentScope.rankedServices = [
         {id: 'freeCodeCamp', name: 'Free Code Camp'},
-        {id: 'pivotalExpert', name: 'Pivotal Expert'},
-        {id: 'codeCombat',name: 'Code Combat'},
+        {id: 'pivotalExpert', name: 'Pivotal Expert'}
+        // {id: 'codeCombat',name: 'Code Combat'},
         // {id: 'singPath',name:  'SingPath Problems'},
-        {id: 'codeSchool', name: 'Code School'}
+        // {id: 'codeSchool', name: 'Code School'}
       ];
     }
 

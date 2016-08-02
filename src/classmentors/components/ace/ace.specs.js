@@ -2,7 +2,7 @@
 import {expect} from 'chai';
 import sinon from 'sinon';
 
-import tmpl from './2015-ace-view.html!text';
+import tmpl from './ace-view.html!text';
 import {component, getStats, ACE_STATS_URL} from './ace.js';
 
 describe('ace component', function() {
