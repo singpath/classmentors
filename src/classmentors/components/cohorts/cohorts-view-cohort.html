@@ -48,13 +48,13 @@
             </md-content>
         </md-tab>
 
-        <md-tab label="Ranking" ng-disabled="true">
+        <md-tab label="Ranking" ng-disabled="!ctrl.isOwner || true">
             <md-content layout-padding>
                 This is a placeholder for the cohort ranking page
             </md-content>
         </md-tab>
 
-        <md-tab label="Stats" ng-disabled="true">
+        <md-tab label="Stats" ng-disabled="!ctrl.isOwner || true">
             <md-content layout-padding>
 
                 <!--<link href="../../../jspm_packages/graphing/c3.min.css" rel="stylesheet" type="text/css">-->

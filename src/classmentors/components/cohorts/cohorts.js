@@ -387,21 +387,13 @@ function ViewCohortCtrl(
     this.joinedEvents = initialData.joinedEvents;
 
     if (
-        self.event &&
-        self.event.owner &&
-        self.event.owner.publicId &&
+        self.cohort &&
+        self.cohort.owner &&
+        self.cohort.owner.publicId &&
         self.currentUser &&
-        self.event.owner.publicId === self.currentUser.publicId
+        self.cohort.owner.publicId === self.currentUser.publicId
     ) {
-        monitorHandler = clmDataStore.events.monitorEvent(
-            this.event, this.tasks, this.participants, this.solutions, this.progress
-        );
         this.isOwner = true;
-    } else {
-        monitorHandler = {
-            update: noop,
-            unwatch: noop
-        };
     }
 
     $scope.$on('$destroy', function() {
