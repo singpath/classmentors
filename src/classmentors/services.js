@@ -433,6 +433,19 @@ export function clmDataStoreFactory(
             });
         },
 
+        updateCohort: function(cohort) {
+            if (!cohort || !cohort.$id || !cohort.$save) {
+              return $q.reject(new Error('Cohort is not a firebase object'));
+            }
+
+            return cohort.$save().then(function() {
+              var cohortId = cohort.$id;
+            }).catch(function(err) {
+              $log.error(err);
+              return err;
+            });
+        },
+
         get: function(cohortId) {
             return spfFirebase.loadedObj(['classMentors/cohorts', cohortId]);
         },
@@ -471,19 +484,9 @@ export function clmDataStoreFactory(
         addAnnouncement: function(cohortId, madeBy, announcement, isArchived) {
             var priority = announcement.priority || 0;
 
-            // if (isOpen) {
-            //     task.openedAt = {'.sv': 'timestamp'};
-            //     task.closedAt = null;
-            // } else {
-            //     task.closedAt = {'.sv': 'timestamp'};
-            //     task.openedAt = null;
-            // }
-
             announcement.madeAt = {'.sv': 'timestamp'};
             announcement.madeBy = madeBy.publicId;
 
-
-            console.log(announcement);
             return spfFirebase.push(['classMentors/cohortAnnouncements', cohortId], announcement).then(function(ref) {
                 ref.setPriority(priority);
                 return ref;
@@ -496,6 +499,59 @@ export function clmDataStoreFactory(
                 limitToLast: 50
             });
         },
+
+        featureAnnouncement: function(cohortId, announcementId) {
+            var url = ['classMentors/cohortAnnouncements', cohortId, announcementId];
+
+            return spfFirebase.transaction(url, function(announcement) {
+                if (announcement.featured) {
+                    return;
+                }
+
+                announcement.featured = true;
+                return announcement;
+            });
+        },
+
+        unfeatureAnnouncement: function(cohortId, announcementId) {
+            var url = ['classMentors/cohortAnnouncements', cohortId, announcementId];
+
+            return spfFirebase.transaction(url, function(announcement) {
+                if (!announcement.featured) {
+                    return;
+                }
+
+                announcement.featured = false;
+                return announcement;
+            });
+        },
+
+        showAnnouncement: function(cohortId, announcementId) {
+            var url = ['classMentors/cohortAnnouncements', cohortId, announcementId];
+
+            return spfFirebase.transaction(url, function(announcement) {
+                if (announcement.visible) {
+                    return;
+                }
+
+                announcement.visible = true;
+                return announcement;
+            });
+        },
+
+        hideAnnouncement: function(cohortId, announcementId) {
+            var url = ['classMentors/cohortAnnouncements', cohortId, announcementId];
+
+            return spfFirebase.transaction(url, function(announcement) {
+                if (!announcement.visible) {
+                    return;
+                }
+
+                announcement.visible = false;
+                return announcement;
+            });
+        }
+
     },
 
     events: {
@@ -508,6 +564,13 @@ export function clmDataStoreFactory(
           limitToLast: 50
         });
       },
+
+    listAll: function() {
+        return spfFirebase.loadedObj(['classMentors/events'], {
+            orderByChild: 'createdAt',
+            limitToLast: 50
+        });
+    },
 
       listCreatedEvents: function() {
         return spfAuthData.user().then(function(authData) {
@@ -536,10 +599,26 @@ export function clmDataStoreFactory(
             limitToLast: 50
           });
         }).catch(function(err) {
-          $log.error(`Failed to list created events: ${err}`);
+          $log.error(`Failed to list joined events: ${err}`);
           return [];
         });
       },
+
+    listJoinedEventsObj: function() {
+        return spfAuthData.user().then(function(authData) {
+            if (!authData.publicId) {
+                return [];
+            }
+
+            return spfFirebase.loadedObj(['classMentors/userProfiles', authData.publicId, 'joinedEvents'], {
+                orderByChild: 'createdAt',
+                limitToLast: 50
+            });
+        }).catch(function(err) {
+            $log.error(`Failed to list joined events: ${err}`);
+            return [];
+        });
+    },
 
       create: function(event, password) {
         var hash, eventId;

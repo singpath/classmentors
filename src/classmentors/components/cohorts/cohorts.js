@@ -6,10 +6,18 @@ import cohortTmpl from './cohorts-view.html!text';
 import newCohortTmpl from './cohorts-new-cohort.html!text';
 import cohortViewTmpl from './cohorts-view-cohort.html!text';
 import cohortEditTmpl from './cohorts-edit-cohort.html!text';
+import cohortStatsPageTmpl from './cohorts-view-cohort-stats-page.html!text';
 import './cohorts.css!';
+// import d3 from '../../../jspm_packages/graphing/d3.min.js';
+// import '../../../jspm_packages/graphing/c3.min.css';
+// import c3 from '../../../jspm_packages/graphing/c3.min.js';
 // import './cohorts.css!';
 
 const noop = () => undefined;
+
+export const component = {
+    controller: ViewCohortCtrl
+};
 
 export function configRoute($routeProvider, routes) {
     $routeProvider
@@ -127,15 +135,17 @@ function NewCohortCtrl(
     this.events = initialData.events;
     this.createdEvents = initialData.createdEvents;
     this.joinedEvents = initialData.joinedEvents;
+
     this.selectedEvents = [];
+    this.selectedEventsNames = [];
+    this.featured = false;
+
     this.includeCreated = false;
     this.includeJoined = false;
-    this.populatedEvents = this.events;
 
     this.creatingEvent = false;
     this.profileNeedsUpdate = !this.currentUser.$completed();
 
-    // console.log(this.populatedEvents);
 
     spfNavBarService.update(
         'New Cohorts',
@@ -145,13 +155,14 @@ function NewCohortCtrl(
         }, []
     );
 
-    this.toggle = function(item, list) {
+    this.toggle = function(item, item2, list, list2) {
         var idx = list.indexOf(item);
         if (idx > -1) {
             list.splice(idx, 1);
         }
         else {
             list.push(item);
+            list2.push(item2);
         }
     };
 
@@ -169,7 +180,8 @@ function NewCohortCtrl(
         self.profile = profile;
         self.profileNeedsUpdate = !self.currentUser.$completed();
     }
-    this.save = function(currentUser, newCohort, events) {
+
+    this.save = function(currentUser, newCohort, events, featured) {
         var next;
 
         self.creatingCohort = true;
@@ -199,7 +211,8 @@ function NewCohortCtrl(
                 createdAt: {
                     '.sv': 'timestamp'
                 },
-                events: events
+                events: events,
+                featured: featured
             }, newCohort);
 
             console.log(data);
@@ -239,10 +252,6 @@ NewCohortCtrl.$inject = [
     'clmDataStore'
 ];
 
-/**
- * Used to resolve `initialData` of `NewEventCtrl`.
- *
- */
 function newCohortCtrlInitialData($q, spfAuth, spfAuthData, clmDataStore) {
     var profilePromise;
     var errLoggedOff = new Error('The user should be logged in to create an event.');
@@ -314,6 +323,16 @@ function viewCohortCtrlInitialData($q, $route, spfAuth, spfAuthData, clmDataStor
             if(canView) {
                 return clmDataStore.cohorts.getAnnouncements(cohortId);
             }
+        }),
+        events: canviewPromise.then(function (canView) {
+            if(canView) {
+                return clmDataStore.events.listAll();
+            }
+        }),
+        joinedEvents: canviewPromise.then(function (canView) {
+            if(canView) {
+                return clmDataStore.events.listJoinedEventsObj();
+            }
         })
         // events: canviewPromise.then(function(canView) {
         //     if(canView) {
@@ -355,10 +374,6 @@ viewCohortCtrlInitialData.$inject = [
     'clmDataStore'
 ];
 
-/**
- * ViewEventCtrl
- *
- */
 function ViewCohortCtrl(
     $scope, initialData, $document, $mdDialog, $route,
     spfAlert, urlFor, spfFirebase, spfAuthData, spfNavBarService, clmDataStore
@@ -371,42 +386,19 @@ function ViewCohortCtrl(
     this.participants = initialData.participants;
     this.profile = initialData.profile;
     this.announcements = initialData.announcements;
-    // this.tasks = initialData.tasks;
-    // this.progress = initialData.progress;
-    // this.solutions = initialData.solutions;
-    // this.scores = initialData.scores;
-    // this.canView = initialData.canView;
-    // this.viewArchived = false;
-    // this.selected = null;
+    this.events = initialData.events;
     this.isOwner = false;
+    this.joinedEvents = initialData.joinedEvents;
 
     if (
-        self.event &&
-        self.event.owner &&
-        self.event.owner.publicId &&
+        self.cohort &&
+        self.cohort.owner &&
+        self.cohort.owner.publicId &&
         self.currentUser &&
-        self.event.owner.publicId === self.currentUser.publicId
+        self.cohort.owner.publicId === self.currentUser.publicId
     ) {
-        monitorHandler = clmDataStore.events.monitorEvent(
-            this.event, this.tasks, this.participants, this.solutions, this.progress
-        );
         this.isOwner = true;
-    } else {
-        monitorHandler = {
-            update: noop,
-            unwatch: noop
-        };
     }
-
-    $scope.$on('$destroy', function() {
-        /* eslint no-unused-expressions: 0 */
-        monitorHandler.unwatch();
-        self.event && self.event.$destroy && self.event.$destroy();
-        self.participants && self.participants.$destroy && self.participants.$destroy();
-        self.profile && self.profile.$destroy && self.profile.$destroy();
-        self.progress && self.progress.$destroy && self.progress.$destroy();
-        self.solutions && self.solutions.$destroy && self.solutions.$destroy();
-    });
 
     updateNavbar();
 
@@ -467,6 +459,34 @@ function ViewCohortCtrl(
 
         return options;
     }
+
+    this.viewFullAnnouncement = function(content, title) {
+        $mdDialog.show({
+            clickOutsideToClose: true,
+            parent: $document.body,
+            template: '<md-dialog aria-label="Announcement dialog" class="announcement-dialog">' +
+            '  <md-dialog-content class="sticky-container">'+
+            '<md-subheader class="md-sticky-no-effect">{{ctrl.title}}</md-subheader>' +
+            '    <div style="white-space: pre-wrap;">{{ctrl.content}}</div>'+
+            '  </md-dialog-content>' +
+            '  <md-dialog-actions>' +
+            '    <md-button ng-click="ctrl.closeDialog()" class="md-primary">' +
+            '      Close' +
+            '    </md-button>' +
+            '  </md-dialog-actions>' +
+            '</md-dialog>',
+            controller: viewAnnouncementController,
+            controllerAs: 'ctrl'
+        });
+
+        function viewAnnouncementController() {
+            this.content = content;
+            this.title = title;
+            this.closeDialog = function() {
+                $mdDialog.hide();
+            };
+        }
+    };
 
     //
     // function promptPassword() {
@@ -570,18 +590,17 @@ function editCohortCtrlInitialData($q, $route, spfAuthData, clmDataStore) {
 }
 editCohortCtrlInitialData.$inject = ['$q', '$route', 'spfAuthData', 'clmDataStore'];
 
-/**
- * EditEventCtrl
- *
- */
 function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataStore) {
     var self = this;
 
     this.currentUser = initialData.currentUser;
     this.cohort = initialData.cohort;
+    this.announcements = initialData.announcements;
     // this.tasks = initialData.tasks;
     // this.newPassword = '';
     this.savingCohort = false;
+    this.creatingNewAnnouncement = false;
+    this.newAnnouncement = {};
 
     spfNavBarService.update(
         'Edit', [{
@@ -598,19 +617,28 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
         // }]
     );
 
-    this.save = function(currentUser, event, newPassword, editEventForm) {
-        self.savingEvent = true;
-        event.owner.publicId = currentUser.publicId;
-        event.owner.displayName = currentUser.displayName;
-        event.owner.gravatar = currentUser.gravatar;
-        return clmDataStore.events.updateEvent(event, newPassword).then(function() {
-            spfAlert.success('Event saved.');
-            self.newPassword = '';
-            editEventForm.$setPristine(true);
+    this.createNewAnnouncement = function () {
+        self.creatingNewAnnouncement = true;
+        self.newAnnouncement.featured = false;
+        self.newAnnouncement.visible = true;
+    };
+
+    this.closeNewAnnouncement = function() {
+        self.creatingNewAnnouncement = false;
+    };
+
+    this.save = function(currentUser, cohort, editCohortForm) {
+        self.savingCohort = true;
+        cohort.owner.publicId = currentUser.publicId;
+        cohort.owner.displayName = currentUser.displayName;
+        cohort.owner.gravatar = currentUser.gravatar;
+        return clmDataStore.cohorts.updateCohort(cohort).then(function() {
+            spfAlert.success('Cohort saved.');
+            editCohortForm.$setPristine(true);
         }).catch(function() {
-            spfAlert.error('Failed to save event.');
+            spfAlert.error('Failed to save cohort.');
         }).finally(function() {
-            self.savingEvent = false;
+            self.savingCohort = false;
         });
     };
 
@@ -619,60 +647,48 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
             spfAlert.success('Announcement created');
         }).catch(function () {
             spfAlert.error('Failed to create announcement');
+        }).finally(function () {
+            self.creatingNewAnnouncement = false;
+            self.newAnnouncement = {};
         })
     };
 
-    this.openTask = function(eventId, taskId) {
-        clmDataStore.events.openTask(eventId, taskId).then(function() {
-            spfAlert.success('Task opened.');
+    this.featureAnnouncement = function(cohortId, announcementId) {
+        clmDataStore.cohorts.featureAnnouncement(cohortId, announcementId).then(function() {
+            spfAlert.success('Announcement featured.');
         }).catch(function() {
-            spfAlert.error('Failed to open task');
+            spfAlert.error('Failed to feature announcement');
         });
     };
 
-    this.closeTask = function(eventId, taskId) {
-        clmDataStore.events.closeTask(eventId, taskId).then(function() {
-            spfAlert.success('Task closed.');
+    this.unfeatureAnnouncement = function(cohortId, announcementId) {
+        clmDataStore.cohorts.unfeatureAnnouncement(cohortId, announcementId).then(function() {
+            spfAlert.success('Announcement un-featured.');
         }).catch(function() {
-            spfAlert.error('Failed to close task.');
+            spfAlert.error('Failed to un-feature announcement');
         });
     };
 
-    this.showTask = function(eventId, taskId) {
-        clmDataStore.events.showTask(eventId, taskId).then(function() {
-            spfAlert.success('Task visible.');
+    this.showAnnouncement = function(cohortId, announcementId) {
+        clmDataStore.cohorts.showAnnouncement(cohortId, announcementId).then(function() {
+            spfAlert.success('Announcement is now visible.');
         }).catch(function() {
-            spfAlert.error('Failed to make task visible.');
+            spfAlert.error('Failed to make announcement visible');
         });
     };
 
-    this.hideTask = function(eventId, taskId) {
-        clmDataStore.events.hideTask(eventId, taskId).then(function() {
-            spfAlert.success('Task hidden.');
+    this.hideAnnouncement = function(cohortId, announcementId) {
+        clmDataStore.cohorts.hideAnnouncement(cohortId, announcementId).then(function() {
+            spfAlert.success('Announcement is now hidden.');
         }).catch(function() {
-            spfAlert.error('Failed to make task hidden.');
+            spfAlert.error('Failed to hide announcement');
         });
     };
 
-    this.archiveTask = function(eventId, taskId) {
-        clmDataStore.events.archiveTask(eventId, taskId).then(function() {
-            spfAlert.success('Task archived.');
-        }).catch(function() {
-            spfAlert.error('Failed to archive task.');
-        });
-    };
+
 }
 EditCohortCtrl.$inject = ['initialData', 'spfNavBarService', 'urlFor', 'spfAlert', 'clmDataStore'];
 
-/**
- * Minimal resolver for `EditCtrl` and `AddEventTaskCtrl`.
- *
- * Load the event data and the current user data.
- *
- * The promise will resolved to an error if the the current user
- * is not the owner of the event.
- *
- */
 function baseEditCtrlInitialData($q, $route, spfAuthData, clmDataStore) {
     var errNoCohort = new Error('Cohort not found');
     var errNotAuthorized = new Error('You cannot edit this cohort');
@@ -687,11 +703,13 @@ function baseEditCtrlInitialData($q, $route, spfAuthData, clmDataStore) {
 
     var data = {
         currentUser: spfAuthData.user(),
+        announcements: clmDataStore.cohorts.getAnnouncements(cohortId),
         cohort: cohortPromise
     };
 
     data.canEdit = $q.all({
         currentUser: spfAuthData.user(),
+        announcements: clmDataStore.cohorts.getAnnouncements(cohortId),
         cohort: cohortPromise
     }).then(function(result) {
         if (
@@ -702,9 +720,59 @@ function baseEditCtrlInitialData($q, $route, spfAuthData, clmDataStore) {
         ) {
             return $q.reject(errNotAuthorized);
         }
-
         return result;
     });
-
     return data;
 }
+
+export function clmCohortsStatsPageFactory() {
+    return {
+        template: cohortStatsPageTmpl,
+        restrict: 'E',
+        bindToController: true,
+        scope: {
+            cohort: '=',
+            profile: '='
+        },
+        controller: ClmCohortStatsPageCtrl,
+        controllerAs: 'ctrl'
+    };
+}
+
+function ClmCohortStatsPageCtrl(
+    $scope, $q, $log, $mdDialog, $document,
+    urlFor, spfAlert, clmServicesUrl, clmDataStore
+) {
+    var self = this;
+    this.selectedStatistic = null;
+
+    this.renderDashboard = function() {
+        if(self.selectedStatistic) {
+            var dataString = JSON.parse('{"Sprint 1": [10, 20, 30, 40, 50],"Sprint 2": [2, 4, 6, 8, 10],"Sprint 3": [5, 10, 15, 20, 25]}');
+            // var chart = c3.generate({
+            //     bindto: "#chart",
+            //     data: {
+            //         //Test data
+            //         // columns: [
+            //         // 	['data1', 50, 70, 30, 20, 10],
+            //         // 	['data2', 14, 56, 88, 34, 100]
+            //         // ],
+            //         json: dataString,
+            //         type: "spline"
+            //     }
+            // });
+        }
+    };
+
+}
+ClmCohortStatsPageCtrl.$inject = [
+    '$scope',
+    '$q',
+    '$log',
+    '$mdDialog',
+    '$document',
+    'urlFor',
+    'spfAlert',
+    'clmServicesUrl',
+    'clmDataStore'
+];
