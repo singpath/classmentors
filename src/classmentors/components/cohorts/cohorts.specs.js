@@ -25,7 +25,7 @@ describe('cohorts component', function() {
 
     it('should update navbar with title', function() {
       expect(navBarService.update).to.have.been.calledOnce;
-      expect(navBarService.update).to.have.been.calledWith('Cohort');
+      expect(navBarService.update).to.have.been.calledWith('Cohorts');
     });
 
     it('should update navbar with an empty list of parent section', function() {
