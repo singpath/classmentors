@@ -3,6 +3,11 @@ div.subhead {
     font-size: 10px;
 }
 
+div.information {
+    font-style: italic;
+    font-size: 15px;
+}
+
 md-dialog.announcement-dialog {
     max-width: 70%;
     max-height: 85%;

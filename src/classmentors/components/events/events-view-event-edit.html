@@ -9,7 +9,7 @@
             <input name="eventTitle" type="text" id="event-title" ng-model="ctrl.event.title" ng-minlength="3" ng-maxlength="60" required="true"/>
             <div ng-messages="editEventForm.eventTitle.$error">
                 <div ng-message="required">An event should have a name.</div>
-                <div ng-message="minlength">An event name shouldn't be shorten than 3 characters.</div>
+                <div ng-message="minlength">An event name shouldn't be shorter than 3 characters.</div>
                 <div ng-message="maxlength">An event name shouldn't be longer than 60 characters.</div>
             </div>
         </md-input-container>
@@ -23,39 +23,55 @@
 
         <md-progress-circular ng-show="ctrl.savingEvent" md-mode="indeterminate" style="margin: 16px auto"></md-progress-circular>
 
-        <md-subheader class="md-sticky-no-effect">Created by {{ctrl.event.owner.displayName}} on ({{ctrl.event.createdAt|date}})</md-subheader>
-        <md-subheader class="md-sticky-no-effect">Assistants:<md-button ng-click="ctrl.addAssistant()">
-            <md-icon md-svg-icon="add"></md-icon>
-            <md-tooltip>
-                Add assistant
-            </md-tooltip>
-        </md-button></md-subheader>
-
-        <form name="addAnnouncementForm" ng-submit="ctrl.saveNewAssistant(ctrl.event.$id)">
-            <md-card ng-if="ctrl.addingNewAssistant">
-                <md-input-container>
-                    <input aria-label="Announcement title" required placeholder="Announcement title" type="text" ng-model="ctrl.newAnnouncement.title" id="new-announcement-title" name="newAnnouncementTitle">
-                    <div ng-messages="addAnnouncementForm.newAnnouncementTitle.$error">
-                        <div ng-message="required">An announcement must have a title.</div>
-                    </div>
-                </md-input-container>
-                <md-switch ng-model="ctrl.newAnnouncement.featured" aria-label="Featured?">
-                    Featured: {{ ctrl.newAnnouncement.featured }}
-                </md-switch>
-                <md-switch ng-model="ctrl.newAnnouncement.visible" aria-label="Visibility">
-                    Visible: {{ ctrl.newAnnouncement.visible }}
-                </md-switch>
-                <md-card-actions layout="row" layout-align="start center">
-                    <md-button class="md-raised md-primary" type="submit" ng-disabled="addAnnouncementForm.$pristine || addAnnouncementForm.$invalid">Save Announcement</md-button>
-                    <md-button class="md-raised" ng-click="ctrl.closeNewAnnouncement()">Cancel</md-button>
-                </md-card-actions>
-            </md-card>
-        </form>
-
+        <div class="information">Created by {{ctrl.event.owner.displayName}} on ({{ctrl.event.createdAt|date}})</div>
+        <div class="information">
+            Assistants:
+            <md-button ng-click="ctrl.addAssistant()">
+                <md-icon md-svg-icon="add"></md-icon>
+                <md-tooltip>
+                    Add assistant
+                </md-tooltip>
+            </md-button>
+        </div>
         <div layout="row" layout-align="center center">
             <md-button type="submit" class="md-raised md-primary" ng-disabled="editEventForm.$pristine || editEventForm.$invalid || ctrl.savingEvent">Save</md-button>
             <md-button type="reset" class="md-raised" ng-click="ctrl.reset(editEventForm)" ng-disabled="ctrl.savingEvent || editEventForm.$pristine">Reset</md-button>
         </div>
+    </form>
+
+    <form name="addAssistantForm" ng-submit="ctrl.saveNewAssistant(ctrl.event.$id)">
+        <md-card ng-if="ctrl.addingNewAssistant">
+            <md-autocomplete flex required
+                             md-input-name="assistantName"
+                             md-input-minlength="1"
+                             md-input-maxlength="64"
+                             md-no-cache="true"
+                             md-selected-item="ctrl.selectedUser"
+                             md-search-text="ctrl.searchUser"
+                             md-items="user in ctrl.querySearch(ctrl.searchUser)"
+                             md-item-text="user.displayName"
+                             md-floating-label="Select assistant profile">
+                <md-item-template>
+                    <span md-highlight-text="ctrl.searchUser">{{user.displayName}}</span>
+                </md-item-template>
+                <div ng-messages="addAssistantForm.assistantName.$error" ng-if="addAssistantForm.assistantName.$touched">
+                    <div ng-message="required">You <b>must</b> select a user.</div>
+                </div>
+                <md-not-found>
+                    No users matching "{{ctrl.searchUser}}" were found.
+                </md-not-found>
+            </md-autocomplete>
+            <md-switch ng-model="ctrl.newAssistant.canEdit" aria-label="canEdit?">
+                Can Edit Events: {{ ctrl.newAssistant.canEdit }}
+            </md-switch>
+            <md-switch ng-model="ctrl.newAssistant.canReview" aria-label="canReview?">
+                Can Review Event Submissions: {{ ctrl.newAssistant.canReview }}
+            </md-switch>
+            <md-card-actions layout="row" layout-align="start center">
+                <md-button class="md-raised md-primary" type="submit" ng-disabled="addAssistantForm.$pristine || addAssistantForm.$invalid">Approve Assistant</md-button>
+                <md-button class="md-raised" ng-click="ctrl.closeNewAssistant()">Cancel</md-button>
+            </md-card-actions>
+        </md-card>
     </form>
         
     <md-divider></md-divider>

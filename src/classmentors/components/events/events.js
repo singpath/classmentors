@@ -665,6 +665,12 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
   this.addingNewAssistant = false;
   this.newAssistant = {};
 
+  // Search form variables
+    this.users        = loadAll();
+    this.selectedUser  = null;
+    this.searchUser    = null;
+    this.querySearch   = querySearch;
+
   spfNavBarService.update(
     'Edit', [{
       title: 'Events',
@@ -685,6 +691,11 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
 
   this.saveNewAssistant = function(eventId) {
     console.log(self.newAssistant);
+    self.addingNewAssistant = false;
+  };
+
+  this.closeNewAssistant = function () {
+      self.addingNewAssistant = false;
   };
 
   this.save = function(currentUser, event, newPassword, editEventForm) {
