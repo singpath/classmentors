@@ -16,7 +16,6 @@ import './cohorts.css!';
 const noop = () => undefined;
 
 export const component = {
-    template,
     controller: ViewCohortCtrl
 };
 
