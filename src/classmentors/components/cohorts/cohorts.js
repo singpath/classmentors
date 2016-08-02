@@ -131,15 +131,17 @@ function NewCohortCtrl(
     this.events = initialData.events;
     this.createdEvents = initialData.createdEvents;
     this.joinedEvents = initialData.joinedEvents;
+
     this.selectedEvents = [];
+    this.selectedEventsNames = [];
+    this.featured = false;
+
     this.includeCreated = false;
     this.includeJoined = false;
-    this.populatedEvents = this.events;
 
     this.creatingEvent = false;
     this.profileNeedsUpdate = !this.currentUser.$completed();
 
-    // console.log(this.populatedEvents);
 
     spfNavBarService.update(
         'New Cohorts',
@@ -149,13 +151,14 @@ function NewCohortCtrl(
         }, []
     );
 
-    this.toggle = function(item, list) {
+    this.toggle = function(item, item2, list, list2) {
         var idx = list.indexOf(item);
         if (idx > -1) {
             list.splice(idx, 1);
         }
         else {
             list.push(item);
+            list2.push(item2);
         }
     };
 
@@ -173,7 +176,8 @@ function NewCohortCtrl(
         self.profile = profile;
         self.profileNeedsUpdate = !self.currentUser.$completed();
     }
-    this.save = function(currentUser, newCohort, events) {
+
+    this.save = function(currentUser, newCohort, events, featured) {
         var next;
 
         self.creatingCohort = true;
@@ -203,7 +207,8 @@ function NewCohortCtrl(
                 createdAt: {
                     '.sv': 'timestamp'
                 },
-                events: events
+                events: events,
+                featured: featured
             }, newCohort);
 
             console.log(data);
@@ -319,6 +324,11 @@ function viewCohortCtrlInitialData($q, $route, spfAuth, spfAuthData, clmDataStor
             if(canView) {
                 return clmDataStore.events.listAll();
             }
+        }),
+        joinedEvents: canviewPromise.then(function (canView) {
+            if(canView) {
+                return clmDataStore.events.listJoinedEventsObj();
+            }
         })
         // events: canviewPromise.then(function(canView) {
         //     if(canView) {
@@ -374,6 +384,7 @@ function ViewCohortCtrl(
     this.announcements = initialData.announcements;
     this.events = initialData.events;
     this.isOwner = false;
+    this.joinedEvents = initialData.joinedEvents;
 
     if (
         self.event &&
@@ -463,13 +474,14 @@ function ViewCohortCtrl(
         return options;
     }
 
-    this.viewFullAnnouncement = function(content) {
+    this.viewFullAnnouncement = function(content, title) {
         $mdDialog.show({
             clickOutsideToClose: true,
             parent: $document.body,
             template: '<md-dialog aria-label="Announcement dialog" class="announcement-dialog">' +
             '  <md-dialog-content class="sticky-container">'+
-            '    <div><p>{{ctrl.content}}</p></div>'+
+            '<md-subheader class="md-sticky-no-effect">{{ctrl.title}}</md-subheader>' +
+            '    <div style="white-space: pre-wrap;">{{ctrl.content}}</div>'+
             '  </md-dialog-content>' +
             '  <md-dialog-actions>' +
             '    <md-button ng-click="ctrl.closeDialog()" class="md-primary">' +
@@ -483,6 +495,7 @@ function ViewCohortCtrl(
 
         function viewAnnouncementController() {
             this.content = content;
+            this.title = title;
             this.closeDialog = function() {
                 $mdDialog.hide();
             };
@@ -785,26 +798,25 @@ function ClmCohortStatsPageCtrl(
     var self = this;
     this.selectedStatistic = null;
 
-    console.log(this.cohort);
-    console.log(this.profile);
-    console.log(this.selectedStatistic);
+    // console.log(this.cohort);
+    // console.log(this.profile);
+    // console.log(this.selectedStatistic);
 
     this.renderDashboard = function() {
-        console.log(self.selectedStatistic);
         if(self.selectedStatistic) {
             var dataString = JSON.parse('{"Sprint 1": [10, 20, 30, 40, 50],"Sprint 2": [2, 4, 6, 8, 10],"Sprint 3": [5, 10, 15, 20, 25]}');
-            var chart = c3.generate({
-                bindto: "#chart",
-                data: {
-                    //Test data
-                    // columns: [
-                    // 	['data1', 50, 70, 30, 20, 10],
-                    // 	['data2', 14, 56, 88, 34, 100]
-                    // ],
-                    json: dataString,
-                    type: "spline"
-                }
-            });
+            // var chart = c3.generate({
+            //     bindto: "#chart",
+            //     data: {
+            //         //Test data
+            //         // columns: [
+            //         // 	['data1', 50, 70, 30, 20, 10],
+            //         // 	['data2', 14, 56, 88, 34, 100]
+            //         // ],
+            //         json: dataString,
+            //         type: "spline"
+            //     }
+            // });
         }
     };
 

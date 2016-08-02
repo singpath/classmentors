@@ -6,11 +6,15 @@
         <md-tab label="Announcements">
             <md-content layout-padding>
                 Events within this cohort:
-                <md-select flex ng-model="ctrl.selectedEvent" name="selectEvent" placeholder="Navigate to cohort events">
+                <md-select flex ng-model="ctrl.selectedEvent" name="selectEvent" placeholder="View cohort events">
                     <md-option disabled ng-value="event" ng-repeat="event in ctrl.cohort.events">
                         {{ctrl.events[event].title}}
                     </md-option>
                 </md-select>
+                Go to my event:<br>
+                <md-button aria-label="Child Event" class="md-raised md-primary" ng-repeat="event in ctrl.cohort.events" ng-if="ctrl.joinedEvents[event]" ng-href="#{{ 'oneEvent' | urlFor: {eventId: event} }}">
+                    {{ctrl.events[event].title}}
+                </md-button>
                 <h3>Featured Announcements</h3>
                 <md-card ng-repeat="a in ctrl.announcements" ng-if="a.featured && a.visible">
                     <md-toolbar>
@@ -22,7 +26,7 @@
                     </md-toolbar>
                     <md-card-content>
                         <p class="subhead">By {{a.madeBy}} at {{a.madeAt|date:'yyyy-MM-dd HH:mm'}}</p>
-                        <p>{{a.content}}</p>
+                        <div style="white-space: pre-wrap;">{{(a.content | cmTruncated: 2000).content}}<md-button ng-if="(a.content | cmTruncated: 2000).truncated" class="material-icons" ng-click="ctrl.viewFullAnnouncement(a.content, a.title)">visibility<md-tooltip>View full announcement</md-tooltip></md-button></div>
                     </md-card-content>
                 </md-card>
                 <h3>Announcements</h3>
@@ -36,27 +40,26 @@
                             </md-card-title>
                         </md-toolbar>
                         <md-card-content>
-                            <p class="subhead">By {{a.madeBy}} at {{a.madeAt|date:'yyyy-MM-dd HH:mm'}}<md-button ng-if="(a.content | cmTruncated: 300).truncated" class="material-icons" ng-click="ctrl.viewFullAnnouncement(a.content)">visibility</md-button></p>
-                            <p>{{(a.content | cmTruncated: 140).content}}</p>
-
+                            <p class="subhead">By {{a.madeBy}} at {{a.madeAt|date:'yyyy-MM-dd HH:mm'}}<md-button ng-if="(a.content | cmTruncated: 300).truncated" class="material-icons" ng-click="ctrl.viewFullAnnouncement(a.content, a.title)">visibility<md-tooltip>View full announcement</md-tooltip></md-button></p>
+                            <div style="white-space: pre-wrap;">{{(a.content | cmTruncated: 140).content}}</div>
                         </md-card-content>
                     </md-card>
                 </md-content>
             </md-content>
         </md-tab>
 
-        <md-tab label="Ranking">
+        <md-tab label="Ranking" ng-disabled="true">
             <md-content layout-padding>
                 This is a placeholder for the cohort ranking page
             </md-content>
         </md-tab>
 
-        <md-tab label="Stats">
+        <md-tab label="Stats" ng-disabled="true">
             <md-content layout-padding>
 
-                <link href="../../../jspm_packages/graphing/c3.min.css" rel="stylesheet" type="text/css">
-                <script src="../../../jspm_packages/graphing/d3.min.js"></script>
-                <script src="../../../jspm_packages/graphing/c3.js"></script>
+                <!--<link href="../../../jspm_packages/graphing/c3.min.css" rel="stylesheet" type="text/css">-->
+                <!--<script src="../../../jspm_packages/graphing/d3.min.js"></script>-->
+                <!--<script src="../../../jspm_packages/graphing/c3.min.js"></script>-->
 
                 <clm-cohorts-stats-page
                         cohort="ctrl.cohort"

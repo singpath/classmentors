@@ -599,10 +599,26 @@ export function clmDataStoreFactory(
             limitToLast: 50
           });
         }).catch(function(err) {
-          $log.error(`Failed to list created events: ${err}`);
+          $log.error(`Failed to list joined events: ${err}`);
           return [];
         });
       },
+
+    listJoinedEventsObj: function() {
+        return spfAuthData.user().then(function(authData) {
+            if (!authData.publicId) {
+                return [];
+            }
+
+            return spfFirebase.loadedObj(['classMentors/userProfiles', authData.publicId, 'joinedEvents'], {
+                orderByChild: 'createdAt',
+                limitToLast: 50
+            });
+        }).catch(function(err) {
+            $log.error(`Failed to list joined events: ${err}`);
+            return [];
+        });
+    },
 
       create: function(event, password) {
         var hash, eventId;
