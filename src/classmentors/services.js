@@ -555,6 +555,12 @@ export function clmDataStoreFactory(
     },
 
     events: {
+      updateTaskAnswers: function(){
+
+      },
+      addTaskAnswers: function(eventId, answers){
+        return spfFirebase.push(['classMentors/eventAnswers', eventId], answers);
+      },
       errNoPublicId: new Error('You should have a public id to join an event'),
 
       list: function() {
@@ -782,7 +788,6 @@ export function clmDataStoreFactory(
 
         return spfFirebase.push(['classMentors/eventTasks', eventId], task).then(function(ref) {
           ref.setPriority(priority);
-          console.log("this ref issss... " + ref);
           return ref;
         });
       },

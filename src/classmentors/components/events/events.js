@@ -798,8 +798,6 @@ function AddEventTaskCtrl(
     });
   };
 
-  //TODO: fill in respective routes for various challenge types.
-  //TODO: grab form data.
   this.challengeRouteProvider = function(eve, event, task, tasktype, isOpen){
     if(tasktype == 'service'){
       console.log('service is clicked');

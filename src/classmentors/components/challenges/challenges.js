@@ -44,15 +44,7 @@ configRoute.$inject = ['$routeProvider', 'routes'];
 //default initial data for each route
 function initialData($q, eventService){
   var data =  eventService.get();
-  // var title = data.task.title;
-  // var desc = data.task.description;
-  // this.title = data.task.title;
-  // this.desc = data.task.description;
   return data;
-  // return {
-  //   title: title,
-  //   desc: desc
-  // }
 }
 initialData.$inject = [
     '$q',
@@ -65,6 +57,7 @@ export function challengeServiceFactory
   return {
     save : function(event, _, task, taskType, isOpen) {
       var copy = spfFirebase.cleanObj(task);
+      var answers = copy.answers;
       console.log('COPY IS ... ', copy);
       if (taskType === 'linkPattern') {
         delete copy.badge;
@@ -80,7 +73,7 @@ export function challengeServiceFactory
       }else if (taskType === 'multipleChoice'){
         delete copy.singPathProblem;
         delete copy.badge;
-        copy.mcqQuestions = 'test';
+        delete copy.answers;
       } else {
         delete copy.singPathProblem;
         copy.badge = spfFirebase.cleanObj(task.badge);
@@ -94,9 +87,12 @@ export function challengeServiceFactory
       self.creatingTask = true;
       clmDataStore.events.addTask(event.$id, copy, isOpen)
         .then(function() {
-          console.log('FAILS!');
           spfAlert.success('Task created');
           $location.path(urlFor('editEvent', {eventId: event.$id}));
+        }).then(function(){
+            if(answers != null){
+              clmDataStore.events.addTaskAnswers(event.$id, answers)
+            }
         }).catch(function(err) {
             $log.error(err);
             spfAlert.error('Failed to created new task');
