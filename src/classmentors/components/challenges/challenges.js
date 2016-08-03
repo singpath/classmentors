@@ -269,7 +269,6 @@ function baseEditCtrlInitialData(sharedData, $q, $route, spfAuthData, clmDataSto
 
 
     var sharedData = clmSurvey.get();
-    //console.log("baseeditctrlinitialdata spfAuthData: " + sharedData.currentUser);
     var errNoEvent = new Error('Event not found');
     var errNotAuthaurized = new Error('You cannot edit this event');
     var eventId = $route.current.params.eventId;

@@ -1,0 +1,55 @@
+<md-content flex class="md-padding">
+    <form name="surveyForm" ng-submit="">
+
+
+        <md-input container flex>
+
+            <div>
+                <h1>Motivated Strategies for Learning</h1>
+            </div>
+            <div>
+                <h3>Please respond to the questions below using the following scale:</h3>
+            </div>
+
+            <div ng-repeat="question in ctrl.questions">
+                <div style="float: left; width: 50%;">
+                    {{question.text}}
+                </div>
+                <div style="float: left; width: 35%; align:center">
+                    <md-radio-group id= "question.qnId" ng-model="question.qn" layout="row">
+                        <div ng-repeat="ratingOption in ctrl.ratingOptions">
+                            <md-radio-button style="margin-right:20px" class="md-primary" ng-value="ratingOption.id">
+                                {{ratingOption.name}}
+                            </md-radio-button>
+                        </div>
+                    </md-radio-group>
+                </div>
+
+                <div style="float: left;">
+                    <md-button class="md-raised md-primary" data-id= "{{question.qnId}}"
+                               ng-click="ctrl.saveSurveyResponse(question.qn , $event, task.$id)">
+                        Save
+                    </md-button>
+                </div>
+
+
+                <br>
+                <br>
+                <md-divider></md-divider>
+                <br>
+                <br>
+
+            </div>
+            <!--<pagination-->
+            <!--ng-model="currentPage"-->
+            <!--total-items="questions.length"-->
+            <!--max-size="maxSize"-->
+            <!--boundary-links="true">-->
+            <!--</pagination>-->
+
+        </md-input>
+
+        <!--<hr style="background: #808080; border: 0; height: 3px"/>-->
+    </form>
+
+</md-content>
