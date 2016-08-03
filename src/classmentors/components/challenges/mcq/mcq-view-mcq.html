@@ -37,61 +37,42 @@
         </p>
 
         <p>
-            <h5>Pre/Post Quiz Surveys</h5>
-            // Q: will people choose the same pre-post survey?
+            <h5>Pre & Post Surveys</h5>
 
-            <md-switch class="md-primary" ng-model="ctrl.prequiz" aria-label="">
-                Enable pre-quiz survey
+            <md-switch class="md-primary" ng-model="ctrl.survey" aria-label="survey">
+                Enable Pre & Post Surveys
             </md-switch>
-            <!--todo: dropdown list of pre-quiz survey-->
-            <md-input-container class="md-block" flex-gt-sm ng-hide="!ctrl.prequiz">
-                <label for="pre-quiz">Pre-quiz Titles</label>
-                <md-select id="pre-quiz" ng-model="task.survey.pre">
+
+            <!--todo: dropdown list of surveys-->
+            <md-input-container ng-hide="!ctrl.survey">
+                <label for="survey">Survey Titles</label>
+                <md-select id="survey" ng-model="ctrl.task.survey">
                     <!--
                     <md-option ng-repeat="state in states" value="{{state.abbrev}}">
                         {{state.abbrev}}
                     </md-option>-->
 
                     <md-option value="hello">
-                        hello
+                        Survey Title 1
                     </md-option>
                     <md-option value="hello2">
-                        hello2
+                        Survey Titile 2
                     </md-option>
                 </md-select>
             </md-input-container>
 
-            <md-switch class="md-primary" ng-model="ctrl.postquiz" aria-label="">
-                Enable post-quiz survey
-            </md-switch>
-            <!--todo: dropdown list of post-quiz survey-->
-            <md-input-container class="md-block" flex-gt-sm ng-hide="!ctrl.postquiz">
-                <label for="post-quiz">Post-quiz Titles</label>
-                <md-select id="post-quiz" ng-model="task.survey.post">
-                    <!--
-                    <md-option ng-repeat="state in states" value="{{state.abbrev}}">
-                        {{state.abbrev}}
-                    </md-option>-->
-
-                    <md-option value="hello">
-                        hello
-                    </md-option>
-                    <md-option value="hello2">
-                        hello2
-                    </md-option>
-                </md-select>
-            </md-input-container>
         </p>
 
         <p>
         <h5>Pre/Post Quiz Video</h5>
-            <md-switch class="md-primary" ng-model="ctrl.previd" aria-label="">
+            <md-switch class="md-primary" ng-model="ctrl.task.video.pre" aria-label="">
                 Enable pre-quiz video
             </md-switch>
+
             <!--todo: ask for link to the video-->
-            <md-input-container ng-hide="!ctrl.previd">
-                <label for="vid-link-pre">Pre Video Link</label>
-                <input type="text" name="vidLinkPre" id="vid-link-pre"
+            <md-input-container ng-hide="!ctrl.task.video.pre">
+                <label for="video-pre">Pre Video Link</label>
+                <input type="text" name="videoPre" id="video-pre"
                        ng-model="ctrl.task.video.pre"
                        pattern="^(https?://.+|#/).+$"
                        placeholer="Video Link to Pre Quiz Video" value="{{ctrl.task.video.pre}}"
@@ -101,13 +82,13 @@
                 </div>-->
             </md-input-container>
 
-            <md-switch class="md-primary" ng-model="ctrl.postvid" aria-label="">
+            <md-switch class="md-primary" ng-model="ctrl.task.video.post" aria-label="">
                 Enable post-quiz video
             </md-switch>
             <!--todo: ask for link to the video-->
-            <md-input-container ng-hide="!ctrl.postvid">
-                <label for="vid-link-post">Post Video Link</label>
-                <input type="text" name="vidLinkPost" id="vid-link-post"
+            <md-input-container ng-hide="!ctrl.task.video.post">
+                <label for="video-post">Post Video Link</label>
+                <input type="text" name="videoPost" id="video-post"
                        ng-model="ctrl.task.video.post"
                        pattern="^(https?://.+|#/).+$"
                        placeholer="Video Link to Post Quiz Video" value="{{ctrl.task.video.post}}"
@@ -128,6 +109,19 @@
             <md-switch class="md-primary" ng-model="ctrl.task.randomOOrder" aria-label="">
                 Randomise options order
             </md-switch>
+        </p>
+
+        <p>
+            <h5>Results Release</h5>
+            Release students' results after completion in
+            <input type="number" name="result" id="result"
+                   ng-model="ctrl.task.result"
+                   min="0" step="1"
+                   placeholer="Release students' results after completion in (minutes)" value=""
+            /> minutes.
+            <!--<div ng-messages="editTask.editTaskLink.$error">
+                <div ng-message="pattern">Wrong format for an absolute or relative URL.</div>
+            </div>-->
         </p>
 
         <p>
@@ -163,14 +157,6 @@
                 </md-input-container>
             </div>
 
-            <div align="center">
-                <!--single answer or no?-->
-                <md-switch class="md-primary" ng-model="question.singleAns" ng-click="ctrl.clearAnswers(question)" answer?">
-                    Single answer only
-                </md-switch>
-                {{question.singleAns}}
-                <label>{{question.answers}}</label>
-            </div>
             <md-input-container >
                 <md-button type="button" class="md-raised md-primary" ng-click="ctrl.addOption(question)">Add option</md-button>
             </md-input-container>
@@ -179,19 +165,19 @@
             <div align="center" layout="row" ng-repeat="option in question.options" >
 
                 <md-input-container flex >
-                    <label for="q-option_{{$index}}">Option </label>
+                    <label for="q-option_{{$index}}">Option</label>
                     <input type="text" name="editQuestion" id="q-option_{{$index}}"
                            ng-model="option.text"
                            placeholer="Options"
                     />
                 </md-input-container>
-                <!--single answer or no?-->
+
                 <md-input-container>
                     <md-button ng-model="question.answers" ng-class="question.answers.indexOf($index) != -1 ? 'md-raised md-primary' : 'md-raised'"
-                               ng-click="ctrl.toggleOption(question, $index, question.singleAns)">Answer</md-button>
+                               ng-click="ctrl.toggleOption(question, $index, question.singleAns)">This is the answer</md-button>
                 </md-input-container>
                 <md-input-container >
-                    <md-button class="md-raised" ng-click="ctrl.removeOption(question,$index)" ng-disabled = "question.options.length == 1">Delete</md-button>
+                    <md-button class="md-raised" ng-click="ctrl.removeOption(question,$index)" ng-disabled = "question.options.length == 1">Delete option</md-button>
                 </md-input-container>
             </div>
 
