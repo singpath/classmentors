@@ -1,21 +1,24 @@
 <md-content flex class="md-padding">
     <form name="surveyForm" ng-submit="">
 
+        <div>
+            <h1>Motivated Strategies for Learning</h1>
+        </div>
+        <div>
+            <h3>Please respond to the questions below using the following scale:</h3>
+        </div>
+        <div><b>1= not at all true of me to 7=very true of me</b></div>
+        <br>
+        <hr style="background: #808080; border: 0; height: 3px"/>
+        <br>
+        <md-input container flex >
 
-        <md-input container flex>
-
-            <div>
-                <h1>Motivated Strategies for Learning</h1>
-            </div>
-            <div>
-                <h3>Please respond to the questions below using the following scale:</h3>
-            </div>
-
-            <div ng-repeat="question in ctrl.questions">
+            <div ng-repeat="question in ctrl.questions" style="height: 80px" >
                 <div style="float: left; width: 50%;">
                     {{question.text}}
                 </div>
-                <div style="float: left; width: 35%; align:center">
+
+                <div style="float: left; width: 32%; align:center; vertical-align: middle">
                     <md-radio-group id= "question.qnId" ng-model="question.qn" layout="row">
                         <div ng-repeat="ratingOption in ctrl.ratingOptions">
                             <md-radio-button style="margin-right:20px" class="md-primary" ng-value="ratingOption.id">
@@ -25,20 +28,14 @@
                     </md-radio-group>
                 </div>
 
-                <div style="float: left;">
                     <md-button class="md-raised md-primary" data-id= "{{question.qnId}}"
                                ng-click="ctrl.saveSurveyResponse(question.qn , $event, task.$id)">
                         Save
                     </md-button>
-                </div>
-
 
                 <br>
                 <br>
                 <md-divider></md-divider>
-                <br>
-                <br>
-
             </div>
             <!--<pagination-->
             <!--ng-model="currentPage"-->
