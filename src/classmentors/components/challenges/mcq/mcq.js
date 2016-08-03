@@ -2,6 +2,7 @@
 //TODO: Add imports
 import mcqTmpl from './mcq-view-mcq.html!text';
 import mcqEditTmpl from './mcq-view-mcq-edit.html!text';
+import mcqStart from './mcq-view-start.html!text';
 
 const noop = () => undefined;
 
@@ -17,6 +18,54 @@ function mcqQuestionFactory(){
     }
   }
 }
+
+export function startMcqController(initialData, challengeService, clmDataStore, $location){
+  var self = this;
+  var data = initialData;
+  var eventId = data.eventId;
+  var taskId = data.taskId;
+  var participant = data.participant;
+  self.task = data.task;
+  var quesFromJson = angular.fromJson(self.task.mcqQuestions);
+  self.questions = loadQuestions(quesFromJson);
+  function loadQuestions(quesFromJson){
+    for(var i = 0; i < quesFromJson.length; i++){
+      quesFromJson[i].answers = [];
+    }
+    return quesFromJson;
+  };
+
+  self.submit = function(){
+    var userAnswers = [];
+    for(var i = 0; i < self.questions.length; i++){
+      userAnswers.push(self.questions[i].answers);
+    }
+    var answerString = angular.toJson(userAnswers);
+    console.log(answerString);
+    clmDataStore.events.submitSolution(eventId, taskId, participant.$id, answerString);
+    $location.path('/events/'+eventId);
+  }
+  console.log(self.questions);
+  self.toggleOption = function(question, itemIndex, singleAns){
+    if(question.answers.indexOf(itemIndex) != -1){
+      var removed = question.answers.splice(itemIndex,1);
+      console.log(removed);
+    }else{
+      if(singleAns){
+        question.answers = [itemIndex];
+      }else{
+        question.answers.push(itemIndex);
+      }
+    }
+  }
+
+}
+startMcqController.$inject = [
+  'initialData',
+  'challengeService',
+  'clmDataStore',
+  '$location'
+];
 
 export function newMcqController(initialData, challengeService, $filter){
   var self = this;
@@ -133,6 +182,9 @@ newMcqController.$inject = [
   '$filter'
 ];
 
+export function starMcqTmpl() {
+  return mcqStart;
+}
 //this export function return the template when creating a new mcq challenge
 export function newMcqTmpl(){
     return mcqTmpl;

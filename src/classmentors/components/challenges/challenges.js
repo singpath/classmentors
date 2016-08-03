@@ -11,8 +11,6 @@ import * as survey from './survey/survey.js';
 export function configRoute($routeProvider, routes){
     $routeProvider
         .when(routes.viewMcq, {
-            template: mcq.showTmpl,
-            controllerAs: 'ctrl',
             template: mcq.newMcqTmpl,
             controller: mcq.newMcqController,
             controllerAs: 'ctrl',
@@ -36,6 +34,15 @@ export function configRoute($routeProvider, routes){
             resolve: {
                 initialData: getTaskSurveyValues
             }
+        })
+
+        .when(routes.startMcq, {
+            template: mcq.starMcqTmpl,
+            controller: mcq.startMcqController,
+            controllerAs: 'ctrl',
+            resolve:{
+              initialData: initialData
+            }
         });
 
 }
@@ -44,6 +51,7 @@ configRoute.$inject = ['$routeProvider', 'routes'];
 //default initial data for each route
 function initialData($q, eventService){
   var data =  eventService.get();
+  console.log(data);
   return data;
 }
 initialData.$inject = [

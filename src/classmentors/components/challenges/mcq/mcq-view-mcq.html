@@ -1,14 +1,5 @@
 <md-content flex class="md-padding">
-<!--<code>{{ctrl.data | json}}</code>-->
-<md-button ng-click="
-	ctrl.test(
-		ctrl.data.event,
-		ctrl.data.task.taskId,
-		ctrl.data.task,
-		ctrl.data.taskType,
-		ctrl.data.isOpen
-		)
-"> Save something</md-button>
+
     {{ctrl.data}}
     <div align="center">
         <h3>Multiple Choice</h3>
@@ -19,6 +10,7 @@
 
     <div name="continueMCQ">
         <!-- toggle buttons -->
+        <div ng-hide="ctrl.isNonAdmin">
         <p>
             <md-switch class="md-primary" ng-model="ctrl.timelimit" aria-label="">
                 Set time limit for the entire quiz
@@ -136,6 +128,7 @@
                 Enable team answering mode
             </md-switch>
         </p>
+        </div>
 
 <!------------------starting of questions--------------------------------------------->
 
