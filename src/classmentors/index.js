@@ -76,6 +76,7 @@ module.constant('routes', {
   viewCohort: '/cohorts/:cohortId',
   editCohort: '/cohorts/:cohortId/edit',
   viewMcq: '/challenges/mcq',
+  startMcq: '/challenges/mcq/start',
   viewSurvey: '/challenges/survey'
 });
 
