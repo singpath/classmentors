@@ -604,6 +604,33 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
     this.showingAnnouncements = false;
     this.addingEvent = false;
 
+    // For searching events
+    this.users        = mapAllUsers();
+    this.selectedUser  = null;
+    this.searchUser    = null;
+    this.querySearch   = querySearch;
+
+    function querySearch (query) {
+        return query ? self.users.filter( createFilterFor(query) ) : self.users;
+    }
+
+    function mapAllUsers() {
+        return self.participants.map( function (user) {
+            return {
+                id: user.$id,
+                value: user.user.displayName.toLowerCase(),
+                displayName: user.user.displayName
+            };
+        });
+    }
+
+    function createFilterFor(query) {
+        var lowercaseQuery = angular.lowercase(query);
+        return function filterFn(user) {
+            return (user.value.indexOf(lowercaseQuery) >= 0);
+        };
+    }
+
     spfNavBarService.update(
         'Edit', [{
             title: 'Cohorts',
