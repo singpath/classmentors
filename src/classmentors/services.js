@@ -481,6 +481,14 @@ export function clmDataStoreFactory(
             });
         },
 
+        addEvent: function(cohortId, eventId, eventNum) {
+            return spfFirebase.set(['classMentors/cohorts', cohortId, 'events', eventNum], eventId);
+        },
+
+        removeEvent: function(cohortId, eventId) {
+            return spfFirebase.remove(['classMentors/cohorts', cohortId, 'events'], eventId);
+        },
+
         addAnnouncement: function(cohortId, madeBy, announcement, isArchived) {
             var priority = announcement.priority || 0;
 
@@ -555,6 +563,12 @@ export function clmDataStoreFactory(
     },
 
     events: {
+      updateTaskAnswers: function(){
+
+      },
+      addTaskAnswers: function(eventId, answers){
+        return spfFirebase.push(['classMentors/eventAnswers', eventId], answers);
+      },
       errNoPublicId: new Error('You should have a public id to join an event'),
 
       list: function() {
@@ -571,6 +585,13 @@ export function clmDataStoreFactory(
             limitToLast: 50
         });
     },
+
+        listAllArr: function() {
+            return spfFirebase.loadedArray(['classMentors/events'], {
+                orderByChild: 'createdAt',
+                limitToLast: 50
+            });
+        },
 
       listCreatedEvents: function() {
         return spfAuthData.user().then(function(authData) {
@@ -782,7 +803,6 @@ export function clmDataStoreFactory(
 
         return spfFirebase.push(['classMentors/eventTasks', eventId], task).then(function(ref) {
           ref.setPriority(priority);
-          console.log("this ref issss... " + ref);
           return ref;
         });
       },

@@ -1,14 +1,5 @@
 <md-content flex class="md-padding">
-<!--<code>{{ctrl.data | json}}</code>-->
-<md-button ng-click="
-	ctrl.test(
-		ctrl.data.event,
-		ctrl.data.task.taskId,
-		ctrl.data.task,
-		ctrl.data.taskType,
-		ctrl.data.isOpen
-		)
-"> Save something</md-button>
+
     {{ctrl.data}}
     <div align="center">
         <h3>Multiple Choice</h3>
@@ -19,6 +10,7 @@
 
     <div name="continueMCQ">
         <!-- toggle buttons -->
+        <div ng-hide="ctrl.isNonAdmin">
         <p>
             <md-switch class="md-primary" ng-model="ctrl.timelimit" aria-label="">
                 Set time limit for the entire quiz
@@ -136,6 +128,7 @@
                 Enable team answering mode
             </md-switch>
         </p>
+        </div>
 
 <!------------------starting of questions--------------------------------------------->
 
@@ -165,9 +158,11 @@
 
             <div align="center">
                 <!--single answer or no?-->
-                <md-switch class="md-primary" ng-model="question.isSingleAnswer" aria-label="single answer?">
+                <md-switch class="md-primary" ng-model="question.singleAns" ng-click="ctrl.clearAnswers(question)" answer?">
                     Single answer only
                 </md-switch>
+                {{question.singleAns}}
+                <label>{{question.answers}}</label>
             </div>
             <md-input-container >
                 <md-button type="button" class="md-raised md-primary" ng-click="ctrl.addOption(question)">Add option</md-button>
@@ -175,27 +170,22 @@
 
             <!--answer options-->
             <div align="center" layout="row" ng-repeat="option in question.options" >
-                <!--todo: enable to add new options -->
+
                 <md-input-container flex >
                     <label for="q-option_{{$index}}">Option </label>
                     <input type="text" name="editQuestion" id="q-option_{{$index}}"
                            ng-model="option.text"
                            placeholer="Options"
                     />
-
-                    <!--<div ng-messages="">-->
-                    <!--<div ng-message="pattern">Some error here.</div>-->
-                    <!--</div>-->
                 </md-input-container>
                 <!--single answer or no?-->
                 <md-input-container>
-                    <md-button ng-class="option.isAns ? 'md-raised md-primary' : 'md-raised'" ng-click="ctrl.toggleOption(option)">Answer</md-button>
+                    <md-button ng-model="question.answers" ng-class="question.answers.indexOf($index) != -1 ? 'md-raised md-primary' : 'md-raised'"
+                               ng-click="ctrl.toggleOption(question, $index, question.singleAns)">Answer</md-button>
                 </md-input-container>
                 <md-input-container >
                     <md-button class="md-raised" ng-click="ctrl.removeOption(question,$index)" ng-disabled = "question.options.length == 1">Delete</md-button>
                 </md-input-container>
-
-
             </div>
 
         </div>
@@ -210,7 +200,9 @@
         <br>
 
         <div align="center">
-            <md-button type="submit" class="md-raised md-primary">Save</md-button>
+            <md-button type="submit" class="md-raised md-primary" ng-click="
+                ctrl.save(ctrl.questions)
+            ">Save</md-button>
             <md-button type="reset" class="md-raised" ng-click="ctrl.discardChanges($event,ctrl.task)">Back</md-button>
         </div>
     </form>

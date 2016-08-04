@@ -847,8 +847,6 @@ function AddEventTaskCtrl(
     });
   };
 
-  //TODO: fill in respective routes for various challenge types.
-  //TODO: grab form data.
   this.challengeRouteProvider = function(eve, event, task, tasktype, isOpen){
     if(tasktype == 'service'){
       console.log('service is clicked');
@@ -1354,7 +1352,8 @@ export function clmEventTableFactory() {
 
 function ClmEventTableCtrl(
   $scope, $q, $log, $mdDialog, $document,
-  urlFor, spfAlert, clmServicesUrl, clmDataStore, clmPagerOption
+  urlFor, spfAlert, clmServicesUrl, clmDataStore, clmPagerOption,
+  eventService, $location
 ) {
   var self = this;
   var unwatchers = [];
@@ -1629,6 +1628,20 @@ function ClmEventTableCtrl(
     codeCombat: true
   };
 
+  this.startMCQ = function(eventId, taskId, task, participant, userSolution){
+    // Assign eventTable variables to data
+    var data = {
+      eventId: eventId,
+      taskId: taskId,
+      task: task,
+      participant: participant,
+      userSolution: userSolution
+    }
+    // Store data in eventService
+    eventService.set(data);
+    $location.path('/challenges/mcq/start');
+  }
+
   this.mustRegister = function(task, profile) {
     return Boolean(
       task &&
@@ -1642,6 +1655,8 @@ function ClmEventTableCtrl(
       )
     );
   };
+
+
 
   this.promptForLink = function(eventId, taskId, task, participant, userSolution) {
     $mdDialog.show({
@@ -1872,7 +1887,9 @@ ClmEventTableCtrl.$inject = [
   'spfAlert',
   'clmServicesUrl',
   'clmDataStore',
-  'clmPagerOption'
+  'clmPagerOption',
+  'eventService',
+  '$location'
 ];
 
 export function clmEventRankTableFactory() {
