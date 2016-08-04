@@ -605,8 +605,6 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
     this.showingAnnouncements = false;
     this.addingEvent = false;
 
-    console.log(self.events);
-
     // For searching events
     this.mappedEvents = mapAllEvents();
     this.selectedEvent = null;
@@ -630,7 +628,8 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
     function createFilterFor(query) {
         var lowercaseQuery = angular.lowercase(query);
         return function filterFn(event) {
-            return (event.value.indexOf(lowercaseQuery) >= 0);
+            // to filter results based on query and ensure that user cnnot select events already in the cohort
+            return (event.value.indexOf(lowercaseQuery) >= 0 && self.cohort.events.indexOf(event.id) < 0);
         };
     }
 
@@ -644,8 +643,34 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
         }]
     );
 
+    this.removeCohortEvent = function(eventId, eventIndex) {
+        // console.log(eventId, eventIndex);
+        // clmDataStore.cohorts.removeEvent(self.cohort.$id, eventId).then(function () {
+        //     spfAlert.success('Removed event');
+        // }).catch(function (err) {
+        //     spfAlert.error('Failed to remove event');
+        // });
+    };
+
+    this.saveAddedEvent = function () {
+        console.log(self.selectedEvent.id + "  " + self.cohort.$id);
+
+        clmDataStore.cohorts.addEvent(self.cohort.$id, self.selectedEvent.id, self.cohort.events.length).then(function() {
+            spfAlert.success(self.selectedEvent.title + ' has been added to the cohort!');
+        }).catch(function(err) {
+            spfAlert.error('Failed to add ' + self.selectedEvent.title + ' to the cohort!');
+        }).finally(function() {
+            self.addingEvent = false;
+            self.selectedEvent = null;
+        });
+    };
+
     this.addEvent = function () {
         self.addingEvent = true;
+    };
+
+    this.closeAddingEvent = function () {
+        self.addingEvent = false;
     };
 
     this.toggleEvents = function () {

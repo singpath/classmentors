@@ -31,7 +31,7 @@
 
     <md-subheader><md-button ng-click="ctrl.toggleEvents()">Cohort Events<md-tooltip ng-if="!ctrl.showingEvents">Click to view and edit cohort events</md-tooltip><md-tooltip ng-if="ctrl.showingEvents">Click to hide cohort events</md-tooltip></md-button></md-subheader>
     <div ng-if="ctrl.showingEvents">
-        <md-button ng-click="ctrl.addEvent()" aria-label="addEvent">Add Event</md-button>
+        <md-button class="md-raised md-primary" ng-click="ctrl.addEvent()" aria-label="addEvent">Add Event</md-button>
         <form name="addEventForm" ng-submit="ctrl.saveAddedEvent(ctrl.cohort.$id)">
             <md-card ng-if="ctrl.addingEvent">
                 <md-autocomplete flex required
@@ -54,13 +54,17 @@
                         No users matching "{{ctrl.searchEvent}}" were found.
                     </md-not-found>
                 </md-autocomplete>
+                <md-card-actions layout="row" layout-align="start center">
+                    <md-button class="md-raised md-primary" type="submit" ng-disabled="addEventForm.$pristine || addEventForm.$invalid || !ctrl.selectedEvent">Add Event</md-button>
+                    <md-button class="md-raised" ng-click="ctrl.closeAddingEvent()">Cancel</md-button>
+                </md-card-actions>
             </md-card>
         </form>
         <md-list>
-            <md-list-item ng-repeat="e in ctrl.cohort.events">
+            <md-list-item ng-repeat="e in ctrl.cohort.events" ng-if="ctrl.events[e]">
                 {{ctrl.events[e].title}}
                 <span flex></span>
-                <md-button>
+                <md-button ng-click="ctrl.removeCohortEvent(e, ctrl.cohort.events.indexOf(e))">
                     <md-icon class="material-icons">clear</md-icon>
                     <md-tooltip md-direction="left">
                         Remove an event (not yet supported)
