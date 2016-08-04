@@ -97,10 +97,12 @@ export function eventServiceFactory($q, $route, spfAuthData, clmDataStore, spfFi
     save: function(event, _, task, taskType, isOpen) {
             var copy = spfFirebase.cleanObj(task);
             console.log('Copy is.. : ', copy);
+
             if (taskType === 'linkPattern') {
                 delete copy.badge;
                 delete copy.serviceId;
                 delete copy.singPathProblem;
+
             } else if (copy.serviceId === 'singPath') {
                 delete copy.badge;
                 if (copy.singPathProblem) {
@@ -845,7 +847,7 @@ function AddEventTaskCtrl(
   }
 
   //this function double checks with user if he wishes to go back and discard all changes thus far
-  this.discardChanges = function (ev,task){
+  this.discardChanges = function (ev){
       var confirm = $mdDialog.confirm()
           .title('Would you like to discard your changes?')
           .textContent('All of the information input will be discarded. Are you sure you want to continue?')
@@ -856,20 +858,8 @@ function AddEventTaskCtrl(
       $mdDialog.show(confirm).then(function() {
           // decided to discard data, bring user to previous page
           $location.path(urlFor('editEvent', {eventId: self.event.$id}));
-
-      }), function() {
-          //go back to the current page
-          //todo: preserve the data that was keyed into form. (data should not be saved into the db yet)
-          this.task.title = task.title
-          this.task.priority = task.priority
-          this.task.description = task.description
-          this.task.link = task.link
-
-          this.task.linkPattern = task.linkPattern
-          this.task.textResponse = task.textResponse
-          this.task.cards = task.cards
-      };
-  }
+      });
+  };
 
 
   this.saveTask = function(event, _, task, taskType, isOpen) {
@@ -1029,6 +1019,8 @@ editEventTaskCtrlInitialData.$inject = ['$q', '$route', 'spfAuthData', 'clmDataS
  *
  */
 
+
+/**Todo: enable edit to multiple choice, index card, etc. **/
 function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBarService, clmDataStore, eventService, $mdDialog,$location) {
   var self = this;
 
@@ -1036,6 +1028,10 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBar
   this.badges = initialData.badges;
   this.taskId = initialData.taskId;
   this.task = initialData.task;
+
+  /**todo: save tasktype**/
+  //this.taskType = initalData.taskType;
+
   this.isOpen = Boolean(this.task.openedAt);
   this.savingTask = false;
   this.enableBeta = true;
@@ -1082,6 +1078,7 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBar
     if(tasktype == 'service'){
       console.log('service is clicked');
       return 'Save';
+
     }else if(tasktype == 'singPath'){
       console.log('singpath is clicked');
       return 'Save';
@@ -1114,14 +1111,14 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBar
     }else if(tasktype == 'journalling'){
       console.log('journalling is clicked');
       return 'Continue';
+
     }else{
       return 'Save';
     }
   }
 
-
   //this function double checks with user if he wishes to go back and discard all changes thus far
-  this.discardChanges = function (ev,task){
+  this.discardChanges = function (ev){
     var confirm = $mdDialog.confirm()
         .title('Would you like to discard your changes?')
         .textContent('All of the information input will be discarded. Are you sure you want to continue?')
@@ -1133,19 +1130,8 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBar
       // decided to discard data, bring user to previous page
       $location.path(urlFor('editEvent', {eventId: self.event.$id}));
 
-    }), function() {
-      //go back to the current page
-      //todo: preserve the data that was keyed into form. (data should not be saved into the db yet)
-      this.task.title = task.title
-      this.task.priority = task.priority
-      this.task.description = task.description
-      this.task.link = task.link
-
-      this.task.linkPattern = task.linkPattern
-      this.task.textResponse = task.textResponse
-      this.task.cards = task.cards
-    };
-  }
+    });
+  };
 
   this.saveTask = function(event, taskId, task, taskType, isOpen) {
     var copy = spfFirebase.cleanObj(task);
@@ -1196,6 +1182,7 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBar
       console.log(data)
       eventService.set(data);
       $location.path(location);
+
     }else{
       self.savingTask = true;
       clmDataStore.events.updateTask(event.$id, taskId, copy).then(function() {

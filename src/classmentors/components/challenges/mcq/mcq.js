@@ -28,6 +28,7 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
   self.task = data.task;
   var quesFromJson = angular.fromJson(self.task.mcqQuestions);
   self.questions = loadQuestions(quesFromJson);
+
   function loadQuestions(quesFromJson){
     for(var i = 0; i < quesFromJson.length; i++){
       quesFromJson[i].answers = [];
@@ -45,21 +46,27 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
     clmDataStore.events.submitSolution(eventId, taskId, participant.$id, answerString);
     $location.path('/events/'+eventId);
   }
+
   console.log(self.questions);
+
   self.toggleOption = function(question, itemIndex, singleAns){
     if(question.answers.indexOf(itemIndex) != -1){
       var removed = question.answers.splice(itemIndex,1);
       console.log(removed);
+
     }else{
       if(singleAns){
         question.answers = [itemIndex];
+
       }else{
         question.answers.push(itemIndex);
+
       }
     }
   }
 
 }
+
 startMcqController.$inject = [
   'initialData',
   'challengeService',
@@ -77,26 +84,34 @@ export function newMcqController(initialData, challengeService, $filter){
       {
         text:""
       }
-    ],
-    singleAns: false
+    ]
+
+    // prob wont need this
+    // ,
+    // singleAns: false
 
   }];
 
   // Save mcq question to database.
   self.save = function(questions){
     var setAnswers = [];
+
     for(var i = 0; i < questions.length; i ++){
       var answers = questions[i].answers;
       setAnswers.push(answers)
       delete questions[i].answers;
     }
+
     // Check does questions contain answers?
     console.log(questions);
+
     // Check answer list
     console.log(setAnswers);
+
     // Change questions into JSON text
     var answersJsonText = angular.toJson(questions);
     console.log(answersJsonText);
+
     // Save function defined in challenges.js
     // Parameters: event, taskid, task, taskType, isOpen
     var event = initialData.event;
@@ -109,6 +124,7 @@ export function newMcqController(initialData, challengeService, $filter){
     console.log(task)
     challengeService.save(event, taskId, task,taskType, isOpen);
   }
+
   // Add question when add question button is clicked
   self.addQuestion = function(){
     var question = {
@@ -121,6 +137,7 @@ export function newMcqController(initialData, challengeService, $filter){
       ],
       singleAns: false
     }
+
     // Push new question object into questions list
     self.questions.push(question);
   }
@@ -132,6 +149,7 @@ export function newMcqController(initialData, challengeService, $filter){
       console.log('Removed : ', removed);
       console.log(self.questions);
     }
+
   }
 
   // Functionality for toggleOption between single answer and multi ans functionality
@@ -141,13 +159,17 @@ export function newMcqController(initialData, challengeService, $filter){
     if(question.answers.indexOf(itemIndex) != -1){
       var removed = question.answers.splice(itemIndex,1);
       console.log(removed);
+
     }else{
       if(singleAns){
         question.answers = [itemIndex];
+
       }else{
         question.answers.push(itemIndex);
+
       }
     }
+
   }
 
   // Used to clear answers whenever users change between single ans and multi ans mode
@@ -174,7 +196,6 @@ export function newMcqController(initialData, challengeService, $filter){
   }
 
 
-
 }
 newMcqController.$inject = [
   'initialData',
@@ -195,4 +216,4 @@ export function editMcqTmpl(){
 }
 
 
-//TODO: implement logic for rendering of mcq questions
+//TODO: enable user to edit mcq
