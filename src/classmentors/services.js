@@ -485,8 +485,8 @@ export function clmDataStoreFactory(
             return spfFirebase.set(['classMentors/cohorts', cohortId, 'events', eventNum], eventId);
         },
 
-        removeEvent: function(cohortId, eventId) {
-            return spfFirebase.remove(['classMentors/cohorts', cohortId, 'events'], eventId);
+        removeEvent: function(cohortId, newEventArray) {
+            return spfFirebase.set(['classMentors/cohorts', cohortId, 'events'], newEventArray);
         },
 
         addAnnouncement: function(cohortId, madeBy, announcement, isArchived) {

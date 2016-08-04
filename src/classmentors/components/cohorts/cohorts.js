@@ -644,12 +644,13 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
     );
 
     this.removeCohortEvent = function(eventId, eventIndex) {
-        // console.log(eventId, eventIndex);
-        // clmDataStore.cohorts.removeEvent(self.cohort.$id, eventId).then(function () {
-        //     spfAlert.success('Removed event');
-        // }).catch(function (err) {
-        //     spfAlert.error('Failed to remove event');
-        // });
+        var newEventArray = self.cohort.events;
+        newEventArray.splice(eventIndex, 1);
+        clmDataStore.cohorts.removeEvent(self.cohort.$id, newEventArray).then(function () {
+            spfAlert.success('Removed event');
+        }).catch(function (err) {
+            spfAlert.error('Failed to remove event');
+        });
     };
 
     this.saveAddedEvent = function () {
