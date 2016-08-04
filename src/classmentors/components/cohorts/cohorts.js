@@ -594,13 +594,15 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
     var self = this;
 
     this.currentUser = initialData.currentUser;
+    this.events = initialData.events;
     this.cohort = initialData.cohort;
     this.announcements = initialData.announcements;
-    // this.tasks = initialData.tasks;
-    // this.newPassword = '';
     this.savingCohort = false;
     this.creatingNewAnnouncement = false;
     this.newAnnouncement = {};
+    this.showingEvents = false;
+    this.showingAnnouncements = false;
+    this.addingEvent = false;
 
     spfNavBarService.update(
         'Edit', [{
@@ -610,12 +612,27 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
             title: this.cohort.title,
             url: `#${urlFor('viewCohort', {cohortId: this.cohort.$id})}`
         }]
-        // [{
-        //     title: 'New Challenge',
-        //     url: `#${urlFor('addEventTask', {eventId: this.event.$id})}`,
-        //     icon: 'create'
-        // }]
     );
+
+    this.addEvent = function () {
+        self.addingEvent = true;
+    };
+
+    this.toggleEvents = function () {
+        if(self.showingEvents) {
+            self.showingEvents = false;
+        } else {
+            self.showingEvents = true;
+        }
+    };
+
+    this.toggleAnnouncements = function () {
+        if(self.showingAnnouncements) {
+            self.showingAnnouncements = false;
+        } else {
+            self.showingAnnouncements = true;
+        }
+    };
 
     this.createNewAnnouncement = function () {
         self.creatingNewAnnouncement = true;
@@ -704,6 +721,7 @@ function baseEditCtrlInitialData($q, $route, spfAuthData, clmDataStore) {
     var data = {
         currentUser: spfAuthData.user(),
         announcements: clmDataStore.cohorts.getAnnouncements(cohortId),
+        events: clmDataStore.events.listAll(),
         cohort: cohortPromise
     };
 
