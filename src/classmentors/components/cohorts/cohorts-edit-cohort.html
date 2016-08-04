@@ -29,7 +29,56 @@
 
     <md-divider></md-divider>
 
-    <h3>Cohort Announcements</h3>
+    <md-subheader><md-button ng-click="ctrl.toggleEvents()">Cohort Events<md-tooltip ng-if="!ctrl.showingEvents">Click to view and edit cohort events</md-tooltip><md-tooltip ng-if="ctrl.showingEvents">Click to hide cohort events</md-tooltip></md-button></md-subheader>
+    <div ng-if="ctrl.showingEvents">
+        <md-button class="md-raised md-primary" ng-click="ctrl.addEvent()" aria-label="addEvent">Add Event</md-button>
+        <form name="addEventForm" ng-submit="ctrl.saveAddedEvent(ctrl.cohort.$id)">
+            <md-card ng-if="ctrl.addingEvent">
+                <md-autocomplete flex required
+                                 md-input-name="eventName"
+                                 md-input-minlength="1"
+                                 md-input-maxlength="64"
+                                 md-no-cache="true"
+                                 md-selected-item="ctrl.selectedEvent"
+                                 md-search-text="ctrl.searchEvent"
+                                 md-items="event in ctrl.querySearch(ctrl.searchEvent)"
+                                 md-item-text="event.title"
+                                 md-floating-label="Select event">
+                    <md-item-template>
+                        <span md-highlight-text="ctrl.searchEvent">{{event.title}}</span>
+                    </md-item-template>
+                    <div ng-messages="addEventForm.eventName.$error" ng-if="addEventForm.eventName.$touched">
+                        <div ng-message="required">You <b>must</b> select an event.</div>
+                    </div>
+                    <md-not-found>
+                        No users matching "{{ctrl.searchEvent}}" were found.
+                    </md-not-found>
+                </md-autocomplete>
+                <md-card-actions layout="row" layout-align="start center">
+                    <md-button class="md-raised md-primary" type="submit" ng-disabled="addEventForm.$pristine || addEventForm.$invalid || !ctrl.selectedEvent">Add Event</md-button>
+                    <md-button class="md-raised" ng-click="ctrl.closeAddingEvent()">Cancel</md-button>
+                </md-card-actions>
+            </md-card>
+        </form>
+        <md-list>
+            <md-list-item ng-repeat="e in ctrl.cohort.events" ng-if="ctrl.events[e]">
+                {{ctrl.events[e].title}}
+                <span flex></span>
+                <md-button ng-click="ctrl.removeCohortEvent(e, ctrl.cohort.events.indexOf(e))">
+                    <md-icon class="material-icons">clear</md-icon>
+                    <md-tooltip md-direction="left">
+                        Remove an event (not yet supported)
+                    </md-tooltip>
+                </md-button>
+                <md-divider ng-if="!$last"></md-divider>
+            </md-list-item>
+        </md-list>
+    </div>
+
+    <md-divider></md-divider>
+
+    <md-subheader><md-button ng-click="ctrl.toggleAnnouncements()">Cohort Announcements<md-tooltip ng-if="!ctrl.showingAnnouncements">Click to view and edit cohort announcements</md-tooltip><md-tooltip ng-if="ctrl.showingAnnouncements">Click to hide cohort announcements</md-tooltip></md-button></md-subheader>
+    <div ng-if="ctrl.showingAnnouncements">
     <md-button class="md-raised md-primary" ng-click="ctrl.createNewAnnouncement()">New Announcement</md-button>
     <form name="addAnnouncementForm" ng-submit="ctrl.saveAnnouncement(ctrl.cohort.$id)">
         <md-card ng-if="ctrl.creatingNewAnnouncement">
@@ -86,4 +135,5 @@
             <md-divider ng-if="!$last"></md-divider>
         </md-list-item>
     </md-list>
+    </div>
 </md-content>

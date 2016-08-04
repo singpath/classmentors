@@ -481,6 +481,14 @@ export function clmDataStoreFactory(
             });
         },
 
+        addEvent: function(cohortId, eventId, eventNum) {
+            return spfFirebase.set(['classMentors/cohorts', cohortId, 'events', eventNum], eventId);
+        },
+
+        removeEvent: function(cohortId, eventId) {
+            return spfFirebase.remove(['classMentors/cohorts', cohortId, 'events'], eventId);
+        },
+
         addAnnouncement: function(cohortId, madeBy, announcement, isArchived) {
             var priority = announcement.priority || 0;
 
@@ -577,6 +585,13 @@ export function clmDataStoreFactory(
             limitToLast: 50
         });
     },
+
+        listAllArr: function() {
+            return spfFirebase.loadedArray(['classMentors/events'], {
+                orderByChild: 'createdAt',
+                limitToLast: 50
+            });
+        },
 
       listCreatedEvents: function() {
         return spfAuthData.user().then(function(authData) {
