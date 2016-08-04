@@ -594,6 +594,7 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
     var self = this;
 
     this.currentUser = initialData.currentUser;
+    this.eventsArr = initialData.eventsArr;
     this.events = initialData.events;
     this.cohort = initialData.cohort;
     this.announcements = initialData.announcements;
@@ -604,30 +605,32 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
     this.showingAnnouncements = false;
     this.addingEvent = false;
 
+    console.log(self.events);
+
     // For searching events
-    this.users        = mapAllUsers();
-    this.selectedUser  = null;
-    this.searchUser    = null;
-    this.querySearch   = querySearch;
+    this.mappedEvents = mapAllEvents();
+    this.selectedEvent = null;
+    this.searchEvent = null;
+    this.querySearch = querySearch;
 
     function querySearch (query) {
-        return query ? self.users.filter( createFilterFor(query) ) : self.users;
+        return query ? self.mappedEvents.filter( createFilterFor(query) ) : self.mappedEvents;
     }
 
-    function mapAllUsers() {
-        return self.participants.map( function (user) {
+    function mapAllEvents() {
+        return self.eventsArr.map( function (event) {
             return {
-                id: user.$id,
-                value: user.user.displayName.toLowerCase(),
-                displayName: user.user.displayName
+                id: event.$id,
+                value: event.title.toLowerCase(),
+                title: event.title
             };
         });
     }
 
     function createFilterFor(query) {
         var lowercaseQuery = angular.lowercase(query);
-        return function filterFn(user) {
-            return (user.value.indexOf(lowercaseQuery) >= 0);
+        return function filterFn(event) {
+            return (event.value.indexOf(lowercaseQuery) >= 0);
         };
     }
 
@@ -748,6 +751,7 @@ function baseEditCtrlInitialData($q, $route, spfAuthData, clmDataStore) {
     var data = {
         currentUser: spfAuthData.user(),
         announcements: clmDataStore.cohorts.getAnnouncements(cohortId),
+        eventsArr: clmDataStore.events.listAllArr(),
         events: clmDataStore.events.listAll(),
         cohort: cohortPromise
     };

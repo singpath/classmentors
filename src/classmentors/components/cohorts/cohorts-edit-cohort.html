@@ -32,28 +32,30 @@
     <md-subheader><md-button ng-click="ctrl.toggleEvents()">Cohort Events<md-tooltip ng-if="!ctrl.showingEvents">Click to view and edit cohort events</md-tooltip><md-tooltip ng-if="ctrl.showingEvents">Click to hide cohort events</md-tooltip></md-button></md-subheader>
     <div ng-if="ctrl.showingEvents">
         <md-button ng-click="ctrl.addEvent()" aria-label="addEvent">Add Event</md-button>
-        <md-card ng-if="ctrl.addingEvent">
-            <md-autocomplete flex required
-                             md-input-name="eventName"
-                             md-input-minlength="1"
-                             md-input-maxlength="64"
-                             md-no-cache="true"
-                             md-selected-item="ctrl.selectedEvent"
-                             md-search-text="ctrl.searchEvent"
-                             md-items="event in ctrl.querySearch(ctrl.searchEvent)"
-                             md-item-text="event.title"
-                             md-floating-label="Select event">
-                <md-item-template>
-                    <span md-highlight-text="ctrl.searchEvent">{{event.title}}</span>
-                </md-item-template>
-                <div ng-messages="addAssistantForm.assistantName.$error" ng-if="addAssistantForm.assistantName.$touched">
-                    <div ng-message="required">You <b>must</b> select a user.</div>
-                </div>
-                <md-not-found>
-                    No users matching "{{ctrl.searchUser}}" were found.
-                </md-not-found>
-            </md-autocomplete>
-        </md-card>
+        <form name="addEventForm" ng-submit="ctrl.saveAddedEvent(ctrl.cohort.$id)">
+            <md-card ng-if="ctrl.addingEvent">
+                <md-autocomplete flex required
+                                 md-input-name="eventName"
+                                 md-input-minlength="1"
+                                 md-input-maxlength="64"
+                                 md-no-cache="true"
+                                 md-selected-item="ctrl.selectedEvent"
+                                 md-search-text="ctrl.searchEvent"
+                                 md-items="event in ctrl.querySearch(ctrl.searchEvent)"
+                                 md-item-text="event.title"
+                                 md-floating-label="Select event">
+                    <md-item-template>
+                        <span md-highlight-text="ctrl.searchEvent">{{event.title}}</span>
+                    </md-item-template>
+                    <div ng-messages="addEventForm.eventName.$error" ng-if="addEventForm.eventName.$touched">
+                        <div ng-message="required">You <b>must</b> select an event.</div>
+                    </div>
+                    <md-not-found>
+                        No users matching "{{ctrl.searchEvent}}" were found.
+                    </md-not-found>
+                </md-autocomplete>
+            </md-card>
+        </form>
         <md-list>
             <md-list-item ng-repeat="e in ctrl.cohort.events">
                 {{ctrl.events[e].title}}

@@ -578,6 +578,13 @@ export function clmDataStoreFactory(
         });
     },
 
+        listAllArr: function() {
+            return spfFirebase.loadedArray(['classMentors/events'], {
+                orderByChild: 'createdAt',
+                limitToLast: 50
+            });
+        },
+
       listCreatedEvents: function() {
         return spfAuthData.user().then(function(authData) {
           if (!authData.publicId) {
