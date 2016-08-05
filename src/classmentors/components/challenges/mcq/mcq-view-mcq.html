@@ -167,8 +167,9 @@
 
                 <md-input-container>
                     <md-button ng-model="question.answers" ng-class="question.answers.indexOf($index) != -1 ? 'md-raised md-primary' : 'md-raised'"
-                               ng-click="ctrl.toggleOption(question, $index, question.singleAns)">This is the answer</md-button>
+                               ng-click="ctrl.toggleOption(question, $index)">This is the answer</md-button>
                 </md-input-container>
+                
                 <md-input-container >
                     <md-button class="md-raised" ng-click="ctrl.removeOption(question,$index)" ng-disabled = "question.options.length == 1">Delete option</md-button>
                 </md-input-container>

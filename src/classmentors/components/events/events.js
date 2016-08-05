@@ -1029,23 +1029,26 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBar
   this.taskId = initialData.taskId;
   this.task = initialData.task;
 
-  /**todo: save tasktype**/
-  //this.taskType = initalData.taskType;
-
   this.isOpen = Boolean(this.task.openedAt);
   this.savingTask = false;
   this.enableBeta = true;
   var location;
 
+  /**todo: append tasktype here **/
+
   if (this.task.serviceId) {
     this.taskType = 'service';
+
   } else if (this.task.linkPattern) {
     this.taskType = 'linkPattern';
+
   } else if (this.task.lang) {
       this.taskType = 'code';
+
   } else if (this.task.textResponse) {
     this.taskType = 'textResponse';
-  }else if (this.task.multipleChoice) {
+
+  }else if (this.task.mcqQuestions) {
     this.taskType = 'multipleChoice';
   }
 

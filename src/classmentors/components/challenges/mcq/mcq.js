@@ -49,19 +49,13 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
 
   console.log(self.questions);
 
-  self.toggleOption = function(question, itemIndex, singleAns){
+  self.toggleOption = function(question, itemIndex){
     if(question.answers.indexOf(itemIndex) != -1){
       var removed = question.answers.splice(itemIndex,1);
       console.log(removed);
 
     }else{
-      if(singleAns){
-        question.answers = [itemIndex];
-
-      }else{
-        question.answers.push(itemIndex);
-
-      }
+      question.answers.push(itemIndex);
     }
   }
 
@@ -85,11 +79,6 @@ export function newMcqController(initialData, challengeService, $filter){
         text:""
       }
     ]
-
-    // prob wont need this
-    // ,
-    // singleAns: false
-
   }];
 
   // Save mcq question to database.
@@ -134,8 +123,7 @@ export function newMcqController(initialData, challengeService, $filter){
         {
           text:""
         }
-      ],
-      singleAns: false
+      ]
     }
 
     // Push new question object into questions list
@@ -161,13 +149,7 @@ export function newMcqController(initialData, challengeService, $filter){
       console.log(removed);
 
     }else{
-      if(singleAns){
-        question.answers = [itemIndex];
-
-      }else{
-        question.answers.push(itemIndex);
-
-      }
+      question.answers.push(itemIndex);
     }
 
   }
