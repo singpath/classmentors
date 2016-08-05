@@ -41,34 +41,35 @@
 
     <form name="addAssistantForm" ng-submit="ctrl.saveNewAssistant(ctrl.event.$id)">
         <md-card ng-if="ctrl.addingNewAssistant">
+            <md-card-content>
+                <md-autocomplete flex required
+                                 md-input-name="assistantName"
+                                 md-input-minlength="1"
+                                 md-input-maxlength="64"
+                                 md-no-cache="true"
+                                 md-selected-item="ctrl.selectedUser"
+                                 md-search-text="ctrl.searchUser"
+                                 md-items="user in ctrl.querySearch(ctrl.searchUser)"
+                                 md-item-text="user.displayName"
+                                 placeholder="Select assistant profile">
+                    <md-item-template>
+                        <span md-highlight-text="ctrl.searchUser">{{user.displayName}}</span>
+                    </md-item-template>
+                    <div ng-messages="addAssistantForm.assistantName.$error" ng-if="addAssistantForm.assistantName.$touched">
+                        <div ng-message="required">You <b>must</b> select a user.</div>
+                    </div>
+                    <md-not-found>
+                        No users matching "{{ctrl.searchUser}}" were found.
+                    </md-not-found>
+                </md-autocomplete>
 
-            <md-autocomplete flex required
-                             md-input-name="assistantName"
-                             md-input-minlength="1"
-                             md-input-maxlength="64"
-                             md-no-cache="true"
-                             md-selected-item="ctrl.selectedUser"
-                             md-search-text="ctrl.searchUser"
-                             md-items="user in ctrl.querySearch(ctrl.searchUser)"
-                             md-item-text="user.displayName"
-                             md-floating-label="Select assistant profile">
-                <md-item-template>
-                    <span md-highlight-text="ctrl.searchUser">{{user.displayName}}</span>
-                </md-item-template>
-                <div ng-messages="addAssistantForm.assistantName.$error" ng-if="addAssistantForm.assistantName.$touched">
-                    <div ng-message="required">You <b>must</b> select a user.</div>
-                </div>
-                <md-not-found>
-                    No users matching "{{ctrl.searchUser}}" were found.
-                </md-not-found>
-            </md-autocomplete>
-
-            <md-switch ng-model="ctrl.newAssistant.canEdit" aria-label="canEdit?">
-                Can Edit Events: {{ ctrl.newAssistant.canEdit }}
-            </md-switch>
-            <md-switch ng-model="ctrl.newAssistant.canReview" aria-label="canReview?">
-                Can Review Event Submissions: {{ ctrl.newAssistant.canReview }}
-            </md-switch>
+                <md-switch ng-model="ctrl.newAssistant.canEdit" aria-label="canEdit?">
+                    Can Edit Events: {{ ctrl.newAssistant.canEdit }}
+                </md-switch>
+                <md-switch ng-model="ctrl.newAssistant.canReview" aria-label="canReview?">
+                    Can Review Event Submissions: {{ ctrl.newAssistant.canReview }}
+                </md-switch>
+            </md-card-content>
             <md-card-actions layout="row" layout-align="start center">
                 <md-button class="md-raised md-primary" type="submit" ng-disabled="addAssistantForm.$pristine || addAssistantForm.$invalid || !ctrl.selectedUser">Approve Assistant</md-button>
                 <md-button class="md-raised" ng-click="ctrl.closeNewAssistant()">Cancel</md-button>

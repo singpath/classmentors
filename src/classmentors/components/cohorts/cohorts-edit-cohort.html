@@ -34,26 +34,28 @@
         <md-button class="md-raised md-primary" ng-click="ctrl.addEvent()" aria-label="addEvent">Add Event</md-button>
         <form name="addEventForm" ng-submit="ctrl.saveAddedEvent(ctrl.cohort.$id)">
             <md-card ng-if="ctrl.addingEvent">
-                <md-autocomplete flex required ng-if="ctrl.addingEvent"
-                                 md-input-name="eventName"
-                                 md-input-minlength="1"
-                                 md-input-maxlength="64"
-                                 md-no-cache="true"
-                                 md-selected-item="ctrl.selectedEvent"
-                                 md-search-text="ctrl.searchEvent"
-                                 md-items="event in ctrl.querySearch(ctrl.searchEvent)"
-                                 md-item-text="event.title"
-                                 placeholder="Select event">>
-                    <md-item-template>
-                        <span md-highlight-text="ctrl.searchEvent">{{event.title}}</span>
-                    </md-item-template>
-                    <div ng-messages="addEventForm.eventName.$error" ng-if="addEventForm.eventName.$touched">
-                        <div ng-message="required">You <b>must</b> select an event.</div>
-                    </div>
-                    <md-not-found>
-                        No events matching "{{ctrl.searchEvent}}" were found.
-                    </md-not-found>
-                </md-autocomplete>
+                <md-card-content>
+                    <md-autocomplete flex required ng-if="ctrl.addingEvent"
+                                     md-input-name="eventName"
+                                     md-input-minlength="1"
+                                     md-input-maxlength="64"
+                                     md-no-cache="true"
+                                     md-selected-item="ctrl.selectedEvent"
+                                     md-search-text="ctrl.searchEvent"
+                                     md-items="event in ctrl.querySearch(ctrl.searchEvent)"
+                                     md-item-text="event.title"
+                                     placeholder="Select event">>
+                        <md-item-template>
+                            <span md-highlight-text="ctrl.searchEvent">{{event.title}}</span>
+                        </md-item-template>
+                        <div ng-messages="addEventForm.eventName.$error" ng-if="addEventForm.eventName.$touched">
+                            <div ng-message="required">You <b>must</b> select an event.</div>
+                        </div>
+                        <md-not-found>
+                            No events matching "{{ctrl.searchEvent}}" were found.
+                        </md-not-found>
+                    </md-autocomplete>
+                </md-card-content>
                 <md-card-actions layout="row" layout-align="start center">
                     <md-button class="md-raised md-primary" type="submit" ng-disabled="addEventForm.$pristine || addEventForm.$invalid || !ctrl.selectedEvent">Add Event</md-button>
                     <md-button class="md-raised" ng-click="ctrl.closeAddingEvent()">Cancel</md-button>

@@ -717,8 +717,10 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
 
   this.saveNewAssistant = function(eventId) {
     self.newAssistant.name = self.selectedUser.displayName;
-    console.log(self.newAssistant);
+    // console.log(self.newAssistant + self.selectedUser.id);
+    clmDataStore.events.addAssistant(eventId, self.selectedUser.id, self.newAssistant);
     self.addingNewAssistant = false;
+    self.selectedUser = null;
   };
 
   this.closeNewAssistant = function () {

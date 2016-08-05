@@ -1287,7 +1287,13 @@ export function clmDataStoreFactory(
           return spfFirebase.set([
               'classMentors/eventScores', eventId, publicId, taskId
           ], score);
-      }
+      },
+
+        addAssistant: function(eventId, assistantId, assistant) {
+            return spfFirebase.set([
+                'classMentors/events', eventId, 'assistants', assistantId
+            ], assistant);
+        }
     },
 
     services: {
