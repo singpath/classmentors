@@ -849,12 +849,12 @@ function AddEventTaskCtrl(
   //this function double checks with user if he wishes to go back and discard all changes thus far
   this.discardChanges = function (ev){
       var confirm = $mdDialog.confirm()
-          .title('Would you like to discard your changes?')
+          .title('You have not saved your input information')
           .textContent('All of the information input will be discarded. Are you sure you want to continue?')
-          .ariaLabel('Discard changes')
+          .ariaLabel('Discard all')
           .targetEvent(ev)
           .ok('Discard All')
-          .cancel('Do Not Discard');
+          .cancel('Continue editing');
       $mdDialog.show(confirm).then(function() {
           // decided to discard data, bring user to previous page
           $location.path(urlFor('editEvent', {eventId: self.event.$id}));
@@ -1034,6 +1034,8 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBar
   this.enableBeta = true;
   var location;
 
+  this.taskType = null;
+
   /**todo: append tasktype here **/
 
   if (this.task.serviceId) {
@@ -1077,41 +1079,47 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBar
   );
 
 
-  this.challengeRouteProvider = function(tasktype){
-    if(tasktype == 'service'){
+  this.challengeRouteProvider = function(){
+    //console.log("task type passed in is",tasktype);
+    //console.log("this task type passed in is", this.taskType);
+
+    if(this.taskType == 'service'){
       console.log('service is clicked');
       return 'Save';
 
-    }else if(tasktype == 'singPath'){
+    }else if(this.taskType == 'singPath'){
       console.log('singpath is clicked');
       return 'Save';
 
-    }else if(tasktype == 'linkPattern'){
+    }else if(this.taskType == 'linkPattern'){
       console.log('linkPattern is clicked');
       return 'Save';
 
-    }else if(tasktype == 'textResponse'){
+    }else if(this.taskType == 'textResponse'){
       console.log('textResponse is clicked');
       return 'Save';
 
-    }else if(tasktype == 'indexCard'){
+    }else if(this.taskType == 'indexCard'){
       console.log('indexCard is clicked');
       return 'Save';
 
-    }else if(tasktype == 'multipleChoice'){
+    }else if(this.taskType == 'multipleChoice'){
       console.log('multipleChoice is clicked');
-      location = '/challenges/mcq';
+
+      console.log("this event url", urlFor('oneEvent', {eventId: this.event.$id}));
+      location = "/challenges/mcq";
+
       return 'Continue';
 
-    }else if(tasktype == 'code'){
+    }else if(this.taskType == 'code'){
       console.log('code is clicked');
       return 'Save';
 
-    }else if(tasktype == 'video'){
+    }else if(this.taskType == 'video'){
       console.log('video is clicked');
       return 'Continue';
 
-    }else if(tasktype == 'journalling'){
+    }else if(this.taskType == 'journalling'){
       console.log('journalling is clicked');
       return 'Continue';
 
@@ -1123,12 +1131,12 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBar
   //this function double checks with user if he wishes to go back and discard all changes thus far
   this.discardChanges = function (ev){
     var confirm = $mdDialog.confirm()
-        .title('Would you like to discard your changes?')
-        .textContent('All of the information input will be discarded. Are you sure you want to continue?')
+        .title('You have not saved your changes')
+        .textContent('All of your changes will be discarded. Are you sure you want to continue?')
         .ariaLabel('Discard changes')
         .targetEvent(ev)
-        .ok('Discard All')
-        .cancel('Do Not Discard');
+        .ok('Discard my changes')
+        .cancel('Continue editing');
     $mdDialog.show(confirm).then(function() {
       // decided to discard data, bring user to previous page
       $location.path(urlFor('editEvent', {eventId: self.event.$id}));
@@ -1184,6 +1192,8 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBar
       );
       console.log(data)
       eventService.set(data);
+
+      console.log("location is at ", location);
       $location.path(location);
 
     }else{
@@ -1263,11 +1273,11 @@ EditEventTaskCtrl.$inject = [
   'spfNavBarService',
   'clmDataStore',
   'eventService',
-  '$location',
   '$mdDialog',
-  '$location',
-  'eventService'
+  '$location'
 ];
+
+
 
 /**
  * Show event tasks and participants progress in a paged table.
