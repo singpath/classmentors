@@ -68,7 +68,7 @@ startMcqController.$inject = [
   '$location'
 ];
 
-export function newMcqController(initialData, challengeService, $filter){
+export function newMcqController(initialData, challengeService, $filter,$mdDialog){
   var self = this;
   self.task = initialData.task;
   self.questions = [{
@@ -82,6 +82,8 @@ export function newMcqController(initialData, challengeService, $filter){
   }];
 
   // Save mcq question to database.
+
+  //todo: clean up the form before submitting. e.g. when toggled, vid entered, but toggled off
   self.save = function(questions){
     var setAnswers = [];
 
@@ -130,20 +132,28 @@ export function newMcqController(initialData, challengeService, $filter){
     self.questions.push(question);
   }
 
-  // Functionality for delete question.
-  self.removeQuestion = function(itemIndex){
-    if(itemIndex > -1){
-      var removed = self.questions.splice(itemIndex,1);
-      console.log('Removed : ', removed);
-      console.log(self.questions);
-    }
+  self.removeQuestion = function(ev,itemIndex) {
 
-  }
+    var confirm = $mdDialog.confirm()
+        .title('Would you like to delete this question?')
+        .textContent('This question and its option(s) will be deleted. Do you wish to proceed?')
+        .ariaLabel('Question deletion')
+        .targetEvent(ev)
+        .ok('Delete')
+        .cancel('Do not delete');
+    $mdDialog.show(confirm).then(function() {
+      if(itemIndex > -1){
+        var removed = self.questions.splice(itemIndex,1);
+        console.log('Removed : ', removed);
+        console.log(self.questions);
+      }
+    });
+  };
 
   // Functionality for toggleOption between single answer and multi ans functionality
   // Needs further review though..
   // Is it better to set the answers as default multiple and the users will just set 1..n answers?
-  self.toggleOption = function(question, itemIndex, singleAns){
+  self.toggleOption = function(question, itemIndex){
     if(question.answers.indexOf(itemIndex) != -1){
       var removed = question.answers.splice(itemIndex,1);
       console.log(removed);
@@ -152,11 +162,6 @@ export function newMcqController(initialData, challengeService, $filter){
       question.answers.push(itemIndex);
     }
 
-  }
-
-  // Used to clear answers whenever users change between single ans and multi ans mode
-  self.clearAnswers = function(question){
-    question.answers = [];
   }
 
   // Add new option to question
@@ -182,7 +187,8 @@ export function newMcqController(initialData, challengeService, $filter){
 newMcqController.$inject = [
   'initialData',
   'challengeService',
-  '$filter'
+  '$filter',
+  '$mdDialog'
 ];
 
 export function starMcqTmpl() {
