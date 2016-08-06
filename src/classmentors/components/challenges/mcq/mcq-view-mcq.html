@@ -109,24 +109,26 @@
 
         <p>
             <h5>Results Release</h5>
-            Release students' results after completion in
-            <input type="number" name="resultRelease" id="result-release"
-                   ng-model="ctrl.task.resultRelease"
-                   min="0" step="1"
-                   placeholer="Release students' results after completion in (minutes)" value="" required
-            /> minutes.
-            <div ng-messages="editMcq.resultRelease.$error">
-                <div ng-message="number">Release time after completion should be a positive number in minutes.</div>
-                <div ng-message="required">Please enter time(minutes) to release results after completion.</div>
-            </div>
+            <md-input-container>
+                Waiting time to view result after student's completion
+                <input type="number" name="resultRelease" id="result-release"
+                       ng-model="ctrl.task.resultRelease"
+                       min="0" step="1"
+                       placeholer="Waiting time to view result after student's completion" value="" required
+                /> minutes.
+                <div ng-messages="editMcq.resultRelease.$error">
+                    <div ng-message="number">Release time after completion should be a positive number in minutes.</div>
+                    <div ng-message="required">Please enter time(minutes) to release results after completion.</div>
+                </div>
+            </md-input-container>
+
         </p>
 
-        <p>
-            <h5>Team Mode</h5>
-            <md-switch class="md-primary" ng-model="ctrl.task.enableTeam" aria-label="">
-                Enable team answering mode
-            </md-switch>
-        </p>
+        <h5>Team Mode</h5>
+        <md-switch class="md-primary" ng-model="ctrl.task.enableTeam" aria-label="">
+            Enable team answering mode
+        </md-switch>
+
         </div>
 
 <!------------------starting of questions--------------------------------------------->
