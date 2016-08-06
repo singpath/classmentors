@@ -1293,6 +1293,10 @@ export function clmDataStoreFactory(
             return spfFirebase.set([
                 'classMentors/events', eventId, 'assistants', assistantId
             ], assistant);
+        },
+
+        getAssistants: function(eventId) {
+            return spfFirebase.loadedArray(['classMentors/events', eventId, 'assistants']);
         }
     },
 

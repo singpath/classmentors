@@ -646,6 +646,10 @@ function editEventCtrllInitialData($q, $route, spfAuthData, clmDataStore) {
     return clmDataStore.events.getTasks(event.$id);
   });
 
+    data.assistants = data.event.then(function(event) {
+        return clmDataStore.events.getAssistants(event.$id);
+    });
+
   return $q.all(data);
 }
 editEventCtrllInitialData.$inject = ['$q', '$route', 'spfAuthData', 'clmDataStore'];
@@ -661,6 +665,8 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
   this.participants = initialData.participants;
   this.event = initialData.event;
   this.tasks = initialData.tasks;
+  this.showingAssistants = false;
+  this.assistants = initialData.assistants;
   this.newPassword = '';
   this.savingEvent = false;
 
@@ -710,6 +716,14 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
       icon: 'create'
     }]
   );
+
+  this.toggleAssistants = function() {
+    if(self.showingAssistants) {
+        self.showingAssistants = false;
+    } else {
+        self.showingAssistants = true;
+    }
+  };
 
   this.addAssistant = function() {
     self.addingNewAssistant = true;
