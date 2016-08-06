@@ -1,20 +1,22 @@
 <md-content flex class="md-padding">
-
-    {{ctrl.data}}
-    <div align="center">
-        <h3>Multiple Choice</h3>
-        <h4>Title: {{ctrl.task.title}}</h4>
-        <h4>Description: {{ctrl.task.description}}</h4>
-        <br><br>
-    </div>
-
-    <div name="continueMCQ">
+    <form name="editMcq" ng-submit="ctrl.save(ctrl.questions)" >
+        {{ctrl.data}}
+        <div align="center">
+            <h3>Multiple Choice</h3>
+            <h4>Title: {{ctrl.task.title}}</h4>
+            <h4>Description: {{ctrl.task.description}}</h4>
+            <br><br>
+        </div>
         <!-- toggle buttons -->
+
+        <!--this is for?-->
         <div ng-hide="ctrl.isNonAdmin">
         <p>
-            <md-switch class="md-primary" ng-model="ctrl.timelimit" aria-label="">
+            <md-switch class="md-primary" ng-model="ctrl.timelimit" >
                 Set time limit for the entire quiz
             </md-switch>
+
+
             <md-input-container ng-hide="!ctrl.timelimit" >
                 <label for="edit-time-limit">Time Limit (in minute)</label>
                 <input type="number" name="editTimeLimit" id="edit-time-limit"
@@ -22,7 +24,7 @@
                        min="0" step="1"
                        placeholer="Time Limit for the quiz" value=""
                 />
-                <div ng-messages="">
+                <div ng-messages="editMcq.editTimeLimit.$error">
                     <div ng-message="number">Time limit allowed should be a positive number in minutes.</div>
                 </div>
             </md-input-container>
@@ -65,13 +67,14 @@
             <md-input-container ng-hide="!ctrl.task.video.pre">
                 <label for="video-pre">Pre Video Link</label>
                 <input type="text" name="videoPre" id="video-pre"
-                       ng-model="ctrl.task.video.pre"
+                       ng-model="ctrl.task.video.preLink"
                        pattern="^(https?://.+|#/).+$"
-                       placeholer="Video Link to Pre Quiz Video" value="{{ctrl.task.video.pre}}"
+                       placeholer="Video Link to Pre Quiz Video" value="{{ctrl.task.video.preLink}}"
                 />
-                <!--<div ng-messages="editTask.editTaskLink.$error">
-                    <div ng-message="pattern">Wrong format for an absolute or relative URL.</div>
-                </div>-->
+                <div ng-messages="editMcq.videoPre.$error">
+                    <div ng-message="pattern">Wrong format for an absolute or relative URL. E.g. https://www.</div>
+                </div>
+
             </md-input-container>
 
             <md-switch class="md-primary" ng-model="ctrl.task.video.post" aria-label="">
@@ -81,13 +84,14 @@
             <md-input-container ng-hide="!ctrl.task.video.post">
                 <label for="video-post">Post Video Link</label>
                 <input type="text" name="videoPost" id="video-post"
-                       ng-model="ctrl.task.video.post"
+                       ng-model="ctrl.task.video.postLink"
                        pattern="^(https?://.+|#/).+$"
-                       placeholer="Video Link to Post Quiz Video" value="{{ctrl.task.video.post}}"
+                       placeholer="Video Link to Post Quiz Video" value="{{ctrl.task.video.postLink}}"
                 />
-                <!--<div ng-messages="editTask.editTaskLink.$error">
-                    <div ng-message="pattern">Wrong format for an absolute or relative URL.</div>
-                </div>-->
+                <div ng-messages="editMcq.videoPost.$error">
+                    <div ng-message="pattern">Wrong format for an absolute or relative URL. E.g. https://www.</div>
+                </div>
+
             </md-input-container>
 
         </p>
@@ -106,14 +110,15 @@
         <p>
             <h5>Results Release</h5>
             Release students' results after completion in
-            <input type="number" name="result" id="result"
-                   ng-model="ctrl.task.result"
+            <input type="number" name="resultRelease" id="result-release"
+                   ng-model="ctrl.task.resultRelease"
                    min="0" step="1"
-                   placeholer="Release students' results after completion in (minutes)" value=""
+                   placeholer="Release students' results after completion in (minutes)" value="" required
             /> minutes.
-            <!--<div ng-messages="editTask.editTaskLink.$error">
-                <div ng-message="pattern">Wrong format for an absolute or relative URL.</div>
-            </div>-->
+            <div ng-messages="editMcq.resultRelease.$error">
+                <div ng-message="number">Release time after completion should be a positive number in minutes.</div>
+                <div ng-message="required">Please enter time(minutes) to release results after completion.</div>
+            </div>
         </p>
 
         <p>
@@ -133,7 +138,7 @@
         <div ng-repeat="question in ctrl.questions">
             <h3>
                 Question {{$index + 1}}
-                <md-button class="md-raised" ng-click="ctrl.removeQuestion($index)" ng-disabled = "ctrl.questions.length == 1">Delete this question</md-button>
+                <md-button class="md-raised" ng-click="ctrl.removeQuestion($event,$index)" ng-disabled = "ctrl.questions.length == 1">Delete this question</md-button>
             </h3>
 
 
@@ -144,9 +149,6 @@
                            ng-model="question.text"
                            placeholer="Question"
                     />
-                    <div ng-messages="">
-                        <div ng-message="pattern">Some error here.</div>
-                    </div>
                 </md-input-container>
             </div>
 
@@ -165,6 +167,7 @@
                     />
                 </md-input-container>
 
+                <!--todo: required at least one option to be the answer.-->
                 <md-input-container>
                     <md-button ng-model="question.answers" ng-class="question.answers.indexOf($index) != -1 ? 'md-raised md-primary' : 'md-raised'"
                                ng-click="ctrl.toggleOption(question, $index)">This is the answer</md-button>
@@ -187,9 +190,9 @@
         <br>
 
         <div align="center">
-            <md-button type="submit" class="md-raised md-primary" ng-click="ctrl.save(ctrl.questions)">Save</md-button>
+            <md-button type="submit" class="md-raised md-primary">Save</md-button>
             <md-button type="reset" class="md-raised" ng-click="ctrl.discardChanges($event)">Back</md-button>
         </div>
     </form>
-	</div>
+
 </md-content>
