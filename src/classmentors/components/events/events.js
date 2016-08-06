@@ -1647,6 +1647,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         if (task.survey === "Motivated strategies for learning") {
             console.log("motivated strategies came in here");
 
+            //route to the below specified url
             $location.path('/events/' + eventId + '/' + taskId + '/' + 'survey2' + '/' + task.survey);
         }
 
@@ -1850,10 +1851,11 @@ ClmEventTableCtrl.$inject = [
 ];
 
 //TODO: include the event to load initial data into surveyformfillctrl
-function addSurveyEventTaskCtrlInitialData($q, $route, spfAuthData, clmDataStore) {
+function addSurveyEventTaskCtrlInitialData(spfFirebase, $q, $route, spfAuthData, clmDataStore) {
     //TODO: load and assign initial data for the survey form
     // var eventId = $route.current.params.eventId
     // var eventPromise = clmDataStore.events.get(eventId);
+
 
     var errNoEvent = new Error('Event not found-1');
     var eventId = $route.current.params.eventId;
@@ -1874,11 +1876,27 @@ function addSurveyEventTaskCtrlInitialData($q, $route, spfAuthData, clmDataStore
         return $q.when(data.profile && data.profile.canView(data.event));
     });
 
+
+    //lky newly added codes
+    var motivatedPromise = spfFirebase.loadedArray(['classMentors/surveyTemplate']);
+
+    // var p = Promise.resolve(motivatedPromise);
+    //
+    // var p2 = p.then(function(value){
+    //     console.log("what is this value? ", value);
+    //     return value;
+    // });
+    //
+    // console.log("p2 isssa: ", p2);
+
     return $q.all({
         currentUser: spfAuthData.user().catch(noop),
         profile: profilePromise,
         event: eventPromise,
         canView: canviewPromise,
+        survey2: motivatedPromise.then(function (value) {
+            return value;
+        }),
         tasks: canviewPromise.then(function (canView) {
             if (canView) {
                 return clmDataStore.events.getTasks(eventId);
@@ -1903,144 +1921,52 @@ function addSurveyEventTaskCtrlInitialData($q, $route, spfAuthData, clmDataStore
 
 }
 
-addSurveyEventTaskCtrlInitialData.$inject = ['$q', '$route', 'spfAuthData', 'clmDataStore'];
+addSurveyEventTaskCtrlInitialData.$inject = ['spfFirebase', '$q', '$route', 'spfAuthData', 'clmDataStore'];
 
 //TODO: include controller for the survey
-function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $routeParams, clmDataStore) {
-    console.log("this routeparams is ", $routeParams.surveyTask);
+function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $routeParams, clmDataStore, spfFirebase) {
 
     //for motivated strategies for learning survey
+    //then function will execute last
+
     if ($routeParams.surveyTask === 'Motivated strategies for learning') {
-        console.log("This scope is:: ", this);
 
-
-        this.ratingOptions = [
-            {id: 1, name: 1},
-            {id: 2, name: 2},
-            {id: 3, name: 3},
-            {id: 4, name: 4},
-            {id: 5, name: 5},
-            {id: 6, name: 6},
-            {id: 7, name: 7},
-        ];
 
         var self = this;
-        self.questions = [
-            {qnId:"Q1", text: "1. I prefer class work that is challenging so I can learn new things.", qn: "ctrl.q1Ans"},
-            {qnId:"Q2",text: "2. Compared with other students in this class I expect to do well.", qn: "ctrl.q2Ans"},
-            {qnId:"Q3",text: "3. I am so nervous during a test that I cannot remember facts I have learned.", qn: "ctrl.q3Ans"},
-            {qnId:"Q4",text: "4. It is important for me to learn what is being taught in this class.", qn: "ctrl.q4Ans"},
-            {qnId:"Q5",text: "5. I like what I am learning in this class.", qn: "ctrl.q5Ans"},
-            {qnId:"Q6",text: "6. I’m certain I can understand the ideas taught in this course.", qn: "ctrl.q6Ans"},
-            {qnId:"Q7",text: "7. I think I will be able to use what I learn in this class in other classes.", qn: "ctrl.q7Ans"},
-            {qnId:"Q8",text: "8. I expect to do very well in this class.", qn: "ctrl.q8Ans"},
-            {qnId:"Q9",text: "9. Compared with others in this class, I think I’m a good student.", qn: "ctrl.q9Ans"},
-            {
-                qnId:"Q10",
-                text: "10. I often choose paper topics I will learn something from even if they require more work.",
-                qn: "ctrl.q10Ans"
-            },
-            {
-                qnId:"Q11",
-                text: "11. I am sure I can do an excellent job on the problems and tasks assigned for this class.",
-                qn: "ctrl.q11Ans"
-            },
-            {qnId:"Q12", text: "12. I have an uneasy, upset feeling when I take a test.", qn: "ctrl.q12Ans"},
-            {qnId:"Q13", text: "13. I think I will receive a good grade in this class.", qn: "ctrl.q13Ans"},
-            {qnId:"Q14", text: "14. Even when I do poorly on a test I try to learn from my mistakes.", qn: "ctrl.q14Ans"},
-            {qnId:"Q15", text: "15. I think that what I am learning in this class is useful for me to know.", qn: "ctrl.q15Ans"},
-            {qnId:"Q16", text: "16. My study skills are excellent compared with others in this class.", qn: "ctrl.q16Ans"},
-            {qnId:"Q17", text: "17. I think that what we are learning in this class is interesting.", qn: "ctrl.q17Ans"},
-            {
-                qnId:"Q18",
-                text: "18. Compared with other students in this class I think I know a great deal about the subject.",
-                qn: "ctrl.q18Ans"
-            },
-            {qnId:"Q19", text: "19. I know that I will be able to learn the material for this class.", qn: "ctrl.q19Ans"},
-            {qnId:"Q20", text: "20. I worry a great deal about tests.", qn: "ctrl.q20Ans"},
-            {qnId:"Q21", text: "21. Understanding this subject is important to me.", qn: "ctrl.q21Ans"},
-            {qnId:"Q22", text: "22. When I take a test I think about how poorly I am doing.", qn: "ctrl.q22Ans"},
-            {
-                qnId:"Q23",
-                text: "23. When I study for a test, I try to put together the information from class and from the book.",
-                qn: "ctrl.q23Ans"
-            },
-            {
-                qnId:"Q24",
-                text: "24. When I do homework, I try to remember what the teacher said in class so I can answer the questions correctly.",
-                qn: "ctrl.q24Ans"
-            },
-            {
-                qnId:"Q25",
-                text: "25. I ask myself questions to make sure I know the material I have been studying.",
-                qn: "ctrl.q25Ans"
-            },
-            {qnId:"Q26", text: "26. It is hard for me to decide what the main ideas are in what I read.", qn: "ctrl.q26Ans"},
-            {qnId:"Q27", text: "27. When work is hard I either give up or study only the easy parts.", qn: "ctrl.q27Ans"},
-            {qnId:"Q28", text: "28. When I study I put important ideas into my own words.", qn: "ctrl.q28Ans"},
-            {
-                qnId:"Q29",
-                text: "29. I always try to understand what the teacher is saying even if it doesn’t make sense.",
-                qn: "ctrl.q29Ans"
-            },
-            {qnId:"Q30", text: "30. When I study for a test I try to remember as many facts as I can.", qn: "ctrl.q30Ans"},
-            {qnId:"Q31", text: "31. When studying, I copy my notes over to help me remember material.", qn: "ctrl.q31Ans"},
-            {
-                qnId:"Q32",
-                text: "32. I work on practice exercises and answer end of chapter questions even when I don't have to.",
-                qn: "ctrl.q32Ans"
-            },
-            {
-                qnId:"Q33",
-                text: "33. Even when study materials are dull and uninteresting, I keep working until I finish.",
-                qn: "ctrl.q33Ans"
-            },
-            {
-                qnId:"Q34",
-                text: "34. When I study for a test I practice saying the important facts over and over to myself.",
-                qn: "ctrl.q34Ans"
-            },
-            {
-                qnId:"Q35",
-                text: "35. Before I begin studying I think about the things I will need to do to learn.",
-                qn: "ctrl.q35Ans"
-            },
-            {
-                qnId:"Q36",
-                text: "36. I use what I have learned from old homework assignments and the textbook to do new assignments.",
-                qn: "ctrl.q36Ans"
-            },
-            {
-                qnId:"Q37",
-                text: "37. I often find that I have been reading for class but don’t know what it is all about.",
-                qn: "ctrl.q37Ans"
-            },
-            {
-                qnId:"Q38",
-                text: "38. I find that when the teacher is talking I think of other things and don’t really listen to what is being said.",
-                qn: "ctrl.q38Ans"
-            },
-            {qnId:"Q39", text: "39. When I am studying a topic, I try to make everything fit together.", qn: "ctrl.q39Ans"},
-            {qnId:"Q40", text: "40. When I’m reading I stop once in a while and go over what I have read.", qn: "ctrl.q40Ans"},
-            {
-                qnId:"Q41",
-                text: "41. When I read materials for this class, I say the words over and over to myself to help me remember.",
-                qn: "ctrl.q41Ans"
-            },
-            {qnId:"Q42", text: "42. I outline the chapters in my book to help me study.", qn: "ctrl.q42Ans"},
-            {qnId:"Q43", text: "43. I work hard to get a good grade even when I don’t like a class.", qn: "ctrl.q43Ans"},
-            {
-                qnId:"Q44",
-                text: "44. When reading I try to connect the things I am reading about with what I already know.",
-                qn: "ctrl.q44Ans"
-            }
+
+        self.questionsArr = [];
+
+
+        //console.log("please give me my promise: ", initialData.survey2);
+        // for (var i = 1; i < Object.keys(initialData.survey2[0]).length - 1; i++) {
+        //     console.log("got anything anot?: ", initialData.survey2[0]["Q" + i]);
+        //     self.questionsArr["name"].push(initialData.survey2[0]["Q" + i]);
+        //
+        // }
+
+
+        for (var i = 1; i < Object.keys(initialData.survey2[1]).length - 1; i++) {
+            //console.log("testing: ", initialData.survey2[1]["Q" + i]);
+            self.questionsArr.push({'name': initialData.survey2[1]["Q" + i], 'qnid' : i});
+        }
+
+
+
+        self.ratingOptions = [
+            {id: 1},
+            {id: 2},
+            {id: 3},
+            {id: 4},
+            {id: 5},
+            {id: 6},
+            {id: 7}
         ];
-
-
 
 
     }
+
     this.event = initialData.event;
+
 
     spfNavBarService.update(
         'Survey', [{
@@ -2048,30 +1974,46 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             url: `#${urlFor('events')}`
         }, {
             title: this.event.title,
-            url: `#${urlFor('oneEvent', {eventId: event.$id})}`
+            url: `#${urlFor('oneEvent', {eventId: this.event.$id})}`
         }]
     );
     this.saveSurveyResponse = function (response, item, task) {
-        //console.log("I have reached response function");
-        //console.log("my response is: ", response);
-        //console.log("my task is: ", task);
-        //console.log("current question number is: ", item.currentTarget.getAttribute("data-id"));
+
         //retrieve all required data to be put into firebase
         var surveyResp = response;
         var questionNumber = item.currentTarget.getAttribute("data-id");
-        
+
         var taskId = $routeParams.taskId;
         var eventId = initialData.event.$id;
         var userId = initialData.currentUser.publicId;
         var surveyType = $routeParams.surveyTask;
-        console.log("all the VALUES HERE: " + surveyResp + ", " + questionNumber + "," + taskId+ ", " + eventId + ", " + userId + ", " + surveyType)
-        clmDataStore.events.saveSurveyResponse(surveyResp, questionNumber, taskId, eventId, userId, surveyType);
-        //var surveyType =
-        //console.log("i have reached initialdata", $routeParams.taskId);
 
+
+        //retrieve values from firebase as a json object
+        /*var promise = spfFirebase.loadedArray(['classMentors/surveyTemplate']);
+         var tempValue;
+         console.log("value before: ", promise);
+         var p = Promise.resolve(promise);
+         p.then(function(value){
+         var count = 1;
+
+         //this is to retrieve the total length of the json object
+         console.log("value? ", Object.keys(value[0]).length);
+         console.log("values: ", value[0]);
+         for(var i = 1; i < Object.keys(value[0]).length -1 ; i++){
+         console.log("looped value: " + value[0]["Q"+i]);
+
+         }*/
+        //end//
+
+
+        console.log("all the VALUES HERE: " + surveyResp + ", " + questionNumber + "," + taskId + ", " + eventId + ", " + userId + ", " + surveyType)
+        clmDataStore.events.saveSurveyResponse(surveyResp, questionNumber, taskId, eventId, userId, surveyType);
     }
-}
-SurveyFormFillCtrl.$inject = ['spfNavBarService', '$location', 'urlFor', 'initialData', '$routeParams', 'clmDataStore' ];
+
+};
+
+SurveyFormFillCtrl.$inject = ['spfNavBarService', '$location', 'urlFor', 'initialData', '$routeParams', 'clmDataStore', 'spfFirebase'];
 
 export function clmEventRankTableFactory() {
     return {
