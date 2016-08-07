@@ -3,10 +3,16 @@
         <div>
             <h1>Education vs Dissatisfaction with learning</h1>
         </div>
-        <div ng-repeat="alpha in initialData.survey2[0]['A']">
-            {{alpha}}
-        </div>
+
+        <md-input container flex>
+
+            <div><h4>{{ctrl.questionsArr2[0].qnObj['title']}}</h4></div>
+            
+            <div ng-repeat="(key, value) in ctrl.questionsArr2[0].qnObj">
+                <div ng-if="key != 'title'">{{value}}</div>
+            </div>
 
 
+        </md-input>
     </form>
 </md-content>

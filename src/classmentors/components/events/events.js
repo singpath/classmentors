@@ -1978,30 +1978,24 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
         //TODO: POPULATE THIS LAST SURVEYYYYYY!!!
 
         var self = this;
+        console.log("TESTTTTTTTT", initialData.survey2[0]);
 
-        //console.log("checking this initial data : ", initialData.survey2[0]);
-        for (var i = 0; i < Object.keys(initialData.survey2[0]['A']).length; i++) {
-            //console.log("testing this shit: ", initialData.survey2[0]['A']);
-        }
-
-        self.questionsArrVal = [];
-        // console.log("value isss",initialData.survey2[0]['A']["What do I think about School?"]);
-        // console.log("value isss ", value);
-        var storeKeys = [];
-
-        angular.forEach(initialData.survey2[0], function (value, key1) {
-            //console.log("key1 is ", key1);
-            if (key1 !== '$id' && key1 !== '$priority') {
-                //stores all question alphabets into json var
-                self.questionsArrVal.push({'keyQn': key1});
-            }
-        });
-
-        console.log("length of questionsarrval isssd", self.questionsArrVal.length);
-        for (var i = 0; i < self.questionsArrVal.length; i++) {
+        self.questionsArr2 = [];
+        for (var i = 1; i <= Object.keys(initialData.survey2[0]).length - 3; i++) {
+            self.questionsArr2.push({qnObj: initialData.survey2[0][i]});
 
         }
+        
+        for (var i = 0; i < self.questionsArr2.length; i++) {
+            console.log("printed output is", self.questionsArr2[i].qnObj);
+        }
 
+        // angular.forEach(initialData.survey2[0], function (value, key1) {
+        //     if (key1 !== '$id' && key1 !== '$priority') {
+        //         //stores all question alphabets into json var
+        //         self.questionsArrVal.push({'keyQn': key1});
+        //     }
+        // });
 
 
         //console.log("qnArr length", self.questionsArrVal.length);
