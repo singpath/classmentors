@@ -86,7 +86,7 @@
             <md-list-item ng-repeat="asst in ctrl.assistants track by asst.$id">
                 {{ asst.name }}
                 <span flex></span>
-                <md-button ng-click="ctrl.disableReview(ctrl.event.$id, task.$id)"
+                <md-button ng-click="ctrl.disableReview(ctrl.event.$id, asst.$id, asst.name)"
                            ng-if="asst.canReview"
                            layout layout-align="center center" class="md-raised md-primary"
                            aria-label="open"
@@ -97,7 +97,7 @@
                     <md-icon md-svg-icon="clear"></md-icon>
                     Reviewing
                 </md-button>
-                <md-button ng-click="ctrl.enableReview(ctrl.event.$id, task.$id)"
+                <md-button ng-click="ctrl.enableReview(ctrl.event.$id, asst.$id, asst.name)"
                            ng-if="!asst.canReview"
                            layout layout-align="center center" class="md-raised md-primary"
                            aria-label="open"
@@ -108,7 +108,7 @@
                     <md-icon md-svg-icon="done"></md-icon>
                     Reviewing
                 </md-button>
-                <md-button ng-click="ctrl.disableEdit(ctrl.event.$id, task.$id)"
+                <md-button ng-click="ctrl.disableEdit(ctrl.event.$id, asst.$id, asst.name)"
                            ng-if="asst.canEdit"
                            layout layout-align="center center" class="md-raised md-primary"
                            aria-label="open"
@@ -119,7 +119,7 @@
                     <md-icon md-svg-icon="clear"></md-icon>
                     Editing
                 </md-button>
-                <md-button ng-click="ctrl.enableEdit(ctrl.event.$id, task.$id)"
+                <md-button ng-click="ctrl.enableEdit(ctrl.event.$id, asst.$id, asst.name)"
                            ng-if="!asst.canEdit"
                            layout layout-align="center center" class="md-raised md-primary"
                            aria-label="open"
@@ -130,7 +130,7 @@
                     <md-icon md-svg-icon="done"></md-icon>
                     Editing
                 </md-button>
-                <md-button ng-click="ctrl.removeAssistant(ctrl.event.$id, task.$id)"
+                <md-button ng-click="ctrl.removeAssistant(ctrl.event.$id, asst.$id, asst.name)"
                            layout layout-align="center center" class="md-raised md-primary"
                            aria-label="open"
                 >

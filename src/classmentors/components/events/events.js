@@ -746,9 +746,51 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
     self.addingNewAssistant = true;
   };
 
+  this.enableReview = function(eventId, assistantId, assistantName) {
+      clmDataStore.events.enableAssistantReviewing(eventId, assistantId).then(function () {
+          spfAlert.success(assistantName + ' can now review event challenge submissions');
+      }).catch(function () {
+          spfAlert.error('Failed to change assistant rights');
+      });
+  };
+
+  this.disableReview = function(eventId, assistantId, assistantName) {
+      clmDataStore.events.disableAssistantReviewing(eventId, assistantId).then(function () {
+          spfAlert.success(assistantName + ' can no longer review event challenge submissions');
+      }).catch(function () {
+          spfAlert.error('Failed to change assistant rights');
+      });
+  };
+
+  this.enableEdit = function(eventId, assistantId, assistantName) {
+      clmDataStore.events.enableAssistantEditing(eventId, assistantId).then(function () {
+          spfAlert.success(assistantName + ' can now edit the event');
+      }).catch(function () {
+          spfAlert.error('Failed to change assistant rights');
+      });
+  };
+
+  this.disableEdit = function(eventId, assistantId, assistantName) {
+      clmDataStore.events.disableAssistantEditing(eventId, assistantId).then(function () {
+          spfAlert.success(assistantName + ' can no longer edit the event');
+      }).catch(function () {
+          spfAlert.error('Failed to change assistant rights');
+      });
+  };
+
+  this.removeAssistant = function (eventId, assistantId, assistantName) {
+      clmDataStore.events.removeAssistant(eventId, assistantId).then(function () {
+          spfAlert.success(assistantName + ' removed as event assistant');
+          if(self.assistantArr.indexOf(assistantId) > 0) {
+              self.assistantArr.splice(assistantId, 1);
+          }
+      }).catch(function () {
+          spfAlert.error('Failed to remove assistant');
+      });
+  };
+
   this.saveNewAssistant = function(eventId) {
     self.newAssistant.name = self.selectedUser.displayName;
-    // console.log(self.newAssistant + self.selectedUser.id);
     clmDataStore.events.addAssistant(eventId, self.selectedUser.id, self.newAssistant);
     self.addingNewAssistant = false;
     self.selectedUser = null;
