@@ -192,7 +192,7 @@ function surveyFormEvent($scope, clmSurvey, spfFirebase, clmDataStore, $log, spf
     //console.log("surveyFormEvent eventId : " + sharedData.taskType);
     var getTask = sharedData.task;
     var self = this;
-    /////////
+
     this.saveSurveyTask = function (surveyType) {
         var copy = spfFirebase.cleanObj(getTask);
         console.log('my copy is ', copy);

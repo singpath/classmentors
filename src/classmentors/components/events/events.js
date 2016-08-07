@@ -21,6 +21,7 @@ import python from '../../../jspm_packages/github/ajaxorg/ace-builds@1.2.3/mode-
 
 import schEngageScaleTmpl from './events-view-schEngageScale-task-form.html!text';
 import motiStratLearnTmpl from './events-view-motiStratLearn-task-form.html!text';
+import eduDisLearnTmpl from './events-view-eduDisLearn-task-form.html!text';
 
 const noop = () => undefined;
 
@@ -99,6 +100,17 @@ export function configRoute($routeProvider, routes) {
             resolve: {
                 initialData: addSurveyEventTaskCtrlInitialData
             }
+        })
+
+        .when('/events/:eventId/:taskId/survey3/:surveyTask', {
+
+            template: eduDisLearnTmpl,
+            controller: SurveyFormFillCtrl,
+            controllerAs: 'ctrl',
+            resolve: {
+                initialData: addSurveyEventTaskCtrlInitialData
+            }
+
         });
 }
 
@@ -1640,21 +1652,22 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             console.log("routes is: ", routes);
             console.log("my eventid is: ", eventId);
 
-
             $location.path('/events/' + eventId + '/' + taskId + '/' + 'survey1' + '/' + task.survey);
 
         }
         if (task.survey === "Motivated strategies for learning") {
-            console.log("motivated strategies came in here");
-
+            //console.log("motivated strategies came in here");
             //route to the below specified url
             $location.path('/events/' + eventId + '/' + taskId + '/' + 'survey2' + '/' + task.survey);
+        }
+        if (task.survey === "Education vs Dissatisfaction with learning") {
+            $location.path('/events/' + eventId + '/' + taskId + '/' + 'survey3' + '/' + task.survey);
+
         }
 
     };
 
     this.promptForTextResponse = function (eventId, taskId, task, participant, userSolution) {
-        console.log("What is this: ", this);
         $mdDialog.show({
             parent: $document.body,
             template: responseTmpl,
@@ -1878,8 +1891,9 @@ function addSurveyEventTaskCtrlInitialData(spfFirebase, $q, $route, spfAuthData,
 
 
     //lky newly added codes
-    var motivatedPromise = spfFirebase.loadedArray(['classMentors/surveyTemplate']);
-
+    //returns a promise object from firebase
+    var surveyPromise = spfFirebase.loadedArray(['classMentors/surveyTemplate']);
+    console.log("this motivated promise is ", surveyPromise);
     // var p = Promise.resolve(motivatedPromise);
     //
     // var p2 = p.then(function(value){
@@ -1888,13 +1902,13 @@ function addSurveyEventTaskCtrlInitialData(spfFirebase, $q, $route, spfAuthData,
     // });
     //
     // console.log("p2 isssa: ", p2);
-
+    //assign the promise to survey2
     return $q.all({
         currentUser: spfAuthData.user().catch(noop),
         profile: profilePromise,
         event: eventPromise,
         canView: canviewPromise,
-        survey2: motivatedPromise.then(function (value) {
+        survey2: surveyPromise.then(function (value) {
             return value;
         }),
         tasks: canviewPromise.then(function (canView) {
@@ -1931,12 +1945,8 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
 
     if ($routeParams.surveyTask === 'Motivated strategies for learning') {
 
-
         var self = this;
-
         self.questionsArr = [];
-
-
         //console.log("please give me my promise: ", initialData.survey2);
         // for (var i = 1; i < Object.keys(initialData.survey2[0]).length - 1; i++) {
         //     console.log("got anything anot?: ", initialData.survey2[0]["Q" + i]);
@@ -1947,9 +1957,8 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
 
         for (var i = 1; i < Object.keys(initialData.survey2[1]).length - 1; i++) {
             //console.log("testing: ", initialData.survey2[1]["Q" + i]);
-            self.questionsArr.push({'name': initialData.survey2[1]["Q" + i], 'qnid' : i});
+            self.questionsArr.push({'name': initialData.survey2[1]["Q" + i], 'qnid': i});
         }
-
 
 
         self.ratingOptions = [
@@ -1965,9 +1974,57 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
 
     }
 
+    if ($routeParams.surveyTask === 'Education vs Dissatisfaction with learning') {
+        //TODO: POPULATE THIS LAST SURVEYYYYYY!!!
+
+        var self = this;
+
+        //console.log("checking this initial data : ", initialData.survey2[0]);
+        for (var i = 0; i < Object.keys(initialData.survey2[0]['A']).length; i++) {
+            //console.log("testing this shit: ", initialData.survey2[0]['A']);
+        }
+
+        self.questionsArrVal = [];
+        // console.log("value isss",initialData.survey2[0]['A']["What do I think about School?"]);
+        // console.log("value isss ", value);
+        var storeKeys = [];
+
+        angular.forEach(initialData.survey2[0], function (value, key1) {
+            //console.log("key1 is ", key1);
+            if (key1 !== '$id' && key1 !== '$priority') {
+                //stores all question alphabets into json var
+                self.questionsArrVal.push({'keyQn': key1});
+            }
+        });
+
+        console.log("length of questionsarrval isssd", self.questionsArrVal.length);
+        for (var i = 0; i < self.questionsArrVal.length; i++) {
+
+        }
+
+
+
+        //console.log("qnArr length", self.questionsArrVal.length);
+        // for(var k = 0  ;  k < self.questionsArrVal.length; k++){
+        //     console.log("text qn is:: ", self.questionsArrVal[k].txtQn);
+        // }
+
+        //todo: store the values of the questions into a json object
+
+
+        // console.log("length: ", Object.keys(initialData.survey2[0]).length);
+        // for(var i = 0 ; i < Object.keys(initialData.survey2[0]).length; i++){
+        //     console.log("values areee::", initialData.survey2[0]);
+        // }
+
+        // for (var k = 0; k < self.questionsArrVal.length; k++) {
+        //     console.log("the keys are: ", self.questionsArrVal[k]);
+        // }
+
+
+    }
+
     this.event = initialData.event;
-
-
     spfNavBarService.update(
         'Survey', [{
             title: 'Events',
@@ -1987,8 +2044,6 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
         var eventId = initialData.event.$id;
         var userId = initialData.currentUser.publicId;
         var surveyType = $routeParams.surveyTask;
-
-
         //retrieve values from firebase as a json object
         /*var promise = spfFirebase.loadedArray(['classMentors/surveyTemplate']);
          var tempValue;
@@ -2005,12 +2060,9 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
 
          }*/
         //end//
-
-
         console.log("all the VALUES HERE: " + surveyResp + ", " + questionNumber + "," + taskId + ", " + eventId + ", " + userId + ", " + surveyType)
         clmDataStore.events.saveSurveyResponse(surveyResp, questionNumber, taskId, eventId, userId, surveyType);
     }
-
 };
 
 SurveyFormFillCtrl.$inject = ['spfNavBarService', '$location', 'urlFor', 'initialData', '$routeParams', 'clmDataStore', 'spfFirebase'];
@@ -2359,6 +2411,7 @@ function ClmEventRankTableCtrl($scope, $log, spfFirebase, clmDataStore, clmPager
     };
 
 }
+
 ClmEventRankTableCtrl.$inject = [
     '$scope',
     '$log',
@@ -2892,6 +2945,7 @@ function ClmEventResultsTableCtrl($scope, $q, $log, $mdDialog, $document,
         });
     });
 }
+
 ClmEventResultsTableCtrl.$inject = [
     '$scope',
     '$q',
@@ -2967,6 +3021,7 @@ export function clmRowPerPageFactory($log) {
 
     return opts;
 }
+
 clmRowPerPageFactory.$inject = ['$log'];
 
 export function clmPagerOptionFactory($log, clmRowPerPage) {
@@ -3071,6 +3126,7 @@ export function clmPagerOptionFactory($log, clmRowPerPage) {
         return opts;
     };
 }
+
 clmPagerOptionFactory.$inject = ['$log', 'clmRowPerPage'];
 
 function ClmPagerCtrl(clmRowPerPage) {
@@ -3092,6 +3148,7 @@ function ClmPagerCtrl(clmRowPerPage) {
         options.setRange(options.rowCount);
     };
 }
+
 ClmPagerCtrl.$inject = ['clmRowPerPage'];
 
 function reverseComparer(reverse, fn) {
