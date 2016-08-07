@@ -19,7 +19,7 @@ function mcqQuestionFactory(){
   }
 }
 
-export function startMcqController(initialData, challengeService, clmDataStore, $location){
+export function startMcqController(initialData, challengeService, clmDataStore, $location, $mdDialog,urlFor ){
   var self = this;
   var data = initialData;
   var eventId = data.eventId;
@@ -59,13 +59,32 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
     }
   }
 
+  self.discardChanges = function (ev){
+    var confirm = $mdDialog.confirm()
+        .title('Would you like to discard your changes?')
+        .textContent('All of the information input will be discarded. Are you sure you want to continue?')
+        .ariaLabel('Discard changes')
+        .targetEvent(ev)
+        .ok('Discard All')
+        .cancel('Do Not Discard');
+    $mdDialog.show(confirm).then(function() {
+      // decided to discard data, bring user to previous page
+
+      //todo: link back to previous page
+      $location.path(urlFor('oneEvent', {eventId: eventId}));
+
+    })
+  }
+
 }
 
 startMcqController.$inject = [
   'initialData',
   'challengeService',
   'clmDataStore',
-  '$location'
+  '$location',
+    '$mdDialog',
+    'urlFor'
 ];
 
 export function newMcqController(initialData, challengeService, $filter,$mdDialog){
