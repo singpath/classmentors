@@ -666,6 +666,7 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
   this.event = initialData.event;
   this.tasks = initialData.tasks;
   this.showingAssistants = false;
+  this.showingTasks = false;
   this.assistants = initialData.assistants;
   this.newPassword = '';
   this.savingEvent = false;
@@ -681,6 +682,13 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
     this.selectedUser  = null;
     this.searchUser    = null;
     this.querySearch   = querySearch;
+
+    this.assistantArr = [];
+    for(var asst in self.assistants) {
+        if(self.assistants[asst].$id) {
+            self.assistantArr.push(self.assistants[asst].$id);
+        }
+    }
 
     function querySearch (query) {
         return query ? self.users.filter( createFilterFor(query) ) : self.users;
@@ -699,7 +707,8 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
     function createFilterFor(query) {
         var lowercaseQuery = angular.lowercase(query);
         return function filterFn(user) {
-            return (user.value.indexOf(lowercaseQuery) >= 0);
+            //Filter results in auto complete. Ensure that users who are already assistants may not be selected again
+            return (user.value.indexOf(lowercaseQuery) >= 0 && self.assistantArr.indexOf(user.id) < 0);
         };
     }
 
@@ -724,6 +733,14 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
         self.showingAssistants = true;
     }
   };
+
+    this.toggleTaskEditView = function() {
+        if(self.showingTasks) {
+            self.showingTasks = false;
+        } else {
+            self.showingTasks = true;
+        }
+    };
 
   this.addAssistant = function() {
     self.addingNewAssistant = true;

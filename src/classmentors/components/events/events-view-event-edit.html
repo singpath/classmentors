@@ -37,7 +37,6 @@
     <md-subheader><md-button ng-click="ctrl.toggleAssistants()">Event Assistants<md-tooltip ng-if="!ctrl.showingAssistants">Click to view and edit event assistants</md-tooltip><md-tooltip ng-if="ctrl.showingAssistants">Click to hide event assistants</md-tooltip></md-button></md-subheader>
     <div ng-if="ctrl.showingAssistants">
         <div class="information">
-            Assistants:
             <md-button ng-click="ctrl.addAssistant()">
                 <md-icon md-svg-icon="add"></md-icon>
                 <md-tooltip>
@@ -87,29 +86,59 @@
             <md-list-item ng-repeat="asst in ctrl.assistants track by asst.$id">
                 {{ asst.name }}
                 <span flex></span>
-                <md-button ng-if="asst.canReview" ng-click="ctrl.disableReview(ctrl.cohort.$id, a.$id)">
-                    <md-icon class="material-icons">visibility_off</md-icon>
+                <md-button ng-click="ctrl.disableReview(ctrl.event.$id, task.$id)"
+                           ng-if="asst.canReview"
+                           layout layout-align="center center" class="md-raised md-primary"
+                           aria-label="open"
+                >
                     <md-tooltip>
-                        Disable Review Capability
+                        Disable reviewing of event task submissions
                     </md-tooltip>
+                    <md-icon md-svg-icon="clear"></md-icon>
+                    Reviewing
                 </md-button>
-                <md-button ng-if="!asst.canReview" ng-click="ctrl.enableReview(ctrl.cohort.$id, a.$id)">
-                    <md-icon class="material-icons">visibility</md-icon>
+                <md-button ng-click="ctrl.enableReview(ctrl.event.$id, task.$id)"
+                           ng-if="!asst.canReview"
+                           layout layout-align="center center" class="md-raised md-primary"
+                           aria-label="open"
+                >
                     <md-tooltip>
-                        Enable Review Capability
+                        Enable reviewing of event task submissions
                     </md-tooltip>
+                    <md-icon md-svg-icon="done"></md-icon>
+                    Reviewing
                 </md-button>
-                <md-button ng-if="asst.canEdit" ng-click="ctrl.disableEdit(ctrl.cohort.$id, a.$id)">
-                    <md-icon class="material-icons">visibility_off</md-icon>
+                <md-button ng-click="ctrl.disableEdit(ctrl.event.$id, task.$id)"
+                           ng-if="asst.canEdit"
+                           layout layout-align="center center" class="md-raised md-primary"
+                           aria-label="open"
+                >
                     <md-tooltip>
-                        Disable Review Capability
+                        Disable editing of event
                     </md-tooltip>
+                    <md-icon md-svg-icon="clear"></md-icon>
+                    Editing
                 </md-button>
-                <md-button ng-if="!asst.canReview" ng-click="ctrl.enableReview(ctrl.cohort.$id, a.$id)">
-                    <md-icon class="material-icons">visibility</md-icon>
+                <md-button ng-click="ctrl.enableEdit(ctrl.event.$id, task.$id)"
+                           ng-if="!asst.canEdit"
+                           layout layout-align="center center" class="md-raised md-primary"
+                           aria-label="open"
+                >
                     <md-tooltip>
-                        Enable Review Capability
+                        Enable editing of event
                     </md-tooltip>
+                    <md-icon md-svg-icon="done"></md-icon>
+                    Editing
+                </md-button>
+                <md-button ng-click="ctrl.removeAssistant(ctrl.event.$id, task.$id)"
+                           layout layout-align="center center" class="md-raised md-primary"
+                           aria-label="open"
+                >
+                    <md-tooltip>
+                        Remove user as event assistant
+                    </md-tooltip>
+                    <md-icon md-svg-icon="clear"></md-icon>
+                    Remove
                 </md-button>
                 <md-divider ng-if="!$last"></md-divider>
             </md-list-item>
@@ -118,7 +147,8 @@
         
     <md-divider></md-divider>
 
-    <md-list>
+    <md-subheader><md-button ng-click="ctrl.toggleTaskEditView()">Event Challenges<md-tooltip ng-if="!ctrl.showingTasks">Click to view and edit event challenges</md-tooltip><md-tooltip ng-if="ctrl.showingTasks">Click to hide event challenges</md-tooltip></md-button></md-subheader>
+    <md-list ng-if="ctrl.showingTasks">
         <md-subheader class="md-no-sticky">{{ ctrl.tasks | spfLength }} challenges</md-subheader>
         <md-list-item class="md-3-line" ng-repeat="task in ctrl.tasks track by task.$id" ng-if="!task.archived">
             <div class="md-list-item-text">
