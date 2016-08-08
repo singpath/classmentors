@@ -1299,6 +1299,10 @@ export function clmDataStoreFactory(
             return spfFirebase.loadedArray(['classMentors/events', eventId, 'assistants']);
         },
 
+      getAsstObj: function (eventId) {
+        return spfFirebase.loadedObj(['classMentors/events', eventId, 'assistants']);
+      },
+
       enableAssistantEditing: function(eventId, assistantId) {
           return spfFirebase.set(['classMentors/events', eventId, 'assistants', assistantId, 'canEdit'], true);
       },

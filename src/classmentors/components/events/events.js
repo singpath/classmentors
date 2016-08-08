@@ -381,7 +381,17 @@ function viewEventCtrlInitialData($q, $route, spfAuth, spfAuthData, clmDataStore
       if (canView) {
         return clmDataStore.events.getScores(eventId);
       }
-    })
+    }),
+    assistants: canviewPromise.then(function (canView) {
+        if(canView) {
+            return clmDataStore.events.getAssistants(eventId);
+        }
+    }),
+      assistantObj: canviewPromise.then(function (canView) {
+          if(canView) {
+              return clmDataStore.events.getAsstObj(eventId);
+          }
+      })
   });
 }
 viewEventCtrlInitialData.$inject = [
@@ -415,6 +425,16 @@ function ViewEventCtrl(
   this.viewArchived = false;
   this.selected = null;
   this.isOwner = false;
+  this.assistants = initialData.assistants;
+  this.assistantObj = initialData.assistantObj;
+  this.asstArr = [];
+
+  for(var asst in self.assistants) {
+      if(self.assistants[asst].$id) {
+          self.asstArr.push(self.assistants[asst].$id);
+      }
+  }
+  console.log(self.assistants);
 
   if (
     self.event &&
@@ -432,6 +452,20 @@ function ViewEventCtrl(
       update: noop,
       unwatch: noop
     };
+  }
+
+  if (self.event && self.currentUser && self.asstArr.indexOf(self.currentUser.publicId) >= 0) {
+      var asst = self.assistantObj[self.currentUser.publicId];
+      if(asst.canReview) {
+          this.isReviewAssistant = true;
+      }
+      if(asst.canEdit) {
+          this.isEditAssistant = true;
+      }
+  }
+
+  if(self.isReviewAssistant || self.isOwner) {
+      this.isReviewSuperUser = true;
   }
 
   $scope.$on('$destroy', function() {
@@ -485,7 +519,8 @@ function ViewEventCtrl(
     }
 
     // Add edit and update button
-    if (self.event.owner.publicId === self.currentUser.publicId) {
+      //self.event.owner.publicId === self.currentUser.publicId
+    if (self.isOwner || self.isEditAssistant) {
       options.push({
         title: 'Edit',
         url: `#${urlFor('editEvent', {eventId: self.event.$id})}`,
@@ -618,15 +653,23 @@ function baseEditCtrlInitialData($q, $route, spfAuthData, clmDataStore) {
 
   data.canEdit = $q.all({
     currentUser: spfAuthData.user(),
-    event: eventPromise
+    event: eventPromise,
+    assistants: clmDataStore.events.getAsstObj(eventId)
   }).then(function(result) {
     if (
       !result.currentUser.publicId ||
       !result.event.owner ||
       !result.event.owner.publicId ||
-      result.event.owner.publicId !== result.currentUser.publicId
+      (result.event.owner.publicId !== result.currentUser.publicId)
     ) {
-      return $q.reject(errNotAuthaurized);
+
+        if(result.assistants[result.currentUser.publicId]) {
+            if(!result.assistants[result.currentUser.publicId].canEdit) {
+                return $q.reject(errNotAuthaurized);
+            }
+        } else {
+            return $q.reject(errNotAuthaurized);
+        }
     }
 
     return result;
@@ -781,7 +824,7 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
   this.removeAssistant = function (eventId, assistantId, assistantName) {
       clmDataStore.events.removeAssistant(eventId, assistantId).then(function () {
           spfAlert.success(assistantName + ' removed as event assistant');
-          if(self.assistantArr.indexOf(assistantId) > 0) {
+          if(self.assistantArr.indexOf(assistantId) >= 0) {
               self.assistantArr.splice(assistantId, 1);
           }
       }).catch(function () {
@@ -1132,15 +1175,22 @@ function editEventTaskCtrlInitialData($q, $route, spfAuthData, clmDataStore) {
     event: eventPromise,
     badges: clmDataStore.badges.all(),
     taskId: taskId,
-    task: taskPromise
+    task: taskPromise,
+    assistants: clmDataStore.events.getAsstObj(eventId)
   }).then(function(data) {
     if (
       !data.currentUser.publicId ||
       !data.event.owner ||
       !data.event.owner.publicId ||
-      data.event.owner.publicId !== data.currentUser.publicId
+      (data.event.owner.publicId !== data.currentUser.publicId && data.currentUser.publicId)
     ) {
-      return $q.reject(errNotAuthaurized);
+      if(data.assistants[data.currentUser.publicId]) {
+          if(!data.assistants[data.currentUser.publicId].canEdit) {
+              return $q.reject(errNotAuthaurized);
+          }
+      } else {
+          return $q.reject(errNotAuthaurized);
+      }
     }
 
     return data;
