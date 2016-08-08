@@ -594,13 +594,44 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
     var self = this;
 
     this.currentUser = initialData.currentUser;
+    this.eventsArr = initialData.eventsArr;
+    this.events = initialData.events;
     this.cohort = initialData.cohort;
     this.announcements = initialData.announcements;
-    // this.tasks = initialData.tasks;
-    // this.newPassword = '';
     this.savingCohort = false;
     this.creatingNewAnnouncement = false;
     this.newAnnouncement = {};
+    this.showingEvents = false;
+    this.showingAnnouncements = false;
+    this.addingEvent = false;
+
+    // For searching events
+    this.mappedEvents = mapAllEvents();
+    this.selectedEvent = null;
+    this.searchEvent = null;
+    this.querySearch = querySearch;
+
+    function querySearch (query) {
+        return query ? self.mappedEvents.filter( createFilterFor(query) ) : self.mappedEvents;
+    }
+
+    function mapAllEvents() {
+        return self.eventsArr.map( function (event) {
+            return {
+                id: event.$id,
+                value: event.title.toLowerCase(),
+                title: event.title
+            };
+        });
+    }
+
+    function createFilterFor(query) {
+        var lowercaseQuery = angular.lowercase(query);
+        return function filterFn(event) {
+            // to filter results based on query and ensure that user cnnot select events already in the cohort
+            return (event.value.indexOf(lowercaseQuery) >= 0 && self.cohort.events.indexOf(event.id) < 0);
+        };
+    }
 
     spfNavBarService.update(
         'Edit', [{
@@ -610,12 +641,53 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
             title: this.cohort.title,
             url: `#${urlFor('viewCohort', {cohortId: this.cohort.$id})}`
         }]
-        // [{
-        //     title: 'New Challenge',
-        //     url: `#${urlFor('addEventTask', {eventId: this.event.$id})}`,
-        //     icon: 'create'
-        // }]
     );
+
+    this.removeCohortEvent = function(eventId, eventIndex) {
+        // console.log(eventId, eventIndex);
+        // clmDataStore.cohorts.removeEvent(self.cohort.$id, eventId).then(function () {
+        //     spfAlert.success('Removed event');
+        // }).catch(function (err) {
+        //     spfAlert.error('Failed to remove event');
+        // });
+    };
+
+    this.saveAddedEvent = function () {
+        console.log(self.selectedEvent.id + "  " + self.cohort.$id);
+
+        clmDataStore.cohorts.addEvent(self.cohort.$id, self.selectedEvent.id, self.cohort.events.length).then(function() {
+            spfAlert.success(self.selectedEvent.title + ' has been added to the cohort!');
+        }).catch(function(err) {
+            spfAlert.error('Failed to add ' + self.selectedEvent.title + ' to the cohort!');
+        }).finally(function() {
+            self.addingEvent = false;
+            self.selectedEvent = null;
+        });
+    };
+
+    this.addEvent = function () {
+        self.addingEvent = true;
+    };
+
+    this.closeAddingEvent = function () {
+        self.addingEvent = false;
+    };
+
+    this.toggleEvents = function () {
+        if(self.showingEvents) {
+            self.showingEvents = false;
+        } else {
+            self.showingEvents = true;
+        }
+    };
+
+    this.toggleAnnouncements = function () {
+        if(self.showingAnnouncements) {
+            self.showingAnnouncements = false;
+        } else {
+            self.showingAnnouncements = true;
+        }
+    };
 
     this.createNewAnnouncement = function () {
         self.creatingNewAnnouncement = true;
@@ -704,6 +776,8 @@ function baseEditCtrlInitialData($q, $route, spfAuthData, clmDataStore) {
     var data = {
         currentUser: spfAuthData.user(),
         announcements: clmDataStore.cohorts.getAnnouncements(cohortId),
+        eventsArr: clmDataStore.events.listAllArr(),
+        events: clmDataStore.events.listAll(),
         cohort: cohortPromise
     };
 
