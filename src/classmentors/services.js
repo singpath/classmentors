@@ -485,8 +485,8 @@ export function clmDataStoreFactory(
             return spfFirebase.set(['classMentors/cohorts', cohortId, 'events', eventNum], eventId);
         },
 
-        removeEvent: function(cohortId, eventId) {
-            return spfFirebase.remove(['classMentors/cohorts', cohortId, 'events'], eventId);
+        removeEvent: function(cohortId, newEventArray) {
+            return spfFirebase.set(['classMentors/cohorts', cohortId, 'events'], newEventArray);
         },
 
         addAnnouncement: function(cohortId, madeBy, announcement, isArchived) {
@@ -579,14 +579,14 @@ export function clmDataStoreFactory(
         });
       },
 
-    listAll: function() {
+      listAll: function() {
         return spfFirebase.loadedObj(['classMentors/events'], {
             orderByChild: 'createdAt',
             limitToLast: 50
         });
     },
 
-        listAllArr: function() {
+      listAllArr: function() {
             return spfFirebase.loadedArray(['classMentors/events'], {
                 orderByChild: 'createdAt',
                 limitToLast: 50
@@ -625,7 +625,7 @@ export function clmDataStoreFactory(
         });
       },
 
-    listJoinedEventsObj: function() {
+      listJoinedEventsObj: function() {
         return spfAuthData.user().then(function(authData) {
             if (!authData.publicId) {
                 return [];
@@ -1287,6 +1287,40 @@ export function clmDataStoreFactory(
           return spfFirebase.set([
               'classMentors/eventScores', eventId, publicId, taskId
           ], score);
+      },
+
+      addAssistant: function(eventId, assistantId, assistant) {
+            return spfFirebase.set([
+                'classMentors/events', eventId, 'assistants', assistantId
+            ], assistant);
+        },
+
+      getAssistants: function(eventId) {
+            return spfFirebase.loadedArray(['classMentors/events', eventId, 'assistants']);
+        },
+
+      getAsstObj: function (eventId) {
+        return spfFirebase.loadedObj(['classMentors/events', eventId, 'assistants']);
+      },
+
+      enableAssistantEditing: function(eventId, assistantId) {
+          return spfFirebase.set(['classMentors/events', eventId, 'assistants', assistantId, 'canEdit'], true);
+      },
+
+      disableAssistantEditing: function(eventId, assistantId) {
+          return spfFirebase.set(['classMentors/events', eventId, 'assistants', assistantId, 'canEdit'], false);
+      },
+
+      enableAssistantReviewing: function(eventId, assistantId) {
+          return spfFirebase.set(['classMentors/events', eventId, 'assistants', assistantId, 'canReview'], true);
+      },
+
+      disableAssistantReviewing: function(eventId, assistantId) {
+          return spfFirebase.set(['classMentors/events', eventId, 'assistants', assistantId, 'canReview'], false);
+      },
+
+      removeAssistant: function (eventId, assistantId) {
+          return spfFirebase.remove(['classMentors/events', eventId, 'assistants', assistantId]);
       }
     },
 

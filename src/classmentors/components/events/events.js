@@ -381,7 +381,17 @@ function viewEventCtrlInitialData($q, $route, spfAuth, spfAuthData, clmDataStore
       if (canView) {
         return clmDataStore.events.getScores(eventId);
       }
-    })
+    }),
+    assistants: canviewPromise.then(function (canView) {
+        if(canView) {
+            return clmDataStore.events.getAssistants(eventId);
+        }
+    }),
+      assistantObj: canviewPromise.then(function (canView) {
+          if(canView) {
+              return clmDataStore.events.getAsstObj(eventId);
+          }
+      })
   });
 }
 viewEventCtrlInitialData.$inject = [
@@ -415,6 +425,16 @@ function ViewEventCtrl(
   this.viewArchived = false;
   this.selected = null;
   this.isOwner = false;
+  this.assistants = initialData.assistants;
+  this.assistantObj = initialData.assistantObj;
+  this.asstArr = [];
+
+  for(var asst in self.assistants) {
+      if(self.assistants[asst].$id) {
+          self.asstArr.push(self.assistants[asst].$id);
+      }
+  }
+  console.log(self.assistants);
 
   if (
     self.event &&
@@ -432,6 +452,20 @@ function ViewEventCtrl(
       update: noop,
       unwatch: noop
     };
+  }
+
+  if (self.event && self.currentUser && self.asstArr.indexOf(self.currentUser.publicId) >= 0) {
+      var asst = self.assistantObj[self.currentUser.publicId];
+      if(asst.canReview) {
+          this.isReviewAssistant = true;
+      }
+      if(asst.canEdit) {
+          this.isEditAssistant = true;
+      }
+  }
+
+  if(self.isReviewAssistant || self.isOwner) {
+      this.isReviewSuperUser = true;
   }
 
   $scope.$on('$destroy', function() {
@@ -485,7 +519,8 @@ function ViewEventCtrl(
     }
 
     // Add edit and update button
-    if (self.event.owner.publicId === self.currentUser.publicId) {
+      //self.event.owner.publicId === self.currentUser.publicId
+    if (self.isOwner || self.isEditAssistant) {
       options.push({
         title: 'Edit',
         url: `#${urlFor('editEvent', {eventId: self.event.$id})}`,
@@ -612,20 +647,29 @@ function baseEditCtrlInitialData($q, $route, spfAuthData, clmDataStore) {
 
   var data = {
     currentUser: spfAuthData.user(),
-    event: eventPromise
+    event: eventPromise,
+    participants: clmDataStore.events.participants(eventId)
   };
 
   data.canEdit = $q.all({
     currentUser: spfAuthData.user(),
-    event: eventPromise
+    event: eventPromise,
+    assistants: clmDataStore.events.getAsstObj(eventId)
   }).then(function(result) {
     if (
       !result.currentUser.publicId ||
       !result.event.owner ||
       !result.event.owner.publicId ||
-      result.event.owner.publicId !== result.currentUser.publicId
+      (result.event.owner.publicId !== result.currentUser.publicId)
     ) {
-      return $q.reject(errNotAuthaurized);
+
+        if(result.assistants[result.currentUser.publicId]) {
+            if(!result.assistants[result.currentUser.publicId].canEdit) {
+                return $q.reject(errNotAuthaurized);
+            }
+        } else {
+            return $q.reject(errNotAuthaurized);
+        }
     }
 
     return result;
@@ -645,6 +689,10 @@ function editEventCtrllInitialData($q, $route, spfAuthData, clmDataStore) {
     return clmDataStore.events.getTasks(event.$id);
   });
 
+    data.assistants = data.event.then(function(event) {
+        return clmDataStore.events.getAssistants(event.$id);
+    });
+
   return $q.all(data);
 }
 editEventCtrllInitialData.$inject = ['$q', '$route', 'spfAuthData', 'clmDataStore'];
@@ -657,10 +705,55 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
   var self = this;
 
   this.currentUser = initialData.currentUser;
+  this.participants = initialData.participants;
   this.event = initialData.event;
   this.tasks = initialData.tasks;
+  this.showingAssistants = false;
+  this.showingTasks = false;
+  this.assistants = initialData.assistants;
   this.newPassword = '';
   this.savingEvent = false;
+
+  this.addingNewAssistant = false;
+  this.newAssistant = {
+      canEdit: false,
+      canReview: true
+  };
+
+  // Search form variables
+    this.users        = mapAllUsers();
+    this.selectedUser  = null;
+    this.searchUser    = null;
+    this.querySearch   = querySearch;
+
+    this.assistantArr = [];
+    for(var asst in self.assistants) {
+        if(self.assistants[asst].$id) {
+            self.assistantArr.push(self.assistants[asst].$id);
+        }
+    }
+
+    function querySearch (query) {
+        return query ? self.users.filter( createFilterFor(query) ) : self.users;
+    }
+
+    function mapAllUsers() {
+        return self.participants.map( function (user) {
+            return {
+                id: user.$id,
+                value: user.user.displayName.toLowerCase(),
+                displayName: user.user.displayName
+            };
+        });
+    }
+
+    function createFilterFor(query) {
+        var lowercaseQuery = angular.lowercase(query);
+        return function filterFn(user) {
+            //Filter results in auto complete. Ensure that users who are already assistants may not be selected again
+            return (user.value.indexOf(lowercaseQuery) >= 0 && self.assistantArr.indexOf(user.id) < 0);
+        };
+    }
 
   spfNavBarService.update(
     'Edit', [{
@@ -675,6 +768,80 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
       icon: 'create'
     }]
   );
+
+  this.toggleAssistants = function() {
+    if(self.showingAssistants) {
+        self.showingAssistants = false;
+    } else {
+        self.showingAssistants = true;
+    }
+  };
+
+    this.toggleTaskEditView = function() {
+        if(self.showingTasks) {
+            self.showingTasks = false;
+        } else {
+            self.showingTasks = true;
+        }
+    };
+
+  this.addAssistant = function() {
+    self.addingNewAssistant = true;
+  };
+
+  this.enableReview = function(eventId, assistantId, assistantName) {
+      clmDataStore.events.enableAssistantReviewing(eventId, assistantId).then(function () {
+          spfAlert.success(assistantName + ' can now review event challenge submissions');
+      }).catch(function () {
+          spfAlert.error('Failed to change assistant rights');
+      });
+  };
+
+  this.disableReview = function(eventId, assistantId, assistantName) {
+      clmDataStore.events.disableAssistantReviewing(eventId, assistantId).then(function () {
+          spfAlert.success(assistantName + ' can no longer review event challenge submissions');
+      }).catch(function () {
+          spfAlert.error('Failed to change assistant rights');
+      });
+  };
+
+  this.enableEdit = function(eventId, assistantId, assistantName) {
+      clmDataStore.events.enableAssistantEditing(eventId, assistantId).then(function () {
+          spfAlert.success(assistantName + ' can now edit the event');
+      }).catch(function () {
+          spfAlert.error('Failed to change assistant rights');
+      });
+  };
+
+  this.disableEdit = function(eventId, assistantId, assistantName) {
+      clmDataStore.events.disableAssistantEditing(eventId, assistantId).then(function () {
+          spfAlert.success(assistantName + ' can no longer edit the event');
+      }).catch(function () {
+          spfAlert.error('Failed to change assistant rights');
+      });
+  };
+
+  this.removeAssistant = function (eventId, assistantId, assistantName) {
+      clmDataStore.events.removeAssistant(eventId, assistantId).then(function () {
+          spfAlert.success(assistantName + ' removed as event assistant');
+          if(self.assistantArr.indexOf(assistantId) >= 0) {
+              self.assistantArr.splice(assistantId, 1);
+          }
+      }).catch(function () {
+          spfAlert.error('Failed to remove assistant');
+      });
+  };
+
+  this.saveNewAssistant = function(eventId) {
+    self.newAssistant.name = self.selectedUser.displayName;
+    clmDataStore.events.addAssistant(eventId, self.selectedUser.id, self.newAssistant);
+    self.addingNewAssistant = false;
+    self.selectedUser = null;
+  };
+
+  this.closeNewAssistant = function () {
+      self.addingNewAssistant = false;
+  };
 
   this.save = function(currentUser, event, newPassword, editEventForm) {
     self.savingEvent = true;
@@ -1008,15 +1175,22 @@ function editEventTaskCtrlInitialData($q, $route, spfAuthData, clmDataStore) {
     event: eventPromise,
     badges: clmDataStore.badges.all(),
     taskId: taskId,
-    task: taskPromise
+    task: taskPromise,
+    assistants: clmDataStore.events.getAsstObj(eventId)
   }).then(function(data) {
     if (
       !data.currentUser.publicId ||
       !data.event.owner ||
       !data.event.owner.publicId ||
-      data.event.owner.publicId !== data.currentUser.publicId
+      (data.event.owner.publicId !== data.currentUser.publicId && data.currentUser.publicId)
     ) {
-      return $q.reject(errNotAuthaurized);
+      if(data.assistants[data.currentUser.publicId]) {
+          if(!data.assistants[data.currentUser.publicId].canEdit) {
+              return $q.reject(errNotAuthaurized);
+          }
+      } else {
+          return $q.reject(errNotAuthaurized);
+      }
     }
 
     return data;
