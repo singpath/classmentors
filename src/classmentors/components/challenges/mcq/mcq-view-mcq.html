@@ -172,7 +172,7 @@
                 <!--todo: required at least one option to be the answer.-->
                 <md-input-container>
                     <md-button ng-model="question.answers" ng-class="question.answers.indexOf($index) != -1 ? 'md-raised md-primary' : 'md-raised'"
-                               ng-click="ctrl.toggleOption(question, $index)">This is the answer</md-button>
+                               ng-click="ctrl.toggleOption(question, $index)">Answer</md-button>
                 </md-input-container>
 
                 <md-input-container >
@@ -192,7 +192,7 @@
         <br>
 
         <div align="center">
-            <md-button type="submit" class="md-raised md-primary">Save</md-button>
+            <md-button ng-disabled="ctrl.isMcqValid == false" type="submit" class="md-raised md-primary">Save</md-button>
             <md-button type="reset" class="md-raised" ng-click="ctrl.discardChanges($event)">Back</md-button>
         </div>
     </form>

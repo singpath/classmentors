@@ -89,6 +89,8 @@ startMcqController.$inject = [
 
 export function newMcqController(initialData, challengeService, $filter,$mdDialog){
   var self = this;
+  // Checks if all questions have at least one answer
+  self.isMcqValid = false;
   self.task = initialData.task;
   self.questions = [{
     text:"",
@@ -149,8 +151,17 @@ export function newMcqController(initialData, challengeService, $filter,$mdDialo
 
     // Push new question object into questions list
     self.questions.push(question);
+    checkMCQValid();
   }
-
+  function checkMCQValid(){
+    for (var i = 0; i < self.questions.length; i ++){
+      if(self.questions[i].answers.length == 0){
+        self.isMcqValid = false;
+        return;
+      }
+    }
+    self.isMcqValid = true;
+  }
   self.removeQuestion = function(ev,itemIndex) {
 
     var confirm = $mdDialog.confirm()
@@ -165,6 +176,7 @@ export function newMcqController(initialData, challengeService, $filter,$mdDialo
         var removed = self.questions.splice(itemIndex,1);
         console.log('Removed : ', removed);
         console.log(self.questions);
+        checkMCQValid();
       }
     });
   };
@@ -173,14 +185,14 @@ export function newMcqController(initialData, challengeService, $filter,$mdDialo
   // Needs further review though..
   // Is it better to set the answers as default multiple and the users will just set 1..n answers?
   self.toggleOption = function(question, itemIndex){
+    console.log('Index being deleted...', itemIndex)
     if(question.answers.indexOf(itemIndex) != -1){
       var removed = question.answers.splice(itemIndex,1);
       console.log(removed);
-
     }else{
       question.answers.push(itemIndex);
     }
-
+    checkMCQValid();
   }
 
   // Add new option to question
@@ -189,6 +201,7 @@ export function newMcqController(initialData, challengeService, $filter,$mdDialo
     question.options.push({
       text:""
     });
+    checkMCQValid();
   }
 
   // Delete options
@@ -199,6 +212,7 @@ export function newMcqController(initialData, challengeService, $filter,$mdDialo
       console.log('Removed : ', removed);
       console.log(question.options);
     }
+    checkMCQValid();
   }
 
 
