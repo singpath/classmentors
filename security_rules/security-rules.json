@@ -205,7 +205,7 @@
           ".validate": "root.child('classMentors/eventTasks/' + $eventId).exists()",
           ".write": true,
           ".read": true
-        },
+        }
       },
       "eventPasswords": {
         "$eventId": {

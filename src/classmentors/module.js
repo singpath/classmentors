@@ -1,5 +1,3 @@
-'use strict';
-
 import angular from 'angular';
 import 'firebase';
 import 'angularfire';
@@ -8,8 +6,10 @@ import 'angular-loading-bar';
 import 'angular-animate';
 import 'angular-messages';
 import 'angular-route';
+
 // import 'd3';
 // import 'c3';
+
 import {spfShared} from 'singpath-core';
 
 const classMentors = angular.module('clm', [

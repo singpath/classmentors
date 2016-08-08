@@ -5,7 +5,6 @@ import template from './ace-view.html!text';
 
 /**
  * Update navBar with a title and no action.
- *
  * @param {spfNavBarService} spfNavBarService
  */
 function AceController(spfNavBarService) {
@@ -22,6 +21,7 @@ AceController.$inject = ['spfNavBarService'];
 export const component = {
   template,
   bindings: {
+
     // binds $ctrl.stats to the value of the stats attribute.
     stats: '<'
   },
