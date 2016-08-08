@@ -712,7 +712,18 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
   this.showingTasks = false;
   this.assistants = initialData.assistants;
   this.newPassword = '';
+  this.isOwner = false;
   this.savingEvent = false;
+
+    if (
+        self.event &&
+        self.event.owner &&
+        self.event.owner.publicId &&
+        self.currentUser &&
+        self.event.owner.publicId === self.currentUser.publicId
+    ) {
+        this.isOwner = true;
+    }
 
   this.addingNewAssistant = false;
   this.newAssistant = {
@@ -773,7 +784,11 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
     if(self.showingAssistants) {
         self.showingAssistants = false;
     } else {
-        self.showingAssistants = true;
+        if(self.isOwner) {
+            self.showingAssistants = true;
+        } else {
+            spfAlert.error('Only the event owner may manage assistants');
+        }
     }
   };
 
