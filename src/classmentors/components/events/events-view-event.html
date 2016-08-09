@@ -49,7 +49,7 @@
             </md-content>
         </md-tab>
 
-        <md-tab label="Results" ng-disabled="!ctrl.participants || !ctrl.isOwner">
+        <md-tab label="Results" ng-disabled="!ctrl.participants || !ctrl.isReviewSuperUser">
             <md-content layout-padding>
                 <md-switch class="md-primary" ng-model="ctrl.viewArchived" aria-label="ViewArchived?">
                     View archived challenges
