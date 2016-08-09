@@ -29,6 +29,9 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
   var quesFromJson = angular.fromJson(self.task.mcqQuestions);
   self.questions = loadQuestions(quesFromJson);
 
+  function markQuestions(){
+
+  }
   function loadQuestions(quesFromJson){
     for(var i = 0; i < quesFromJson.length; i++){
       quesFromJson[i].answers = [];

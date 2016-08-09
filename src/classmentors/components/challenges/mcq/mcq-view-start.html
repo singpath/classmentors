@@ -63,20 +63,23 @@
         Question {{$index + 1}}
       </h3>
       <div align="center" layout="row" >
-        {{question.text}}
+          <label>{{question.text}}</label>
       </div>
+
 
       <!--answer options-->
       <div align="center" layout="row" ng-repeat="option in question.options" >
-
-
         <!--single answer or no?-->
-        <md-input-container>
+        <div flex align="left">
           <h4>{{option.text}}</h4>
-          <md-button ng-model="question.answers" ng-class="question.answers.indexOf($index) != -1 ? 'md-raised md-primary' : 'md-raised'"
-        </md-input-container>
+        </div>
+        <div flex="20">
+        <md-button ng-model="question.answers" ng-class="question.answers.indexOf($index) != -1 ? 'md-raised md-primary' : 'md-raised'"
+                   ng-click="ctrl.toggleOption(question, $index)">Answer</md-button>
+        </div>
+          <md-divider ng-if="!$last"></md-divider>
       </div>
-
+      <md-divider ng-if="!$last"></md-divider>
     </div>
 
     <br>
