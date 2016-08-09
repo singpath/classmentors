@@ -7,6 +7,7 @@ import newCohortTmpl from './cohorts-new-cohort.html!text';
 import cohortViewTmpl from './cohorts-view-cohort.html!text';
 import cohortEditTmpl from './cohorts-edit-cohort.html!text';
 import cohortStatsPageTmpl from './cohorts-view-cohort-stats-page.html!text';
+import cohortRankingPageTmpl from './cohorts-view-cohort-ranking-page.html!text';
 import './cohorts.css!';
 // import d3 from '../../../jspm_packages/graphing/d3.min.js';
 // import '../../../jspm_packages/graphing/c3.min.css';
@@ -851,4 +852,72 @@ ClmCohortStatsPageCtrl.$inject = [
     'spfAlert',
     'clmServicesUrl',
     'clmDataStore'
+];
+
+export function clmCohortRankPageFactory() {
+    return {
+        template: cohortRankingPageTmpl,
+        restrict: 'E',
+        bindToController: true,
+        scope: {
+            cohort: '=',
+            profile: '='
+        },
+        controller: ClmCohortRankPageCtrl,
+        controllerAs: 'ctrl'
+    };
+}
+
+function ClmCohortRankPageCtrl($q, $scope, $log, spfFirebase, clmDataStore, clmPagerOption) {
+
+    var self = this;
+    var unwatchers = [];
+    this.cohortEventData = [];
+
+    getAllEventData();
+
+    function getAllEventData() {
+        var chain = $q.when();
+        for(var eventIndex in self.cohort.events) {
+
+            // for(var i = 0; i < 5; i++) {
+            //     chain = chain.then(function() {
+            //         return $http.get('/data' + i);
+            //     });
+            // }
+
+            chain = chain.then(function () {
+                var event = self.cohort.events[eventIndex];
+                self.cohortEventData[eventIndex] = {};
+                spfFirebase.loadedArray(['classMentors/eventParticipants', event], {
+                    limitToLast: 100
+                }).then(function(promise) {
+                    return promise;
+                }).then(function(data) {
+                    var result = data;
+                    console.log(result);
+                    self.cohortEventData[eventIndex].participants = result;
+                }, function(reason) {
+                    console.log('Failed ' + reason);
+                });
+                spfFirebase.loadedObj(['classMentors/events', event]).then(function(promise) {
+                    return promise;
+                }).then(function(data) {
+                    var result = data;
+                    self.cohortEventData[eventIndex].title = result.title;
+                }, function(reason) {
+                    console.log('Failed ' + reason);
+                });
+            });
+        }
+    }
+    console.log(self.cohortEventData);
+}
+ClmCohortRankPageCtrl.$inject = [
+    '$q',
+    '$scope',
+    '$log',
+    'spfFirebase',
+    'clmDataStore',
+    'clmPagerOption'
 ];

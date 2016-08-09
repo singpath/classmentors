@@ -48,9 +48,12 @@
             </md-content>
         </md-tab>
 
-        <md-tab label="Ranking" ng-disabled="!ctrl.isOwner || true">
+        <md-tab label="Ranking">
             <md-content layout-padding>
-                This is a placeholder for the cohort ranking page
+                <clm-cohorts-ranking-page
+                        cohort="ctrl.cohort"
+                        profile="ctrl.profile">
+                </clm-cohorts-ranking-page>
             </md-content>
         </md-tab>
 

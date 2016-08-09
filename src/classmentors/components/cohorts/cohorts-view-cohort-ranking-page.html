@@ -1,0 +1,34 @@
+<div ng-if="ctrl.loading" layout="row" layout-align="space-around" class="md-padding">
+    <md-progress-circular md-mode="indeterminate"></md-progress-circular>
+</div>
+<div ng-if="!ctrl.loading">
+    <md-content class="md-padding">
+        <button ng-show="ctrl.cohort.owner.publicId==ctrl.profile.$id" type="submit" ng-click="ctrl.updateAllParticipantUserProfiles()">Update All User Achievements</button>
+        <table class="events ranking">
+            <thead>
+            <tr ng-class="{'reversed': ctrl.orderOpts[0].reversed, secondaryReversed: ctrl.orderOpts[1].reversed}">
+                <th ng-class="{orderer: ctrl.orderOpts[0].key == 'name', secondaryOrderer: ctrl.orderOpts[1].key == 'name'}">
+                    <md-button ng-click="ctrl.orderBy('name')">Rank</md-button>
+                </th>
+                <th ng-class="{orderer: ctrl.orderOpts[0].key == 'name', secondaryOrderer: ctrl.orderOpts[1].key == 'name'}">
+                    <md-button ng-click="ctrl.orderBy('name')">Registered Students</md-button>
+                </th>
+                <th ng-class="{orderer: ctrl.orderOpts[0].key == 'schoolName', secondaryOrderer: ctrl.orderOpts[1].key == 'schoolName'}">
+                    <md-button ng-click="ctrl.orderBy('schoolName')">Event</md-button>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="event in ctrl.cohortEventData">
+                    <th>
+                        {{ ctrl.currentUserRanking.$ranking }}
+                    </th>
+                    <td>{{ event.participants.length }}</td>
+                    <td>{{ event.title }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </md-content>
+
+    <clm-pager options="ctrl.pagerOpts" class="md-padding"></clm-pager>
+</div>
