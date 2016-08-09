@@ -877,41 +877,55 @@ function ClmCohortRankPageCtrl($q, $scope, $log, spfFirebase, clmDataStore, clmP
     getAllEventData();
 
     function getAllEventData() {
-        var chain = $q.when();
-        for(var eventIndex in self.cohort.events) {
-
-            // for(var i = 0; i < 5; i++) {
-            //     chain = chain.then(function() {
-            //         return $http.get('/data' + i);
-            //     });
-            // }
-
-            chain = chain.then(function () {
-                var event = self.cohort.events[eventIndex];
-                self.cohortEventData[eventIndex] = {};
+        var iter = 0;
+        loopDBEvents();
+        function loopDBEvents() {
+            var oneEventData = {};
+            var event = self.cohort.events[iter];
+            if(iter < self.cohort.events.length) {
                 spfFirebase.loadedArray(['classMentors/eventParticipants', event], {
                     limitToLast: 100
                 }).then(function(promise) {
                     return promise;
                 }).then(function(data) {
                     var result = data;
-                    console.log(result);
-                    self.cohortEventData[eventIndex].participants = result;
-                }, function(reason) {
-                    console.log('Failed ' + reason);
+                    oneEventData.participants = result;
+                }).then(function () {
+                    spfFirebase.loadedObj(['classMentors/events', event]).then(function(promise) {
+                        return promise;
+                    }).then(function(data) {
+                        var result = data;
+                        oneEventData.title = result.title;
+                        self.cohortEventData.push(oneEventData);
+                        iter++;
+                        loopDBEvents();
+                    })
+                })
+            } else {
+                self.cohortEventData.sort(function(a,b) {
+                    return b.participants.length - a.participants.length;
                 });
-                spfFirebase.loadedObj(['classMentors/events', event]).then(function(promise) {
-                    return promise;
-                }).then(function(data) {
-                    var result = data;
-                    self.cohortEventData[eventIndex].title = result.title;
-                }, function(reason) {
-                    console.log('Failed ' + reason);
-                });
-            });
+                var rank = 1;
+                for(var i = 0; i < self.cohortEventData.length-1; i++) {
+                    if(self.cohortEventData[i].participants.length > self.cohortEventData[i+1].participants.length) {
+                        self.cohortEventData[i].rank = rank;
+                        rank ++;
+                    } else {
+                        self.cohortEventData[i].rank = rank;
+                    }
+                }
+                if(self.cohortEventData[self.cohortEventData.length-1].participants.length < self.cohortEventData[self.cohortEventData.length-2].participants.length) {
+                    rank++;
+                    self.cohortEventData[self.cohortEventData.length-1].rank = rank;
+                } else {
+                    self.cohortEventData[self.cohortEventData.length-1].rank = rank;
+                }
+            }
         }
     }
-    console.log(self.cohortEventData);
+
+    // this.rankings = Array.from(Array(self.cohort.events.length).keys());
+    // console.log(self.rankings);
 }
 ClmCohortRankPageCtrl.$inject = [
     '$q',

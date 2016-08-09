@@ -3,7 +3,7 @@
 </div>
 <div ng-if="!ctrl.loading">
     <md-content class="md-padding">
-        <button ng-show="ctrl.cohort.owner.publicId==ctrl.profile.$id" type="submit" ng-click="ctrl.updateAllParticipantUserProfiles()">Update All User Achievements</button>
+        <!--<button ng-show="ctrl.cohort.owner.publicId==ctrl.profile.$id" type="submit" ng-click="ctrl.updateAllParticipantUserProfiles()">Update All User Achievements</button>-->
         <table class="events ranking">
             <thead>
             <tr ng-class="{'reversed': ctrl.orderOpts[0].reversed, secondaryReversed: ctrl.orderOpts[1].reversed}">
@@ -19,9 +19,9 @@
             </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="event in ctrl.cohortEventData">
+                <tr ng-repeat="event in ctrl.cohortEventData" ng-class="'index-' + $index + ' ' + ($odd ? 'odd' : 'even')">
                     <th>
-                        {{ ctrl.currentUserRanking.$ranking }}
+                        {{ event.rank }}
                     </th>
                     <td>{{ event.participants.length }}</td>
                     <td>{{ event.title }}</td>
