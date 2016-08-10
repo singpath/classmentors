@@ -24,7 +24,7 @@
 
                         ng-model="ctrl.task.priority"
                         min="0" step="1"
-                        placeholder="Challenge priority" value="{{ctrl.task.priority}}"
+                        placeholer="Challenge priority" value="{{ctrl.task.priority}}"
 
                     />
                     <div ng-messages="editTask.editTaskPriority.$error">
@@ -293,7 +293,7 @@
             2. -->
 
 
-            <!--<md-button type="button" class="md-raised" ng-disabled="!ctrl.enableBeta" ng-href="#{{ctrl.challengeRouteProvider(ctrl.taskType)}}">Continue*</md-button>-->
+            <md-button type="button" class="md-raised" ng-disabled="!ctrl.enableBeta" ng-href="#{{ctrl.challengeRouteProvider(ctrl.taskType, ctrl.task, ctrl.isOpen)}}">Continue BETA*</md-button>
             <md-button type="submit" class="md-raised md-primary" ng-disabled="editTask.$invalid || !ctrl.taskType ||ctrl.savingTask">{{ ctrl.challengeRouteProvider($event, ctrl.event, ctrl.task, ctrl.taskType, ctrl.isOpen)}}</md-button>
             <md-button type="reset" class="md-raised" ng-click="ctrl.discardChanges($event,ctrl.task)">Back</md-button>
 

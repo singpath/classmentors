@@ -218,10 +218,10 @@ function surveyFormEvent($scope, clmSurvey, spfFirebase, clmDataStore, $log, spf
     //console.log("surveyFormEvent eventId : " + sharedData.taskType);
     var getTask = sharedData.task;
     var self = this;
-    /////////
+
     this.saveSurveyTask = function (surveyType) {
         var copy = spfFirebase.cleanObj(getTask);
-        //console.log('What is survey? ', surveyType);
+        console.log('my copy is ', copy);
         if (sharedData.taskType === 'linkPattern') {
             delete copy.badge;
             delete copy.serviceId;
@@ -295,7 +295,6 @@ function baseEditCtrlInitialData(sharedData, $q, $route, spfAuthData, clmDataSto
 
 
     var sharedData = clmSurvey.get();
-    //console.log("baseeditctrlinitialdata spfAuthData: " + sharedData.currentUser);
     var errNoEvent = new Error('Event not found');
     var errNotAuthaurized = new Error('You cannot edit this event');
     var eventId = $route.current.params.eventId;
