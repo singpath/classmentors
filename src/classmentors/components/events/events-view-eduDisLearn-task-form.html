@@ -4,15 +4,122 @@
             <h1>Education vs Dissatisfaction with learning</h1>
         </div>
 
-        <md-input container flex>
 
-            <div><h4>{{ctrl.questionsArr2[0].qnObj['title']}}</h4></div>
-            
-            <div ng-repeat="(key, value) in ctrl.questionsArr2[0].qnObj">
-                <div ng-if="key != 'title'">{{value}}</div>
-            </div>
+        <table ng-repeat="(key, value) in ctrl.questions[0]" width="100%">
+            <tr>
+                <td><h3>{{value.title}}</h3></td>
+            </tr>
+
+            <tr ng-if="key =='18'">
+                <td>
+                    <textarea placeholder="Share some of your most exciting moments here!" type="text" cols="80"
+                              rows="5" style="max-width:500px; max-height: 200px" ng-model="$parent.$parent.bestResponse"></textarea>
+
+                    <md-button class="md-raised md-primary" data-id="1"
+                               ng-click="ctrl.saveEduDisResponse(ansResp , age, $event, task.$id, sib, selectedMonth, country, spokenLanguage, value.title, bestResponse)">
+
+                        Save
+                    </md-button>
+                </td>
+            </tr>
+            <tr ng-if="key2 != 'title'" ng-repeat="(key2, value2) in value"
+                ng-class="'index-' + $index + ' ' + ($odd ? 'odd' : 'even')">
+                <td style="width:800px">
+                    {{value2}}
+                </td>
+
+                <td>
+                    <md-radio-group ng-if="key != '6'" layout="row" ng-model="$parent.ansResp">
+                        <div ng-repeat="ratingOption in ctrl.ratingOptions">
+                            <md-radio-button style="margin-right:20px" class="md-primary" ng-value="ratingOption.id">
+                                {{ratingOption.id}}
+                            </md-radio-button>
+                        </div>
+                    </md-radio-group>
+                    <div ng-if="key == '6'">
+                        <div ng-if="key2 == '1'">
+                            <input placeholder="State a valid age" ng-model="$parent.$parent.age" type="number" min="3" style="width: 30%"/> years old
+                        </div>
+                        <div ng-if="key2 == '2'">
+                            <table width="100%">
+                                <tr>
+                                    <td ng-repeat="family in ctrl.familyMembers">
+                                        <md-checkbox  value="{{family.name}}" ng-click="ctrl.toggle(family, ctrl.selectedFamily)" ng-checked="ctrl.exists(family, ctrl.selectedFamily)">
+                                            {{family.name}}
+                                        </md-checkbox>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div ng-if="key2 == '3'">
+                            <input placeholder="Number of siblings" ng-model="$parent.$parent.sib" type="number" min="0" style="width: 30%"/>
+                        </div>
+                        <div ng-if="key2 == '4'">
+                            <md-input-container flex>
+                                <label>Month</label>
+                                <md-select ng-model="$parent.$parent.selectedMonth">
+                                    <md-option ng-repeat="bday in ctrl.bdayMonth" value="{{bday.month}}">
+                                        {{bday.month}}
+                                    </md-option>
+                                </md-select>
+                            </md-input-container>
+                        </div>
+                        <div ng-if="key2 == '5'">
+                            <table width="100%">
+                                <tr>
+                                    <td ng-if="ethnic.firstRow" ng-repeat="ethnic in ctrl.ethnicity">
+                                        <md-checkbox ng-click="ctrl.toggle(ethnic, ctrl.selectedRaceEthnicity)" ng-checked="ctrl.exists(ethnic, ctrl.selectedRaceEthnicity)"
+                                                     value="{{ethnic.firstRow}}">
+                                            {{ethnic.firstRow}}
+                                        </md-checkbox>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td ng-if="ethnic.secondRow" ng-repeat="ethnic in ctrl.ethnicity">
+                                        <md-checkbox ng-click="ctrl.toggle(ethnic, ctrl.selectedRaceEthnicity)" ng-checked="ctrl.exists(ethnic, ctrl.selectedRaceEthnicity)"
+                                                     value="{{ethnic.secondRow}}">
+                                            {{ethnic.secondRow}}
+                                        </md-checkbox>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div ng-if="key2 == '6'">
+                            <input type="text" placeholder="State a valid country" ng-model="$parent.$parent.country"/>
+                        </div>
+                        <div ng-if="key2 == '7'">
+                            <input type="text" placeholder="State a valid language" ng-model="$parent.$parent.spokenLanguage"/>
+                            for multiple languages, separate by a comma (,)
+                        </div>
+
+                    </div>
+                </td>
+
+                <td align="center">
+                    <md-button ng-if="key2 != '5' && key2 != '2'" class="md-raised md-primary" data-id="{{key2}}"
+                               ng-click="ctrl.saveEduDisResponse(ansResp , age, $event, task.$id, sib, selectedMonth, country, spokenLanguage, value.title)">
+                        Save
+                    </md-button>
+                    <md-button ng-if="key2 == '2'" class="md-raised md-primary" data-id="{{key2}}"
+                                ng-click="ctrl.saveEduDisMultiResponse(ctrl.selectedFamily, $event, task.$id, value.title)">
+                        Save
+                    </md-button>
+
+                    <md-button ng-if="key2 == '5'" class="md-raised md-primary" data-id="{{key2}}"
+                               ng-click="ctrl.saveEduDisMultiResponse(ctrl.selectedRaceEthnicity, $event, task.$id, value.title)">
+                        Save
+                    </md-button>
 
 
-        </md-input>
+                </td>
+            </tr>
+
+            <md-divider></md-divider>
+
+        </table>
+
+        <!--<md-button class="md-raised md-primary" ng-click="$location.path('#/new-page.html')">Next</md-button>-->
+
+
     </form>
 </md-content>

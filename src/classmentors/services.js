@@ -1079,6 +1079,58 @@ export function clmDataStoreFactory(
 
       },
 
+      saveSurveyEduDisResponse: function(surveyResp, questionNumber, taskId, eventId, userId, surveyTask, qnTitle){
+        if (!surveyResp) {
+            return $q.reject(new Error('No responses provided'));
+        }
+        if (!questionNumber) {
+            return $q.reject(new Error('Invalid survey question'));
+        }
+        if (!taskId) {
+            return $q.reject(new Error('No task id provided'));
+        }
+        if (!eventId) {
+            return $q.reject(new Error('No event id provided'));
+        }
+        if (!userId) {
+            return $q.reject(new Error('No user id provided'));
+        }
+        if(!surveyTask){
+            return $q.reject(new Error('No survey task provided'));
+        }
+        if(!qnTitle){
+            return $q.reject(new Error('No question title provided'));
+        }
+          console.log("qntitle isss", qnTitle);
+          return spfFirebase.set(['classMentors/surveyResponse', eventId, taskId, surveyTask, userId, qnTitle, questionNumber], surveyResp);
+      },
+    
+        saveSurveyEduDisMultiResponse: function (responses, questionNumber, taskId, eventId, userId, surveyTask, qnTitle ){
+            if (!responses) {
+                return $q.reject(new Error('No responses provided'));
+            }
+            if (!questionNumber) {
+                return $q.reject(new Error('Invalid survey question'));
+            }
+            if (!taskId) {
+                return $q.reject(new Error('No task id provided'));
+            }
+            if (!eventId) {
+                return $q.reject(new Error('No event id provided'));
+            }
+            if (!userId) {
+                return $q.reject(new Error('No user id provided'));
+            }
+            if(!surveyTask){
+                return $q.reject(new Error('No survey task provided'));
+            }
+            if(!qnTitle){
+                return $q.reject(new Error('No question title provided'));
+            }
+            console.log("qntitle isss", qnTitle);
+            return spfFirebase.set(['classMentors/surveyResponse', eventId, taskId, surveyTask, userId, qnTitle, questionNumber], responses);
+        },
+
       submitSolution: function(eventId, taskId, publicId, link) {
         if (!eventId) {
           return $q.reject(new Error('No event id provided'));

@@ -1942,10 +1942,21 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
 
     //for motivated strategies for learning survey
     //then function will execute last
+    var self = this;
+    this.questions = initialData.survey2;
+    this.ratingOptions = [
+        {id: 1},
+        {id: 2},
+        {id: 3},
+        {id: 4},
+        {id: 5},
+        {id: 6},
+        {id: 7}
+    ];
 
     if ($routeParams.surveyTask === 'Motivated strategies for learning') {
 
-        var self = this;
+
         self.questionsArr = [];
         //console.log("please give me my promise: ", initialData.survey2);
         // for (var i = 1; i < Object.keys(initialData.survey2[0]).length - 1; i++) {
@@ -1961,59 +1972,65 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
         }
 
 
-        self.ratingOptions = [
-            {id: 1},
-            {id: 2},
-            {id: 3},
-            {id: 4},
-            {id: 5},
-            {id: 6},
-            {id: 7}
-        ];
-
-
     }
 
     if ($routeParams.surveyTask === 'Education vs Dissatisfaction with learning') {
         //TODO: POPULATE THIS LAST SURVEYYYYYY!!!
+        this.familyMembers = [
+            {name: 'Father'},
+            {name: 'Mother'},
+            {name: 'Sister(s)'},
+            {name: 'Brother(s)'},
+            {name: 'Relative(s)'},
+            {name: 'Grandparent(s)'}
+        ]
+        this.selectedFamily = [];
+        this.selectedRaceEthnicity = [];
 
-        var self = this;
-        console.log("TESTTTTTTTT", initialData.survey2[0]);
+        this.toggle = function (item, list) {
+            console.log("got come in here");
+            var idx = list.indexOf(item);
+            if (idx > -1) {
+                list.splice(idx, 1);
 
-        self.questionsArr2 = [];
-        for (var i = 1; i <= Object.keys(initialData.survey2[0]).length - 3; i++) {
-            self.questionsArr2.push({qnObj: initialData.survey2[0][i]});
+            }
+            else {
+                list.push(item);
 
-        }
-        
-        for (var i = 0; i < self.questionsArr2.length; i++) {
-            console.log("printed output is", self.questionsArr2[i].qnObj);
-        }
+            }
+            return list
+        };
 
-        // angular.forEach(initialData.survey2[0], function (value, key1) {
-        //     if (key1 !== '$id' && key1 !== '$priority') {
-        //         //stores all question alphabets into json var
-        //         self.questionsArrVal.push({'keyQn': key1});
-        //     }
-        // });
+        this.exists = function (item, list) {
+            return list.indexOf(item) > -1;
+        };
 
 
-        //console.log("qnArr length", self.questionsArrVal.length);
-        // for(var k = 0  ;  k < self.questionsArrVal.length; k++){
-        //     console.log("text qn is:: ", self.questionsArrVal[k].txtQn);
-        // }
+        this.bdayMonth = [
+            {month: 'January'},
+            {month: 'February'},
+            {month: 'March'},
+            {month: 'April'},
+            {month: 'May'},
+            {month: 'June'},
+            {month: 'July'},
+            {month: 'August'},
+            {month: 'September'},
+            {month: 'October'},
+            {month: 'November'},
+            {month: 'December'}
+        ];
 
-        //todo: store the values of the questions into a json object
+        this.ethnicity = [
+            {firstRow: 'White'},
+            {firstRow: 'African American'},
+            {firstRow: 'Hispanic/Latino'},
+            {secondRow: 'Asian'},
+            {secondRow: 'Native Hawaii/Pacific Islander'},
+            {secondRow: 'Other'},
+        ];
 
-
-        // console.log("length: ", Object.keys(initialData.survey2[0]).length);
-        // for(var i = 0 ; i < Object.keys(initialData.survey2[0]).length; i++){
-        //     console.log("values areee::", initialData.survey2[0]);
-        // }
-
-        // for (var k = 0; k < self.questionsArrVal.length; k++) {
-        //     console.log("the keys are: ", self.questionsArrVal[k]);
-        // }
+        this.selectEthnicity = [];
 
 
     }
@@ -2038,6 +2055,9 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
         var eventId = initialData.event.$id;
         var userId = initialData.currentUser.publicId;
         var surveyType = $routeParams.surveyTask;
+
+
+        //console.log("ans reponse is::", ansResponse);
         //retrieve values from firebase as a json object
         /*var promise = spfFirebase.loadedArray(['classMentors/surveyTemplate']);
          var tempValue;
@@ -2056,6 +2076,106 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
         //end//
         console.log("all the VALUES HERE: " + surveyResp + ", " + questionNumber + "," + taskId + ", " + eventId + ", " + userId + ", " + surveyType)
         clmDataStore.events.saveSurveyResponse(surveyResp, questionNumber, taskId, eventId, userId, surveyType);
+    }
+    this.saveEduDisMultiResponse = function (selectedArr, item, task, qnTitle) {
+
+        var questionNumber = item.currentTarget.getAttribute("data-id");
+        var taskId = $routeParams.taskId;
+        var eventId = initialData.event.$id;
+        var userId = initialData.currentUser.publicId;
+        var surveyType = $routeParams.surveyTask;
+
+        console.log("questions number issss", questionNumber);
+
+        if (questionNumber == 2) {
+            var familyArr = [];
+
+            //transfer selected family members values into array
+            for (var i = 0; i < selectedArr.length; i++) {
+                familyArr.push(selectedArr[i].name);
+            }
+
+            clmDataStore.events.saveSurveyEduDisMultiResponse(familyArr, questionNumber, taskId, eventId, userId, surveyType, qnTitle);
+        }
+        if (questionNumber == 5) {
+            var ethnicityRace = [];
+            //transfer selected race and ethnicity values into array
+            for (var i = 0; i < selectedArr.length; i++) {
+
+                if (selectedArr[i].firstRow != undefined) {
+                    ethnicityRace.push(selectedArr[i].firstRow);
+                }
+                if (selectedArr[i].secondRow != undefined) {
+                    ethnicityRace.push(selectedArr[i].secondRow);
+                }
+
+            }
+            clmDataStore.events.saveSurveyEduDisMultiResponse(ethnicityRace, questionNumber, taskId, eventId, userId, surveyType, qnTitle);
+        }
+
+        //clmDataStore.events.saveSurveyEduDisMultiResponse(familyArr, questionNumber, taskId, eventId, userId, surveyType, qnTitle);
+
+
+    }
+    this.saveEduDisResponse = function (response, age, item, task, siblingNum, selectedMonth, country, language, qnTitle, bestResp) {
+        console.log("qn title is", qnTitle);
+        console.log("qn Number is", item.currentTarget.getAttribute("data-id"));
+
+
+        var surveyResp = response;
+        var questionNumber = item.currentTarget.getAttribute("data-id");
+        var taskId = $routeParams.taskId;
+        var eventId = initialData.event.$id;
+        var userId = initialData.currentUser.publicId;
+        var surveyType = $routeParams.surveyTask;
+        //new codes
+        var ageResp = age;
+        var sibResp = siblingNum;
+        var monthResp = selectedMonth;
+        var qnTitle = qnTitle;
+        var bornCountry = country;
+        var spokenLanguage = language;
+        var bestResp = bestResp;
+
+        if (surveyResp != undefined) {
+            clmDataStore.events.saveSurveyEduDisResponse(surveyResp, questionNumber, taskId, eventId, userId, surveyType, qnTitle);
+        }
+        else if (ageResp != undefined) {
+            console.log("THE VALUES ARE: " + ageResp + ", " + questionNumber + ", " + taskId + ", " + eventId + ", " + userId + ", " + surveyType + ", " + qnTitle)
+            clmDataStore.events.saveSurveyEduDisResponse(ageResp, questionNumber, taskId, eventId, userId, surveyType, qnTitle);
+        }
+
+        else if (sibResp != undefined) {
+            clmDataStore.events.saveSurveyEduDisResponse(sibResp, questionNumber, taskId, eventId, userId, surveyType, qnTitle);
+
+        }
+        else if (monthResp != undefined) {
+            clmDataStore.events.saveSurveyEduDisResponse(monthResp, questionNumber, taskId, eventId, userId, surveyType, qnTitle);
+        }
+
+        else if (bornCountry != undefined) {
+            clmDataStore.events.saveSurveyEduDisResponse(bornCountry, questionNumber, taskId, eventId, userId, surveyType, qnTitle);
+        }
+        else if (spokenLanguage != undefined) {
+            clmDataStore.events.saveSurveyEduDisResponse(spokenLanguage, questionNumber, taskId, eventId, userId, surveyType, qnTitle);
+        }
+        else if (bestResp != undefined) {
+            clmDataStore.events.saveSurveyEduDisResponse(bestResp, questionNumber, taskId, eventId, userId, surveyType, qnTitle);
+        }
+
+        // console.log("ALL RETRIEVED VALUES: " + surveyResp + ", " + questionNumber + ", " + taskId
+        // + ", " + eventId + ", " + userId + ", " + surveyType + ", " + ageResp + ", " + sibResp +
+        //         ", " + monthResp + ", " + qnTitle + ", " + bornCountry + ", " + spokenLanguage + ", "
+        //     + spokenLanguage + ", " + bestResp);
+
+        // for(var z = 0 ; z < familyArr.length; z++){
+        //     console.log("ALL RETRIEVED VALUES:" + familyArr[z]);
+        // }
+        //
+        // for(var k = 0; k < ethnicityRace.length; k++){
+        //     console.log("ALL RETRIEVED VALUES:" + ethnicityRace[k]);
+        // }
+
     }
 };
 
