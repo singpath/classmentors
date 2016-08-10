@@ -15,7 +15,7 @@ export function configRoute($routeProvider, routes){
             controller: mcq.newMcqController,
             controllerAs: 'ctrl',
             resolve:{
-              initialData: initialData
+              initialData: createMCQinitialData
             }
         })
 
@@ -41,29 +41,49 @@ export function configRoute($routeProvider, routes){
             controller: mcq.startMcqController,
             controllerAs: 'ctrl',
             resolve:{
-              initialData: initialData
+              initialData: startMCQinitialData
             }
         });
 
 }
 configRoute.$inject = ['$routeProvider', 'routes'];
 
-//default initial data for each route
-function initialData($q, eventService){
+// Initial data for starting an MCQ
+function startMCQinitialData($q, eventService, clmDataStore){
+  var data =  eventService.get();
+  return clmDataStore.events.getTaskAnswers(data.eventId, data.taskId).then(
+      function(result){
+        return {
+          data: data,
+          correctAnswers: result
+        }
+      }, function(error){
+        console.log(error);
+      }
+  );
+}
+startMCQinitialData.$inject = [
+    '$q',
+    'eventService',
+    'clmDataStore'
+]
+
+// Initial data for creating MCQ
+function createMCQinitialData($q, eventService){
   var data =  eventService.get();
   console.log(data);
   return data;
 }
-initialData.$inject = [
-    '$q',
-    'eventService'
+createMCQinitialData.$inject = [
+  '$q',
+  'eventService'
 ]
 
 //TODO: Generic save function
 export function challengeServiceFactory
   ($q, $route, spfAuthData, clmDataStore, spfFirebase, $log, spfAlert, $location, urlFor){
   return {
-    save : function(event, _, task, taskType, isOpen) {
+    save : function(event, taskId, task, taskType, isOpen) {
       var copy = spfFirebase.cleanObj(task);
       var answers = copy.answers;
       console.log('COPY IS ... ', copy);
@@ -93,14 +113,10 @@ export function challengeServiceFactory
       }
 
       self.creatingTask = true;
-      clmDataStore.events.addTask(event.$id, copy, isOpen)
-        .then(function() {
+      var ref = clmDataStore.events.addTaskWithAns(event.$id, copy, isOpen,answers);
+      ref.then(function() {
           spfAlert.success('Task created');
           $location.path(urlFor('editEvent', {eventId: event.$id}));
-        }).then(function(){
-            if(answers != null){
-              clmDataStore.events.addTaskAnswers(event.$id, answers)
-            }
         }).catch(function(err) {
             $log.error(err);
             spfAlert.error('Failed to created new task');

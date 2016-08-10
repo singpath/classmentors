@@ -563,6 +563,29 @@ export function clmDataStoreFactory(
     },
 
     events: {
+      addTaskWithAns: function(eventId, task, isOpen, answers) {
+        var priority = task.priority || 0;
+        console.log('Eventid is ? ', eventId);
+        console.log('task is : ', task);
+        if (isOpen) {
+          task.openedAt = {'.sv': 'timestamp'};
+          task.closedAt = null;
+        } else {
+          task.closedAt = {'.sv': 'timestamp'};
+          task.openedAt = null;
+        }
+
+        return spfFirebase.push(['classMentors/eventTasks', eventId], task).then(function(ref) {
+          ref.setPriority(priority);
+          var taskId = ref.key();
+          spfFirebase.set(['classMentors/eventAnswers',eventId,taskId], answers);
+          return ref;
+        });
+      },
+      getTaskAnswers: function(eventId,taskId){
+        return spfFirebase.loadedObj(['classMentors/eventAnswers',eventId,taskId]);
+      },
+
       updateTaskAnswers: function(){
 
       },

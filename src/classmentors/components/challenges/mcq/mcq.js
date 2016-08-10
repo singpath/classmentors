@@ -21,17 +21,37 @@ function mcqQuestionFactory(){
 
 export function startMcqController(initialData, challengeService, clmDataStore, $location, $mdDialog,urlFor ){
   var self = this;
-  var data = initialData;
+  var data = initialData.data;
   var eventId = data.eventId;
   var taskId = data.taskId;
   var participant = data.participant;
+  var correctAnswers = angular.fromJson(initialData.correctAnswers.$value);
+  console.log(correctAnswers);
   self.task = data.task;
   var quesFromJson = angular.fromJson(self.task.mcqQuestions);
   self.questions = loadQuestions(quesFromJson);
 
-  function markQuestions(){
+  function arraysEqual(arr1, arr2) {
+    if(arr1.length !== arr2.length)
+      return 0;
+    for(var i = arr1.length; i--;) {
+      if(arr1[i] !== arr2[i])
+        return 0;
+    }
 
+    return 1;
   }
+
+  function markQuestions(submittedAnswers){
+    console.log('Correct Answers...', correctAnswers);
+    console.log('Submitted Answers...', submittedAnswers);
+    var score = 0;
+    for(var i = 0; i < submittedAnswers.length; i ++){
+      score += arraysEqual(submittedAnswers[i], correctAnswers[i]);
+    }
+    return score;
+  }
+
   function loadQuestions(quesFromJson){
     for(var i = 0; i < quesFromJson.length; i++){
       quesFromJson[i].answers = [];
@@ -40,14 +60,24 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
   };
 
   self.submit = function(){
+    var submission = {};
     var userAnswers = [];
     for(var i = 0; i < self.questions.length; i++){
       userAnswers.push(self.questions[i].answers);
     }
-    var answerString = angular.toJson(userAnswers);
+    submission.userAnswers = userAnswers;
+    var score = markQuestions(userAnswers);
+    console.log(submission.score);
+    var answerString = angular.toJson(submission);
     console.log(answerString);
-    clmDataStore.events.submitSolution(eventId, taskId, participant.$id, answerString);
-    $location.path('/events/'+eventId);
+    clmDataStore.events.submitSolution(eventId, taskId, participant.$id, answerString)
+      .then(
+        clmDataStore.events.saveScore(eventId, participant.$id, taskId, score)
+      ).then(
+      $location.path('/events/'+eventId)
+    );
+
+
   }
 
   console.log(self.questions);
@@ -131,7 +161,7 @@ export function newMcqController(initialData, challengeService, $filter,$mdDialo
     // Parameters: event, taskid, task, taskType, isOpen
     var event = initialData.event;
     var task = initialData.task;
-    var taskId = task.taskId;
+    var taskId = initialData.taskId;
     var taskType = initialData.taskType;
     var isOpen = initialData.isOpen;
     task.mcqQuestions = answersJsonText;
