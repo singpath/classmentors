@@ -7,6 +7,7 @@ import newCohortTmpl from './cohorts-new-cohort.html!text';
 import cohortViewTmpl from './cohorts-view-cohort.html!text';
 import cohortEditTmpl from './cohorts-edit-cohort.html!text';
 import cohortStatsPageTmpl from './cohorts-view-cohort-stats-page.html!text';
+import cohortRankingPageTmpl from './cohorts-view-cohort-ranking-page.html!text';
 import './cohorts.css!';
 // import d3 from '../../../jspm_packages/graphing/d3.min.js';
 // import '../../../jspm_packages/graphing/c3.min.css';
@@ -851,4 +852,86 @@ ClmCohortStatsPageCtrl.$inject = [
     'spfAlert',
     'clmServicesUrl',
     'clmDataStore'
+];
+
+export function clmCohortRankPageFactory() {
+    return {
+        template: cohortRankingPageTmpl,
+        restrict: 'E',
+        bindToController: true,
+        scope: {
+            cohort: '=',
+            profile: '='
+        },
+        controller: ClmCohortRankPageCtrl,
+        controllerAs: 'ctrl'
+    };
+}
+
+function ClmCohortRankPageCtrl($q, $scope, $log, spfFirebase, clmDataStore, clmPagerOption) {
+
+    var self = this;
+    var unwatchers = [];
+    this.cohortEventData = [];
+
+    getAllEventData();
+
+    function getAllEventData() {
+        var iter = 0;
+        loopDBEvents();
+        function loopDBEvents() {
+            var oneEventData = {};
+            var event = self.cohort.events[iter];
+            if(iter < self.cohort.events.length) {
+                spfFirebase.loadedArray(['classMentors/eventParticipants', event], {
+                    limitToLast: 100
+                }).then(function(promise) {
+                    return promise;
+                }).then(function(data) {
+                    var result = data;
+                    oneEventData.participants = result;
+                }).then(function () {
+                    spfFirebase.loadedObj(['classMentors/events', event]).then(function(promise) {
+                        return promise;
+                    }).then(function(data) {
+                        var result = data;
+                        oneEventData.title = result.title;
+                        self.cohortEventData.push(oneEventData);
+                        iter++;
+                        loopDBEvents();
+                    })
+                })
+            } else {
+                self.cohortEventData.sort(function(a,b) {
+                    return b.participants.length - a.participants.length;
+                });
+                var rank = 1;
+                for(var i = 0; i < self.cohortEventData.length-1; i++) {
+                    if(self.cohortEventData[i].participants.length > self.cohortEventData[i+1].participants.length) {
+                        self.cohortEventData[i].rank = rank;
+                        rank ++;
+                    } else {
+                        self.cohortEventData[i].rank = rank;
+                    }
+                }
+                if(self.cohortEventData[self.cohortEventData.length-1].participants.length < self.cohortEventData[self.cohortEventData.length-2].participants.length) {
+                    rank++;
+                    self.cohortEventData[self.cohortEventData.length-1].rank = rank;
+                } else {
+                    self.cohortEventData[self.cohortEventData.length-1].rank = rank;
+                }
+            }
+        }
+    }
+
+    // this.rankings = Array.from(Array(self.cohort.events.length).keys());
+    // console.log(self.rankings);
+}
+ClmCohortRankPageCtrl.$inject = [
+    '$q',
+    '$scope',
+    '$log',
+    'spfFirebase',
+    'clmDataStore',
+    'clmPagerOption'
 ];
