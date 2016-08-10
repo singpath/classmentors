@@ -158,6 +158,16 @@
                                 </md-button>
                             </span>
                         </div>
+
+                        <div ng-if="task.survey">
+
+                                <md-button class="md-raised md-primary"
+                                           aria-label="Submit survey"
+                                           ng-click="ctrl.promptForSurvey(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant, ctrl.currentUserSolutions)"
+                                           ng-disabled="task.closedAt"
+                                >
+                                    Start Survey
+                        </div>
                     </td>
                 </tr>
 
