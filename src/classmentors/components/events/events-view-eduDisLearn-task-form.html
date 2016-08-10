@@ -96,16 +96,22 @@
                 </td>
 
                 <td align="center">
-                    <md-button ng-if="key2 != '5' && key2 != '2'" class="md-raised md-primary" data-id="{{key2}}"
+                    <md-button ng-if="(key =='6' && key2 != '2') && (key == '6' && key2 != '5')" class="md-raised md-primary" data-id="{{key2}}"
                                ng-click="ctrl.saveEduDisResponse(ansResp , age, $event, task.$id, sib, selectedMonth, country, spokenLanguage, value.title)">
                         Save
                     </md-button>
-                    <md-button ng-if="key2 == '2'" class="md-raised md-primary" data-id="{{key2}}"
+
+                    <md-button ng-if="key !='6'" class="md-raised md-primary" data-id="{{key2}}"
+                               ng-click="ctrl.saveEduDisResponse(ansResp , age, $event, task.$id, sib, selectedMonth, country, spokenLanguage, value.title)">
+                        Save
+                    </md-button>
+
+                    <md-button ng-if="(key == '6' && key2 == '2')" class="md-raised md-primary" data-id="{{key2}}"
                                 ng-click="ctrl.saveEduDisMultiResponse(ctrl.selectedFamily, $event, task.$id, value.title)">
                         Save
                     </md-button>
 
-                    <md-button ng-if="key2 == '5'" class="md-raised md-primary" data-id="{{key2}}"
+                    <md-button ng-if="(key=='6' && key2 == '5')" class="md-raised md-primary" data-id="{{key2}}"
                                ng-click="ctrl.saveEduDisMultiResponse(ctrl.selectedRaceEthnicity, $event, task.$id, value.title)">
                         Save
                     </md-button>
