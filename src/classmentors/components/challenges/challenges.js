@@ -11,11 +11,12 @@ import * as survey from './survey/survey.js';
 export function configRoute($routeProvider, routes){
     $routeProvider
         .when(routes.viewMcq, {
-            template: mcq.showTmpl,
-            controllerAs: 'ctrl',
             template: mcq.newMcqTmpl,
             controller: mcq.newMcqController,
-            controllerAs: 'ctrl'
+            controllerAs: 'ctrl',
+            resolve:{
+              initialData: initialData
+            }
         })
 
         .when(routes.editMcq, {
@@ -33,10 +34,30 @@ export function configRoute($routeProvider, routes){
             resolve: {
                 initialData: getTaskSurveyValues
             }
+        })
+
+        .when(routes.startMcq, {
+            template: mcq.starMcqTmpl,
+            controller: mcq.startMcqController,
+            controllerAs: 'ctrl',
+            resolve:{
+              initialData: initialData
+            }
         });
 
 }
 configRoute.$inject = ['$routeProvider', 'routes'];
+
+//default initial data for each route
+function initialData($q, eventService){
+  var data =  eventService.get();
+  console.log(data);
+  return data;
+}
+initialData.$inject = [
+    '$q',
+    'eventService'
+]
 
 //TODO: Generic save function
 export function challengeServiceFactory
@@ -44,6 +65,8 @@ export function challengeServiceFactory
   return {
     save : function(event, _, task, taskType, isOpen) {
       var copy = spfFirebase.cleanObj(task);
+      var answers = copy.answers;
+      console.log('COPY IS ... ', copy);
       if (taskType === 'linkPattern') {
         delete copy.badge;
         delete copy.serviceId;
@@ -58,7 +81,7 @@ export function challengeServiceFactory
       }else if (taskType === 'multipleChoice'){
         delete copy.singPathProblem;
         delete copy.badge;
-        copy.mcqQuestions = 'test';
+        delete copy.answers;
       } else {
         delete copy.singPathProblem;
         copy.badge = spfFirebase.cleanObj(task.badge);
@@ -72,9 +95,12 @@ export function challengeServiceFactory
       self.creatingTask = true;
       clmDataStore.events.addTask(event.$id, copy, isOpen)
         .then(function() {
-          console.log('FAILS!');
           spfAlert.success('Task created');
           $location.path(urlFor('editEvent', {eventId: event.$id}));
+        }).then(function(){
+            if(answers != null){
+              clmDataStore.events.addTaskAnswers(event.$id, answers)
+            }
         }).catch(function(err) {
             $log.error(err);
             spfAlert.error('Failed to created new task');

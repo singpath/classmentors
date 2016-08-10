@@ -1,0 +1,75 @@
+<md-content flex class="md-padding">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+          rel="stylesheet">
+    <md-tabs md-dynamic-height="true" md-border-bottom="true">
+
+        <md-tab label="Announcements">
+            <md-content layout-padding>
+                Events within this cohort:
+                <md-select flex ng-model="ctrl.selectedEvent" name="selectEvent" placeholder="View cohort events">
+                    <md-option disabled ng-value="event" ng-repeat="event in ctrl.cohort.events">
+                        {{ctrl.events[event].title}}
+                    </md-option>
+                </md-select>
+                Go to my event:<br>
+                <md-button aria-label="Child Event" class="md-raised md-primary" ng-repeat="event in ctrl.cohort.events" ng-if="ctrl.joinedEvents[event]" ng-href="#{{ 'oneEvent' | urlFor: {eventId: event} }}">
+                    {{ctrl.events[event].title}}
+                </md-button>
+                <h3>Featured Announcements</h3>
+                <md-card ng-repeat="a in ctrl.announcements" ng-if="a.featured && a.visible">
+                    <md-toolbar>
+                        <md-card-title>
+                            <md-card-title-text>
+                                <span class="md-headline">{{a.title}}</span>
+                            </md-card-title-text>
+                        </md-card-title>
+                    </md-toolbar>
+                    <md-card-content>
+                        <p class="subhead">By {{a.madeBy}} at {{a.madeAt|date:'yyyy-MM-dd HH:mm'}}</p>
+                        <div style="white-space: pre-wrap;">{{(a.content | cmTruncated: 2000).content}}<md-button ng-if="(a.content | cmTruncated: 2000).truncated" class="material-icons" ng-click="ctrl.viewFullAnnouncement(a.content, a.title)">visibility<md-tooltip>View full announcement</md-tooltip></md-button></div>
+                    </md-card-content>
+                </md-card>
+                <h3>Announcements</h3>
+                <md-content layout="row" layout-wrap>
+                    <md-card ng-repeat="a in ctrl.announcements" ng-if="!a.featured && a.visible" flex="49" style="min-width: 400px;">
+                        <md-toolbar>
+                            <md-card-title>
+                                <md-card-title-text>
+                                    <span class="md-headline">{{a.title}}</span>
+                                </md-card-title-text>
+                            </md-card-title>
+                        </md-toolbar>
+                        <md-card-content>
+                            <p class="subhead">By {{a.madeBy}} at {{a.madeAt|date:'yyyy-MM-dd HH:mm'}}<md-button ng-if="(a.content | cmTruncated: 300).truncated" class="material-icons" ng-click="ctrl.viewFullAnnouncement(a.content, a.title)">visibility<md-tooltip>View full announcement</md-tooltip></md-button></p>
+                            <div style="white-space: pre-wrap;">{{(a.content | cmTruncated: 140).content}}</div>
+                        </md-card-content>
+                    </md-card>
+                </md-content>
+            </md-content>
+        </md-tab>
+
+        <md-tab label="Ranking">
+            <md-content layout-padding>
+                <clm-cohorts-ranking-page
+                        cohort="ctrl.cohort"
+                        profile="ctrl.profile">
+                </clm-cohorts-ranking-page>
+            </md-content>
+        </md-tab>
+
+        <md-tab label="Stats" ng-disabled="!ctrl.isOwner || true">
+            <md-content layout-padding>
+
+                <!--<link href="../../../jspm_packages/graphing/c3.min.css" rel="stylesheet" type="text/css">-->
+                <!--<script src="../../../jspm_packages/graphing/d3.min.js"></script>-->
+                <!--<script src="../../../jspm_packages/graphing/c3.min.js"></script>-->
+
+                <clm-cohorts-stats-page
+                        cohort="ctrl.cohort"
+                        profile="ctrl.profile">
+                </clm-cohorts-stats-page>
+            </md-content>
+        </md-tab>
+    </md-tabs>
+
+</md-content>

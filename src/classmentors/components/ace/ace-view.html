@@ -1,19 +1,32 @@
 <md-content flex>
 	<md-content class="md-padding">
-		<p>The <a href="http://www.infocommtalent.sg/nic4.aspx">IDA Ace of Coders</a> event will take place on September 10, 2015.</p>
-		<p>Click here to register and participate in the online portions of the <a href="http://www.classmentors.com/#/events/-Jqh4lFKnAQ3ACi3Crk6">junior</a> 
-		or <a href="http://www.classmentors.com/#/events/-Jqh51g1CR4E00gg3mFl">senior</a> categories. You will need to login with a Google ID and the click on the "Join" button. 
-		<p>There will be lucky draw prizes for online participants who do not qualify to attend the live event. Online qualfication will end on August 26th at 12pm.</p>
-		<p><b>{{$ctrl.stats.total_participants}}</b> students have registered so far.</p>
-		<p><b>{{$ctrl.stats.total_schools}}</b> schools are participating.</p>
-		<p>If you see a school missing in the rankings below, please encoruage them to participate.</p>
-		<p>You can visit the <a href="http://www.infocommtalent.sg/nic4.aspx">IDA website</a> for more details or visit the <a href="https://www.facebook.com/aceofcoders">Ace of Coders Facebook page</a> to leave comments, questions, and join the conversation.</p>
+		<p>The IDA <a href="https://www.ida.gov.sg/Sub/Talent/Student-Programmes/National-Infocomm-Competition">2016 Ace of Coders</a> National Infocomm Competition will take place on November 12, 2016.</p>
+		<p>There will be a junior and senior category. The password to join all events is "ida" unless a teacher from your school has requested to change the password. </p>
+<ol>	    
+	<li>Please login to ClassMentors.com by clicking the login button above.</li>
+    <li>If you are new to ClassMentors, you will need to enter a unique public ID after you login (example: chris123).</li>
+    <li>After you are logged-in and have completed registering, click on the event for your school below.</li>
+	<li>From the school event page, click the <b>Join</b> button, enter the password <b>ida</b>, and press enter. </li> 
+	<li>Once you have joined an event, go register for an account at <a href="https://www.freecodecamp.com">FreeCodeCamp.com</a> and complete the first few achievements.</li>
+	<li>Then come back to ClassMentors and update <a href="/#/profile/">your profile</a> with your FreeCodeCamp username. This will allow ClassMentors to see how many FreeCodeCamp achievements you have completed.</li> 
+</ol>
+
+	    <p>If you see a school missing in the rankings below, please encoruage them to participate. If your school is not listed, you can join the <b>All Other Junior</b> or <b>All Other Senior</b> events.</p>
+		<p>You can visit the <a href="https://www.facebook.com/aceofcoders">Ace of Coders Facebook page</a> to leave comments, ask questions, and join in the conversation.</p>
+			
+Thank you!<br>
+Have fun learning :)<br>
+ClassMentors Team<br>
 		
+		<!-- <p><b>{{$ctrl.stats.total_participants}}</b> students have registered so far.</p>
+		<p><b>{{$ctrl.stats.total_schools}}</b> schools are participating.</p>
+		-->
+
 	</md-content>
-   
+ 
 	<md-toolbar md-scroll-shrink>
 		<div class="md-toolbar-tools">
-			<h3><span>{{$ctrl.stats.junior_schools}} Participating Junior Category Schools</span></h3>
+			<h3><span>{{$ctrl.stats.junior_ranking.length}} Participating Junior Category Schools</span></h3>
 		</div>
 	</md-toolbar>
 	<md-content class="md-padding">
@@ -21,16 +34,18 @@
 		<table>
 			<tr>
 				<th>Rank</th> 
-				<th>Achievements</th>
-				<th>School</th>
-				<th>Second ranked student from school</th> 
+				<th>Registerd Students</th>
+				<th>School Event</th>
+				<th></th> 
+				<th></th> 
 			</tr>
 			<tr ng-repeat="school in $ctrl.stats.junior_ranking" bgcolor="{{$index==9?'lightgreen':'white'}}">
 				<td>{{$index+1}}</td>				
 				<td>{{school.total}}</td>
-				<td>{{school.school}}</td>
-				<td ng-if="school.name !== 'no second student'">{{school.name}}</td>
-				<td ng-if="school.name == 'no second student'"><span style="font-style: italic; color: grey;">No second student</span></td>
+				<td><a href="{{school.eventURL}}">{{school.school}}</a></td>
+				<td ng-if="school.name !== 'no second student'"></td>
+				<td></td>
+				<!--<td ng-if="school.name == 'no second student'"><span style="font-style: italic; color: grey;">No second student</span></td>-->
 			</tr>
 
 	    </table>
@@ -46,53 +61,19 @@
 		<table>
 			<tr>
 				<th>Rank</th> 
-				<th>Achievements</th>
-				<th>School</th>
-				<th>Second ranked student from school</th> 
+				<th>Registered Students</th>
+				<th>School Event</th>
+				<th></th> 
+				<th></th>
 			</tr>
 			<tr ng-repeat="school in $ctrl.stats.senior_ranking"  bgcolor="{{$index==9?'lightgreen':'white'}}">
 				<td>{{$index+1}}</td>
 				<td>{{school.total}}</td>
-				<td>{{school.school}}</td>
-				<td ng-if="school.name !== 'no second student'">{{school.name}}</td>
-				<td ng-if="school.name == 'no second student'"><span style="font-style: italic; color: grey;">No second student</span></td>
-				
+				<td><a href="{{school.eventURL}}">{{school.school}}</a></td>
+				<td ng-if="school.name !== 'no second student'"></td>
+				<td></td>
+				<!--<td ng-if="school.name == 'no second student'"><span style="font-style: italic; color: grey;">No second student</span></td>-->
 			</tr>
 	    </table>
-	</md-content>
-		<md-toolbar md-scroll-shrink>
-		<div class="md-toolbar-tools">
-			<h3><span>Top 5 Junior Category Schools by Registrations</span></h3>
-		</div>
-	</md-toolbar>
-	<md-content class="md-padding">
-		<table>
-			<tr>
-				<th>Registered Students</th> 
-				<th>School</th>
-			</tr>
-			<tr ng-repeat="school in $ctrl.stats.juniorSchoolRanking | limitTo:5">
-				<td>{{school.total}}</td>
-				<td>{{school.school}}</td>				
-			</tr>
-	    </table>
-	</md-content>
-	</md-content>
-		<md-toolbar md-scroll-shrink>
-		<div class="md-toolbar-tools">
-			<h3><span>Top 5 Senior Category Schools by Registrations</span></h3>
-		</div>
-	</md-toolbar>
-	<md-content class="md-padding">
-		<table>
-			<tr>
-				<th>Registered Students</th> 
-				<th>School</th>
-			</tr>
-			<tr ng-repeat="school in $ctrl.stats.seniorSchoolRanking | limitTo:5">
-				<td>{{school.total}}</td>
-				<td>{{school.school}}</td>				
-			</tr>
-	    </table>
-	</md-content>
+    </md-content>
 </md-content>

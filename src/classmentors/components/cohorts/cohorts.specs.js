@@ -4,9 +4,9 @@
 import {expect} from 'chai';
 import sinon from 'sinon';
 
-import * as cohort from './cohort.js';
+import * as cohort from './cohorts.js';
 
-describe('cohort component', function() {
+describe('cohorts component', function() {
 
   describe('controller', function() {
     let ctrl, navBarService;
@@ -25,7 +25,7 @@ describe('cohort component', function() {
 
     it('should update navbar with title', function() {
       expect(navBarService.update).to.have.been.calledOnce;
-      expect(navBarService.update).to.have.been.calledWith('Cohort');
+      expect(navBarService.update).to.have.been.calledWith('Cohorts');
     });
 
     it('should update navbar with an empty list of parent section', function() {

@@ -1,0 +1,141 @@
+<md-content flex class="md-padding">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+          rel="stylesheet">
+    <h2 hide show-sm>
+        {{ ctrl.event.title }}
+    </h2>
+
+    <form name="editCohortForm" ng-submit="ctrl.save(ctrl.currentUser, ctrl.cohort, editCohortForm)">
+        <md-input-container>
+            <label for="cohort-title">Cohort Name</label>
+            <input flex name="cohortTitle" type="text" id="cohort-title" ng-model="ctrl.cohort.title" ng-minlength="3" ng-maxlength="60" required/>
+            <div ng-messages="editCohortForm.cohortTitle.$error">
+                <div ng-message="required">A cohort must have a name.</div>
+                <div ng-message="minlength">A cohort name shouldn't be shorter than 3 characters.</div>
+                <div ng-message="maxlength">A cohort name shouldn't be longer than 60 characters.</div>
+            </div>
+            <md-switch class="md-primary" ng-model="ctrl.cohort.featured" aria-label="feature?">
+                Feature cohort
+            </md-switch>
+        </md-input-container>
+
+        <md-progress-circular ng-show="ctrl.savingCohort" md-mode="indeterminate" style="margin: 16px auto"></md-progress-circular>
+
+        <div layout="row" layout-align="center center">
+            <md-button type="submit" class="md-raised md-primary" ng-disabled="editCohortForm.$pristine || editCohortForm.$invalid || ctrl.savingCohort">Save</md-button>
+            <md-button type="reset" class="md-raised" ng-click="ctrl.reset(editCohortForm)" ng-disabled="ctrl.savingCohort || editCohortForm.$pristine">Reset</md-button>
+        </div>
+    </form>
+
+    <md-divider></md-divider>
+
+    <md-subheader><md-button ng-click="ctrl.toggleEvents()">Cohort Events<md-tooltip ng-if="!ctrl.showingEvents">Click to view and edit cohort events</md-tooltip><md-tooltip ng-if="ctrl.showingEvents">Click to hide cohort events</md-tooltip></md-button></md-subheader>
+    <div ng-if="ctrl.showingEvents">
+        <md-button class="md-raised md-primary" ng-click="ctrl.addEvent()" aria-label="addEvent">Add Event</md-button>
+        <form name="addEventForm" ng-submit="ctrl.saveAddedEvent(ctrl.cohort.$id)">
+            <md-card ng-if="ctrl.addingEvent">
+                <md-card-content>
+                    <md-autocomplete flex required ng-if="ctrl.addingEvent"
+                                     md-input-name="eventName"
+                                     md-input-minlength="1"
+                                     md-input-maxlength="64"
+                                     md-no-cache="true"
+                                     md-selected-item="ctrl.selectedEvent"
+                                     md-search-text="ctrl.searchEvent"
+                                     md-items="event in ctrl.querySearch(ctrl.searchEvent)"
+                                     md-item-text="event.title"
+                                     placeholder="Select event">>
+                        <md-item-template>
+                            <span md-highlight-text="ctrl.searchEvent">{{event.title}}</span>
+                        </md-item-template>
+                        <div ng-messages="addEventForm.eventName.$error" ng-if="addEventForm.eventName.$touched">
+                            <div ng-message="required">You <b>must</b> select an event.</div>
+                        </div>
+                        <md-not-found>
+                            No events matching "{{ctrl.searchEvent}}" were found.
+                        </md-not-found>
+                    </md-autocomplete>
+                </md-card-content>
+                <md-card-actions layout="row" layout-align="start center">
+                    <md-button class="md-raised md-primary" type="submit" ng-disabled="addEventForm.$pristine || addEventForm.$invalid || !ctrl.selectedEvent">Add Event</md-button>
+                    <md-button class="md-raised" ng-click="ctrl.closeAddingEvent()">Cancel</md-button>
+                </md-card-actions>
+            </md-card>
+        </form>
+        <md-list>
+            <md-list-item ng-repeat="e in ctrl.cohort.events" ng-if="ctrl.events[e]">
+                {{ctrl.events[e].title}}
+                <span flex></span>
+                <md-button ng-click="ctrl.removeCohortEvent(e, ctrl.cohort.events.indexOf(e))">
+                    <md-icon class="material-icons">clear</md-icon>
+                    <md-tooltip md-direction="left">
+                        Remove event
+                    </md-tooltip>
+                </md-button>
+                <md-divider ng-if="!$last"></md-divider>
+            </md-list-item>
+        </md-list>
+    </div>
+
+    <md-divider></md-divider>
+
+    <md-subheader><md-button ng-click="ctrl.toggleAnnouncements()">Cohort Announcements<md-tooltip ng-if="!ctrl.showingAnnouncements">Click to view and edit cohort announcements</md-tooltip><md-tooltip ng-if="ctrl.showingAnnouncements">Click to hide cohort announcements</md-tooltip></md-button></md-subheader>
+    <div ng-if="ctrl.showingAnnouncements">
+    <md-button class="md-raised md-primary" ng-click="ctrl.createNewAnnouncement()">New Announcement</md-button>
+    <form name="addAnnouncementForm" ng-submit="ctrl.saveAnnouncement(ctrl.cohort.$id)">
+        <md-card ng-if="ctrl.creatingNewAnnouncement">
+            <md-input-container>
+                <input aria-label="Announcement title" required placeholder="Announcement title" type="text" ng-model="ctrl.newAnnouncement.title" id="new-announcement-title" name="newAnnouncementTitle">
+                <div ng-messages="addAnnouncementForm.newAnnouncementTitle.$error">
+                    <div ng-message="required">An announcement must have a title.</div>
+                </div>
+            </md-input-container>
+            <textarea aria-label="Announcement content" required placeholder="Announcement content" name="newAnnouncementContent" id="new-announcement-content"
+                      ng-model="ctrl.newAnnouncement.content" rows="3">
+            </textarea>
+            <md-switch ng-model="ctrl.newAnnouncement.featured" aria-label="Featured?">
+                Featured: {{ ctrl.newAnnouncement.featured }}
+            </md-switch>
+            <md-switch ng-model="ctrl.newAnnouncement.visible" aria-label="Visibility">
+                Visible: {{ ctrl.newAnnouncement.visible }}
+            </md-switch>
+            <md-card-actions layout="row" layout-align="start center">
+                <md-button class="md-raised md-primary" type="submit" ng-disabled="addAnnouncementForm.$pristine || addAnnouncementForm.$invalid">Save Announcement</md-button>
+                <md-button class="md-raised" ng-click="ctrl.closeNewAnnouncement()">Cancel</md-button>
+            </md-card-actions>
+        </md-card>
+    </form>
+
+    <md-list>
+        <md-list-item ng-repeat="a in ctrl.announcements">
+            {{a.title}}
+            <span flex></span>
+            <md-button ng-if="!a.featured" ng-click="ctrl.featureAnnouncement(ctrl.cohort.$id, a.$id)">
+                <md-icon class="material-icons">leak_add</md-icon>
+                <md-tooltip>
+                Feature
+                </md-tooltip>
+            </md-button>
+            <md-button ng-if="a.featured" ng-click="ctrl.unfeatureAnnouncement(ctrl.cohort.$id, a.$id)">
+                <md-icon class="material-icons">leak_remove</md-icon>
+                <md-tooltip>
+                    Un-Feature
+                </md-tooltip>
+            </md-button>
+            <md-button ng-if="!a.visible" ng-click="ctrl.showAnnouncement(ctrl.cohort.$id, a.$id)">
+                <md-icon class="material-icons">visibility</md-icon>
+                <md-tooltip>
+                    Show announcement
+                </md-tooltip>
+            </md-button>
+            <md-button ng-if="a.visible" ng-click="ctrl.hideAnnouncement(ctrl.cohort.$id, a.$id)">
+                <md-icon class="material-icons">visibility_off</md-icon>
+                <md-tooltip>
+                    Hide announcement
+                </md-tooltip>
+            </md-button>
+            <md-divider ng-if="!$last"></md-divider>
+        </md-list-item>
+    </md-list>
+    </div>
+</md-content>

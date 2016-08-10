@@ -49,7 +49,7 @@
             </md-content>
         </md-tab>
 
-        <md-tab label="Results" ng-disabled="!ctrl.participants || !ctrl.isOwner">
+        <md-tab label="Results" ng-disabled="!ctrl.participants || !ctrl.isReviewSuperUser">
             <md-content layout-padding>
                 <md-switch class="md-primary" ng-model="ctrl.viewArchived" aria-label="ViewArchived?">
                     View archived challenges
@@ -70,26 +70,6 @@
                     Event Answers:
                 </div>
                 <div ng-show="ctrl.selected">
-                    <!--Manually written result table-->
-
-                    <!--<md-content class="md-padding">-->
-                            <!--<table class="events tasks">-->
-                                <!--<thead>-->
-                                    <!--<tr ng-class="{'reversed': ctrl.orderOptions.reversed}">-->
-                                        <!--<th>Name</th>-->
-                                        <!--<th>Answer</th>-->
-                                    <!--</tr>-->
-                                <!--</thead>-->
-                                <!--<tbody>-->
-                                    <!--<tr ng-repeat="participant in ctrl.participants">-->
-                                        <!--<td>{{participant.user.displayName}}</td>-->
-                                        <!--<td>{{ctrl.solutions[participant.$id][ctrl.selected.$id]}}</td>-->
-                                    <!--</tr>-->
-                                <!--</tbody>-->
-                            <!--</table>-->
-                    <!--</md-content>-->
-
-                    <!--Attempt at create own table directive for results-->
                     <md-content layout-padding>
                         <clm-event-results-table
                                 ng-if="ctrl.canView"

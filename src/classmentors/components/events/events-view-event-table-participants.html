@@ -3,7 +3,6 @@
 </div>
 
 <div ng-if="!ctrl.loading">
-
     <md-content class="md-padding">
         <table class="events tasks">
             <thead>
@@ -53,6 +52,24 @@
                     </th>
 
                     <td ng-repeat="task in ctrl.visibleTasks track by task.$id">
+                        <div ng-if="task.mcqQuestions">
+                            <span ng-if="ctrl.currentUserSolutions[task.$id]">
+                                Completed<span ng-if="!ctrl.currentUserProgress[task.$id].completed"></span>
+                            </span>
+                            <span ng-if="!ctrl.currentUserSolutions[task.$id]">
+                                <md-button class="md-raised md-primary"
+                                           ng-click="ctrl.startMCQ(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant, ctrl.currentUserSolutions)"
+                                           target="_blank"
+                                           ng-disabled="task.closedAt"
+                                           aria-label="Start challenge"
+                                >
+                                    start mcq
+                                    <!--<span ng-switch on="ctrl.mustRegister(task, ctrl.profile)">-->
+                                        <!--<span ng-switch-when="true">Register</span>-->
+                                        <!--<span ng-switch-default>Start challenge</span>-->
+                                    <!--</span>-->
+                                </md-button>
+                        </div>
 
                         <div ng-if="task.serviceId">
                             <span ng-if="ctrl.currentUserSolutions[task.$id]">

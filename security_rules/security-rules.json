@@ -88,6 +88,10 @@
       }
     },
     "classMentors": {
+      "surveyTemplate":{
+        ".read": true,
+        ".write": true
+      },
       "admins": {
         "$userId": {
           ".validate": "newData.isBoolean() && root.child('auth/users/' + $userId).exists()"
@@ -200,6 +204,13 @@
           ".write": "auth !== null && root.child('classMentors/events').child($eventId).child('owner/publicId').val() === root.child('auth/users').child(auth.uid).child('publicId').val()"
         }
       },
+      "eventAnswers":{
+        "$eventId":{
+          ".validate": "root.child('classMentors/eventTasks/' + $eventId).exists()",
+          ".write": true,
+          ".read": true
+        }
+      },
       "eventPasswords": {
         "$eventId": {
           ".validate": "root.child('classMentors/events/' + $eventId).exists() && newData.hasChildren(['hash', 'options'])",
@@ -285,14 +296,14 @@
           ".write": "auth !== null && root.child('classMentors/events').child($eventId).child('owner/publicId').val() === root.child('auth/users').child(auth.uid).child('publicId').val()"
         }
       },
-      "surveyResponse":{
-        "$eventId":{
-          "$taskId":{
-            "surveyType":{
-              "$publicId":{
-                "qn":{
-                  ".read":true,
-                  ".write":true
+      "surveyResponse": {
+        "$eventId": {
+          "$taskId": {
+            "$surveyType": {
+              "$publicId": {
+                "qn": {
+                  ".read": true,
+                  ".write": true
                 },
                 ".write": "auth !== null && root.child('auth/publicIds').child($publicId).val() === auth.uid"
               }
@@ -320,7 +331,7 @@
       "eventTasks": {
         "$eventId": {
           "$taskId": {
-            ".validate": "newData.hasChildren(['title', 'description', 'archived']) && (\n  newData.child('serviceId').exists()\n  || newData.child('linkPattern').exists()\n  || newData.child('textResponse').exists()\n || newData.child('survey').exists()\n) && (\n  newData.child('openedAt').exists()\n  || newData.child('closedAt').exists()\n) && (\n  data.child('openedAt').exists() === false\n  || (\n    newData.child('openedAt').exists()\n    || newData.child('history').child('' + data.child('openedAt').val()).val() === 'opened'\n  )\n) && (\n  data.child('closedAt').exists() === false\n  || (\n    newData.child('closedAt').exists()\n    || newData.child('history').child('' + data.child('closedAt').val()).val() === 'closed'\n  )\n)",
+            ".validate": "newData.hasChildren(['title', 'description', 'archived']) && (\n  newData.child('serviceId').exists()\n || newData.child('mcqQuestions').exists()\n || newData.child('linkPattern').exists()\n  || newData.child('textResponse').exists()\n || newData.child('survey').exists()\n) && (\n  newData.child('openedAt').exists()\n  || newData.child('closedAt').exists()\n) && (\n  data.child('openedAt').exists() === false\n  || (\n    newData.child('openedAt').exists()\n    || newData.child('history').child('' + data.child('openedAt').val()).val() === 'opened'\n  )\n) && (\n  data.child('closedAt').exists() === false\n  || (\n    newData.child('closedAt').exists()\n    || newData.child('history').child('' + data.child('closedAt').val()).val() === 'closed'\n  )\n)",
             "archived": {
               ".validate": "newData.isBoolean()"
             },
@@ -442,7 +453,10 @@
             ".validate": "newData.isString() && newData.val().length >= 3 && newData.val().length <= 60"
           }
         },
-        ".indexOn": ["featured", "createdAt"],
+        ".indexOn": [
+          "featured",
+          "createdAt"
+        ],
         ".read": true
       },
       "cohortAnnouncements": {
@@ -462,7 +476,10 @@
               ".validate": "newData.isString()"
             }
           },
-          ".indexOn": ["archived", "createdAt"],
+          ".indexOn": [
+            "archived",
+            "createdAt"
+          ],
           ".read": true,
           ".write": true
         }
@@ -496,7 +513,10 @@
             ".validate": "newData.isString() && newData.val().length >= 3 && newData.val().length <= 60"
           }
         },
-        ".indexOn": ["createdAt", "featured"],
+        ".indexOn": [
+          "createdAt",
+          "featured"
+        ],
         ".read": true
       },
       "premiumUsers": {
@@ -612,8 +632,8 @@
         },
         ".read": true
       },
-      "userAchievements":{
-        ".read":true,
+      "userAchievements": {
+        ".read": true,
         ".write": "auth.uid == 'queue-worker'"
       },
       "userProfiles": {
@@ -702,9 +722,7 @@
                 "name": {
                   ".validate": "newData.isString() && newData.val().length >= 1"
                 },
-                "registeredBefore": {
-
-                }
+                "registeredBefore": {}
               },
               "lastUpdate": {
                 ".validate": "newData.val() === now",
@@ -754,11 +772,11 @@
           ".write": "auth !== null && root.child('auth/publicIds/' + $publicId).val() === auth.uid"
         },
         ".read": true,
-        ".write":"auth.uid == 'queue-worker'"
+        ".write": "auth.uid == 'queue-worker'"
       }
     },
     "logs": {
-      ".write":"auth !== null",
+      ".write": "auth !== null",
       ".read": "auth !== null"
     },
     "queue": {

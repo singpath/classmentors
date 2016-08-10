@@ -120,15 +120,16 @@ configRoute.$inject = ['$routeProvider', 'routes'];
 //Create eventServiceFactory
 //TODO: Edit
 export function eventServiceFactory($q, $route, spfAuthData, clmDataStore, spfFirebase, $log, spfAlert) {
-    var savedData = {};
-    var eventService = {
-        set: function (data) {
-            savedData = data;
-        },
-        get: function () {
-            return savedData;
-        },
-        save: function (event, _, task, taskType, isOpen) {
+  var savedData = {};
+  var eventService = {
+    set: function(data) {
+      savedData = data;
+      console.log(savedData);
+    },
+    get: function(){
+      return savedData;
+    },
+    save: function(event, _, task, taskType, isOpen) {
             var copy = spfFirebase.cleanObj(task);
             console.log('Copy is.. : ', copy);
             if (taskType === 'linkPattern') {
@@ -383,37 +384,47 @@ function viewEventCtrlInitialData($q, $route, spfAuth, spfAuthData, clmDataStore
         return $q.when(data.profile && data.profile.canView(data.event));
     });
 
-    return $q.all({
-        currentUser: spfAuthData.user().catch(noop),
-        profile: profilePromise,
-        event: eventPromise,
-        canView: canviewPromise,
-        tasks: canviewPromise.then(function (canView) {
-            if (canView) {
-                return clmDataStore.events.getTasks(eventId);
-            }
-        }),
-        participants: canviewPromise.then(function (canView) {
-            if (canView) {
-                return clmDataStore.events.participants(eventId);
-            }
-        }),
-        progress: canviewPromise.then(function (canView) {
-            if (canView) {
-                return clmDataStore.events.getProgress(eventId);
-            }
-        }),
-        solutions: canviewPromise.then(function (canView) {
-            if (canView) {
-                return clmDataStore.events.getSolutions(eventId);
-            }
-        }),
-        scores: canviewPromise.then(function (canView) {
-            if (canView) {
-                return clmDataStore.events.getScores(eventId);
-            }
-        })
-    });
+  return $q.all({
+    currentUser: spfAuthData.user().catch(noop),
+    profile: profilePromise,
+    event: eventPromise,
+    canView: canviewPromise,
+    tasks: canviewPromise.then(function(canView) {
+      if (canView) {
+        return clmDataStore.events.getTasks(eventId);
+      }
+    }),
+    participants: canviewPromise.then(function(canView) {
+      if (canView) {
+        return clmDataStore.events.participants(eventId);
+      }
+    }),
+    progress: canviewPromise.then(function(canView) {
+      if (canView) {
+        return clmDataStore.events.getProgress(eventId);
+      }
+    }),
+    solutions: canviewPromise.then(function(canView) {
+      if (canView) {
+        return clmDataStore.events.getSolutions(eventId);
+      }
+    }),
+    scores: canviewPromise.then(function(canView) {
+      if (canView) {
+        return clmDataStore.events.getScores(eventId);
+      }
+    }),
+    assistants: canviewPromise.then(function (canView) {
+        if(canView) {
+            return clmDataStore.events.getAssistants(eventId);
+        }
+    }),
+      assistantObj: canviewPromise.then(function (canView) {
+          if(canView) {
+              return clmDataStore.events.getAsstObj(eventId);
+          }
+      })
+  });
 }
 viewEventCtrlInitialData.$inject = [
     '$q',
@@ -432,18 +443,28 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
     var self = this;
     var monitorHandler;
 
-    this.currentUser = initialData.currentUser;
-    this.event = initialData.event;
-    this.participants = initialData.participants;
-    this.profile = initialData.profile;
-    this.tasks = initialData.tasks;
-    this.progress = initialData.progress;
-    this.solutions = initialData.solutions;
-    this.scores = initialData.scores;
-    this.canView = initialData.canView;
-    this.viewArchived = false;
-    this.selected = null;
-    this.isOwner = false;
+  this.currentUser = initialData.currentUser;
+  this.event = initialData.event;
+  this.participants = initialData.participants;
+  this.profile = initialData.profile;
+  this.tasks = initialData.tasks;
+  this.progress = initialData.progress;
+  this.solutions = initialData.solutions;
+  this.scores = initialData.scores;
+  this.canView = initialData.canView;
+  this.viewArchived = false;
+  this.selected = null;
+  this.isOwner = false;
+  this.assistants = initialData.assistants;
+  this.assistantObj = initialData.assistantObj;
+  this.asstArr = [];
+
+  for(var asst in self.assistants) {
+      if(self.assistants[asst].$id) {
+          self.asstArr.push(self.assistants[asst].$id);
+      }
+  }
+  console.log(self.assistants);
 
     if (
         self.event &&
@@ -463,15 +484,29 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
         };
     }
 
-    $scope.$on('$destroy', function () {
-        /* eslint no-unused-expressions: 0 */
-        monitorHandler.unwatch();
-        self.event && self.event.$destroy && self.event.$destroy();
-        self.participants && self.participants.$destroy && self.participants.$destroy();
-        self.profile && self.profile.$destroy && self.profile.$destroy();
-        self.progress && self.progress.$destroy && self.progress.$destroy();
-        self.solutions && self.solutions.$destroy && self.solutions.$destroy();
-    });
+  if (self.event && self.currentUser && self.asstArr.indexOf(self.currentUser.publicId) >= 0) {
+      var asst = self.assistantObj[self.currentUser.publicId];
+      if(asst.canReview) {
+          this.isReviewAssistant = true;
+      }
+      if(asst.canEdit) {
+          this.isEditAssistant = true;
+      }
+  }
+
+  if(self.isReviewAssistant || self.isOwner) {
+      this.isReviewSuperUser = true;
+  }
+
+  $scope.$on('$destroy', function() {
+    /* eslint no-unused-expressions: 0 */
+    monitorHandler.unwatch();
+    self.event && self.event.$destroy && self.event.$destroy();
+    self.participants && self.participants.$destroy && self.participants.$destroy();
+    self.profile && self.profile.$destroy && self.profile.$destroy();
+    self.progress && self.progress.$destroy && self.progress.$destroy();
+    self.solutions && self.solutions.$destroy && self.solutions.$destroy();
+  });
 
     updateNavbar();
 
@@ -513,21 +548,22 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
             });
         }
 
-        // Add edit and update button
-        if (self.event.owner.publicId === self.currentUser.publicId) {
-            options.push({
-                title: 'Edit',
-                url: `#${urlFor('editEvent', {eventId: self.event.$id})}`,
-                icon: 'create'
-            });
-            options.push({
-                title: 'Update',
-                onClick: function () {
-                    monitorHandler.update();
-                },
-                icon: 'loop'
-            });
-        }
+    // Add edit and update button
+      //self.event.owner.publicId === self.currentUser.publicId
+    if (self.isOwner || self.isEditAssistant) {
+      options.push({
+        title: 'Edit',
+        url: `#${urlFor('editEvent', {eventId: self.event.$id})}`,
+        icon: 'create'
+      });
+      options.push({
+        title: 'Update',
+        onClick: function() {
+          monitorHandler.update();
+        },
+        icon: 'loop'
+      });
+    }
 
         return options;
     }
@@ -637,21 +673,32 @@ function baseEditCtrlInitialData($q, $route, spfAuthData, clmDataStore) {
         return event;
     });
 
-    var data = {
-        currentUser: spfAuthData.user(),
-        event: eventPromise
-    };
+  var data = {
+    currentUser: spfAuthData.user(),
+    event: eventPromise,
+    participants: clmDataStore.events.participants(eventId)
+  };
 
-    data.canEdit = $q.all({
-        currentUser: spfAuthData.user(),
-        event: eventPromise
-    }).then(function (result) {
-        if (
-            !result.currentUser.publicId || !result.event.owner || !result.event.owner.publicId ||
-            result.event.owner.publicId !== result.currentUser.publicId
-        ) {
+  data.canEdit = $q.all({
+    currentUser: spfAuthData.user(),
+    event: eventPromise,
+    assistants: clmDataStore.events.getAsstObj(eventId)
+  }).then(function(result) {
+    if (
+      !result.currentUser.publicId ||
+      !result.event.owner ||
+      !result.event.owner.publicId ||
+      (result.event.owner.publicId !== result.currentUser.publicId)
+    ) {
+
+        if(result.assistants[result.currentUser.publicId]) {
+            if(!result.assistants[result.currentUser.publicId].canEdit) {
+                return $q.reject(errNotAuthaurized);
+            }
+        } else {
             return $q.reject(errNotAuthaurized);
         }
+    }
 
         return result;
     });
@@ -670,7 +717,11 @@ function editEventCtrllInitialData($q, $route, spfAuthData, clmDataStore) {
         return clmDataStore.events.getTasks(event.$id);
     });
 
-    return $q.all(data);
+    data.assistants = data.event.then(function(event) {
+        return clmDataStore.events.getAssistants(event.$id);
+    });
+
+  return $q.all(data);
 }
 editEventCtrllInitialData.$inject = ['$q', '$route', 'spfAuthData', 'clmDataStore'];
 
@@ -681,41 +732,175 @@ editEventCtrllInitialData.$inject = ['$q', '$route', 'spfAuthData', 'clmDataStor
 function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataStore) {
     var self = this;
 
-    this.currentUser = initialData.currentUser;
-    this.event = initialData.event;
-    this.tasks = initialData.tasks;
-    this.newPassword = '';
-    this.savingEvent = false;
+  this.currentUser = initialData.currentUser;
+  this.participants = initialData.participants;
+  this.event = initialData.event;
+  this.tasks = initialData.tasks;
+  this.showingAssistants = false;
+  this.showingTasks = false;
+  this.assistants = initialData.assistants;
+  this.newPassword = '';
+  this.isOwner = false;
+  this.savingEvent = false;
 
-    spfNavBarService.update(
-        'Edit', [{
-            title: 'Events',
-            url: `#${urlFor('events')}`
-        }, {
-            title: this.event.title,
-            url: `#${urlFor('oneEvent', {eventId: this.event.$id})}`
-        }], [{
-            title: 'New Challenge',
-            url: `#${urlFor('addEventTask', {eventId: this.event.$id})}`,
-            icon: 'create'
-        }]
-    );
+    if (
+        self.event &&
+        self.event.owner &&
+        self.event.owner.publicId &&
+        self.currentUser &&
+        self.event.owner.publicId === self.currentUser.publicId
+    ) {
+        this.isOwner = true;
+    }
 
-    this.save = function (currentUser, event, newPassword, editEventForm) {
-        self.savingEvent = true;
-        event.owner.publicId = currentUser.publicId;
-        event.owner.displayName = currentUser.displayName;
-        event.owner.gravatar = currentUser.gravatar;
-        return clmDataStore.events.updateEvent(event, newPassword).then(function () {
-            spfAlert.success('Event saved.');
-            self.newPassword = '';
-            editEventForm.$setPristine(true);
-        }).catch(function () {
-            spfAlert.error('Failed to save event.');
-        }).finally(function () {
-            self.savingEvent = false;
+  this.addingNewAssistant = false;
+  this.newAssistant = {
+      canEdit: false,
+      canReview: true
+  };
+
+  // Search form variables
+    this.users        = mapAllUsers();
+    this.selectedUser  = null;
+    this.searchUser    = null;
+    this.querySearch   = querySearch;
+
+    this.assistantArr = [];
+    for(var asst in self.assistants) {
+        if(self.assistants[asst].$id) {
+            self.assistantArr.push(self.assistants[asst].$id);
+        }
+    }
+
+    function querySearch (query) {
+        return query ? self.users.filter( createFilterFor(query) ) : self.users;
+    }
+
+    function mapAllUsers() {
+        return self.participants.map( function (user) {
+            return {
+                id: user.$id,
+                value: user.user.displayName.toLowerCase(),
+                displayName: user.user.displayName
+            };
         });
+    }
+
+    function createFilterFor(query) {
+        var lowercaseQuery = angular.lowercase(query);
+        return function filterFn(user) {
+            //Filter results in auto complete. Ensure that users who are already assistants may not be selected again
+            return (user.value.indexOf(lowercaseQuery) >= 0 && self.assistantArr.indexOf(user.id) < 0);
+        };
+    }
+
+  spfNavBarService.update(
+    'Edit', [{
+      title: 'Events',
+      url: `#${urlFor('events')}`
+    }, {
+      title: this.event.title,
+      url: `#${urlFor('oneEvent', {eventId: this.event.$id})}`
+    }], [{
+      title: 'New Challenge',
+      url: `#${urlFor('addEventTask', {eventId: this.event.$id})}`,
+      icon: 'create'
+    }]
+  );
+
+  this.toggleAssistants = function() {
+    if(self.showingAssistants) {
+        self.showingAssistants = false;
+    } else {
+        if(self.isOwner) {
+            self.showingAssistants = true;
+        } else {
+            spfAlert.error('Only the event owner may manage assistants');
+        }
+    }
+  };
+
+    this.toggleTaskEditView = function() {
+        if(self.showingTasks) {
+            self.showingTasks = false;
+        } else {
+            self.showingTasks = true;
+        }
     };
+
+  this.addAssistant = function() {
+    self.addingNewAssistant = true;
+  };
+
+  this.enableReview = function(eventId, assistantId, assistantName) {
+      clmDataStore.events.enableAssistantReviewing(eventId, assistantId).then(function () {
+          spfAlert.success(assistantName + ' can now review event challenge submissions');
+      }).catch(function () {
+          spfAlert.error('Failed to change assistant rights');
+      });
+  };
+
+  this.disableReview = function(eventId, assistantId, assistantName) {
+      clmDataStore.events.disableAssistantReviewing(eventId, assistantId).then(function () {
+          spfAlert.success(assistantName + ' can no longer review event challenge submissions');
+      }).catch(function () {
+          spfAlert.error('Failed to change assistant rights');
+      });
+  };
+
+  this.enableEdit = function(eventId, assistantId, assistantName) {
+      clmDataStore.events.enableAssistantEditing(eventId, assistantId).then(function () {
+          spfAlert.success(assistantName + ' can now edit the event');
+      }).catch(function () {
+          spfAlert.error('Failed to change assistant rights');
+      });
+  };
+
+  this.disableEdit = function(eventId, assistantId, assistantName) {
+      clmDataStore.events.disableAssistantEditing(eventId, assistantId).then(function () {
+          spfAlert.success(assistantName + ' can no longer edit the event');
+      }).catch(function () {
+          spfAlert.error('Failed to change assistant rights');
+      });
+  };
+
+  this.removeAssistant = function (eventId, assistantId, assistantName) {
+      clmDataStore.events.removeAssistant(eventId, assistantId).then(function () {
+          spfAlert.success(assistantName + ' removed as event assistant');
+          if(self.assistantArr.indexOf(assistantId) >= 0) {
+              self.assistantArr.splice(assistantId, 1);
+          }
+      }).catch(function () {
+          spfAlert.error('Failed to remove assistant');
+      });
+  };
+
+  this.saveNewAssistant = function(eventId) {
+    self.newAssistant.name = self.selectedUser.displayName;
+    clmDataStore.events.addAssistant(eventId, self.selectedUser.id, self.newAssistant);
+    self.addingNewAssistant = false;
+    self.selectedUser = null;
+  };
+
+  this.closeNewAssistant = function () {
+      self.addingNewAssistant = false;
+  };
+
+  this.save = function(currentUser, event, newPassword, editEventForm) {
+    self.savingEvent = true;
+    event.owner.publicId = currentUser.publicId;
+    event.owner.displayName = currentUser.displayName;
+    event.owner.gravatar = currentUser.gravatar;
+    return clmDataStore.events.updateEvent(event, newPassword).then(function() {
+      spfAlert.success('Event saved.');
+      self.newPassword = '';
+      editEventForm.$setPristine(true);
+    }).catch(function() {
+      spfAlert.error('Failed to save event.');
+    }).finally(function() {
+      self.savingEvent = false;
+    });
+  };
 
     this.openTask = function (eventId, taskId) {
         clmDataStore.events.openTask(eventId, taskId).then(function () {
@@ -780,8 +965,7 @@ addEventTaskCtrlInitialData.$inject = ['$q', '$route', 'spfAuthData', 'clmDataSt
  * AddEventTaskCtrl
  *
  */
-function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, urlFor, spfNavBarService, clmDataStore, $mdDialog, $scope,
-                          eventService, clmSurvey) {
+function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, urlFor, spfNavBarService, clmDataStore, $mdDialog, $scope, eventService, clmSurvey) {
 
     var self = this;
 
@@ -821,17 +1005,13 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
         });
     };
 
-    //TODO: fill in respective routes for various challenge types.
-    //TODO: grab form data.
-    //TODO: change the parameters for adding surveys
-    this.challengeRouteProvider = function (tasktype, task, isOpen) {
-
-        if (tasktype == 'service') {
-            console.log('service is clicked');
-            return 'Save';
-        } else if (tasktype == 'singPath') {
-            console.log('singpath is clicked');
-            return 'Save';
+  this.challengeRouteProvider = function(tasktype, task, isOpen){
+    if(tasktype == 'service'){
+      console.log('service is clicked');
+      return 'Save';
+    }else if(tasktype == 'singPath'){
+      console.log('singpath is clicked');
+      return 'Save';
 
         } else if (tasktype == 'linkPattern') {
             console.log('linkPattern is clicked');
@@ -866,6 +1046,8 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
             clmSurvey.set(initialData.event.$id, initialData.event, task, tasktype, isOpen);
             var obj = clmSurvey.get();
             return '/challenges/survey'
+        } else {
+            return 'Save'; // by default should show 'save'
         }
     }
 
@@ -1036,19 +1218,28 @@ function editEventTaskCtrlInitialData($q, $route, spfAuthData, clmDataStore) {
         });
     });
 
-    return $q.all({
-        currentUser: spfAuthData.user(),
-        event: eventPromise,
-        badges: clmDataStore.badges.all(),
-        taskId: taskId,
-        task: taskPromise
-    }).then(function (data) {
-        if (
-            !data.currentUser.publicId || !data.event.owner || !data.event.owner.publicId ||
-            data.event.owner.publicId !== data.currentUser.publicId
-        ) {
-            return $q.reject(errNotAuthaurized);
-        }
+  return $q.all({
+    currentUser: spfAuthData.user(),
+    event: eventPromise,
+    badges: clmDataStore.badges.all(),
+    taskId: taskId,
+    task: taskPromise,
+    assistants: clmDataStore.events.getAsstObj(eventId)
+  }).then(function(data) {
+    if (
+      !data.currentUser.publicId ||
+      !data.event.owner ||
+      !data.event.owner.publicId ||
+      (data.event.owner.publicId !== data.currentUser.publicId && data.currentUser.publicId)
+    ) {
+      if(data.assistants[data.currentUser.publicId]) {
+          if(!data.assistants[data.currentUser.publicId].canEdit) {
+              return $q.reject(errNotAuthaurized);
+          }
+      } else {
+          return $q.reject(errNotAuthaurized);
+      }
+    }
 
         return data;
     });
@@ -1209,40 +1400,41 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBar
         }
 
 
-        self.creatingTask = true;
-        if (taskType === 'multipleChoice' || taskType === 'journalling' || taskType === 'video') {
-            var data = {
-                taskType: taskType,
-                isOpen: isOpen,
-                event: event,
-                task: task
-            };
-
-            spfNavBarService.update(
-                'New Challenge Details', [{
-                    title: 'Events',
-                    url: `#${urlFor('events')}`
-                }, {
-                    title: this.event.title,
-                    url: `#${urlFor('oneEvent', {eventId: this.event.$id})}`
-                }, {
-                    title: 'Challenges',
-                    url: `#${urlFor('editEvent', {eventId: this.event.$id})}`
-                }]
-            );
-            eventService.set(data);
-            $location.path(location);
-        } else {
-            self.savingTask = true;
-            clmDataStore.events.updateTask(event.$id, taskId, copy).then(function () {
-                if (
-                    (isOpen && task.openedAt) ||
-                    (!isOpen && task.closedAt)
-                ) {
-                    return;
-                } else if (isOpen) {
-                    return clmDataStore.events.openTask(event.$id, taskId);
-                }
+    self.creatingTask = true;
+    if(taskType === 'multipleChoice' || taskType === 'journalling' || taskType === 'video'){
+      var data = {
+        taskType: taskType,
+        isOpen: isOpen,
+        event: event,
+        task: task
+      };
+      console.log('Data shows... ', data);
+      spfNavBarService.update(
+          'New Challenge Details', [{
+            title: 'Events',
+            url: `#${urlFor('events')}`
+          }, {
+            title: this.event.title,
+            url: `#${urlFor('oneEvent', {eventId: this.event.$id})}`
+          }, {
+            title: 'Challenges',
+            url: `#${urlFor('editEvent', {eventId: this.event.$id})}`
+          }]
+      );
+      console.log(data)
+      eventService.set(data);
+      $location.path(location);
+    }else{
+      self.savingTask = true;
+      clmDataStore.events.updateTask(event.$id, taskId, copy).then(function() {
+        if (
+            (isOpen && task.openedAt) ||
+            (!isOpen && task.closedAt)
+        ) {
+          return;
+        } else if (isOpen) {
+          return clmDataStore.events.openTask(event.$id, taskId);
+        }
 
                 return clmDataStore.events.closeTask(event.$id, taskId);
             }).then(function () {
@@ -1337,10 +1529,13 @@ export function clmEventTableFactory() {
     };
 }
 
-function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
-                           urlFor, spfAlert, clmServicesUrl, clmDataStore, clmPagerOption, $location, routes, $route) {
-    var self = this;
-    var unwatchers = [];
+function ClmEventTableCtrl(
+  $scope, $q, $log, $mdDialog, $document,
+  urlFor, spfAlert, clmServicesUrl, clmDataStore, clmPagerOption,
+  eventService, $location, routes, $route
+) {
+  var self = this;
+  var unwatchers = [];
 
     this.currentUserParticipant = undefined;
     this.participantsView = [];
@@ -1597,23 +1792,43 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         codeCombat: true
     };
 
-    this.mustRegister = function (task, profile) {
-        return Boolean(
-            task &&
-            task.serviceId &&
-            trackedServices[task.serviceId] && (
-                !profile || !profile.services || !profile.services[task.serviceId] || !profile.services[task.serviceId].details || !profile.services[task.serviceId].details.id
-            )
-        );
-    };
+  this.startMCQ = function(eventId, taskId, task, participant, userSolution){
+    // Assign eventTable variables to data
+    var data = {
+      eventId: eventId,
+      taskId: taskId,
+      task: task,
+      participant: participant,
+      userSolution: userSolution
+    }
+    // Store data in eventService
+    eventService.set(data);
+    $location.path('/challenges/mcq/start');
+  }
 
-    this.promptForLink = function (eventId, taskId, task, participant, userSolution) {
-        $mdDialog.show({
-            parent: $document.body,
-            template: linkTmpl,
-            controller: DialogController,
-            controllerAs: 'ctrl'
-        });
+  this.mustRegister = function(task, profile) {
+    return Boolean(
+      task &&
+      task.serviceId &&
+      trackedServices[task.serviceId] && (
+        !profile ||
+        !profile.services ||
+        !profile.services[task.serviceId] ||
+        !profile.services[task.serviceId].details ||
+        !profile.services[task.serviceId].details.id
+      )
+    );
+  };
+
+
+
+  this.promptForLink = function(eventId, taskId, task, participant, userSolution) {
+    $mdDialog.show({
+      parent: $document.body,
+      template: linkTmpl,
+      controller: DialogController,
+      controllerAs: 'ctrl'
+    });
 
         function DialogController() {
             this.task = task;
@@ -1708,20 +1923,30 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             clickOutsideToClose: true,
             parent: angular.element(document.body),
             template: codeTmpl,
-            onComplete: loadEditor,
             controller: CodeController,
-            controllerAs: 'ctrl'
+            controllerAs: 'ctrl',
+            onComplete: loadEditor
         });
 
-        function loadEditor() {
-            var editor = ace.edit(document.querySelector('#editor'));
-            editor.setTheme("ace/theme/monokai");
-            editor.getSession().setMode("ace/mode/" + task.lang.toLowerCase());
-            editor.getSession().setUseWrapMode(true);
-        }
+      this.loadingEditor = true;
+      var parent = this;
+
+      function loadEditor() {
+          var editor = ace.edit(document.querySelector('#editor'));
+          editor.setTheme("ace/theme/monokai");
+          editor.getSession().setMode("ace/mode/"+task.lang.toLowerCase());
+          editor.getSession().setUseWrapMode(true);
+          parent.loadingEditor = false;
+      }
 
         function CodeController() {
             this.task = task;
+
+            this.checkEditor = function() {
+                return parent.loadingEditor;
+                console.log(parent.loadingEditor);
+            };
+
             if (
                 userSolution &&
                 userSolution[taskId]
@@ -1856,6 +2081,7 @@ ClmEventTableCtrl.$inject = [
     'clmServicesUrl',
     'clmDataStore',
     'clmPagerOption',
+    'eventService',
     '$location',
     'routes',
     '$route'
@@ -2235,24 +2461,24 @@ function ClmEventRankTableCtrl($scope, $log, spfFirebase, clmDataStore, clmPager
     // If there are no ranked services on the event, use the default.
     // Add this after the event is fetched if rankedServices is null.
 
-    var addRankedServices = function (parentScope) {
-        if (parentScope.event.rankedServices) {
-            parentScope.rankedServices = [];
-            for (var property in parentScope.event.rankedServices) {
-                if (parentScope.event.rankedServices.hasOwnProperty(property)) {
-                    // do stuff
-                    parentScope.rankedServices.push({id: property, name: property});
-                }
-            }
-        } else { // load the default services to list in ranking table.
-            parentScope.rankedServices = [
-                {id: 'freeCodeCamp', name: 'Free Code Camp'},
-                {id: 'pivotalExpert', name: 'Pivotal Expert'},
-                {id: 'codeCombat', name: 'Code Combat'},
-                // {id: 'singPath',name:  'SingPath Problems'},
-                {id: 'codeSchool', name: 'Code School'}
-            ];
+  var addRankedServices = function(parentScope) {
+    if (parentScope.event.rankedServices) {
+      parentScope.rankedServices = [];
+      for (var property in parentScope.event.rankedServices) {
+        if (parentScope.event.rankedServices.hasOwnProperty(property)) {
+          // do stuff
+          parentScope.rankedServices.push({id: property, name: property});
         }
+      }
+    } else { // load the default services to list in ranking table.
+      parentScope.rankedServices = [
+        {id: 'freeCodeCamp', name: 'Free Code Camp'},
+        //{id: 'pivotalExpert', name: 'Pivotal Expert'}
+        // {id: 'codeCombat',name: 'Code Combat'},
+        // {id: 'singPath',name:  'SingPath Problems'},
+        // {id: 'codeSchool', name: 'Code School'}
+      ];
+    }
 
     };
     // Update the list of services to show in table.
@@ -2555,8 +2781,10 @@ export function clmEventResultsTableFactory() {
     };
 }
 
-function ClmEventResultsTableCtrl($scope, $q, $log, $mdDialog, $document,
-                                  urlFor, spfAlert, clmServicesUrl, clmDataStore, clmPagerOption) {
+function ClmEventResultsTableCtrl(
+    $scope, $q, $log, $mdDialog, $document,
+    urlFor, spfAlert, clmServicesUrl, clmDataStore, clmPagerOption, $sce
+) {
     var self = this;
     var unwatchers = [];
 
@@ -2843,7 +3071,7 @@ function ClmEventResultsTableCtrl($scope, $q, $log, $mdDialog, $document,
                 userSolution &&
                 userSolution[taskId]
             ) {
-                this.solution = userSolution[taskId];
+                this.solution = $sce.trustAsResourceUrl(userSolution[taskId]);
             }
 
             this.save = function (link) {
@@ -2871,7 +3099,6 @@ function ClmEventResultsTableCtrl($scope, $q, $log, $mdDialog, $document,
             controller: DialogController,
             controllerAs: 'ctrl'
         });
-        console.log(this.currentUserProgress);
 
         function DialogController() {
             this.task = task;
@@ -2910,6 +3137,9 @@ function ClmEventResultsTableCtrl($scope, $q, $log, $mdDialog, $document,
             controllerAs: 'ctrl'
         });
 
+        this.loadingEditor = true;
+        var parent = this;
+
         function loadEditor() {
             var editor = ace.edit(document.querySelector('#editor'));
             editor.setTheme("ace/theme/monokai");
@@ -2919,12 +3149,19 @@ function ClmEventResultsTableCtrl($scope, $q, $log, $mdDialog, $document,
                 readOnly: true,
                 highlightActiveLine: false,
                 highlightGutterLine: false
-            })
+            });
+            parent.loadingEditor = false;
         }
 
         function CodeController() {
             this.task = task;
             this.viewOnly = true;
+
+            this.checkEditor = function() {
+                return parent.loadingEditor;
+                console.log(parent.loadingEditor);
+            };
+
             if (
                 userSolution &&
                 userSolution[taskId]
@@ -2952,8 +3189,7 @@ function ClmEventResultsTableCtrl($scope, $q, $log, $mdDialog, $document,
         }
     };
 
-    this.saveAllocatedPoints = function (eventId, taskId, task, participant, score) {
-        console.log(Number.isInteger(score));
+    this.saveAllocatedPoints = function(eventId, taskId, task, participant, score) {
         clmDataStore.events.saveScore(eventId, participant.$id, taskId, score).then(function () {
             spfAlert.success('Score has been saved.');
         }).catch(function (err) {
@@ -2961,7 +3197,7 @@ function ClmEventResultsTableCtrl($scope, $q, $log, $mdDialog, $document,
             spfAlert.error('Failed to save score.');
             return err;
         });
-    }
+    };
 
     this.update = function () {
     };
@@ -3070,7 +3306,8 @@ ClmEventResultsTableCtrl.$inject = [
     'spfAlert',
     'clmServicesUrl',
     'clmDataStore',
-    'clmPagerOption'
+    'clmPagerOption',
+    '$sce'
 ];
 
 export function clmPagerFactory() {

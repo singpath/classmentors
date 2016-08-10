@@ -2,6 +2,7 @@ SystemJS.config({
   paths: {
     "npm:": "jspm_packages/npm/",
     "github:": "jspm_packages/github/",
+    // "graphing": "jspm_packages/graphing/",
     "classmentors/": "classmentors/"
   },
   browserConfig: {
@@ -33,6 +34,8 @@ SystemJS.config({
   ],
   map: {
     "ace": "github:ajaxorg/ace-builds@1.2.3",
+    // "c3": "graphingc3.min.js",
+    // "d3": "graphingd3.min.js",
     "angular": "github:angular/bower-angular@1.5.7",
     "angular-animate": "github:angular/bower-angular-animate@1.5.7",
     "angular-aria": "github:angular/bower-angular-aria@1.5.7",

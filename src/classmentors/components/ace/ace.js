@@ -1,11 +1,10 @@
 /**
  * classmentors/components/ace/ace.js - Define the ace component.
  */
-import template from './2015-ace-view.html!text';
+import template from './ace-view.html!text';
 
 /**
  * Update navBar with a title and no action.
- *
  * @param {spfNavBarService} spfNavBarService
  */
 function AceController(spfNavBarService) {
@@ -22,13 +21,14 @@ AceController.$inject = ['spfNavBarService'];
 export const component = {
   template,
   bindings: {
+
     // binds $ctrl.stats to the value of the stats attribute.
     stats: '<'
   },
   controller: AceController
 };
 
-export const ACE_STATS_URL = 'https://dl.dropboxusercontent.com/u/4972572/ace_of_coders_stats.json';
+export const ACE_STATS_URL = 'https://dl.dropboxusercontent.com/u/4972572/ace_of_coders_2016_stats.json';
 
 /**
  * Route resolver helper.
