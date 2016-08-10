@@ -83,13 +83,15 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
   console.log(self.questions);
 
   self.toggleOption = function(question, itemIndex){
-    if(question.answers.indexOf(itemIndex) != -1){
-      var removed = question.answers.splice(itemIndex,1);
+    console.log('Index being deleted...', itemIndex)
+    var idx = question.answers.indexOf(itemIndex);
+    if(idx > -1){
+      var removed = question.answers.splice(idx,1);
       console.log(removed);
-
     }else{
       question.answers.push(itemIndex);
     }
+    console.log(question.answers);
   }
 
   self.discardChanges = function (ev){
@@ -219,12 +221,14 @@ export function newMcqController(initialData, challengeService, $filter,$mdDialo
   // Is it better to set the answers as default multiple and the users will just set 1..n answers?
   self.toggleOption = function(question, itemIndex){
     console.log('Index being deleted...', itemIndex)
-    if(question.answers.indexOf(itemIndex) != -1){
-      var removed = question.answers.splice(itemIndex,1);
+    var idx = question.answers.indexOf(itemIndex);
+    if(idx > -1){
+      var removed = question.answers.splice(idx,1);
       console.log(removed);
     }else{
       question.answers.push(itemIndex);
     }
+    console.log(question.answers);
     checkMCQValid();
   }
 
@@ -239,12 +243,19 @@ export function newMcqController(initialData, challengeService, $filter,$mdDialo
 
   // Delete options
   self.removeOption = function(question, itemIndex) {
-    if(itemIndex > -1){
-      var removed = question.options.splice(itemIndex,1);
-      question.answers.splice(itemIndex,1);
-      console.log('Removed : ', removed);
-      console.log(question.options);
+    question.options.splice(itemIndex,1);
+    var idxOfAns = question.answers.indexOf(itemIndex);
+    if(idxOfAns > -1){
+      var removedAns = question.answers.splice(idxOfAns,1);
+      console.log('Removed an answer: ', removedAns);
     }
+    for(var i = 0; i < question.answers.length; i ++){
+      var ans = question.answers[i];
+      if(ans > itemIndex){
+        question.answers[i] = ans - 1;
+      }
+    }
+    console.log(question.options);
     checkMCQValid();
   }
 

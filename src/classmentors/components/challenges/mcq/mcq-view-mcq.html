@@ -160,7 +160,7 @@
 
             <!--answer options-->
             <div align="center" layout="row" ng-repeat="option in question.options" >
-
+                {{$index}}
                 <md-input-container flex >
                     <label for="q-option_{{$index}}">Option</label>
                     <input type="text" name="editQuestion" id="q-option_{{$index}}"
