@@ -19,6 +19,153 @@ function mcqQuestionFactory(){
   }
 }
 
+export function editMcqController(initialData, challengeService, $filter,$mdDialog){
+  var self = this;
+  // Checks if all questions have at least one answer
+
+  self.task = initialData.data.task;
+  console.log(initialData);
+  var questions = angular.fromJson(self.task.mcqQuestions);
+  var savedAnswers = angular.fromJson(initialData.savedAnswers.$value);
+  self.questions = builtMCQ(questions, savedAnswers);
+  function builtMCQ(questions, savedAnswers){
+    for(var i = 0; i < questions.length; i ++){
+      questions[i].answers = savedAnswers[i];
+    }
+    return questions;
+  }
+  self.isMcqValid = checkMCQValid();
+  // Save mcq question to database.
+
+  //todo: clean up the form before submitting. e.g. when toggled, vid entered, but toggled off
+  self.save = function(questions){
+    var setAnswers = [];
+
+    for(var i = 0; i < questions.length; i ++){
+      var answers = questions[i].answers;
+      setAnswers.push(answers)
+      delete questions[i].answers;
+    }
+
+    // Check does questions contain answers?
+    console.log(questions);
+
+    // Check answer list
+    console.log(setAnswers);
+
+    // Change questions into JSON text
+    var answersJsonText = angular.toJson(questions);
+    console.log(answersJsonText);
+
+    // Save function defined in challenges.js
+    // Parameters: event, taskid, task, taskType, isOpen
+    var event = initialData.data.event;
+    var task = self.task;
+    var taskId = task.$id;
+    var taskType = initialData.data.taskType;
+    var isOpen = initialData.data.isOpen;
+    task.mcqQuestions = answersJsonText;
+    task.answers = angular.toJson(setAnswers);
+    console.log(task);
+    challengeService.update(event, taskId, task,taskType, isOpen);
+  }
+
+  // Add question when add question button is clicked
+  self.addQuestion = function(){
+    var question = {
+      text:"",
+      answers:[],
+      options:[
+        {
+          text:""
+        }
+      ]
+    }
+
+    // Push new question object into questions list
+    self.questions.push(question);
+    checkMCQValid();
+  }
+  function checkMCQValid(){
+    for (var i = 0; i < self.questions.length; i ++){
+      if(self.questions[i].answers.length == 0){
+        self.isMcqValid = false;
+        return;
+      }
+    }
+    self.isMcqValid = true;
+  }
+  self.removeQuestion = function(ev,itemIndex) {
+
+    var confirm = $mdDialog.confirm()
+        .title('Would you like to delete this question?')
+        .textContent('This question and its option(s) will be deleted. Do you wish to proceed?')
+        .ariaLabel('Question deletion')
+        .targetEvent(ev)
+        .ok('Delete')
+        .cancel('Do not delete');
+    $mdDialog.show(confirm).then(function() {
+      if(itemIndex > -1){
+        var removed = self.questions.splice(itemIndex,1);
+        console.log('Removed : ', removed);
+        console.log(self.questions);
+        checkMCQValid();
+      }
+    });
+  };
+
+  // Functionality for toggleOption between single answer and multi ans functionality
+  // Needs further review though..
+  // Is it better to set the answers as default multiple and the users will just set 1..n answers?
+  self.toggleOption = function(question, itemIndex){
+    console.log('Index being deleted...', itemIndex)
+    var idx = question.answers.indexOf(itemIndex);
+    if(idx > -1){
+      var removed = question.answers.splice(idx,1);
+      console.log(removed);
+    }else{
+      question.answers.push(itemIndex);
+    }
+    console.log(question.answers);
+    checkMCQValid();
+  }
+
+  // Add new option to question
+  self.addOption = function (question) {
+    // Get options
+    question.options.push({
+      text:""
+    });
+    checkMCQValid();
+  }
+
+  // Delete options
+  self.removeOption = function(question, itemIndex) {
+    question.options.splice(itemIndex,1);
+    var idxOfAns = question.answers.indexOf(itemIndex);
+    if(idxOfAns > -1){
+      var removedAns = question.answers.splice(idxOfAns,1);
+      console.log('Removed an answer: ', removedAns);
+    }
+    for(var i = 0; i < question.answers.length; i ++){
+      var ans = question.answers[i];
+      if(ans > itemIndex){
+        question.answers[i] = ans - 1;
+      }
+    }
+    console.log(question.options);
+    checkMCQValid();
+  }
+
+
+}
+editMcqController.$inject = [
+    'initialData',
+    'challengeService',
+    '$filter',
+    '$mdDialog'
+];
+
 export function startMcqController(initialData, challengeService, clmDataStore, $location, $mdDialog,urlFor ){
   var self = this;
   var data = initialData.data;

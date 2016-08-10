@@ -15,15 +15,18 @@ export function configRoute($routeProvider, routes){
             controller: mcq.newMcqController,
             controllerAs: 'ctrl',
             resolve:{
-              initialData: createMCQinitialData
+              initialData: createMCQInitialData
             }
         })
 
         //todo: change the controller to one in mcq.js
         .when(routes.editMcq, {
             template: mcq.editMcqTmpl,
-            controller: editCtrl,
-            controllerAs: 'ctrl'
+            controller: mcq.editMcqController,
+            controllerAs: 'ctrl',
+            resolve:{
+              initialData: editMCQInitialData
+            }
 
         })
 
@@ -41,15 +44,36 @@ export function configRoute($routeProvider, routes){
             controller: mcq.startMcqController,
             controllerAs: 'ctrl',
             resolve:{
-              initialData: startMCQinitialData
+              initialData: startMCQInitialData
             }
         });
 
 }
 configRoute.$inject = ['$routeProvider', 'routes'];
 
+
+function editMCQInitialData($q, eventService, clmDataStore){
+  var data = eventService.get();
+  console.log(data);
+  return clmDataStore.events.getTaskAnswers(data.event.$id, data.task.$id).then(
+      function(result){
+        return {
+          data: data,
+          savedAnswers: result
+        }
+      }, function(error){
+        console.log(error);
+      }
+  );
+}
+editMCQInitialData.$inject = [
+    '$q',
+    'eventService',
+    'clmDataStore'
+];
+
 // Initial data for starting an MCQ
-function startMCQinitialData($q, eventService, clmDataStore){
+function startMCQInitialData($q, eventService, clmDataStore){
   var data =  eventService.get();
   return clmDataStore.events.getTaskAnswers(data.eventId, data.taskId).then(
       function(result){
@@ -62,19 +86,19 @@ function startMCQinitialData($q, eventService, clmDataStore){
       }
   );
 }
-startMCQinitialData.$inject = [
+startMCQInitialData.$inject = [
     '$q',
     'eventService',
     'clmDataStore'
 ]
 
 // Initial data for creating MCQ
-function createMCQinitialData($q, eventService){
+function createMCQInitialData($q, eventService){
   var data =  eventService.get();
   console.log(data);
   return data;
 }
-createMCQinitialData.$inject = [
+createMCQInitialData.$inject = [
   '$q',
   'eventService'
 ]
@@ -123,6 +147,57 @@ export function challengeServiceFactory
         }).finally(function() {
             self.creatingTask = false;
         });
+    },
+    update: function(event, taskId, task, taskType, isOpen) {
+      var copy = spfFirebase.cleanObj(task);
+      var answers = copy.answers;
+      console.log('COPY IS ... ', copy);
+      if (taskType === 'linkPattern') {
+        delete copy.badge;
+        delete copy.serviceId;
+        delete copy.singPathProblem;
+      } else if (copy.serviceId === 'singPath') {
+        delete copy.badge;
+        if (copy.singPathProblem) {
+          copy.singPathProblem.path = spfFirebase.cleanObj(task.singPathProblem.path);
+          copy.singPathProblem.level = spfFirebase.cleanObj(task.singPathProblem.level);
+          copy.singPathProblem.problem = spfFirebase.cleanObj(task.singPathProblem.problem);
+        }
+      }else if (taskType === 'multipleChoice'){
+        delete copy.singPathProblem;
+        delete copy.badge;
+        delete copy.answers;
+      } else {
+        delete copy.singPathProblem;
+        copy.badge = spfFirebase.cleanObj(task.badge);
+      }
+
+      if (!copy.link) {
+        // delete empty link. Can't be empty string
+        delete copy.link;
+      }
+
+      self.creatingTask = true;
+      var ref = clmDataStore.events.updateTaskWithAns(event.$id, taskId, copy, answers);
+      ref.then(function() {
+        if (
+            (isOpen && task.openedAt) ||
+            (!isOpen && task.closedAt)
+        ) {
+          return;
+        } else if (isOpen) {
+          return clmDataStore.events.openTask(event.$id, taskId);
+        }
+
+        return clmDataStore.events.closeTask(event.$id, taskId);
+      }).then(function() {
+        spfAlert.success('Task saved');
+        $location.path(urlFor('editEvent', {eventId: event.$id}));
+      }).catch(function() {
+        spfAlert.error('Failed to save the task.');
+      }).finally(function() {
+        self.savingTask = false;
+      });;
     }
   }
 }

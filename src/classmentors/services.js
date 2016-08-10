@@ -586,8 +586,16 @@ export function clmDataStoreFactory(
         return spfFirebase.loadedObj(['classMentors/eventAnswers',eventId,taskId]);
       },
 
-      updateTaskAnswers: function(){
+      updateTaskWithAns: function(eventId, taskId, task,answers){
+        var priority = task.priority || 0;
 
+        return spfFirebase.setWithPriority(
+            ['classMentors/eventTasks', eventId, taskId],
+            task,
+            priority
+        ).then(function () {
+          spfFirebase.set(['classMentors/eventAnswers',eventId,taskId], answers);
+        });
       },
       addTaskAnswers: function(eventId, answers){
         return spfFirebase.push(['classMentors/eventAnswers', eventId], answers);

@@ -1296,7 +1296,7 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBar
       console.log('multipleChoice is clicked');
 
       console.log("this event url", urlFor('oneEvent', {eventId: this.event.$id}));
-      location = "/challenges/mcq";
+      location = "/challenges/mcq/edit";
 
       return 'Continue';
 
