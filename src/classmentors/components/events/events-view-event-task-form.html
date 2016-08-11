@@ -24,7 +24,7 @@
 
                         ng-model="ctrl.task.priority"
                         min="0" step="1"
-                        placeholder="Challenge priority" value="{{ctrl.task.priority}}"
+                        placeholer="Challenge priority" value="{{ctrl.task.priority}}"
 
                     />
                     <div ng-messages="editTask.editTaskPriority.$error">
@@ -237,7 +237,7 @@
                 <input type="number" name="editMaxCards" id="edit-max-cards"
                        ng-model="ctrl.task.cards"
                        min="0" step="1"
-                       placeholer="Challenge priority" value="{{ctrl.task.cards}}"
+                       placeholer="index Cards" value="{{ctrl.task.cards}}"
                 />
                 <div ng-messages="editTask.editTaskPriority.$error">
                     <div ng-message="number">The max cards allowed should be a positive number.</div>
@@ -288,14 +288,11 @@
         </div>
 
         <div layout="row" layout-align="center center">
-            <!--TODO:
-            1. Create continue button controller to route to other views depending on challenge type
-            2. -->
+            <!--TODO: 1. Create continue button controller to route to other views depending on challenge type-->
 
-
-            <!--<md-button type="button" class="md-raised" ng-disabled="!ctrl.enableBeta" ng-href="#{{ctrl.challengeRouteProvider(ctrl.taskType)}}">Continue*</md-button>-->
+            <md-button type="button" class="md-raised" ng-disabled="!ctrl.enableBeta" ng-href="#{{ctrl.challengeRouteProvider(ctrl.taskType, ctrl.task, ctrl.isOpen)}}">Continue BETA*</md-button>
             <md-button type="submit" class="md-raised md-primary" ng-disabled="editTask.$invalid || !ctrl.taskType ||ctrl.savingTask">{{ ctrl.challengeRouteProvider($event, ctrl.event, ctrl.task, ctrl.taskType, ctrl.isOpen)}}</md-button>
-            <md-button type="reset" class="md-raised" ng-click="ctrl.discardChanges($event,ctrl.task)">Back</md-button>
+            <md-button type="reset" class="md-raised" ng-click="ctrl.discardChanges($event)">Back</md-button>
 
         </div>
     </form>
