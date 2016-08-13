@@ -1139,7 +1139,7 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
             };
             console.log('Data shows... ', data);
             spfNavBarService.update(
-                'New Challenge Details', [{
+                'Challenge Details', [{
                     title: 'Events',
                     url: `#${urlFor('events')}`
                 }, {

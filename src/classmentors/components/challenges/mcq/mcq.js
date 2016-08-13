@@ -19,15 +19,18 @@ function mcqQuestionFactory(){
   }
 }
 
-export function editMcqController(initialData, challengeService, $filter,$mdDialog){
+export function editMcqController(initialData, challengeService, $filter,$mdDialog, urlFor, $location){
   var self = this;
+
+
   // Checks if all questions have at least one answer
 
   self.task = initialData.data.task;
-  console.log(initialData);
+  console.log("the initial edit data is........", initialData);
   var questions = angular.fromJson(self.task.mcqQuestions);
   var savedAnswers = angular.fromJson(initialData.savedAnswers.$value);
   self.questions = builtMCQ(questions, savedAnswers);
+
   function builtMCQ(questions, savedAnswers){
     for(var i = 0; i < questions.length; i ++){
       questions[i].answers = savedAnswers[i];
@@ -157,13 +160,33 @@ export function editMcqController(initialData, challengeService, $filter,$mdDial
     checkMCQValid();
   }
 
+  //todo:add back button controls here
+  self.discardChanges = function (ev){
+    var confirm = $mdDialog.confirm()
+        .title('Would you like to discard your changes?')
+        .textContent('All of the information input will be discarded. Are you sure you want to continue?')
+        .ariaLabel('Discard changes')
+        .targetEvent(ev)
+        .ok('Cancel Editing')
+        .cancel('Continue Editing');
+    $mdDialog.show(confirm).then(function() {
+      // decided to discard data, bring user to previous page
+
+      //todo: link back to previous page
+      //$location.path(urlFor('editEventTask', {eventId: initialData.event.$id},{taskId: task.$id}));
+      $location.path(urlFor('oneEvent', {eventId: initialData.event.$id}));
+    })
+  }
+
 
 }
 editMcqController.$inject = [
     'initialData',
     'challengeService',
     '$filter',
-    '$mdDialog'
+    '$mdDialog',
+    'urlFor',
+    '$location'
 ];
 
 export function startMcqController(initialData, challengeService, clmDataStore, $location, $mdDialog,urlFor ){
@@ -221,7 +244,7 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
       .then(
         clmDataStore.events.saveScore(eventId, participant.$id, taskId, score)
       ).then(
-      $location.path('/events/'+eventId)
+      $location.path(urlFor('oneEvent',{eventId: eventId}))
     );
 
 
@@ -243,17 +266,17 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
 
   self.discardChanges = function (ev){
     var confirm = $mdDialog.confirm()
-        .title('Would you like to discard your changes?')
-        .textContent('All of the information input will be discarded. Are you sure you want to continue?')
-        .ariaLabel('Discard changes')
+        .title('Would you like to discard your answers?')
+        .textContent('All of your answers will be discarded. Are you sure you want to continue?')
+        .ariaLabel('Discard answers')
         .targetEvent(ev)
-        .ok('Discard All')
-        .cancel('Do Not Discard');
+        .ok('Cancel Answering')
+        .cancel('Continue Answering');
     $mdDialog.show(confirm).then(function() {
       // decided to discard data, bring user to previous page
 
       //todo: link back to previous page
-      $location.path(urlFor('oneEvent', {eventId: eventId}));
+      $location.path(urlFor('oneEvent', {eventId: initialData.event.$id}));
 
     })
   }
@@ -269,8 +292,11 @@ startMcqController.$inject = [
     'urlFor'
 ];
 
-export function newMcqController(initialData, challengeService, $filter,$mdDialog){
+export function newMcqController(initialData, challengeService, $filter,$mdDialog,urlFor,$location){
   var self = this;
+
+  console.log("the initial new data is........", initialData);
+
   // Checks if all questions have at least one answer
   self.isMcqValid = false;
   self.task = initialData.task;
@@ -315,7 +341,7 @@ export function newMcqController(initialData, challengeService, $filter,$mdDialo
     var isOpen = initialData.isOpen;
     task.mcqQuestions = answersJsonText;
     task.answers = angular.toJson(setAnswers);
-    console.log(task)
+    console.log(task);
     challengeService.save(event, taskId, task,taskType, isOpen);
   }
 
@@ -406,13 +432,35 @@ export function newMcqController(initialData, challengeService, $filter,$mdDialo
     checkMCQValid();
   }
 
+  //todo:back button add here
+  self.discardChanges = function (ev){
+
+    var confirm = $mdDialog.confirm()
+        .title('Would you like to discard your changes?')
+        .textContent('All of the information input will be discarded. Are you sure you want to continue?')
+        .ariaLabel('Discard changes')
+        .targetEvent(ev)
+        .ok('Cancel Editing')
+        .cancel('Continue Editing');
+    $mdDialog.show(confirm).then(function() {
+      // decided to discard data, bring user to previous page
+
+      //todo: link back to previous page
+      //$location.path(urlFor('addEventTask', {eventId: initialData.event.$id}));
+      $location.path(urlFor('oneEvent', {eventId: initialData.event.$id}));
+
+    })
+  }
+
 
 }
 newMcqController.$inject = [
   'initialData',
   'challengeService',
   '$filter',
-  '$mdDialog'
+  '$mdDialog',
+    'urlFor',
+    '$location'
 ];
 
 export function starMcqTmpl() {
@@ -426,6 +474,3 @@ export function newMcqTmpl(){
 export function editMcqTmpl(){
     return mcqEditTmpl;
 }
-
-
-//TODO: enable user to edit mcq
