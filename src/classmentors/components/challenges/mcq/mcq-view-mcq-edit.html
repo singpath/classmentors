@@ -92,7 +92,10 @@
             </div>
 
             <md-input-container >
-                <md-button type="button" class="md-raised md-primary" ng-click="ctrl.addOption(question)">Add option</md-button>
+                <md-button type="button" class="md-raised md-primary" id="addOptions" ng-click="ctrl.addOption(question)">Add option</md-button>
+
+                    <div ng-show="ctrl.isMcqValid == false">One of the option must be an answer.</div>
+
             </md-input-container>
 
             <!--answer options-->

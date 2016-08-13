@@ -93,6 +93,7 @@ export function editMcqController(initialData, challengeService, $filter,$mdDial
     for (var i = 0; i < self.questions.length; i ++){
       if(self.questions[i].answers.length == 0){
         self.isMcqValid = false;
+
         return;
       }
     }

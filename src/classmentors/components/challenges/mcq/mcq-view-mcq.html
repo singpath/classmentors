@@ -92,8 +92,10 @@
             </div>
 
             <md-input-container >
-                <md-button type="button" class="md-raised md-primary" ng-click="ctrl.addOption(question)">Add option</md-button>
+                <md-button type="button" class="md-raised md-primary" id="addOptions" ng-click="ctrl.addOption(question)">Add option</md-button>
             </md-input-container>
+
+            <p ng-show="ctrl.isMcqValid == false"><font color="red">*One of the option must be an answer.</font></p>
 
             <!--answer options-->
             <div align="center" layout="row" ng-repeat="option in question.options" >
