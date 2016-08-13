@@ -739,7 +739,7 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
   this.event = initialData.event;
   this.tasks = initialData.tasks;
   this.showingAssistants = false;
-  this.showingTasks = false;
+  this.showingTasks = true;
   this.assistants = initialData.assistants;
   this.newPassword = '';
   this.isOwner = false;

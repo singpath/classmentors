@@ -24,7 +24,7 @@
                         {{ event.rank }}
                     </th>
                     <td>{{ event.participants.length }}</td>
-                    <td>{{ event.title }}</td>
+                    <td><a href="#{{ 'oneEvent' | urlFor: {eventId: event.id} }}">{{ event.title }}</a></td>
                 </tr>
             </tbody>
         </table>
