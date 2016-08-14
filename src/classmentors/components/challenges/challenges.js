@@ -208,11 +208,6 @@ challengeServiceFactory.$inject =
 //
 // }
 
-//todo: to be removed when controller is changed.
-function editCtrl (){
-    console.log("hello. this is edit ctl");
-};
-
 function surveyFormEvent($scope, clmSurvey, spfFirebase, clmDataStore, $log, spfAlert, $location, urlFor) {
 
     this.surveys = [
