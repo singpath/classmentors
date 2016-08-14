@@ -201,6 +201,21 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
   self.task = data.task;
   var quesFromJson = angular.fromJson(self.task.mcqQuestions);
   self.questions = loadQuestions(quesFromJson);
+  self.multipleAns = initMultipleAns(correctAnswers);
+  // what is dah output?
+  console.log(self.multipleAns);
+
+  function initMultipleAns(correctAnswers){
+    var multipleAnsList = [];
+    for(var i = 0; i < correctAnswers.length; i ++){
+      if(correctAnswers[i].length > 1){
+        multipleAnsList.push(true);
+      }else {
+        multipleAnsList.push(false);
+      }
+    }
+    return multipleAnsList;
+  }
 
   function arraysEqual(arr1, arr2) {
     if(arr1.length !== arr2.length)

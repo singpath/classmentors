@@ -66,8 +66,12 @@
           <label>{{question.text}}</label>
       </div>
 
-
       <!--answer options-->
+      <div align="center" layout="row">
+        <md-radio-group>
+          <md-radio-button ng-repeat="option in question.options"></md-radio-button>
+        </md-radio-group>
+      </div>
       <div align="center" layout="row" ng-repeat="option in question.options" >
         <!--single answer or no?-->
         <div flex align="left">
@@ -76,6 +80,12 @@
         <div flex="20">
         <md-button ng-model="question.answers" ng-class="question.answers.indexOf($index) != -1 ? 'md-raised md-primary' : 'md-raised'"
                    ng-click="ctrl.toggleOption(question, $index)">Answer</md-button>
+        </div>
+        <div flex="20" ng-show="ctrl.multipleAns[$parent.$index]">
+          <input type="checkbox" name="answer" value="$index"/>
+        </div>
+        <div flex="20" ng-show="!ctrl.multipleAns[$parent.$index]">
+          <input type="radio" name="answer" value="$index"/>
         </div>
           <md-divider ng-if="!$last"></md-divider>
       </div>
