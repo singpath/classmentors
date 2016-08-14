@@ -47,19 +47,20 @@
                 </div>
             </md-input-container>
 
-            <h5> Re-attempts Allowance</h5>
-            <md-input-container>
-                *Waiting time before students can re-attempt challenge (minutes)
-                <input type="number" name="reattempts" id="reattempts"
-                       ng-model="ctrl.task.reattempts"
-                       min="0" step="1"
-                       placeholer="Waiting time before students can re-attempt challenge (minutes)" value="" required
-                />
-                <div ng-messages="editMcq.reattempts.$error">
-                    <div ng-message="number">Waiting time before students can re-attempt challenge should be a positive number in minutes.</div>
-                    <div ng-message="required">Please enter time(minutes) before students can re-attempt challenge.</div>
-                </div>
-            </md-input-container>
+            <!--todo: install angular-timer and make timer work first before uncommenting-->
+            <!--<h5> Re-attempts Allowance</h5>-->
+            <!--<md-input-container>-->
+                <!--*Waiting time before students can re-attempt challenge (minutes)-->
+                <!--<input type="number" name="reattempts" id="reattempts"-->
+                       <!--ng-model="ctrl.task.reattempts"-->
+                       <!--min="0" step="1"-->
+                       <!--placeholer="Waiting time before students can re-attempt challenge (minutes)" value="" required-->
+                <!--/>-->
+                <!--<div ng-messages="editMcq.reattempts.$error">-->
+                    <!--<div ng-message="number">Waiting time before students can re-attempt challenge should be a positive number in minutes.</div>-->
+                    <!--<div ng-message="required">Please enter time(minutes) before students can re-attempt challenge.</div>-->
+                <!--</div>-->
+            <!--</md-input-container>-->
 
             <h5>Team Mode</h5>
             <md-switch class="md-primary" ng-model="ctrl.task.enableTeam" aria-label="">
