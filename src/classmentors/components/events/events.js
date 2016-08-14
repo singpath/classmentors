@@ -1852,10 +1852,6 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
 
         if (task.survey === "School engagement scale") {
             //TODO: implement config route to route to survey form template
-            console.log("school engagement came in here");
-            console.log("routes is: ", routes);
-            console.log("my eventid is: ", eventId);
-
             $location.path('/events/' + eventId + '/' + taskId + '/' + 'survey1' + '/' + task.survey);
 
         }
@@ -2157,6 +2153,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
     this.pagerOpts = clmPagerOption();
     var self = this;
     this.questions = initialData.survey2;
+    console.log("this questions are::", initialData.survey2);
     this.ratingOptions = [
         {id: 1},
         {id: 2},
@@ -2166,6 +2163,26 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
         {id: 6},
         {id: 7}
     ];
+
+
+    if ($routeParams.surveyTask === 'School engagement scale') {
+
+        self.responseRating = [
+            {option: 'Never'},
+            {option: 'On Occasion'},
+            {option: 'Some of the Time'},
+            {option: 'Most of the Time'},
+            {option: 'All of the Time'}
+        ];
+
+        self.schEngageResp = [];
+
+        for (var k = 0; k <= Object.keys(initialData.survey2[2]).length - 2; k++) {
+            self.schEngageResp.push({[k + 1]: 0});
+        }
+        console.log("this schengageresp: ", self.schEngageResp);
+
+    }
 
     if ($routeParams.surveyTask === 'Motivated strategies for learning') {
 
@@ -2262,17 +2279,17 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
         var surveyType = $routeParams.surveyTask;
 
         /*var tempValue;
-        console.log("value before: ", promise);
-        var p = Promise.resolve(promise);
-        p.then(function(value){
-        var count = 1;
+         console.log("value before: ", promise);
+         var p = Promise.resolve(promise);
+         p.then(function(value){
+         var count = 1;
 
-        //this is to retrieve the total length of the json object
-        console.log("value? ", Object.keys(value[0]).length);
-        console.log("values: ", value[0]);
-        for(var i = 1; i < Object.keys(value[0]).length -1 ; i++){
-        console.log("looped value: " + value[0]["Q"+i]);
-        }*/
+         //this is to retrieve the total length of the json object
+         console.log("value? ", Object.keys(value[0]).length);
+         console.log("values: ", value[0]);
+         for(var i = 1; i < Object.keys(value[0]).length -1 ; i++){
+         console.log("looped value: " + value[0]["Q"+i]);
+         }*/
 
         console.log("all the VALUES HERE: " + surveyResp + ", " + questionNumber + "," + taskId + ", " + eventId + ", " + userId + ", " + surveyType)
         clmDataStore.events.saveSurveyResponse(surveyResp, questionNumber, taskId, eventId, userId, surveyType);
@@ -2359,7 +2376,32 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
         }
 
     }
+    this.submitSchEngageResponse = function (schEngageResp){
+        console.log("sch engage goes in here:", schEngageResp);
 
+        var allResponses = true;
+        for (var i = 1; i < schEngageResp.length; i++) {
+            if (schEngageResp[i][i + 1] === 0) {
+                allResponses = false;
+                break;
+            }
+        }
+        if (!allResponses) {
+            spfAlert.warning('Failed to save the responses.');
+        } else {
+            var taskId = $routeParams.taskId;
+            var eventId = initialData.event.$id;
+            var userId = initialData.currentUser.publicId;
+            var surveyType = $routeParams.surveyTask;
+            spfAlert.success('Response has been submitted. Thank you for doing this survey!');
+            clmDataStore.events.saveSurveyResponseOnSubmit(taskId, eventId, userId, surveyType, schEngageResp);
+            $location.path(urlFor('oneEvent', {eventId: self.event.$id}));
+
+        }
+
+
+
+    };
     this.submitMotiStratResponse = function (motiResp) {
 
         var allResponses = true;
@@ -2373,7 +2415,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
         }
         if (!allResponses) {
             spfAlert.warning('Failed to save the responses.');
-        }else{
+        } else {
             var taskId = $routeParams.taskId;
             var eventId = initialData.event.$id;
             var userId = initialData.currentUser.publicId;
