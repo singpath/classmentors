@@ -2154,11 +2154,7 @@ addSurveyEventTaskCtrlInitialData.$inject = ['spfFirebase', '$q', '$route', 'spf
 
 //TODO: include controller for the survey
 function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $routeParams, clmDataStore, spfFirebase, clmPagerOption, spfAlert, $log) {
-    var unwatchers = [];
     this.pagerOpts = clmPagerOption();
-    unwatchers.push(this.pagerOpts.$destroy.bind(this.pagerOpts));
-    //for motivated strategies for learning survey
-    //then function will execute last
     var self = this;
     this.questions = initialData.survey2;
     this.ratingOptions = [
@@ -2173,7 +2169,6 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
 
     if ($routeParams.surveyTask === 'Motivated strategies for learning') {
 
-
         self.questionsArr = [];
         for (var i = 1; i < Object.keys(initialData.survey2[1]).length - 1; i++) {
             //console.log("testing: ", initialData.survey2[1]["Q" + i]);
@@ -2181,16 +2176,10 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
         }
 
         self.motiResp = [];
-        for (var k = 1; k <= self.questionsArr.length; k++) {
-            self.motiResp.push({[k]: 0});
+        for (var k = 0; k <= self.questionsArr.length; k++) {
+            self.motiResp.push({[k + 1]: 0});
 
         }
-        //console.log("please give me my promise: ", initialData.survey2);
-        // for (var i = 1; i < Object.keys(initialData.survey2[0]).length - 1; i++) {
-        //     console.log("got anything anot?: ", initialData.survey2[0]["Q" + i]);
-        //     self.questionsArr["name"].push(initialData.survey2[0]["Q" + i]);
-        //
-        // }
 
     }
 
@@ -2225,7 +2214,6 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             return list.indexOf(item) > -1;
         };
 
-
         this.bdayMonth = [
             {month: 'January'},
             {month: 'February'},
@@ -2251,8 +2239,6 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
         ];
 
         this.selectEthnicity = [];
-
-
     }
 
     this.event = initialData.event;
@@ -2267,7 +2253,6 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
     );
     this.saveSurveyResponse = function (response, item, task) {
 
-        //retrieve all required data to be put into firebase
         var surveyResp = response;
         var questionNumber = item.currentTarget.getAttribute("data-id");
 
@@ -2276,24 +2261,19 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
         var userId = initialData.currentUser.publicId;
         var surveyType = $routeParams.surveyTask;
 
+        /*var tempValue;
+        console.log("value before: ", promise);
+        var p = Promise.resolve(promise);
+        p.then(function(value){
+        var count = 1;
 
-        //console.log("ans reponse is::", ansResponse);
-        //retrieve values from firebase as a json object
-        /*var promise = spfFirebase.loadedArray(['classMentors/surveyTemplate']);
-         var tempValue;
-         console.log("value before: ", promise);
-         var p = Promise.resolve(promise);
-         p.then(function(value){
-         var count = 1;
+        //this is to retrieve the total length of the json object
+        console.log("value? ", Object.keys(value[0]).length);
+        console.log("values: ", value[0]);
+        for(var i = 1; i < Object.keys(value[0]).length -1 ; i++){
+        console.log("looped value: " + value[0]["Q"+i]);
+        }*/
 
-         //this is to retrieve the total length of the json object
-         console.log("value? ", Object.keys(value[0]).length);
-         console.log("values: ", value[0]);
-         for(var i = 1; i < Object.keys(value[0]).length -1 ; i++){
-         console.log("looped value: " + value[0]["Q"+i]);
-
-         }*/
-        //end//
         console.log("all the VALUES HERE: " + surveyResp + ", " + questionNumber + "," + taskId + ", " + eventId + ", " + userId + ", " + surveyType)
         clmDataStore.events.saveSurveyResponse(surveyResp, questionNumber, taskId, eventId, userId, surveyType);
     }
@@ -2332,14 +2312,11 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             clmDataStore.events.saveSurveyEduDisMultiResponse(ethnicityRace, questionNumber, taskId, eventId, userId, surveyType, qnTitle);
         }
 
-        //clmDataStore.events.saveSurveyEduDisMultiResponse(familyArr, questionNumber, taskId, eventId, userId, surveyType, qnTitle);
-
 
     }
     this.saveEduDisResponse = function (response, age, item, task, siblingNum, selectedMonth, country, language, qnTitle, bestResp) {
-        console.log("qn title is", qnTitle);
-        console.log("qn Number is", item.currentTarget.getAttribute("data-id"));
-
+        //console.log("qn title is", qnTitle);
+        //console.log("qn Number is", item.currentTarget.getAttribute("data-id"));
 
         var surveyResp = response;
         var questionNumber = item.currentTarget.getAttribute("data-id");
@@ -2347,7 +2324,6 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
         var eventId = initialData.event.$id;
         var userId = initialData.currentUser.publicId;
         var surveyType = $routeParams.surveyTask;
-        //new codes
         var ageResp = age;
         var sibResp = siblingNum;
         var monthResp = selectedMonth;
@@ -2382,33 +2358,30 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             clmDataStore.events.saveSurveyEduDisResponse(bestResp, questionNumber, taskId, eventId, userId, surveyType, qnTitle);
         }
 
-        // console.log("ALL RETRIEVED VALUES: " + surveyResp + ", " + questionNumber + ", " + taskId
-        // + ", " + eventId + ", " + userId + ", " + surveyType + ", " + ageResp + ", " + sibResp +
-        //         ", " + monthResp + ", " + qnTitle + ", " + bornCountry + ", " + spokenLanguage + ", "
-        //     + spokenLanguage + ", " + bestResp);
-
-        // for(var z = 0 ; z < familyArr.length; z++){
-        //     console.log("ALL RETRIEVED VALUES:" + familyArr[z]);
-        // }
-        //
-        // for(var k = 0; k < ethnicityRace.length; k++){
-        //     console.log("ALL RETRIEVED VALUES:" + ethnicityRace[k]);
-        // }
-
     }
 
     this.submitMotiStratResponse = function (motiResp) {
-        console.log("motiresp iss:", motiResp);
-        var allResponses = true;
-        for (var i = 1; i < motiResp.length; i++) {
 
+        var allResponses = true;
+        console.log("trying ", motiResp);
+        for (var i = 1; i < motiResp.length; i++) {
+            console.log("this motiresp:", motiResp[i]);
             if (motiResp[i][i + 1] === 0) {
                 allResponses = false;
                 break;
             }
         }
         if (!allResponses) {
-            spfAlert.error('Failed to save the responses.');
+            spfAlert.warning('Failed to save the responses.');
+        }else{
+            var taskId = $routeParams.taskId;
+            var eventId = initialData.event.$id;
+            var userId = initialData.currentUser.publicId;
+            var surveyType = $routeParams.surveyTask;
+            spfAlert.success('Response has been submitted. Thank you for doing this survey!');
+            clmDataStore.events.saveSurveyResponseOnSubmit(taskId, eventId, userId, surveyType, motiResp);
+            $location.path(urlFor('oneEvent', {eventId: self.event.$id}));
+
         }
     }
 

@@ -1275,6 +1275,10 @@ export function clmDataStoreFactory(
         'classMentors/surveyResponse', eventId, taskId, surveyTask, userId, questionNumber], surveyResp);
 
       },
+        saveSurveyResponseOnSubmit: function(taskId, eventId, userId, surveyType, motiResp){
+            return spfFirebase.set([
+            'classMentors/surveyResponse',eventId, taskId, surveyType, userId],motiResp);
+        },
 
       saveSurveyEduDisResponse: function(surveyResp, questionNumber, taskId, eventId, userId, surveyTask, qnTitle){
         if (!surveyResp) {
