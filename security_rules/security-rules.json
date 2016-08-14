@@ -200,7 +200,7 @@
               }
             }
           },
-          ".read": "auth !== null && (\n  root.child('classMentors/eventApplications/').child($eventId).child(auth.uid).exists()\n  || root.child('classMentors/events').child($eventId).child('owner/publicId').val() === root.child('auth/users').child(auth.uid).child('publicId').val()\n  || root.child('classMentors/admins').child(auth.uid).val() === true\n)",
+          ".read": "auth !== null",
           ".write": "auth !== null && root.child('classMentors/events').child($eventId).child('owner/publicId').val() === root.child('auth/users').child(auth.uid).child('publicId').val()"
         }
       },
