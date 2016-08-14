@@ -277,7 +277,7 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
       // decided to discard data, bring user to previous page
 
       //todo: link back to previous page
-      $location.path(urlFor('oneEvent', {eventId: initialData.event.$id}));
+      $location.path(urlFor('oneEvent', {eventId: eventId}));
 
     })
   }
