@@ -3,12 +3,21 @@
           rel="stylesheet">
     <md-tabs md-dynamic-height="true" md-border-bottom="true">
 
+        <md-tab label="Ranking">
+            <md-content layout-padding>
+                <clm-cohorts-ranking-page
+                        cohort="ctrl.cohort"
+                        profile="ctrl.profile">
+                </clm-cohorts-ranking-page>
+            </md-content>
+        </md-tab>
+
         <md-tab label="Announcements">
             <md-content layout-padding>
                 Events within this cohort:
                 <md-select flex ng-model="ctrl.selectedEvent" name="selectEvent" placeholder="View cohort events">
                     <md-option disabled ng-value="event" ng-repeat="event in ctrl.cohort.events">
-                        {{ctrl.events[event].title}}
+                        <a href="#{{ 'oneEvent' | urlFor: {eventId: event} }}">{{ ctrl.events[event].title }}</a>
                     </md-option>
                 </md-select>
                 Go to my event:<br>
@@ -45,15 +54,6 @@
                         </md-card-content>
                     </md-card>
                 </md-content>
-            </md-content>
-        </md-tab>
-
-        <md-tab label="Ranking">
-            <md-content layout-padding>
-                <clm-cohorts-ranking-page
-                        cohort="ctrl.cohort"
-                        profile="ctrl.profile">
-                </clm-cohorts-ranking-page>
             </md-content>
         </md-tab>
 
