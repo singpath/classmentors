@@ -17,7 +17,10 @@
             <md-input-container align="center">
                 <md-select ng-model="ctrl.surveyType" style="width: 500px" placeholder="Please select a form">
                     <md-optgroup label="Upload Standard Template">
-                        <md-option ng-value="survey" ng-repeat="survey in ctrl.surveys">{{survey.name}}</md-option>
+                        <md-option ng-value="survey"
+                                   ng-disabled="survey.name == 'Education vs Dissatisfaction with learning'"
+                                   ng-repeat="survey in ctrl.surveys">{{survey.name}}
+                        </md-option>
                     </md-optgroup>
                 </md-select>
             </md-input-container>

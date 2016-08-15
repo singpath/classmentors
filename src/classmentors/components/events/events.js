@@ -2153,7 +2153,6 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
     this.pagerOpts = clmPagerOption();
     var self = this;
     this.questions = initialData.survey2;
-    console.log("this questions are::", initialData.survey2);
     this.ratingOptions = [
         {id: 1},
         {id: 2},
@@ -2180,7 +2179,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
         for (var k = 0; k <= Object.keys(initialData.survey2[2]).length - 2; k++) {
             self.schEngageResp.push({[k + 1]: 0});
         }
-        console.log("this schengageresp: ", self.schEngageResp);
+
 
     }
 
@@ -2201,7 +2200,6 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
     }
 
     if ($routeParams.surveyTask === 'Education vs Dissatisfaction with learning') {
-        //TODO: POPULATE THIS LAST SURVEYYYYYY!!!
         this.familyMembers = [
             {name: 'Father'},
             {name: 'Mother'},
@@ -2214,15 +2212,12 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
         this.selectedRaceEthnicity = [];
 
         this.toggle = function (item, list) {
-            //console.log("got come in here");
             var idx = list.indexOf(item);
             if (idx > -1) {
                 list.splice(idx, 1);
-
             }
             else {
                 list.push(item);
-
             }
             return list
         };
@@ -2255,7 +2250,30 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             {secondRow: 'Other'},
         ];
 
-        this.selectEthnicity = [];
+        //this.selectEthnicity = [];
+
+        this.eduDissResp = [];
+
+        for (var i = 1; i < Object.keys(initialData.survey2[0]).length - 1; i++) {
+
+            this.eduDissResp.push({[initialData.survey2[0][i]['title']]: []});
+            for (var k = 1; k <= Object.keys(initialData.survey2[0][i]).length - 1; k++) {
+                //console.log("this initial data is::", initialData.survey2[0][i][k]);
+                this.eduDissResp[i-1][initialData.survey2[0][i]['title']].push({[k]:0});
+
+            }
+            //     console.log("break");
+        }
+        console.log("test", this.eduDissResp);
+        // this.eduDissResp[0]['What do I think about school?'].push({[1]: 'testing'});
+        // console.log("this edudissresp is:", this.eduDissResp[0]['What do I think about school?'][0][1]);
+
+        //this.eduDissResp[0]['What do I think about school?']=({'1' : 'trying only'});
+        //console.log("these titles: ", this.eduDissResp[0]['What do I think about school?'][1]);
+        // for (var k = 0; k <= Object.keys(initialData.survey2[2]).length - 2; k++) {
+        //     self.schEngageResp.push({[k + 1]: 0});
+        // }
+        //console.log("this edu diss promise has:", initialData.survey2[0]);
     }
 
     this.event = initialData.event;
@@ -2376,7 +2394,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
         }
 
     }
-    this.submitSchEngageResponse = function (schEngageResp){
+    this.submitSchEngageResponse = function (schEngageResp) {
         console.log("sch engage goes in here:", schEngageResp);
 
         var allResponses = true;
@@ -2400,14 +2418,13 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
         }
 
 
-
     };
     this.submitMotiStratResponse = function (motiResp) {
 
         var allResponses = true;
         console.log("trying ", motiResp);
         for (var i = 1; i < motiResp.length; i++) {
-            console.log("this motiresp:", motiResp[i]);
+            //console.log("this motiresp:", motiResp[i]);
             if (motiResp[i][i + 1] === 0) {
                 allResponses = false;
                 break;
@@ -2426,6 +2443,10 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
 
         }
     }
+
+    this.submitEduDissResponse = function (eduDissResp) {
+        console.log("edudissresp values: ", eduDissResp);
+    };
 
 
 };
