@@ -217,6 +217,16 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
     return multipleAnsList;
   }
 
+  self.toggle = function(list, item){
+    var idx = list.indexOf(item);
+    if (idx > -1) {
+      list.splice(idx, 1);
+    }
+    else {
+      list.push(item);
+    }
+  }
+
   function arraysEqual(arr1, arr2) {
     if(arr1.length !== arr2.length)
       return 0;
@@ -249,7 +259,11 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
     var submission = {};
     var userAnswers = [];
     for(var i = 0; i < self.questions.length; i++){
-      userAnswers.push(self.questions[i].answers);
+      var ans = self.questions[i].answers;
+      if (typeof ans == 'string'){
+        ans = angular.fromJson('[' + ans + ']');
+      }
+      userAnswers.push(ans);
     }
     submission.userAnswers = userAnswers;
     var score = markQuestions(userAnswers);
@@ -264,20 +278,6 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
     );
 
 
-  }
-
-  console.log(self.questions);
-
-  self.toggleOption = function(question, itemIndex){
-    console.log('Index being deleted...', itemIndex)
-    var idx = question.answers.indexOf(itemIndex);
-    if(idx > -1){
-      var removed = question.answers.splice(idx,1);
-      console.log(removed);
-    }else{
-      question.answers.push(itemIndex);
-    }
-    console.log(question.answers);
   }
 
   self.discardChanges = function (ev){
