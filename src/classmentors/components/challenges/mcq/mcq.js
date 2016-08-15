@@ -227,6 +227,8 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
     }
   }
 
+  self.isMcqValid = false;
+
   function arraysEqual(arr1, arr2) {
     if(arr1.length !== arr2.length)
       return 0;
@@ -280,6 +282,7 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
 
   }
 
+
   self.discardChanges = function (ev){
     var confirm = $mdDialog.confirm()
         .title('Would you like to discard your answers?')
@@ -292,7 +295,7 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
       // decided to discard data, bring user to previous page
 
       //todo: link back to previous page
-      $location.path(urlFor('oneEvent', {eventId: initialData.event.$id}));
+      $location.path(urlFor('oneEvent', {eventId: eventId}));
 
     })
   }
@@ -310,8 +313,6 @@ startMcqController.$inject = [
 
 export function newMcqController(initialData, challengeService, $filter,$mdDialog,urlFor,$location){
   var self = this;
-
-  console.log("the initial new data is........", initialData);
 
   // Checks if all questions have at least one answer
   self.isMcqValid = false;

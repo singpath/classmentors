@@ -887,9 +887,6 @@ function ClmCohortRankPageCtrl($q, $scope, $log, spfFirebase, clmDataStore, clmP
             }
         }
     }
-
-    // this.rankings = Array.from(Array(self.cohort.events.length).keys());
-    // console.log(self.rankings);
 }
 ClmCohortRankPageCtrl.$inject = [
     '$q',
