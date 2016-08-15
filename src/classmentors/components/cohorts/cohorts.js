@@ -320,51 +320,9 @@ function viewCohortCtrlInitialData($q, $route, spfAuth, spfAuthData, clmDataStor
         profile: profilePromise,
         cohort: cohortPromise,
         canView: canviewPromise,
-        announcements: canviewPromise.then(function (canView) {
-            if(canView) {
-                return clmDataStore.cohorts.getAnnouncements(cohortId);
-            }
-        }),
-        events: canviewPromise.then(function (canView) {
-            if(canView) {
-                return clmDataStore.events.listAll();
-            }
-        }),
-        joinedEvents: canviewPromise.then(function (canView) {
-            if(canView) {
-                return clmDataStore.events.listJoinedEventsObj();
-            }
-        })
-        // events: canviewPromise.then(function(canView) {
-        //     if(canView) {
-        //         return clmDataStore.cohorts.getEvents(cohortId);
-        //     }
-        // }),
-        // tasks: canviewPromise.then(function(canView) {
-        //     if (canView) {
-        //         return clmDataStore.events.getTasks(eventId);
-        //     }
-        // }),
-        // participants: canviewPromise.then(function(canView) {
-        //     if (canView) {
-        //         return clmDataStore.events.participants(eventId);
-        //     }
-        // }),
-        // progress: canviewPromise.then(function(canView) {
-        //     if (canView) {
-        //         return clmDataStore.events.getProgress(eventId);
-        //     }
-        // }),
-        // solutions: canviewPromise.then(function(canView) {
-        //     if (canView) {
-        //         return clmDataStore.events.getSolutions(eventId);
-        //     }
-        // }),
-        // scores: canviewPromise.then(function(canView) {
-        //     if (canView) {
-        //         return clmDataStore.events.getScores(eventId);
-        //     }
-        // })
+        announcements: clmDataStore.cohorts.getAnnouncements(cohortId),
+        events: clmDataStore.events.listAll(),
+        joinedEvents: clmDataStore.events.listJoinedEventsObj()
     });
 }
 viewCohortCtrlInitialData.$inject = [
@@ -890,12 +848,18 @@ function ClmCohortRankPageCtrl($q, $scope, $log, spfFirebase, clmDataStore, clmP
                 }).then(function(data) {
                     var result = data;
                     oneEventData.participants = result;
+                }).catch(function (err) {
+                    // prevent events with no participants from breaking the code by initialising their participant array to an empty one.
+                    oneEventData.participants = [];
+                    $log.error(err);
+                    return err;
                 }).then(function () {
                     spfFirebase.loadedObj(['classMentors/events', event]).then(function(promise) {
                         return promise;
                     }).then(function(data) {
                         var result = data;
                         oneEventData.title = result.title;
+                        oneEventData.id = result.$id;
                         self.cohortEventData.push(oneEventData);
                         iter++;
                         loopDBEvents();
@@ -914,18 +878,15 @@ function ClmCohortRankPageCtrl($q, $scope, $log, spfFirebase, clmDataStore, clmP
                         self.cohortEventData[i].rank = rank;
                     }
                 }
-                if(self.cohortEventData[self.cohortEventData.length-1].participants.length < self.cohortEventData[self.cohortEventData.length-2].participants.length) {
-                    rank++;
+                if(self.cohortEventData[self.cohortEventData.length-1].participants.length <= self.cohortEventData[self.cohortEventData.length-2].participants.length) {
                     self.cohortEventData[self.cohortEventData.length-1].rank = rank;
                 } else {
+                    rank--;
                     self.cohortEventData[self.cohortEventData.length-1].rank = rank;
                 }
             }
         }
     }
-
-    // this.rankings = Array.from(Array(self.cohort.events.length).keys());
-    // console.log(self.rankings);
 }
 ClmCohortRankPageCtrl.$inject = [
     '$q',

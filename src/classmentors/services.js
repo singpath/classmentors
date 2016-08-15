@@ -563,8 +563,39 @@ export function clmDataStoreFactory(
     },
 
     events: {
-      updateTaskAnswers: function(){
+      addTaskWithAns: function(eventId, task, isOpen, answers) {
+        var priority = task.priority || 0;
+        console.log('Eventid is ? ', eventId);
+        console.log('task is : ', task);
+        if (isOpen) {
+          task.openedAt = {'.sv': 'timestamp'};
+          task.closedAt = null;
+        } else {
+          task.closedAt = {'.sv': 'timestamp'};
+          task.openedAt = null;
+        }
 
+        return spfFirebase.push(['classMentors/eventTasks', eventId], task).then(function(ref) {
+          ref.setPriority(priority);
+          var taskId = ref.key();
+          spfFirebase.set(['classMentors/eventAnswers',eventId,taskId], answers);
+          return ref;
+        });
+      },
+      getTaskAnswers: function(eventId,taskId){
+        return spfFirebase.loadedObj(['classMentors/eventAnswers',eventId,taskId]);
+      },
+
+      updateTaskWithAns: function(eventId, taskId, task,answers){
+        var priority = task.priority || 0;
+
+        return spfFirebase.setWithPriority(
+            ['classMentors/eventTasks', eventId, taskId],
+            task,
+            priority
+        ).then(function () {
+          spfFirebase.set(['classMentors/eventAnswers',eventId,taskId], answers);
+        });
       },
       addTaskAnswers: function(eventId, answers){
         return spfFirebase.push(['classMentors/eventAnswers', eventId], answers);

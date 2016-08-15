@@ -1,3 +1,51 @@
+
+<!--Dialog box view-->
+<!--<md-dialog aria-label="{{ctrl.task.title}}" class="enlarged-dialog">-->
+  <!--<form name="provideMcqResponse" ng-submit="ctrl.save(ctrl.questions)">-->
+    <!--<md-dialog-content class="sticky-container">-->
+      <!--<md-subheader class="md-sticky-no-effect">Multiple Choice</md-subheader>-->
+      <!--<div>-->
+        <!--<p>Title: {{ctrl.task.title}}</p>-->
+        <!--<p>Description: {{ctrl.task.description}}</p>-->
+        <!--<div layout="row" layout-sm="column" layout-align="space-around" ng-if="">-->
+          <!--<md-progress-circular md-mode="indeterminate"></md-progress-circular>-->
+        <!--</div>-->
+        <!--&lt;!&ndash;the questions, options here&ndash;&gt;-->
+        <!--<div ng-repeat="question in ctrl.questions">-->
+          <!--<h3>-->
+            <!--Question {{$index + 1}}-->
+          <!--</h3>-->
+
+          <!--<p>-->
+            <!--{{question.text}}-->
+          <!--</p>-->
+
+          <!--<md-input-container ng-repeat="option in question.options">-->
+            <!--{{option.text}}-->
+            <!--<md-button ng-model="question.answers" ng-class="question.answers.indexOf($index) != -1 ? 'md-raised md-primary' : 'md-raised'"-->
+                       <!--ng-click="ctrl.toggleOption(question, $index)">Answer-->
+            <!--</md-button>-->
+          <!--</md-input-container>-->
+
+        <!--</div>-->
+      <!--</div>-->
+
+      <!--<md-dialog-actions layout="row" layout-align="center end">-->
+        <!--<div>-->
+          <!--<md-button type="submit" class="md-primary md-raised" ng-hide="ctrl.viewOnly" ng-disabled="!provideMcqResponse.$valid">-->
+            <!--Save-->
+          <!--</md-button>-->
+        <!--</div>-->
+        <!--<div>-->
+          <!--<md-button ng-click="ctrl.cancel()" type="button" class="md-accent">Cancel</md-button>-->
+        <!--</div>-->
+      <!--</md-dialog-actions>-->
+    <!--</md-dialog-content>-->
+
+  <!--</form>-->
+<!--</md-dialog>-->
+
+
 <md-content flex class="md-padding">
 
   <!--{{ctrl.data}}-->
@@ -8,38 +56,39 @@
     <br><br>
   </div>
 
-  <div name="continueMCQ">
+  <form name="editMcq" ng-submit="ctrl.submit(ctrl.questions)">
     <!------------------starting of questions--------------------------------------------->
     <div ng-repeat="question in ctrl.questions">
       <h3>
         Question {{$index + 1}}
       </h3>
       <div align="center" layout="row" >
-        {{question.text}}
+          <label>{{question.text}}</label>
       </div>
+
 
       <!--answer options-->
       <div align="center" layout="row" ng-repeat="option in question.options" >
-
-
         <!--single answer or no?-->
-        <md-input-container>
+        <div flex align="left">
           <h4>{{option.text}}</h4>
-          <md-button ng-model="question.answers" ng-class="question.answers.indexOf($index) != -1 ? 'md-raised md-primary' : 'md-raised'"
-                     ng-click="ctrl.toggleOption(question, $index, question.singleAns)">Answer</md-button>
-        </md-input-container>
+        </div>
+        <div flex="20">
+        <md-button ng-model="question.answers" ng-class="question.answers.indexOf($index) != -1 ? 'md-raised md-primary' : 'md-raised'"
+                   ng-click="ctrl.toggleOption(question, $index)">Answer</md-button>
+        </div>
+          <md-divider ng-if="!$last"></md-divider>
       </div>
-
+      <md-divider ng-if="!$last"></md-divider>
     </div>
 
     <br>
 
     <div align="center">
-      <md-button type="submit" class="md-raised md-primary" ng-click="
-                ctrl.submit(ctrl.questions)
-            ">Submit</md-button>
-      <!--<md-button type="reset" class="md-raised" ng-click="ctrl.discardChanges($event,ctrl.task)">Back</md-button>-->
+      <md-button type="submit" ng-disabled="ctrl.isMcqValid == false" class="md-raised md-primary">Submit</md-button>
+      <md-button type="reset" class="md-raised" ng-click="ctrl.discardChanges($event)">Cancel</md-button>
     </div>
     </form>
-  </div>
+
+  </form>
 </md-content>
