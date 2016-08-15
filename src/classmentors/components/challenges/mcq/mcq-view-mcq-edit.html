@@ -7,129 +7,68 @@
             <h4>Description: {{ctrl.task.description}}</h4>
             <br><br>
         </div>
-        <!-- toggle buttons -->
 
-        <!--this is for?-->
-        <div>
-            <p>
-                <md-switch class="md-primary" ng-model="ctrl.timelimit" >
-                    Set time limit for the entire quiz
-                </md-switch>
+        <!--<div>-->
+        <!--todo: requires timer to enable this function.-->
+        <!--<md-input-container>-->
+        <!--*Time Limit (in minute)-->
+        <!--<input type="number" name="editTimeLimit" id="edit-time-limit"-->
+        <!--ng-model="ctrl.task.timeLimit"-->
+        <!--min="0" step="1"-->
+        <!--placeholder="Time Limit for the quiz" value="" required-->
+        <!--/>-->
+        <!--<div ng-messages="editMcq.editTimeLimit.$error">-->
+        <!--<div ng-message="number">Time limit allowed should be a positive number in minutes.</div>-->
+        <!--<div ng-message="required">Enter time limit for the quiz. </div>-->
+        <!--</div>-->
+        <!--</md-input-container>-->
 
+        <!--<p>-->
+        <!--<h5>Questions</h5>-->
+        <!--<md-switch class="md-primary" ng-model="ctrl.task.randomQOrder" aria-label="">-->
+        <!--Randomise questions order-->
+        <!--</md-switch>-->
 
-                <md-input-container ng-hide="!ctrl.timelimit" >
-                    <label for="edit-time-limit">Time Limit (in minute)</label>
-                    <input type="number" name="editTimeLimit" id="edit-time-limit"
-                           ng-model="ctrl.task.timelimit"
-                           min="0" step="1"
-                           placeholer="Time Limit for the quiz" value=""
-                    />
-                    <div ng-messages="editMcq.editTimeLimit.$error">
-                        <div ng-message="number">Time limit allowed should be a positive number in minutes.</div>
-                    </div>
-                </md-input-container>
-            </p>
+        <!--<md-switch class="md-primary" ng-model="ctrl.task.randomOOrder" aria-label="">-->
+        <!--Randomise options order-->
+        <!--</md-switch>-->
+        <!--</p>-->
 
-            <p>
-            <h5>Pre & Post Surveys</h5>
+        <!--<h5>Results Release</h5>-->
+        <!--<md-input-container>-->
+        <!--*Waiting time to view result after student's completion (minutes)-->
+        <!--<input type="number" name="resultRelease" id="result-release"-->
+        <!--ng-model="ctrl.task.resultRelease"-->
+        <!--min="0" step="1"-->
+        <!--placeholder="Waiting time to view result after student's completion" value="" required-->
+        <!--/>-->
+        <!--<div ng-messages="editMcq.resultRelease.$error">-->
+        <!--<div ng-message="number">Release time after completion should be a positive number in minutes.</div>-->
+        <!--<div ng-message="required">Please enter time(minutes) to release results after completion.</div>-->
+        <!--</div>-->
+        <!--</md-input-container>-->
 
-            <md-switch class="md-primary" ng-model="ctrl.survey" aria-label="survey">
-                Enable Pre & Post Surveys
-            </md-switch>
+        <!--todo: install angular-timer and make timer work first before uncommenting-->
+        <!--<h5> Re-attempts Allowance</h5>-->
+        <!--<md-input-container>-->
+        <!--*Waiting time before students can re-attempt challenge (minutes)-->
+        <!--<input type="number" name="reattempts" id="reattempts"-->
+        <!--ng-model="ctrl.task.reattempts"-->
+        <!--min="0" step="1"-->
+        <!--placeholder="Waiting time before students can re-attempt challenge (minutes)" value="" required-->
+        <!--/>-->
+        <!--<div ng-messages="editMcq.reattempts.$error">-->
+        <!--<div ng-message="number">Waiting time before students can re-attempt challenge should be a positive number in minutes.</div>-->
+        <!--<div ng-message="required">Please enter time(minutes) before students can re-attempt challenge.</div>-->
+        <!--</div>-->
+        <!--</md-input-container>-->
 
-            <!--todo: dropdown list of surveys-->
-            <md-input-container ng-hide="!ctrl.survey">
-                <label for="survey">Survey Titles</label>
-                <md-select id="survey" ng-model="ctrl.task.survey">
-                    <!--
-                    <md-option ng-repeat="state in states" value="{{state.abbrev}}">
-                        {{state.abbrev}}
-                    </md-option>-->
+        <!--<h5>Team Mode</h5>-->
+        <!--<md-switch class="md-primary" ng-model="ctrl.task.enableTeam" aria-label="">-->
+        <!--Enable team answering mode-->
+        <!--</md-switch>-->
 
-                    <md-option value="hello">
-                        Survey Title 1
-                    </md-option>
-                    <md-option value="hello2">
-                        Survey Titile 2
-                    </md-option>
-                </md-select>
-            </md-input-container>
-
-            </p>
-
-            <p>
-            <h5>Pre/Post Quiz Video</h5>
-            <md-switch class="md-primary" ng-model="ctrl.task.video.pre" aria-label="">
-                Enable pre-quiz video
-            </md-switch>
-
-            <!--todo: ask for link to the video-->
-            <md-input-container ng-hide="!ctrl.task.video.pre">
-                <label for="video-pre">Pre Video Link</label>
-                <input type="text" name="videoPre" id="video-pre"
-                       ng-model="ctrl.task.video.preLink"
-                       pattern="^(https?://.+|#/).+$"
-                       placeholer="Video Link to Pre Quiz Video" value="{{ctrl.task.video.preLink}}"
-                />
-                <div ng-messages="editMcq.videoPre.$error">
-                    <div ng-message="pattern">Wrong format for an absolute or relative URL. E.g. https://www.</div>
-                </div>
-
-            </md-input-container>
-
-            <md-switch class="md-primary" ng-model="ctrl.task.video.post" aria-label="">
-                Enable post-quiz video
-            </md-switch>
-            <!--todo: ask for link to the video-->
-            <md-input-container ng-hide="!ctrl.task.video.post">
-                <label for="video-post">Post Video Link</label>
-                <input type="text" name="videoPost" id="video-post"
-                       ng-model="ctrl.task.video.postLink"
-                       pattern="^(https?://.+|#/).+$"
-                       placeholer="Video Link to Post Quiz Video" value="{{ctrl.task.video.postLink}}"
-                />
-                <div ng-messages="editMcq.videoPost.$error">
-                    <div ng-message="pattern">Wrong format for an absolute or relative URL. E.g. https://www.</div>
-                </div>
-
-            </md-input-container>
-
-            </p>
-
-            <p>
-            <h5>Questions</h5>
-            <md-switch class="md-primary" ng-model="ctrl.task.randomQOrder" aria-label="">
-                Randomise questions order
-            </md-switch>
-
-            <md-switch class="md-primary" ng-model="ctrl.task.randomOOrder" aria-label="">
-                Randomise options order
-            </md-switch>
-            </p>
-
-            <p>
-            <h5>Results Release</h5>
-            <md-input-container>
-                Waiting time to view result after student's completion
-                <input type="number" name="resultRelease" id="result-release"
-                       ng-model="ctrl.task.resultRelease"
-                       min="0" step="1"
-                       placeholer="Waiting time to view result after student's completion" value="" required
-                /> minutes.
-                <div ng-messages="editMcq.resultRelease.$error">
-                    <div ng-message="number">Release time after completion should be a positive number in minutes.</div>
-                    <div ng-message="required">Please enter time(minutes) to release results after completion.</div>
-                </div>
-            </md-input-container>
-
-            </p>
-
-            <h5>Team Mode</h5>
-            <md-switch class="md-primary" ng-model="ctrl.task.enableTeam" aria-label="">
-                Enable team answering mode
-            </md-switch>
-
-        </div>
+        <!--</div>-->
 
         <!------------------starting of questions--------------------------------------------->
 
@@ -155,12 +94,14 @@
             </div>
 
             <md-input-container >
-                <md-button type="button" class="md-raised md-primary" ng-click="ctrl.addOption(question)">Add option</md-button>
+                <md-button type="button" class="md-raised md-primary" id="addOptions" ng-click="ctrl.addOption(question)">Add option</md-button>
             </md-input-container>
+
+            <p ng-show="ctrl.isMcqValid == false"><font color="red">*One of the option must be an answer.</font></p>
 
             <!--answer options-->
             <div align="center" layout="row" ng-repeat="option in question.options" >
-                {{$index}}
+                <!--{{$index}}-->
                 <md-input-container flex >
                     <label for="q-option_{{$index}}">Option</label>
                     <input type="text" name="editQuestion" id="q-option_{{$index}}"
@@ -193,7 +134,7 @@
 
         <div align="center">
             <md-button ng-disabled="ctrl.isMcqValid == false" type="submit" class="md-raised md-primary">Save</md-button>
-            <md-button type="reset" class="md-raised" ng-click="ctrl.discardChanges($event)">Back</md-button>
+            <md-button type="reset" class="md-raised" ng-click="ctrl.discardChanges($event)">Cancel</md-button>
         </div>
     </form>
 

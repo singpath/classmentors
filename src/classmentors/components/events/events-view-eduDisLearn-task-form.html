@@ -1,5 +1,5 @@
 <md-content flex class="md-padding">
-    <form name="surveyForm" ng-submit="">
+    <form name="surveyForm" ng-submit="ctrl.submitEduDissResponse(ctrl.eduDissResp)">
         <div>
             <h1>Education vs Dissatisfaction with learning</h1>
         </div>
@@ -38,7 +38,7 @@
                     </md-radio-group>
                     <div ng-if="key == '6'">
                         <div ng-if="key2 == '1'">
-                            <input placeholder="State a valid age" ng-model="$parent.$parent.age" type="number" min="3" style="width: 30%"/> years old
+                            <input placeholder="State a valid age" ng-model="$parent.$parent.age" type="number" min="3" style="width: 30%" /> years old
                         </div>
                         <div ng-if="key2 == '2'">
                             <table width="100%">
@@ -52,7 +52,7 @@
                             </table>
                         </div>
                         <div ng-if="key2 == '3'">
-                            <input placeholder="Number of siblings" ng-model="$parent.$parent.sib" type="number" min="0" style="width: 30%"/>
+                            <input placeholder="Number of siblings" ng-model="$parent.$parent.sib" type="number" min="0" style="width: 30%" />
                         </div>
                         <div ng-if="key2 == '4'">
                             <md-input-container flex>
@@ -85,11 +85,17 @@
                             </table>
                         </div>
                         <div ng-if="key2 == '6'">
-                            <input type="text" placeholder="State a valid country" ng-model="$parent.$parent.country"/>
+                            <input type="text" placeholder="State a valid country" ng-model="$parent.$parent.country" />
+                            title:{{value.title}}
+                            <br>
+                            key2: {{key2}}
+
+
                         </div>
                         <div ng-if="key2 == '7'">
-                            <input type="text" placeholder="State a valid language" ng-model="$parent.$parent.spokenLanguage"/>
+                            <input type="text" placeholder="State a valid language" ng-model="$parent.$parent.spokenLanguage" />
                             for multiple languages, separate by a comma (,)
+                            this spokenLanguage is : {{spokenLanguage}}
                         </div>
 
                     </div>
@@ -124,7 +130,9 @@
 
         </table>
 
-        <!--<md-button class="md-raised md-primary" ng-click="$location.path('#/new-page.html')">Next</md-button>-->
+        <div>
+            <md-button type="submit" class="md-raised md-primary" style="width: 150px;">Submit</md-button>
+        </div>
 
 
     </form>
