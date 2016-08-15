@@ -1,5 +1,5 @@
 <md-content flex class="md-padding">
-    <form name="surveyForm" ng-submit="">
+    <form name="surveyForm" ng-submit="ctrl.submitMotiStratResponse(ctrl.motiResp)">
 
         <div>
             <h1>Motivated Strategies for Learning</h1>
@@ -14,37 +14,42 @@
         <br>
         <md-input container flex>
 
-            <div class="wrap" ng-repeat="question in ctrl.questionsArr" style="height: 80px">
-                <div style="float: left; width: 50%;">
-                    {{question.qnid}}. {{question.name}}
-                </div>
-
-                <div style="float: left; width: 32%; align:center; vertical-align: middle">
-                    <md-radio-group layout="row" ng-model="ans">
-                        <div ng-repeat="ratingOption in ctrl.ratingOptions">
-                            <md-radio-button style="margin-right:20px" class="md-primary" ng-value="ratingOption.id">
-                                {{ratingOption.id}}
-                            </md-radio-button>
-                        </div>
-                    </md-radio-group>
-                </div>
-
-                <md-button class="md-raised md-primary" data-id="{{question.qnid}}"
-                           ng-click="ctrl.saveSurveyResponse(ans , $event, task.$id)">
-                    Save
-                </md-button>
-
-                <br>
-                <br>
-                <md-divider></md-divider>
-            </div>
+            <table>
+                <tr ng-repeat="question in ctrl.questionsArr">
+                    <!--<div  style="height: 80px">-->
+                    <td>
+                        {{question.qnid}}.
+                    </td>
+                    <td>
+                        {{question.name}}
+                    </td>
+                    <!--ng-change="ctrl.motiResp.push(ans)"-->
+                    <td>
+                        <md-radio-group layout="row" ng-model="ans" ng-change="ctrl.motiResp[question.qnid] = ans">
+                            <div ng-repeat="ratingOption in ctrl.ratingOptions">
+                                <md-radio-button style="margin-right:20px" class="md-primary"
+                                                 ng-value="ratingOption.id">
+                                    {{ratingOption.id}}
+                                </md-radio-button>
+                            </div>
+                        </md-radio-group>
+                    </td>
+                    <td>
+                        <md-button class="md-raised md-primary" data-id="{{question.qnid}}"
+                                   ng-click="ctrl.saveSurveyResponse(ans , $event, task.$id)">
+                            Save
+                        </md-button>
+                    </td>
+                </tr>
+            </table>
+            <clm-pager options="ctrl.pagerOpts" class="md-padding"></clm-pager>
             <!--<pagination-->
             <!--ng-model="currentPage"-->
             <!--total-items="questions.length"-->
             <!--max-size="maxSize"-->
             <!--boundary-links="true">-->
             <!--</pagination>-->
-
+            <md-button type="submit" class="md-primary md-raised">Submit</md-button>
         </md-input>
 
         <!--<hr style="background: #808080; border: 0; height: 3px"/>-->

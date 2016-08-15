@@ -23,8 +23,8 @@
     "mockfirebase":"latest"
   },
   "scripts": {
-    "test": "./node_modules/mocha/bin/mocha test",
-    "coverage": "./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha",
-    "travis-ci": "./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha && ./node_modules/.bin/istanbul-coveralls;"
+    "test": "node ./node_modules/mocha/bin/mocha test",
+    "coverage": "node ./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha",
+    "travis-ci": "node ./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha && ./node_modules/.bin/istanbul-coveralls;"
   }
 }
