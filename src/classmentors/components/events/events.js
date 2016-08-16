@@ -1909,6 +1909,15 @@ function ClmEventTableCtrl(
                 return err;
             });
 
+            clmDataStore.getSchools().then(function (promise) {
+                return promise;
+            }).then(function (data) {
+                self.schools = data;
+            }).catch(function (err) {
+                $log.error(err);
+                return err;
+            });
+
             this.camelText = function (input) {
                 return input.replace(/(?:^\w|[A-Z]|\b\w)/g, function(letter, index) {
                     return index == 0 ? letter.toLowerCase() : letter.toUpperCase();
@@ -1918,9 +1927,17 @@ function ClmEventTableCtrl(
             this.save = function () {
                 self.userData.displayName = self.participantInfo.displayName;
                 self.userData.gravatar = self.participantInfo.gravatar;
-                self.userData.country = self.participantInfo.country;
-                // self.userData.yearOfBirth = self.participantInfo.yearOfBirth;
-                self.userData.school = self.participantInfo.school;
+
+                if(!self.userData.yearOfBirth) {
+                    self.userData.yearOfBirth = self.participantInfo.yearOfBirth;
+                }
+                if(!self.userData.school) {
+                    self.userData.school = self.participantInfo.school;
+                }
+                if(!self.userData.country) {
+                    self.userData.country = self.participantInfo.country;
+                }
+
                 self.userData.publicId = participant.$id;
                 clmDataStore.updateProfile(self.userData).then(function () {
                     $mdDialog.hide();

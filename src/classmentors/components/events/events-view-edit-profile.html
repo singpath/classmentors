@@ -1,5 +1,5 @@
 <md-dialog aria-label="{{ctrl.task.title}}" class="enlarged-dialog">
-    <form name="provideResponseForm" ng-submit="ctrl.save()">
+    <form name="editProfileForm" ng-submit="ctrl.save()">
         <md-dialog-content class="sticky-container">
             <md-subheader class="md-sticky-no-effect">{{ctrl.task.title}}</md-subheader>
             <p>{{ctrl.task.description}}</p>
@@ -12,16 +12,20 @@
                         </md-option>
                     </md-select>
                 </div>
-                <div ng-if="ctrl.camelText(toEdit)==='country'">
-                    Editing Country.
-                </div>
+                <!--<div ng-if="ctrl.camelText(toEdit)==='country'">-->
+                    <!--Editing Country.-->
+                <!--</div>-->
                 <div ng-if="ctrl.camelText(toEdit)==='school'">
-                    Editing School.
+                    <md-select ng-model="ctrl.userData.school" aria-label="select_school" required placeholder="Select your school">
+                        <md-option ng-value="school" ng-repeat="school in ctrl.schools">
+                            {{school.name}}
+                        </md-option>
+                    </md-select>
                 </div>
             </div>
             <md-dialog-actions layout="row" layout-align="center end">
                 <div>
-                    <md-button type="submit" class="md-primary md-raised" ng-hide="ctrl.viewOnly" ng-disabled="!provideResponseForm.$valid">
+                    <md-button type="submit" class="md-primary md-raised" ng-hide="ctrl.viewOnly" ng-disabled="!editProfileForm.$valid">
                         Save
                     </md-button>
                 </div>

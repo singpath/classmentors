@@ -284,7 +284,7 @@
 
         <div ng-if="ctrl.taskType == 'profileEdit'">
             Select fields for participants to edit:
-            <md-list  ng-repeat="metaData in ['Year of Birth', 'School', 'Country']">
+            <md-list  ng-repeat="metaData in ['Year of Birth', 'School']">
                 <md-checkbox ng-checked="ctrl.exists(metaData, ctrl.selectedMetaData)" ng-click="ctrl.toggle(metaData, ctrl.selectedMetaData)">
                     {{metaData}}</br>
                 </md-checkbox>
