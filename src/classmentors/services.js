@@ -376,6 +376,10 @@ export function clmDataStoreFactory(
       });
     },
 
+    getProfileData: function(publicId) {
+      return spfFirebase.loadedObj(['classMentors/userProfiles', publicId, 'user']);
+    },
+
     updateProfile: function(userData) {
       return spfFirebase.patch(
         ['classMentors/userProfiles', userData.publicId, 'user'], {

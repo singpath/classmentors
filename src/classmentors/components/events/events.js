@@ -10,6 +10,7 @@ import pagerTmpl from './events-view-pager.html!text';
 import passwordTmpl from './events-view-password.html!text';
 import linkTmpl from './events-view-provide-link.html!text';
 import responseTmpl from './events-view-provide-response.html!text';
+import editProfileTmpl from './events-view-edit-profile.html!text';
 import codeTmpl from './events-view-provide-code.html!text';
 import './events.css!';
 import ace from '../../../jspm_packages/github/ajaxorg/ace-builds@1.2.3/ace.js';
@@ -978,6 +979,8 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
     this.enableBeta = true;
     var location;
 
+    this.selectedMetaData = [];
+
     spfNavBarService.update(
         'New Challenge', [{
             title: 'Events',
@@ -990,6 +993,20 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
             url: `#${urlFor('editEvent', {eventId: this.event.$id})}`
         }]
     );
+
+    this.toggle = function(item, list) {
+        var idx = list.indexOf(item);
+        if (idx > -1) {
+            list.splice(idx, 1);
+        }
+        else {
+            list.push(item);
+        }
+    };
+
+    this.exists = function(item, list) {
+        return list.indexOf(item) > -1;
+    };
 
 
     this.loadLevels = function (selected) {
@@ -1046,6 +1063,8 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
             clmSurvey.set(initialData.event.$id, initialData.event, task, tasktype, isOpen);
             var obj = clmSurvey.get();
             return '/challenges/survey'
+        } else if(tasktype === 'profileEdit') {
+            return 'Save';
         } else {
             return 'Save'; // by default should show 'save'
         }
@@ -1096,6 +1115,10 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
   };
 
     this.saveTask = function (event, _, task, taskType, isOpen) {
+        if(taskType === 'profileEdit') {
+            task.toEdit = self.selectedMetaData;
+            task.textResponse = "Placeholder";
+        }
         var copy = spfFirebase.cleanObj(task);
         console.log("what is this copy?: ", copy);
         var data = {
@@ -1855,6 +1878,64 @@ function ClmEventTableCtrl(
                 !profile || !profile.services || !profile.services[task.serviceId] || !profile.services[task.serviceId].details || !profile.services[task.serviceId].details.id
             )
         );
+    };
+
+    this.editProfileInfo = function (eventId, taskId, task, participant) {
+        console.log(task);
+        $mdDialog.show({
+            clickOutsideToClose: true,
+            parent: $document.body,
+            template: editProfileTmpl,
+            controller: DialogController,
+            controllerAs: 'ctrl'
+        });
+
+        function DialogController() {
+            var self = this;
+            this.task = task;
+            this.yearOpts = ['born before 1990'];
+            this.userData = {};
+            for(var y = 1991; y <= 2011; y++) {
+                self.yearOpts.push(y);
+            }
+
+            clmDataStore.getProfileData(participant.$id).then(function (promise) {
+                return promise;
+            }).then(function (data) {
+                self.participantInfo = data;
+                console.log(self.participantInfo);
+            }).catch(function (err) {
+                $log.error(err);
+                return err;
+            });
+
+            this.camelText = function (input) {
+                return input.replace(/(?:^\w|[A-Z]|\b\w)/g, function(letter, index) {
+                    return index == 0 ? letter.toLowerCase() : letter.toUpperCase();
+                }).replace(/\s+/g, '');
+            };
+
+            this.save = function () {
+                self.userData.displayName = self.participantInfo.displayName;
+                self.userData.gravatar = self.participantInfo.gravatar;
+                self.userData.country = self.participantInfo.country;
+                // self.userData.yearOfBirth = self.participantInfo.yearOfBirth;
+                self.userData.school = self.participantInfo.school;
+                self.userData.publicId = participant.$id;
+                clmDataStore.updateProfile(self.userData).then(function () {
+                    $mdDialog.hide();
+                    spfAlert.success('Profile updated.');
+                }).catch(function (err) {
+                    $log.error(err);
+                    spfAlert.error('Failed to update your profile.');
+                    return err;
+                });
+            };
+
+            this.cancel = function () {
+                $mdDialog.hide();
+            };
+        }
     };
 
 
