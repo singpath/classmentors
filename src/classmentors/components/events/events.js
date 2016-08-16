@@ -2303,21 +2303,21 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
 
         //this.selectEthnicity = [];
 
-        this.eduDissResp = [];
-
+        this.eduDissResp = {};
+        this.questionJson = {};
+        //console.log("initial data before: ", initialData.survey2[0]);
         for (var i = 1; i < Object.keys(initialData.survey2[0]).length - 1; i++) {
 
-            this.eduDissResp.push({[initialData.survey2[0][i]['title']]: []});
-            for (var k = 1; k <= Object.keys(initialData.survey2[0][i]).length - 1; k++) {
-                //console.log("this initial data is::", initialData.survey2[0][i][k]);
-                this.eduDissResp[i - 1][initialData.survey2[0][i]['title']].push({[k]: 0});
+            this.eduDissResp[initialData.survey2[0][i]['title']] = {};
 
+            for (var k = 0; k < Object.keys(initialData.survey2[0][i]).length - 1; k++) {
+                this.eduDissResp[initialData.survey2[0][i]['title']][k + 1] = 0;
             }
-            //     console.log("break");
+
         }
-        console.log("test", this.eduDissResp);
-        // this.eduDissResp[0]['What do I think about school?'].push({[1]: 'testing'});
-        // console.log("this edudissresp is:", this.eduDissResp[0]['What do I think about school?'][0][1]);
+
+        //console.log("testing titles: ", this.eduDissResp);
+
 
         //this.eduDissResp[0]['What do I think about school?']=({'1' : 'trying only'});
         //console.log("these titles: ", this.eduDissResp[0]['What do I think about school?'][1]);
@@ -2483,7 +2483,6 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
         var allResponses = true;
         console.log("trying ", motiResp);
         for (var i = 1; i < motiResp.length; i++) {
-            //console.log("this motiresp:", motiResp[i]);
             if (motiResp[i][i + 1] === 0) {
                 allResponses = false;
                 break;
@@ -2510,8 +2509,53 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
         }
     }
 
-    this.submitEduDissResponse = function (eduDissResp) {
+    this.submitEduDissResponse = function (eduDissResp, selectedFamily, selectedRaceEthnicity) {
+
+        //add checkbox values into json
+        var allResponses = true;
+        for (var title in eduDissResp) {
+            if (title == "Tell us about YOURSELF:") {
+                eduDissResp[title][2] = selectedFamily;
+                eduDissResp[title][5] = selectedRaceEthnicity;
+            }else if (title == "What do you like BEST about Learning Gardens?"){
+                //ignore
+            }
+            else {
+
+                for (var qn in eduDissResp[title]) {
+                    if (eduDissResp[title][qn] == 0) {
+                        allResponses = false;
+                        break;
+                    }
+                }
+            }
+            if (!allResponses) {
+                break;
+            }
+        }
         console.log("edudissresp values: ", eduDissResp);
+        if (!allResponses) {
+            spfAlert.warning('Failed to save the responses.');
+        } else {
+
+            //retrieving all required variables to be added into firebase
+            var taskId = $routeParams.taskId;
+            var eventId = initialData.event.$id;
+            var userId = initialData.currentUser.publicId;
+            var surveyType = $routeParams.surveyTask;
+            var completed = true;
+
+            initialData.progress[userId][taskId] = {completed: completed};
+
+
+            spfAlert.success('Response has been submitted. Thank you for doing this survey!');
+            //add into firebase
+            clmDataStore.events.saveSurveyResponseOnSubmit(taskId, eventId, userId, surveyType, eduDissResp);
+            clmDataStore.events.submitSolution(eventId, taskId, userId, "Completed");
+            clmDataStore.events.setProgress(eventId, taskId, userId, initialData.progress);
+
+            $location.path(urlFor('oneEvent', {eventId: self.event.$id}));
+        }
     };
 
 
