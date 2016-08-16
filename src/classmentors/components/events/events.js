@@ -2460,6 +2460,8 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             var surveyType = $routeParams.surveyTask;
             spfAlert.success('Response has been submitted. Thank you for doing this survey!');
             clmDataStore.events.saveSurveyResponseOnSubmit(taskId, eventId, userId, surveyType, schEngageResp);
+            clmDataStore.events.submitSolution(eventId, taskId, userId, "Completed");
+            console.log(eventId, taskId, userId);
             $location.path(urlFor('oneEvent', {eventId: self.event.$id}));
 
         }
