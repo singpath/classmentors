@@ -201,6 +201,31 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
   self.task = data.task;
   var quesFromJson = angular.fromJson(self.task.mcqQuestions);
   self.questions = loadQuestions(quesFromJson);
+  self.multipleAns = initMultipleAns(correctAnswers);
+  // what is dah output?
+  console.log(self.multipleAns);
+
+  function initMultipleAns(correctAnswers){
+    var multipleAnsList = [];
+    for(var i = 0; i < correctAnswers.length; i ++){
+      if(correctAnswers[i].length > 1){
+        multipleAnsList.push(true);
+      }else {
+        multipleAnsList.push(false);
+      }
+    }
+    return multipleAnsList;
+  }
+
+  self.toggle = function(list, item){
+    var idx = list.indexOf(item);
+    if (idx > -1) {
+      list.splice(idx, 1);
+    }
+    else {
+      list.push(item);
+    }
+  }
 
   self.isMcqValid = false;
 
@@ -233,50 +258,30 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
   };
 
   self.submit = function(){
-      var submission = {};
-      var userAnswers = [];
-      for(var i = 0; i < self.questions.length; i++){
-        userAnswers.push(self.questions[i].answers);
+    var submission = {};
+    var userAnswers = [];
+    for(var i = 0; i < self.questions.length; i++){
+      var ans = self.questions[i].answers;
+      if (typeof ans == 'string'){
+        ans = angular.fromJson('[' + ans + ']');
       }
-      submission.userAnswers = userAnswers;
-      var score = markQuestions(userAnswers);
-      console.log(submission.score);
-      var answerString = angular.toJson(submission);
-      console.log(answerString);
-      clmDataStore.events.submitSolution(eventId, taskId, participant.$id, answerString)
-          .then(
-              clmDataStore.events.saveScore(eventId, participant.$id, taskId, score)
-          ).then(
-          $location.path(urlFor('oneEvent',{eventId: eventId}))
-      );
-  }
-
-  console.log(self.questions);
-
-  self.toggleOption = function(question, itemIndex){
-    console.log('Index being deleted...', itemIndex)
-    var idx = question.answers.indexOf(itemIndex);
-    if(idx > -1){
-      var removed = question.answers.splice(idx,1);
-      console.log(removed);
-    }else{
-      question.answers.push(itemIndex);
+      userAnswers.push(ans);
     }
-    console.log(question.answers);
+    submission.userAnswers = userAnswers;
+    var score = markQuestions(userAnswers);
+    console.log(submission.score);
+    var answerString = angular.toJson(submission);
+    console.log(answerString);
+    clmDataStore.events.submitSolution(eventId, taskId, participant.$id, answerString)
+      .then(
+        clmDataStore.events.saveScore(eventId, participant.$id, taskId, score)
+      ).then(
+      $location.path(urlFor('oneEvent',{eventId: eventId}))
+    );
 
-    checkMCQValid();
+
   }
 
-  function checkMCQValid(){
-    for (var i = 0; i < self.questions.length; i ++){
-      if(self.questions[i].answers.length == 0){
-        self.isMcqValid = false;
-
-        return;
-      }
-    }
-    self.isMcqValid = true;
-  }
 
   self.discardChanges = function (ev){
     var confirm = $mdDialog.confirm()
