@@ -3,7 +3,8 @@
         <md-dialog-content class="sticky-container">
             <md-subheader class="md-sticky-no-effect">{{ctrl.task.title}}</md-subheader>
             <p>{{ctrl.task.description}}</p>
-            <div ng-repeat="toEdit in ctrl.task.toEdit" ng-if="!ctrl.participantInfo[ctrl.camelText(toEdit)]">
+            <!--<div ng-repeat="toEdit in ctrl.task.toEdit" ng-if="!ctrl.participantInfo[ctrl.camelText(toEdit)]">-->
+            <div ng-repeat="toEdit in ctrl.task.toEdit">
                 Please input your {{toEdit}}
                 <div ng-if="ctrl.camelText(toEdit)==='yearOfBirth'">
                     <md-select ng-model="ctrl.userData.yearOfBirth" aria-label="select_yob" required placeholder="Select your year of birth">

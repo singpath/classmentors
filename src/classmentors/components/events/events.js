@@ -1880,6 +1880,18 @@ function ClmEventTableCtrl(
         );
     };
 
+    // this.needToEdit = function(tasks, participant) {
+    //     var ans = false;
+    //     clmDataStore.getProfileData(participant.$id).then(function (promise) {
+    //         // return promise;
+    //     }).then(function (data) {
+    //         self.participantInfo = data;
+    //         console.log(self.participantInfo);
+    //     }).finally(function() {
+    //         return ans;
+    //     });
+    // };
+
     this.editProfileInfo = function (eventId, taskId, task, participant) {
         console.log(task);
         $mdDialog.show({
@@ -1904,6 +1916,12 @@ function ClmEventTableCtrl(
             }).then(function (data) {
                 self.participantInfo = data;
                 console.log(self.participantInfo);
+                if(self.participantInfo.yearOfBirth) {
+                    self.userData.yearOfBirth = self.participantInfo.yearOfBirth;
+                }
+                if(self.participantInfo.school) {
+                    self.userData.school = self.participantInfo.school;
+                }
             }).catch(function (err) {
                 $log.error(err);
                 return err;
@@ -1934,11 +1952,18 @@ function ClmEventTableCtrl(
                 if(!self.userData.school) {
                     self.userData.school = self.participantInfo.school;
                 }
-                if(!self.userData.country) {
-                    self.userData.country = self.participantInfo.country;
-                }
+                // if(!self.userData.country) {
+                //     self.userData.country = self.participantInfo.country;
+                // }
 
                 self.userData.publicId = participant.$id;
+                clmDataStore.events.submitSolution(eventId, taskId, participant.$id, "Responded").then(function () {
+
+                }).catch(function (err) {
+                    $log.error(err);
+                    spfAlert.error('Failed to register submission.');
+                    return err;
+                });
                 clmDataStore.updateProfile(self.userData).then(function () {
                     $mdDialog.hide();
                     spfAlert.success('Profile updated.');

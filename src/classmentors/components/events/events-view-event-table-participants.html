@@ -185,11 +185,11 @@
                         </div>
 
                         <div ng-if="task.toEdit">
-                            <!--<div ng-if="ctrl.currentUserSolutions[task.$id]">SURVEY COMPLETED</div>-->
+                            <div ng-if="ctrl.currentUserSolutions[task.$id]">Profile up to date</div>
 
                             <md-button class="md-raised md-primary"
                                        aria-label="Enter_profile_info"
-                                       ng-click="ctrl.editProfileInfo(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant)" ng-disabled="task.closedAt">
+                                       ng-click="ctrl.editProfileInfo(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant)" ng-disabled="task.closedAt" ng-if="!ctrl.currentUserSolutions[task.$id]">
                                 Enter Information
                             </md-button>
                         </div>
