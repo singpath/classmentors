@@ -10,6 +10,7 @@ import pagerTmpl from './events-view-pager.html!text';
 import passwordTmpl from './events-view-password.html!text';
 import linkTmpl from './events-view-provide-link.html!text';
 import responseTmpl from './events-view-provide-response.html!text';
+import editProfileTmpl from './events-view-edit-profile.html!text';
 import codeTmpl from './events-view-provide-code.html!text';
 import './events.css!';
 import ace from '../../../jspm_packages/github/ajaxorg/ace-builds@1.2.3/ace.js';
@@ -978,6 +979,8 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
     this.enableBeta = true;
     var location;
 
+    this.selectedMetaData = [];
+
     spfNavBarService.update(
         'New Challenge', [{
             title: 'Events',
@@ -990,6 +993,20 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
             url: `#${urlFor('editEvent', {eventId: this.event.$id})}`
         }]
     );
+
+    this.toggle = function(item, list) {
+        var idx = list.indexOf(item);
+        if (idx > -1) {
+            list.splice(idx, 1);
+        }
+        else {
+            list.push(item);
+        }
+    };
+
+    this.exists = function(item, list) {
+        return list.indexOf(item) > -1;
+    };
 
 
     this.loadLevels = function (selected) {
@@ -1046,6 +1063,8 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
             clmSurvey.set(initialData.event.$id, initialData.event, task, tasktype, isOpen);
             var obj = clmSurvey.get();
             return '/challenges/survey'
+        } else if(tasktype === 'profileEdit') {
+            return 'Save';
         } else {
             return 'Save'; // by default should show 'save'
         }
@@ -1096,6 +1115,10 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
   };
 
     this.saveTask = function (event, _, task, taskType, isOpen) {
+        if(taskType === 'profileEdit') {
+            task.toEdit = self.selectedMetaData;
+            task.textResponse = "Placeholder";
+        }
         var copy = spfFirebase.cleanObj(task);
         console.log("what is this copy?: ", copy);
         var data = {
@@ -1857,6 +1880,106 @@ function ClmEventTableCtrl(
         );
     };
 
+    // this.needToEdit = function(tasks, participant) {
+    //     var ans = false;
+    //     clmDataStore.getProfileData(participant.$id).then(function (promise) {
+    //         // return promise;
+    //     }).then(function (data) {
+    //         self.participantInfo = data;
+    //         console.log(self.participantInfo);
+    //     }).finally(function() {
+    //         return ans;
+    //     });
+    // };
+
+    this.editProfileInfo = function (eventId, taskId, task, participant) {
+        console.log(task);
+        $mdDialog.show({
+            clickOutsideToClose: true,
+            parent: $document.body,
+            template: editProfileTmpl,
+            controller: DialogController,
+            controllerAs: 'ctrl'
+        });
+
+        function DialogController() {
+            var self = this;
+            this.task = task;
+            this.yearOpts = ['born before 1990'];
+            this.userData = {};
+            for(var y = 1991; y <= 2011; y++) {
+                self.yearOpts.push(y);
+            }
+
+            clmDataStore.getProfileData(participant.$id).then(function (promise) {
+                return promise;
+            }).then(function (data) {
+                self.participantInfo = data;
+                console.log(self.participantInfo);
+                if(self.participantInfo.yearOfBirth) {
+                    self.userData.yearOfBirth = self.participantInfo.yearOfBirth;
+                }
+                if(self.participantInfo.school) {
+                    self.userData.school = self.participantInfo.school;
+                }
+            }).catch(function (err) {
+                $log.error(err);
+                return err;
+            });
+
+            clmDataStore.getSchools().then(function (promise) {
+                return promise;
+            }).then(function (data) {
+                self.schools = data;
+            }).catch(function (err) {
+                $log.error(err);
+                return err;
+            });
+
+            this.camelText = function (input) {
+                return input.replace(/(?:^\w|[A-Z]|\b\w)/g, function(letter, index) {
+                    return index == 0 ? letter.toLowerCase() : letter.toUpperCase();
+                }).replace(/\s+/g, '');
+            };
+
+            this.save = function () {
+                self.userData.displayName = self.participantInfo.displayName;
+                self.userData.gravatar = self.participantInfo.gravatar;
+
+                if(!self.userData.yearOfBirth) {
+                    self.userData.yearOfBirth = self.participantInfo.yearOfBirth;
+                }
+                if(!self.userData.school) {
+                    self.userData.school = self.participantInfo.school;
+                }
+                // if(!self.userData.country) {
+                //     self.userData.country = self.participantInfo.country;
+                // }
+
+                self.userData.publicId = participant.$id;
+                clmDataStore.events.submitSolution(eventId, taskId, participant.$id, "Responded").then(function () {
+
+                }).catch(function (err) {
+                    $log.error(err);
+                    spfAlert.error('Failed to register submission.');
+                    return err;
+                });
+                clmDataStore.updateProfile(self.userData).then(function () {
+                    $mdDialog.hide();
+                    spfAlert.success('Profile updated.');
+                }).catch(function (err) {
+                    $log.error(err);
+                    spfAlert.error('Failed to update your profile.');
+                    return err;
+                });
+            };
+
+            this.cancel = function () {
+                $mdDialog.hide();
+            };
+        }
+    };
+
 
     this.promptForLink = function (eventId, taskId, task, participant, userSolution) {
         $mdDialog.show({
@@ -2460,6 +2583,8 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             var surveyType = $routeParams.surveyTask;
             spfAlert.success('Response has been submitted. Thank you for doing this survey!');
             clmDataStore.events.saveSurveyResponseOnSubmit(taskId, eventId, userId, surveyType, schEngageResp);
+            clmDataStore.events.submitSolution(eventId, taskId, userId, "Completed");
+            console.log(eventId, taskId, userId);
             $location.path(urlFor('oneEvent', {eventId: self.event.$id}));
 
         }

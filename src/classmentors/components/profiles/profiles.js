@@ -131,12 +131,17 @@ function ClmProfileCtrl(
   spfNavBarService.update('Profile', undefined, menu);
 
   this.settingPublicId = false;
-  this.profileNeedsUpdate = this.currentUser && !this.currentUser.$completed();
+  // this.profileNeedsUpdate = this.currentUser && !this.currentUser.$completed();
+  this.profileNeedsUpdate = false;
 
   function cleanProfile(currentUser) {
     currentUser.country = spfFirebase.cleanObj(currentUser.country);
     currentUser.school = spfFirebase.cleanObj(currentUser.school);
   }
+
+  this.goBack = function () {
+    self.profileNeedsUpdate = false;
+  };
 
   this.refreshAchievements = function(profileId) {
     //TODO: Only request updates if the user has registered for the service. 

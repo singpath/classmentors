@@ -1,0 +1,39 @@
+<md-dialog aria-label="{{ctrl.task.title}}" class="enlarged-dialog">
+    <form name="editProfileForm" ng-submit="ctrl.save()">
+        <md-dialog-content class="sticky-container">
+            <md-subheader class="md-sticky-no-effect">{{ctrl.task.title}}</md-subheader>
+            <p>{{ctrl.task.description}}</p>
+            <!--<div ng-repeat="toEdit in ctrl.task.toEdit" ng-if="!ctrl.participantInfo[ctrl.camelText(toEdit)]">-->
+            <div ng-repeat="toEdit in ctrl.task.toEdit">
+                Please input your {{toEdit}}
+                <div ng-if="ctrl.camelText(toEdit)==='yearOfBirth'">
+                    <md-select ng-model="ctrl.userData.yearOfBirth" aria-label="select_yob" required placeholder="Select your year of birth">
+                        <md-option ng-value="year" ng-repeat="year in ctrl.yearOpts">
+                            {{year}}
+                        </md-option>
+                    </md-select>
+                </div>
+                <!--<div ng-if="ctrl.camelText(toEdit)==='country'">-->
+                    <!--Editing Country.-->
+                <!--</div>-->
+                <div ng-if="ctrl.camelText(toEdit)==='school'">
+                    <md-select ng-model="ctrl.userData.school" aria-label="select_school" required placeholder="Select your school">
+                        <md-option ng-value="school" ng-repeat="school in ctrl.schools">
+                            {{school.name}}
+                        </md-option>
+                    </md-select>
+                </div>
+            </div>
+            <md-dialog-actions layout="row" layout-align="center end">
+                <div>
+                    <md-button type="submit" class="md-primary md-raised" ng-hide="ctrl.viewOnly" ng-disabled="!editProfileForm.$valid">
+                        Save
+                    </md-button>
+                </div>
+                <div>
+                    <md-button ng-click="ctrl.cancel()" type="button" class="md-accent">Cancel</md-button>
+                </div>
+            </md-dialog-actions>
+        </md-dialog-content>
+    </form>
+</md-dialog>

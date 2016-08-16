@@ -295,6 +295,11 @@ export function clmDataStoreFactory(
   var clmDataStore;
 
   clmDataStore = {
+      
+    // setAuthInfo: function () {
+    //
+    // }
+      
     _profileFactory: spfFirebase.objFactory({
       canView: function(obj) {
         var kind = obj && obj.$ref && obj.$ref().parent().path.toString();
@@ -376,6 +381,10 @@ export function clmDataStoreFactory(
       });
     },
 
+    getProfileData: function(publicId) {
+      return spfFirebase.loadedObj(['classMentors/userProfiles', publicId, 'user']);
+    },
+
     updateProfile: function(userData) {
       return spfFirebase.patch(
         ['classMentors/userProfiles', userData.publicId, 'user'], {
@@ -389,6 +398,10 @@ export function clmDataStoreFactory(
       ).then(function() {
         return clmDataStore.profile(userData.publicId);
       });
+    },
+
+    getSchools: function() {
+        return spfFirebase.loadedObj(['classMentors/schools']);
     },
 
     initProfile: function() {

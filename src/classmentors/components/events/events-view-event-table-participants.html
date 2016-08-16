@@ -105,7 +105,7 @@
                             </span>
                         </div>
 
-                        <div ng-if="task.textResponse && !task.lang">
+                        <div ng-if="task.textResponse && !task.lang && !task.toEdit">
                             <span ng-if="ctrl.currentUserSolutions[task.$id]">
                                 {{ ctrl.currentUserSolutions[task.$id] | cmTruncate: 10 }}<span ng-if="!ctrl.currentUserProgress[task.$id].completed"></span>
                                 <md-button class="md-icon-button md-primary small-icon"
@@ -175,13 +175,23 @@
                         </div>
 
                         <div ng-if="task.survey">
+                                <div ng-if="ctrl.currentUserSolutions[task.$id]">SURVEY COMPLETED</div>
 
                                 <md-button class="md-raised md-primary"
                                            aria-label="Submit survey"
-                                           ng-click="ctrl.promptForSurvey(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant, ctrl.currentUserSolutions)"
-                                           ng-disabled="task.closedAt"
-                                >
+                                           ng-click="ctrl.promptForSurvey(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant, ctrl.currentUserSolutions)" ng-disabled="task.closedAt" ng-if="!ctrl.currentUserSolutions[task.$id]">
                                     Start Survey
+                                </md-button>
+                        </div>
+
+                        <div ng-if="task.toEdit">
+                            <div ng-if="ctrl.currentUserSolutions[task.$id]">Profile up to date</div>
+
+                            <md-button class="md-raised md-primary"
+                                       aria-label="Enter_profile_info"
+                                       ng-click="ctrl.editProfileInfo(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant)" ng-disabled="task.closedAt" ng-if="!ctrl.currentUserSolutions[task.$id]">
+                                Enter Information
+                            </md-button>
                         </div>
                     </td>
                 </tr>
