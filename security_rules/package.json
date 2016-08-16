@@ -6,11 +6,13 @@
   "homepage": "http://chrisboesch.com",
   "dependencies": {
     "deep-assign": "^2.0.0",
+    "deepcopy": "^0.6.3",
     "firebase": "2.4.2",
     "firebase-queue": "latest",
     "request": "latest"
   },
   "devDependencies": {
+    "@dinoboff/targaryen": "^2.2.1",
     "chai": "3.5.0",
     "coveralls": "^2.11.9",
     "eslint": "^2.13.1",
@@ -22,13 +24,12 @@
     "mockfirebase": "latest",
     "proxyquire": "latest",
     "sinon": "latest",
-    "superagent": "1.8.3",
-    "targaryen": "^2.1.1"
+    "superagent": "1.8.3"
   },
   "scripts": {
     "lint": "eslint test/",
     "format": "eslint test/ --fix",
-    "test": "node ./node_modules/mocha/bin/mocha test",
+    "test": "node ./node_modules/mocha/bin/mocha test/index.specs.js",
     "coverage": "node ./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha",
     "travis-ci": "node ./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha && ./node_modules/.bin/istanbul-coveralls;"
   }
