@@ -6,7 +6,6 @@
   "homepage": "http://chrisboesch.com",
   "dependencies": {
     "deep-assign": "^2.0.0",
-    "deepcopy": "^0.6.3",
     "firebase": "2.4.2",
     "firebase-queue": "latest",
     "request": "latest"
