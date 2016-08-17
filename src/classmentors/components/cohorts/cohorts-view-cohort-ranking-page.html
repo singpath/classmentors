@@ -11,7 +11,7 @@
                     <md-button ng-click="ctrl.orderBy('name')">Rank</md-button>
                 </th>
                 <th ng-class="{orderer: ctrl.orderOpts[0].key == 'name', secondaryOrderer: ctrl.orderOpts[1].key == 'name'}">
-                    <md-button ng-click="ctrl.orderBy('name')">Registered Students</md-button>
+                    <md-button ng-click="ctrl.orderBy('name')">Registered Students ({{ctrl.cohortTotalParticipants}})</md-button>
                 </th>
                 <th ng-class="{orderer: ctrl.orderOpts[0].key == 'schoolName', secondaryOrderer: ctrl.orderOpts[1].key == 'schoolName'}">
                     <md-button ng-click="ctrl.orderBy('schoolName')">Event</md-button>
@@ -21,7 +21,7 @@
             <tbody>
                 <tr ng-repeat="event in ctrl.cohortEventData" ng-class="'index-' + $index + ' ' + ($odd ? 'odd' : 'even')">
                     <th>
-                        {{ event.rank }}
+                     {{$index+1}}
                     </th>
                     <td>{{ event.participants.length }}</td>
                     <td><a href="#{{ 'oneEvent' | urlFor: {eventId: event.id} }}">{{ event.title }}</a></td>
