@@ -21,22 +21,32 @@ describe('With current security rules', function() {
   });
 
   describe('Unauthorized users', function() {
-    var theUser = {uid: 'github:1234'};
+    var chris = {uid: 'google:110893970871115341770'};
 
-    it('can not write bad data to classMentors/userActions', function() {
-      expect(theUser)
-        .cannot.write({action: 'button'}).path('classMentors/userActions');
+    it('can not write bad data to classMentors/userActions/$userActions', function() {
+      expect(chris)
+        .cannot.write({action: 'button'}).path('classMentors/userActions/someAction');
     });
 
-    // var goodAction = {publicId: 'abc', action: 'button', misc: 'misc'};
+    var goodAction = {
+      publicId: 'cboesch',
+      action: 'button',
+      misc: 'misc',
+      timestamp: {'.sv': 'timestamp'}
+    };
 
-    // it('can write to classMentors/userActions', function() {
-    //   expect(theUser)
-    //     .can.write(goodAction).path("classMentors/userActions");
-    // });
+    it('can write to classMentors/userActions/$userActions', function() {
+      expect(chris)
+        .can.write(goodAction).path('classMentors/userActions/someAction');
+    });
+
+    it('cannot write to someone else action classMentors/userActions/$userActions', function() {
+      expect({uid: 'google:12345'})
+        .cannot.write(goodAction).path('classMentors/userActions/someAction');
+    });
 
     it('cannot read classMentors/userActions', function() {
-      expect(theUser).cannot.read.path('classMentors/userActions');
+      expect(chris).cannot.read.path('classMentors/userActions');
     });
 
     it('can read classMentors/userAchievements', function() {
