@@ -64,6 +64,21 @@
                                 <!--</md-button>-->
                             <!--</span>-->
                     <!--</div>-->
+                    <div ng-if="ctrl.selected.mcqQuestions">
+                        <span ng-if="ctrl.solutions[participant.$id][ctrl.selected.$id]">
+                            {{ ctrl.solutions[participant.$id][ctrl.selected.$id] | cmTruncate: 140 }}<br>
+                            <md-button class="md-raised md-primary"
+                                       aria-label="Update response"
+                                       ng-click="ctrl.viewTextResponse(ctrl.event.$id, ctrl.selected.$id, ctrl.selected, participant, ctrl.solutions[participant.$id])"
+                                       ng-if="ctrl.selected.openedAt"
+                            >View Response
+                            </md-button>
+                        </span>
+
+                        <span ng-if="!ctrl.solutions[participant.$id][ctrl.selected.$id]">
+                            No Submission
+                        </span>
+                    </div>
 
                     <div ng-if="ctrl.selected.textResponse && !ctrl.selected.lang">
                         <span ng-if="ctrl.solutions[participant.$id][ctrl.selected.$id]">
