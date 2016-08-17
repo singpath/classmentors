@@ -7,6 +7,8 @@
 import * as mcq from './mcq/mcq.js';
 import * as survey from './survey/survey.js';
 
+const noop = () => undefined;
+
 //TODO: Add config for routing to various challenges
 export function configRoute($routeProvider, routes){
     $routeProvider
@@ -73,21 +75,30 @@ editMCQInitialData.$inject = [
 ];
 
 // Initial data for starting an MCQ
-function startMCQInitialData($q, eventService, clmDataStore){
-  var data =  eventService.get();
-  return clmDataStore.events.getTaskAnswers(data.eventId, data.taskId).then(
-      function(result){
-        return {
-          data: data,
-          correctAnswers: result
-        }
-      }, function(error){
-        console.log(error);
-      }
-  );
+function startMCQInitialData($q, spfAuthData, eventService, clmDataStore){
+    //promise object
+    var currentUser = spfAuthData.user().catch(noop);
+
+    var data =  eventService.get();
+
+    console.log("the data is here...,", data);
+    console.log("current user now is.", currentUser);
+
+    return clmDataStore.events.getTaskAnswers(data.eventId, data.taskId).then(
+          function(result){
+            return {
+              data: data,
+              correctAnswers: result,
+                currentUser: currentUser
+            }
+          }, function(error){
+            console.log(error);
+          }
+      );
 }
 startMCQInitialData.$inject = [
     '$q',
+    'spfAuthData',
     'eventService',
     'clmDataStore'
 ]
@@ -95,7 +106,7 @@ startMCQInitialData.$inject = [
 // Initial data for creating MCQ
 function createMCQInitialData($q, eventService){
   var data =  eventService.get();
-  console.log(data);
+  console.log("data initialised are............................",data);
   return data;
 }
 createMCQInitialData.$inject = [

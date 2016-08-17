@@ -196,14 +196,23 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
   var eventId = data.eventId;
   var taskId = data.taskId;
   var participant = data.participant;
+
+  //console.log(initialData);
+  //get user's Id
+  var userId = initialData.publicId;
+
+  console.log("the userid is", userId);
+
+
   var correctAnswers = angular.fromJson(initialData.correctAnswers.$value);
-  console.log(correctAnswers);
+  //console.log(correctAnswers);
   self.task = data.task;
   var quesFromJson = angular.fromJson(self.task.mcqQuestions);
   self.questions = loadQuestions(quesFromJson);
   self.multipleAns = initMultipleAns(correctAnswers);
+
   // what is dah output?
-  console.log(self.multipleAns);
+  //console.log(self.multipleAns);
 
   function initMultipleAns(correctAnswers){
     var multipleAnsList = [];
@@ -268,14 +277,21 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
       userAnswers.push(ans);
     }
     submission.userAnswers = userAnswers;
+
     var score = markQuestions(userAnswers);
-    console.log(submission.score);
     var answerString = angular.toJson(submission);
-    console.log(answerString);
+    //console.log(submission.score);
+    //console.log(answerString);
+
     clmDataStore.events.submitSolution(eventId, taskId, participant.$id, answerString)
       .then(
         clmDataStore.events.saveScore(eventId, participant.$id, taskId, score),
         spfAlert.success('Your Mcq responses are saved.'),
+
+        //todo:set progress to true, and save the progress into firebase
+        data.progress[userId][taskId] = {completed: true},
+        clmDataStore.events.setProgress(eventId, taskId, userId, initialData.progress),
+
         $location.path(urlFor('oneEvent',{eventId: eventId}))
       ). catch (function (err){
 

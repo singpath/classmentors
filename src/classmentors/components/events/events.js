@@ -2579,7 +2579,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             }
         }
         if (!allResponses) {
-            spfAlert.warning('Failed to save the responses.');
+            spfAlert.warning('Failed to save the responses. Please answer all questions.');
         } else {
             var taskId = $routeParams.taskId;
             var eventId = initialData.event.$id;
