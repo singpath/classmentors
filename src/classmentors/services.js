@@ -1154,7 +1154,6 @@ export function clmDataStoreFactory(
         var delay = 300;
         var unWatchSolution = solutions.$watch(debouncedUpdate);
         var unWatchParticipants = participants.$watch(debouncedUpdate);
-
         function update() {
           return participants.map(function(participant) {
             return clmDataStore.events.updateProgress(
@@ -1393,6 +1392,12 @@ export function clmDataStoreFactory(
           'classMentors/eventSolutions', eventId, publicId, taskId
         ], link);
       },
+
+        setProgress: function(eventId, taskId, publicId, progress){
+            
+            return spfFirebase.set(['classMentors/eventProgress', eventId, publicId, taskId], progress[publicId][taskId]);
+
+        },
 
       saveScore: function(eventId, publicId, taskId, score) {
           if (!eventId) {
