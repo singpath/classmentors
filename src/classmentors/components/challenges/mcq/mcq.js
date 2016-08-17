@@ -190,7 +190,7 @@ editMcqController.$inject = [
     '$location'
 ];
 
-export function startMcqController(initialData, challengeService, clmDataStore, $location, $mdDialog,urlFor ){
+export function startMcqController(initialData, challengeService, clmDataStore, $location, $mdDialog,urlFor, spfAlert ){
   var self = this;
   var data = initialData.data;
   var eventId = data.eventId;
@@ -274,13 +274,21 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
     console.log(answerString);
     clmDataStore.events.submitSolution(eventId, taskId, participant.$id, answerString)
       .then(
-        clmDataStore.events.saveScore(eventId, participant.$id, taskId, score)
-      ).then(
-      $location.path(urlFor('oneEvent',{eventId: eventId}))
-    );
+        clmDataStore.events.saveScore(eventId, participant.$id, taskId, score),
+        spfAlert.success('Your Mcq responses are saved.'),
+        $location.path(urlFor('oneEvent',{eventId: eventId}))
+      ). catch (function (err){
 
+        $log.error(err);
+        spfAlert.error('Failed to save the mcq responses.');
+        return err;
+    });
 
   }
+
+  self.cancel = function () {
+    $mdDialog.hide();
+  };
 
 
   self.discardChanges = function (ev){
@@ -308,7 +316,8 @@ startMcqController.$inject = [
   'clmDataStore',
   '$location',
     '$mdDialog',
-    'urlFor'
+    'urlFor',
+    'spfAlert'
 ];
 
 export function newMcqController(initialData, challengeService, $filter,$mdDialog,urlFor,$location){
