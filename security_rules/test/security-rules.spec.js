@@ -50,11 +50,32 @@ describe('With current security rules', function () {
                 .cannot.write.path("logs");
         });
 
+       it('cannot write userActions', function () {
+            expect(targaryen.users.unauthenticated)
+                .cannot.write.path("classMentors/userActions");
+        });
+
     });
 
     describe('Authorized users', function () {
        var theUser = { uid: 'github:1234' };
-                  
+
+        
+        it('can not write bad data to classMentors/userActions', function () {
+            expect(theUser)
+                .cannot.write({'action':'button'}).path("classMentors/userActions");
+        });
+
+        //var goodAction = {'publicId':'abc','action':'button','misc':'misc'};
+        //it('can write to classMentors/userActions', function () {
+        //    expect(theUser)
+        //        .can.write(goodAction).path("classMentors/userActions");
+        //});
+
+        it('cannot read classMentors/userActions', function () {
+          expect(theUser).cannot.read.path("classMentors/userActions"); 
+        });
+
         var goodTask = {'service':'s1','id':'chris'};
         it('can write to queue/tasks', function () {
             expect(theUser)

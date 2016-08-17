@@ -2674,6 +2674,14 @@ function ClmEventRankTableCtrl($scope, $log, spfFirebase, clmDataStore, clmPager
 
     // this.rankingView = [];
 
+    var updateLog = function (actionObj) {
+        actionObj.publicId = self.profile.$id;        
+        actionObj.timestamp = Firebase.ServerValue.TIMESTAMP;
+        //console.log(actionObj);
+        spfFirebase.push(['classMentors/userActions'], actionObj);
+        // spfFirebase.push(['queue/tasks'], { id: profileId, service: "freeCodeCamp" });
+    };
+
     // June 2016
     this.rankingView2 = []; // 2016 update to new cm-worker
     // If there are no ranked services on the event, use the default.
@@ -2748,6 +2756,8 @@ function ClmEventRankTableCtrl($scope, $log, spfFirebase, clmDataStore, clmPager
         });
     };
 
+
+
     var refreshAchievements = function (profileId, service) {
         // TODO: Only request updates for the services that users have registered for.
         console.log(`Requesting achievement update for ${profileId}`);
@@ -2757,6 +2767,7 @@ function ClmEventRankTableCtrl($scope, $log, spfFirebase, clmDataStore, clmPager
 
     this.updateAllParticipantUserProfiles = function () {
         // console.log("Requesting all users in ranking to be updated.");
+        updateLog({action: "updateAllParticipantUserProfiles", "eventId": self.event.$id});
         // For each user in the ranking
         for (var i = 0; i < self.rankingView2.length; i++) {
             var publicId = self.rankingView2[i].$id;
@@ -2929,6 +2940,8 @@ function ClmEventRankTableCtrl($scope, $log, spfFirebase, clmDataStore, clmPager
             });
             self.orderOpts = self.orderOpts.slice(0, 2);
         }
+        
+        updateLog({action: "eventRankingOrderby", "eventId": self.event.$id, "key":key, "reversed":self.orderOpts[0].reversed});
 
         // TODO: Revisit when 2nd order ranking becomes a priority.
         // There was an issue with getting both strings and numbers to rank properly.
