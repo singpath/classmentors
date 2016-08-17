@@ -833,7 +833,7 @@ function ClmCohortRankPageCtrl($q, $scope, $log, spfFirebase, clmDataStore, clmP
     this.cohortEventData = [];
 
     getAllEventData();
-
+    this.cohortTotalParticipants = 0;
     function getAllEventData() {
         var iter = 0;
         loopDBEvents();
@@ -859,6 +859,8 @@ function ClmCohortRankPageCtrl($q, $scope, $log, spfFirebase, clmDataStore, clmP
                     }).then(function(data) {
                         var result = data;
                         oneEventData.title = result.title;
+                        self.cohortTotalParticipants += oneEventData.participants.length;
+                        console.log("Length was",self.cohortTotalParticipants );
                         oneEventData.id = result.$id;
                         self.cohortEventData.push(oneEventData);
                         iter++;
