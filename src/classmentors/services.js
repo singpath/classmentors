@@ -375,6 +375,12 @@ export function clmDataStoreFactory(
       });
     },
 
+    logging: {
+        inputLog: function (actionObj) {
+            spfFirebase.push(['classMentors/userActions'], actionObj);
+        }
+    },
+
     profile: function(publicId) {
       return $q.when(publicId).then(function(id) {
         return clmDataStore._profileFactory(['classMentors/userProfiles', id]).$loaded();

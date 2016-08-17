@@ -94,7 +94,9 @@
           "publicId":{
             ".validate":"newData.isString() && root.child('auth/publicIds').child(newData.val()).val() === auth.uid"
           }
-        }
+        },
+        ".write": "auth !== null",
+        ".read": "auth !== null && root.child('classMentors/admins').child(auth.uid).val() === true"
       },
       "surveyTemplate":{
         ".read": true,

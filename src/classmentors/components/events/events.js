@@ -1877,18 +1877,6 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         );
     };
 
-    // this.needToEdit = function(tasks, participant) {
-    //     var ans = false;
-    //     clmDataStore.getProfileData(participant.$id).then(function (promise) {
-    //         // return promise;
-    //     }).then(function (data) {
-    //         self.participantInfo = data;
-    //         console.log(self.participantInfo);
-    //     }).finally(function() {
-    //         return ans;
-    //     });
-    // };
-
     this.editProfileInfo = function (eventId, taskId, task, participant) {
         console.log(task);
         $mdDialog.show({
@@ -1977,7 +1965,6 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         }
     };
 
-
     this.promptForLink = function (eventId, taskId, task, participant, userSolution) {
         $mdDialog.show({
             parent: $document.body,
@@ -2011,7 +1998,6 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             };
         }
     };
-
 
     this.promptForSurvey = function (eventId, taskId, task, participant, userSolution) {
 
@@ -2750,7 +2736,8 @@ function ClmEventRankTableCtrl($scope, $log, spfFirebase, clmDataStore, clmPager
         actionObj.publicId = self.profile.$id;        
         actionObj.timestamp = Firebase.ServerValue.TIMESTAMP;
         //console.log(actionObj);
-        spfFirebase.push(['classMentors/userActions'], actionObj);
+        // spfFirebase.push(['classMentors/userActions'], actionObj);
+        clmDataStore.logging.inputLog(actionObj);
         // spfFirebase.push(['queue/tasks'], { id: profileId, service: "freeCodeCamp" });
     };
 
