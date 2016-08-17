@@ -1991,6 +1991,12 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                     spfAlert.error('Failed to save the link.');
                     return err;
                 });
+                clmDataStore.logging.inputLog({
+                    action: "submitLinkResponse",
+                    eventId: self.event.$id,
+                    publicId: self.profile.$id,
+                    timestamp: Firebase.ServerValue.TIMESTAMP
+                });
             };
 
             this.cancel = function () {
@@ -2048,6 +2054,12 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                     spfAlert.error('Failed to save your response.');
                     return err;
                 });
+                clmDataStore.logging.inputLog({
+                    action: "submitTextResponse",
+                    eventId: self.event.$id,
+                    publicId: self.profile.$id,
+                    timestamp: Firebase.ServerValue.TIMESTAMP
+                });
             };
 
             this.cancel = function () {
@@ -2103,6 +2115,12 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                     $log.error(err);
                     spfAlert.error('Failed to save your response.');
                     return err;
+                });
+                clmDataStore.logging.inputLog({
+                    action: "submitCodeResponse",
+                    eventId: self.event.$id,
+                    publicId: self.profile.$id,
+                    timestamp: Firebase.ServerValue.TIMESTAMP
                 });
             };
 
