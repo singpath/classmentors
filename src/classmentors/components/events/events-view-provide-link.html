@@ -1,17 +1,17 @@
-<md-dialog aria-label="{{ctrl.task.title}}">
+<md-dialog aria-label="{{ctrl.task.title}}" class="link-dialog">
     <form name="provideLinkForm" ng-submit="ctrl.save(ctrl.solution)">
         <md-dialog-content class="sticky-container">
             <md-subheader class="md-sticky-no-effect">{{ctrl.task.title}}</md-subheader>
             <div ng-if="!ctrl.review">
                 <p>{{ctrl.task.description}}</p>
-                <md-input-container>
+                <md-input-container class="md-block" flex>
                     <label for="edit-solution-link">Solution Link</label>
                     <input type="text" name="linkSolution" id="edit-solution-link"
                         ng-model="ctrl.solution"
-                        required="true"
+                        required
                         cm-contains="ctrl.task.linkPattern"
-                        placeholer="URL to provide"
-                    />
+                        placeholder="URL to provide"
+                    >
                     <div ng-messages="provideLinkForm.linkSolution.$error">
                         <div ng-message="required">Required.</div>
                         <div ng-message="cmContains">Invalid pattern.</div>
