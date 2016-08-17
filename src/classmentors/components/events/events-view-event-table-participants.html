@@ -175,7 +175,9 @@
                         </div>
 
                         <div ng-if="task.survey">
-                                <div ng-if="ctrl.currentUserSolutions[task.$id]">SURVEY COMPLETED</div>
+                                <span ng-if="ctrl.currentUserSolutions[task.$id]">Survey Completed
+                                    <span ng-if="!ctrl.currentUserProgress[task.$id].completed"></span>
+                                </span>
 
                                 <md-button class="md-raised md-primary"
                                            aria-label="Submit survey"
