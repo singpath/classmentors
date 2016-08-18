@@ -192,6 +192,7 @@ editMcqController.$inject = [
 
 export function startMcqController(initialData, challengeService, clmDataStore, $location, $mdDialog,urlFor, spfAlert ){
   var self = this;
+
   var data = initialData.data;
   var eventId = data.eventId;
   var taskId = data.taskId;
@@ -199,7 +200,7 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
 
   //console.log(initialData);
   //get user's Id
-  var userId = initialData.publicId;
+  var userId = initialData.currentUser.publicId;
 
   console.log("the userid is", userId);
 
@@ -289,7 +290,7 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
         spfAlert.success('Your Mcq responses are saved.'),
 
         //todo:set progress to true, and save the progress into firebase
-        data.progress[userId][taskId] = {completed: true},
+        initialData.progress[userId][taskId] = {completed: true},
         clmDataStore.events.setProgress(eventId, taskId, userId, initialData.progress),
 
         $location.path(urlFor('oneEvent',{eventId: eventId}))

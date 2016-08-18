@@ -77,24 +77,37 @@ editMCQInitialData.$inject = [
 // Initial data for starting an MCQ
 function startMCQInitialData($q, spfAuthData, eventService, clmDataStore){
     //promise object
-    var currentUser = spfAuthData.user().catch(noop);
+   // var currentUser = spfAuthData.user().catch(noop);
 
     var data =  eventService.get();
 
     console.log("the data is here...,", data);
-    console.log("current user now is.", currentUser);
+    //console.log("current user now is.", currentUser);
 
-    return clmDataStore.events.getTaskAnswers(data.eventId, data.taskId).then(
-          function(result){
-            return {
-              data: data,
-              correctAnswers: result,
-                currentUser: currentUser
-            }
-          }, function(error){
-            console.log(error);
-          }
-      );
+    return $q.all ({
+       currentUser: spfAuthData.user(),
+        answers: clmDataStore.events.getTaskAnswers(data.eventId, data.taskId),
+        getProgress: clmDataStore.events.getProgress(data.eventId)
+    }).then (function (result){
+        return {
+            data: data,
+            correctAnswers: result.answers,
+            currentUser: result.currentUser,
+            progress: result.getProgress
+        }
+    });
+
+    // return clmDataStore.events.getTaskAnswers(data.eventId, data.taskId).then(
+    //       function(result){
+    //         return {
+    //           data: data,
+    //           correctAnswers: result,
+    //             currentUser: currentUser
+    //         }
+    //       }, function(error){
+    //         console.log(error);
+    //       }
+    //   );
 }
 startMCQInitialData.$inject = [
     '$q',
