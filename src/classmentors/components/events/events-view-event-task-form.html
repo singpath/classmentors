@@ -35,10 +35,9 @@
         </div>
 
         <div>
-            <md-input-container>
+            <md-input-container class="md-block" flex>
                 <label for="edit-task-desc">Description</label>
                 <textarea name="editTaskDesc" id="edit-task-desc"
-
                     ng-model="ctrl.task.description"
                     required="required" ng-minLength="3" md-maxLength="200"
                     placeholder="Challenge description"

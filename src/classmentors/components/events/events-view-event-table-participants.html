@@ -222,8 +222,15 @@
                                 <span ng-if="task.linkPattern">
                                     <a ng-href="{{ctrl.solutions[participant.$id][task.$id]}}" target="_blank">completed</a>
                                 </span>
-                                <span ng-if="task.textResponse && !task.lang">
-                                    {{ ctrl.solutions[participant.$id][task.$id] | cmTruncate: 10 }}
+                                <span ng-if="task.textResponse && !task.lang && !ctrl.isReviewSuperUser">
+                                    {{ ctrl.solutions[participant.$id][task.$id] | cmTruncate: 10 }}!!
+                                </span>
+                                <span ng-if="task.textResponse && !task.lang && ctrl.isReviewSuperUser">
+                                    <md-button class="md-raised md-primary"
+                                               aria-label="view response"
+                                               ng-click="ctrl.viewTextResponse(task, ctrl.solutions[participant.$id][task.$id])"
+                                    >View Response
+                                    </md-button>
                                 </span>
                                 <span ng-if="task.textResponse && task.lang">
                                     {{ ctrl.solutions[participant.$id][task.$id] | cmTruncate: 10 }}

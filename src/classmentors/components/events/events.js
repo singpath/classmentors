@@ -12,6 +12,7 @@ import linkTmpl from './events-view-provide-link.html!text';
 import responseTmpl from './events-view-provide-response.html!text';
 import editProfileTmpl from './events-view-edit-profile.html!text';
 import codeTmpl from './events-view-provide-code.html!text';
+import mcqTmpl from './events-view-provide-mcq.html!text';
 import './events.css!';
 import ace from '../../../jspm_packages/github/ajaxorg/ace-builds@1.2.3/ace.js';
 import monokai from '../../../jspm_packages/github/ajaxorg/ace-builds@1.2.3/theme-monokai.js';
@@ -461,6 +462,7 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
     this.assistants = initialData.assistants;
     this.assistantObj = initialData.assistantObj;
     this.asstArr = [];
+    this.isReviewSuperUser = false;
 
     for (var asst in self.assistants) {
         if (self.assistants[asst].$id) {
@@ -498,7 +500,7 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
     }
 
     if (self.isReviewAssistant || self.isOwner) {
-        this.isReviewSuperUser = true;
+        self.isReviewSuperUser = true;
     }
 
     $scope.$on('$destroy', function () {
@@ -1608,6 +1610,21 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         reversed: false
     };
 
+    //Find superReviewUser rights
+    console.log(self.event);
+    console.log(self.profile);
+    this.isReviewSuperUser = false;
+    if(self.event.owner.publicId == self.profile.$id) {
+        self.isReviewSuperUser = true;
+    }
+    if(self.event.assistants) {
+        if(self.event.assistants[self.profile.$id]) {
+            if(self.event.assistants[self.profile.$id].canReview) {
+                self.isReviewSuperUser = true;
+            }
+        }
+    }
+
     this.pagerOptions = clmPagerOption();
     unwatchers.push(self.pagerOptions.$destroy.bind(self.pagerOptions));
 
@@ -1993,8 +2010,9 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                 });
                 clmDataStore.logging.inputLog({
                     action: "submitLinkResponse",
-                    eventId: self.event.$id,
                     publicId: self.profile.$id,
+                    eventId: self.event.$id,
+                    taskId: taskId,
                     timestamp: Firebase.ServerValue.TIMESTAMP
                 });
             };
@@ -2056,8 +2074,9 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                 });
                 clmDataStore.logging.inputLog({
                     action: "submitTextResponse",
-                    eventId: self.event.$id,
                     publicId: self.profile.$id,
+                    eventId: self.event.$id,
+                    taskId: taskId,
                     timestamp: Firebase.ServerValue.TIMESTAMP
                 });
             };
@@ -2118,11 +2137,32 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                 });
                 clmDataStore.logging.inputLog({
                     action: "submitCodeResponse",
-                    eventId: self.event.$id,
                     publicId: self.profile.$id,
+                    eventId: self.event.$id,
+                    taskId: taskId,
                     timestamp: Firebase.ServerValue.TIMESTAMP
                 });
             };
+
+            this.cancel = function () {
+                $mdDialog.hide();
+            };
+        }
+    };
+
+    this.viewTextResponse = function (task, userSolution) {
+        $mdDialog.show({
+            clickOutsideToClose: true,
+            parent: $document.body,
+            template: responseTmpl,
+            controller: DialogController,
+            controllerAs: 'ctrl'
+        });
+
+        function DialogController() {
+            this.task = task;
+            this.viewOnly = true;
+            this.solution = userSolution;
 
             this.cancel = function () {
                 $mdDialog.hide();
@@ -2241,8 +2281,6 @@ ClmEventTableCtrl.$inject = [
     '$location',
     'routes',
     '$route'
-
-
 ];
 
 //TODO: include the event to load initial data into surveyformfillctrl
@@ -2583,7 +2621,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             }
         }
         if (!allResponses) {
-            spfAlert.warning('Failed to save the responses.');
+            spfAlert.warning('Failed to save the responses. Please answer all questions.');
         } else {
             var taskId = $routeParams.taskId;
             var eventId = initialData.event.$id;
@@ -2708,7 +2746,8 @@ export function clmEventRankTableFactory() {
         bindToController: true,
         scope: {
             event: '=',
-            profile: '='
+            profile: '=',
+            assistants: '='
         },
         controller: ClmEventRankTableCtrl,
         controllerAs: 'ctrl'
@@ -2751,7 +2790,7 @@ function ClmEventRankTableCtrl($scope, $log, spfFirebase, clmDataStore, clmPager
     // this.rankingView = [];
 
     var updateLog = function (actionObj) {
-        actionObj.publicId = self.profile.$id;        
+        actionObj.publicId = self.profile.$id;
         actionObj.timestamp = Firebase.ServerValue.TIMESTAMP;
         //console.log(actionObj);
         // spfFirebase.push(['classMentors/userActions'], actionObj);
@@ -2827,13 +2866,15 @@ function ClmEventRankTableCtrl($scope, $log, spfFirebase, clmDataStore, clmPager
             temp.displayName = result.user.displayName;
             temp.name = result.user.displayName;
             temp.user = result.user;
-            parentScope.rankingView2.push(temp);
+            // console.log(parentScope.event);
+            // console.log(parentScope.profile);
+            if(parentScope.assistants.indexOf(result.$id) < 0 && parentScope.event.owner.publicId !== result.$id) {
+                parentScope.rankingView2.push(temp);
+            }
         }, function (reason) {
             console.log(`Failed ${reason}`);
         });
     };
-
-
 
     var refreshAchievements = function (profileId, service) {
         // TODO: Only request updates for the services that users have registered for.
@@ -3093,7 +3134,6 @@ function ClmEventResultsTableCtrl($scope, $q, $log, $mdDialog, $document,
                                   urlFor, spfAlert, clmServicesUrl, clmDataStore, clmPagerOption, $sce) {
     var self = this;
     var unwatchers = [];
-
 
     this.currentUserParticipant = undefined;
     this.participantsView = [];
@@ -3396,6 +3436,46 @@ function ClmEventResultsTableCtrl($scope, $q, $log, $mdDialog, $document,
             };
         }
     };
+    
+    this.viewMultipleChoiceResponse = function (eventId, taskId, task, participant, userSolution){
+        $mdDialog.show({
+            clickOutsideToClose: true,
+            parent: $document.body,
+            template: mcqTmpl,
+            controller: DialogController,
+            controllerAs: 'ctrl'
+        });
+
+        function DialogController() {
+            this.task = task;
+            this.viewOnly = true;
+            this.questions = angular.fromJson(this.task.mcqQuestions);
+            this.isChecked = function(answers, index){
+                return answers.indexOf(index) > -1;
+            }
+            this.show = function(answers){
+                return answers.length > 1;
+            }
+
+            // If userSolution is not null and userSolution given
+            // taskId is not null
+            if (
+                userSolution &&
+                userSolution[taskId]
+            ) {
+                this.solution = userSolution[taskId];
+            }
+            var userAnswers = angular.fromJson(this.solution).userAnswers;
+            console.log(userAnswers);
+            for(var i = 0; i < this.questions.length; i++){
+                this.questions[i].answers = userAnswers[i];
+            }
+            console.log(this.questions);
+            this.cancel = function () {
+                $mdDialog.hide();
+            };
+        }
+    }
 
     this.viewTextResponse = function (eventId, taskId, task, participant, userSolution) {
         $mdDialog.show({

@@ -1,0 +1,78 @@
+<md-dialog flex layout-padding aria-label="{{ctrl.task.title}}">
+    <md-dialog-content>
+        <div layout='column' align="center">
+    <h3>Multiple Choice</h3>
+    <h4>Title: {{ctrl.task.title}}</h4>
+    <h4>Description: {{ctrl.task.description}}</h4>
+    <br>
+  </div>
+
+  <form name="startMcq" ng-submit="ctrl.submit()">
+  <div layout-align="column">
+
+      <!------------------starting of questions--------------------------------------------->
+      <div flex ng-repeat="question in ctrl.questions">
+        <div align="start" layout="column" >
+          <label><h2>Question {{$index + 1}}</h2></label>
+          <md-divider></md-divider>
+          <label><h4>{{question.text}}</h4></label>
+        </div>
+
+        <!--answer's options-->
+        <div ng-show="!ctrl.show(question.answers)">
+          <md-radio-group ng-model="question.answers">
+            <div layout="column" ng-repeat="option in question.options">
+              <div layout="row">
+                <div flex="80">
+                  <label>{{$index + 1}}) {{option.text}}</label>
+                </div>
+                <div flex="20">
+                  <md-radio-button ng-disabled="true" value={{$index}} ng-checked="ctrl.isChecked(question.answers, $index)"></md-radio-button>
+                </div>
+              </div>
+              <md-divider layout-padding ng-if="!$last"></md-divider>
+            </div>
+          </md-radio-group>
+        </div>
+
+        <div ng-show="ctrl.show(question.answers)">
+          <div layout="column" ng-repeat="option in question.options">
+            <div layout="row">
+              <div flex="80">
+                <label>{{$index + 1}}) {{option.text}}</label>
+              </div>
+              <div flex="20">
+                <md-checkbox ng-disabled="true" ng-checked="ctrl.isChecked(question.answers, $index)"></md-checkbox>
+              </div>
+            </div>
+            <md-divider layout-padding ng-if="!$last"></md-divider>
+          </div>
+        </div>
+        <!--<div align="center" layout="row" ng-repeat="option in question.options" >-->
+          <!--&lt;!&ndash;single answer or no?&ndash;&gt;-->
+          <!--<div flex align="left">-->
+            <!--<h4>{{option.text}}</h4>-->
+          <!--</div>-->
+          <!--<div flex="20">-->
+          <!--<md-button ng-model="question.answers" ng-class="question.answers.indexOf($index) != -1 ? 'md-raised md-primary' : 'md-raised'"-->
+                     <!--ng-click="ctrl.toggleOption(question, $index)">Answer</md-button>-->
+          <!--</div>-->
+          <!--<div flex="20" ng-show="ctrl.multipleAns[$parent.$index]">-->
+
+          <!--</div>-->
+          <!--<div flex="20" ng-show="!ctrl.multipleAns[$parent.$index]">-->
+            <!--<input type="radio" name="answer" value="$index"/>-->
+          <!--</div>-->
+            <!--<md-divider ng-if="!$last"></md-divider>-->
+        <!--</div>-->
+      </div>
+
+
+  </div>
+  <br/>
+  <div layout="row" layout-align="center center">
+    <md-button type="reset" class="md-raised" ng-click="ctrl.cancel()">Cancel</md-button>
+  </div>
+  </form>
+    </md-dialog-content>
+</md-dialog>
