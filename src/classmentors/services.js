@@ -312,6 +312,11 @@ export function clmDataStoreFactory(
           return true;
         }
 
+        if (obj.assistants && obj.assistants[this.$id]) {
+            // console.log(obj.assistants );
+            return true;
+        }
+
         if (
           kind === '/classMentors/events' &&
           obj.$id &&
@@ -373,6 +378,12 @@ export function clmDataStoreFactory(
 
         return clmDataStore.updateProfile(resp.currentUser);
       });
+    },
+
+    logging: {
+        inputLog: function (actionObj) {
+            spfFirebase.push(['classMentors/userActions'], actionObj);
+        }
     },
 
     profile: function(publicId) {

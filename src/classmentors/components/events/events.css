@@ -45,8 +45,16 @@ th.secondaryOrderer .md-button:after {
 
 md-dialog.enlarged-dialog {
     max-width: 70%;
-    max-height: 70%;
+    max-height: 90%;
     width: 70%;
-    height: 70%;
+    height: 90%;
+    border-radius: 0;
+}
+
+md-dialog.link-dialog {
+    max-width: 70%;
+    max-height: 50%;
+    width: 70%;
+    height: 50%;
     border-radius: 0;
 }

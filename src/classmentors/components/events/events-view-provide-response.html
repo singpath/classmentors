@@ -1,4 +1,4 @@
-<md-dialog aria-label="{{ctrl.task.title}}">
+<md-dialog aria-label="{{ctrl.task.title}}" class="link-dialog">
     <form name="provideResponseForm" ng-submit="ctrl.save(ctrl.solution)">
         <md-dialog-content class="sticky-container">
             <md-subheader class="md-sticky-no-effect">{{ctrl.task.title}}</md-subheader>
@@ -16,11 +16,16 @@
                 </md-input-container>
             </div>
             <div ng-show="ctrl.viewOnly">
-                <label for="view-solution-response">{{ctrl.task.textResponse}}</label><br><br>
-                <textarea name="linkSolution" id="view-solution-response"
-                          ng-model="ctrl.solution"
-                          required rows="3" readonly>
-                </textarea>
+                <md-divider></md-divider>
+                <!--<md-input-container class="md-block">-->
+                    <!--<label for="view-solution-response">{{ctrl.task.textResponse}}</label><br><br>-->
+                    <!--<textarea name="linkSolution" id="view-solution-response"-->
+                              <!--ng-model="ctrl.solution"-->
+                              <!--required rows="3" readonly>-->
+                    <!--</textarea>-->
+                <!--</md-input-container>-->
+                <div style="white-space: pre-wrap;">{{ctrl.solution}}</div>
+                <md-divider></md-divider>
             </div>
             <div class="md-dialog-actions" layout="row">
                 <md-button type="submit" class="md-primary md-raised" ng-hide="ctrl.viewOnly" ng-disabled="!provideResponseForm.$valid">

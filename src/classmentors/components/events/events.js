@@ -1877,18 +1877,6 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         );
     };
 
-    // this.needToEdit = function(tasks, participant) {
-    //     var ans = false;
-    //     clmDataStore.getProfileData(participant.$id).then(function (promise) {
-    //         // return promise;
-    //     }).then(function (data) {
-    //         self.participantInfo = data;
-    //         console.log(self.participantInfo);
-    //     }).finally(function() {
-    //         return ans;
-    //     });
-    // };
-
     this.editProfileInfo = function (eventId, taskId, task, participant) {
         console.log(task);
         $mdDialog.show({
@@ -1977,7 +1965,6 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         }
     };
 
-
     this.promptForLink = function (eventId, taskId, task, participant, userSolution) {
         $mdDialog.show({
             parent: $document.body,
@@ -2004,6 +1991,12 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                     spfAlert.error('Failed to save the link.');
                     return err;
                 });
+                clmDataStore.logging.inputLog({
+                    action: "submitLinkResponse",
+                    publicId: self.profile.$id,
+                    eventId: self.event.$id,
+                    timestamp: Firebase.ServerValue.TIMESTAMP
+                });
             };
 
             this.cancel = function () {
@@ -2011,7 +2004,6 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             };
         }
     };
-
 
     this.promptForSurvey = function (eventId, taskId, task, participant, userSolution) {
 
@@ -2061,6 +2053,12 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                     $log.error(err);
                     spfAlert.error('Failed to save your response.');
                     return err;
+                });
+                clmDataStore.logging.inputLog({
+                    action: "submitTextResponse",
+                    publicId: self.profile.$id,
+                    eventId: self.event.$id,
+                    timestamp: Firebase.ServerValue.TIMESTAMP
                 });
             };
 
@@ -2117,6 +2115,12 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                     $log.error(err);
                     spfAlert.error('Failed to save your response.');
                     return err;
+                });
+                clmDataStore.logging.inputLog({
+                    action: "submitCodeResponse",
+                    publicId: self.profile.$id,
+                    eventId: self.event.$id,
+                    timestamp: Firebase.ServerValue.TIMESTAMP
                 });
             };
 
@@ -2704,7 +2708,8 @@ export function clmEventRankTableFactory() {
         bindToController: true,
         scope: {
             event: '=',
-            profile: '='
+            profile: '=',
+            assistants: '='
         },
         controller: ClmEventRankTableCtrl,
         controllerAs: 'ctrl'
@@ -2747,10 +2752,11 @@ function ClmEventRankTableCtrl($scope, $log, spfFirebase, clmDataStore, clmPager
     // this.rankingView = [];
 
     var updateLog = function (actionObj) {
-        actionObj.publicId = self.profile.$id;        
+        actionObj.publicId = self.profile.$id;
         actionObj.timestamp = Firebase.ServerValue.TIMESTAMP;
         //console.log(actionObj);
-        spfFirebase.push(['classMentors/userActions'], actionObj);
+        // spfFirebase.push(['classMentors/userActions'], actionObj);
+        clmDataStore.logging.inputLog(actionObj);
         // spfFirebase.push(['queue/tasks'], { id: profileId, service: "freeCodeCamp" });
     };
 
@@ -2822,13 +2828,15 @@ function ClmEventRankTableCtrl($scope, $log, spfFirebase, clmDataStore, clmPager
             temp.displayName = result.user.displayName;
             temp.name = result.user.displayName;
             temp.user = result.user;
-            parentScope.rankingView2.push(temp);
+            // console.log(parentScope.event);
+            // console.log(parentScope.profile);
+            if(parentScope.assistants.indexOf(result.$id) < 0 && parentScope.event.owner.publicId !== result.$id) {
+                parentScope.rankingView2.push(temp);
+            }
         }, function (reason) {
             console.log(`Failed ${reason}`);
         });
     };
-
-
 
     var refreshAchievements = function (profileId, service) {
         // TODO: Only request updates for the services that users have registered for.
