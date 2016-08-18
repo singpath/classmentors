@@ -35,7 +35,7 @@ tools.exec(`git config user.email "${commitEmail}"`);
 // Switch firebase id in
 sh.echo('Switching firebase id in "index.html"');
 sh.cp('index.html', 'index.html.tmp');
-sh.sed('-i', /firebaseId: ['"][-a-zA-Z0-9]+['"]/, firebaseId, 'index.html');
+sh.sed('-i', /firebaseId: ['"][-a-zA-Z0-9]+['"]/, `firebaseId: '${firebaseId}'`, 'index.html');
 
 // Commit files
 sh.echo('Committing files');
@@ -47,6 +47,7 @@ tools.exec('git commit -m "Deploy to GitHub Pages"');
 // # repo's gh-pages branch. (All previous history on the gh-pages branch
 // # will be lost, since we are overwriting it.) We redirect any ${BUILD_DEST}put to
 // # /dev/null to hide any sensitive credential data that might otherwise be exposed.
+sh.echo('Pushing gh-pages to origin remote repo (or provided one)...');
 tools.exec(`git push --force --quiet ${remoteUrl} master:gh-pages`, {
   printCmd: false,
   ignoreStdout: true,
