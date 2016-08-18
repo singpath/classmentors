@@ -2705,7 +2705,8 @@ export function clmEventRankTableFactory() {
         bindToController: true,
         scope: {
             event: '=',
-            profile: '='
+            profile: '=',
+            assistants: '='
         },
         controller: ClmEventRankTableCtrl,
         controllerAs: 'ctrl'
@@ -2824,13 +2825,15 @@ function ClmEventRankTableCtrl($scope, $log, spfFirebase, clmDataStore, clmPager
             temp.displayName = result.user.displayName;
             temp.name = result.user.displayName;
             temp.user = result.user;
-            parentScope.rankingView2.push(temp);
+            // console.log(parentScope.event);
+            // console.log(parentScope.profile);
+            if(parentScope.assistants.indexOf(result.$id) < 0 && parentScope.event.owner.publicId !== result.$id) {
+                parentScope.rankingView2.push(temp);
+            }
         }, function (reason) {
             console.log(`Failed ${reason}`);
         });
     };
-
-
 
     var refreshAchievements = function (profileId, service) {
         // TODO: Only request updates for the services that users have registered for.
