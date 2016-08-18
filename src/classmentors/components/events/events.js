@@ -461,6 +461,7 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
     this.assistants = initialData.assistants;
     this.assistantObj = initialData.assistantObj;
     this.asstArr = [];
+    this.isReviewSuperUser = false;
 
     for (var asst in self.assistants) {
         if (self.assistants[asst].$id) {
@@ -498,7 +499,7 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
     }
 
     if (self.isReviewAssistant || self.isOwner) {
-        this.isReviewSuperUser = true;
+        self.isReviewSuperUser = true;
     }
 
     $scope.$on('$destroy', function () {
@@ -1608,6 +1609,19 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         reversed: false
     };
 
+    //Find superReviewUser rights
+    console.log(self.event);
+    console.log(self.profile);
+    this.isReviewSuperUser = false;
+    if(self.event.owner.publicId == self.profile.$id) {
+        self.isReviewSuperUser = true;
+    }
+    if(self.event.assistants[self.profile.$id]) {
+        if(self.event.assistants[self.profile.$id].canReview) {
+            self.isReviewSuperUser = true;
+        }
+    }
+
     this.pagerOptions = clmPagerOption();
     unwatchers.push(self.pagerOptions.$destroy.bind(self.pagerOptions));
 
@@ -2130,6 +2144,26 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         }
     };
 
+    this.viewTextResponse = function (task, userSolution) {
+        $mdDialog.show({
+            clickOutsideToClose: true,
+            parent: $document.body,
+            template: responseTmpl,
+            controller: DialogController,
+            controllerAs: 'ctrl'
+        });
+
+        function DialogController() {
+            this.task = task;
+            this.viewOnly = true;
+            this.solution = userSolution;
+
+            this.cancel = function () {
+                $mdDialog.hide();
+            };
+        }
+    };
+
     this.update = function () {
     };
     /*
@@ -2241,8 +2275,6 @@ ClmEventTableCtrl.$inject = [
     '$location',
     'routes',
     '$route'
-
-
 ];
 
 //TODO: include the event to load initial data into surveyformfillctrl
@@ -3096,7 +3128,6 @@ function ClmEventResultsTableCtrl($scope, $q, $log, $mdDialog, $document,
                                   urlFor, spfAlert, clmServicesUrl, clmDataStore, clmPagerOption, $sce) {
     var self = this;
     var unwatchers = [];
-
 
     this.currentUserParticipant = undefined;
     this.participantsView = [];
