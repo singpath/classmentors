@@ -1991,10 +1991,9 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                     spfAlert.error('Failed to save the link.');
                     return err;
                 });
-                clmDataStore.logging.inputLog({
+                clmDataStore.logging.inputLog(self.profile.$id, {
                     action: "submitLinkResponse",
                     eventId: self.event.$id,
-                    publicId: self.profile.$id,
                     timestamp: Firebase.ServerValue.TIMESTAMP
                 });
             };
@@ -2054,10 +2053,9 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                     spfAlert.error('Failed to save your response.');
                     return err;
                 });
-                clmDataStore.logging.inputLog({
+                clmDataStore.logging.inputLog(self.profile.$id, {
                     action: "submitTextResponse",
                     eventId: self.event.$id,
-                    publicId: self.profile.$id,
                     timestamp: Firebase.ServerValue.TIMESTAMP
                 });
             };
@@ -2116,10 +2114,9 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                     spfAlert.error('Failed to save your response.');
                     return err;
                 });
-                clmDataStore.logging.inputLog({
+                clmDataStore.logging.inputLog(self.profile.$id, {
                     action: "submitCodeResponse",
                     eventId: self.event.$id,
-                    publicId: self.profile.$id,
                     timestamp: Firebase.ServerValue.TIMESTAMP
                 });
             };
@@ -2751,11 +2748,11 @@ function ClmEventRankTableCtrl($scope, $log, spfFirebase, clmDataStore, clmPager
     // this.rankingView = [];
 
     var updateLog = function (actionObj) {
-        actionObj.publicId = self.profile.$id;        
+        // actionObj.publicId = self.profile.$id;
         actionObj.timestamp = Firebase.ServerValue.TIMESTAMP;
         //console.log(actionObj);
         // spfFirebase.push(['classMentors/userActions'], actionObj);
-        clmDataStore.logging.inputLog(actionObj);
+        clmDataStore.logging.inputLog(self.profile.$id, actionObj);
         // spfFirebase.push(['queue/tasks'], { id: profileId, service: "freeCodeCamp" });
     };
 

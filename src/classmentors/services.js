@@ -376,8 +376,8 @@ export function clmDataStoreFactory(
     },
 
     logging: {
-        inputLog: function (actionObj) {
-            spfFirebase.push(['classMentors/userActions'], actionObj);
+        inputLog: function (publicId, actionObj) {
+            spfFirebase.push(['classMentors/userActions', publicId], actionObj);
         }
     },
 

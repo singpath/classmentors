@@ -89,10 +89,12 @@
     },
     "classMentors": {
       "userActions":{
-        "$userActions":{
-          ".write":"newData.hasChildren(['publicId','action','timestamp'])",
-          "publicId":{
-            ".validate":"newData.isString() && root.child('auth/publicIds').child(newData.val()).val() === auth.uid"
+        "$publicId": {
+          "$userActions":{
+            ".write":"newData.hasChildren(['action','timestamp'])",
+            "publicId":{
+              ".validate":"newData.isString() && root.child('auth/publicIds').child(newData.val()).val() === auth.uid"
+            }
           }
         },
         ".write": "auth !== null",
