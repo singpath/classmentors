@@ -42,6 +42,10 @@ const externals = [{
   name: 'angularfire',
   entry: 'angularfire',
   globalName: 'angular'
+}, {
+  name: 'd3',
+  entry: 'd3',
+  globalName: 'd3'
 }];
 
 exports.name = pkg.name;

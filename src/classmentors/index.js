@@ -2,6 +2,9 @@
 
 import angular from 'angular';
 import module from 'classmentors/module.js';
+import * as d3 from 'd3';
+
+console.log(d3);
 
 import * as services from 'classmentors/services.js';
 import * as filters from 'classmentors/filters.js';
