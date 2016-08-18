@@ -312,6 +312,11 @@ export function clmDataStoreFactory(
           return true;
         }
 
+        if (obj.assistants && obj.assistants[this.$id]) {
+            // console.log(obj.assistants );
+            return true;
+        }
+
         if (
           kind === '/classMentors/events' &&
           obj.$id &&
