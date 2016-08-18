@@ -2010,6 +2010,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                     action: "submitLinkResponse",
                     publicId: self.profile.$id,
                     eventId: self.event.$id,
+                    taskId: taskId,
                     timestamp: Firebase.ServerValue.TIMESTAMP
                 });
             };
@@ -2073,6 +2074,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                     action: "submitTextResponse",
                     publicId: self.profile.$id,
                     eventId: self.event.$id,
+                    taskId: taskId,
                     timestamp: Firebase.ServerValue.TIMESTAMP
                 });
             };
@@ -2135,6 +2137,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                     action: "submitCodeResponse",
                     publicId: self.profile.$id,
                     eventId: self.event.$id,
+                    taskId: taskId,
                     timestamp: Firebase.ServerValue.TIMESTAMP
                 });
             };
