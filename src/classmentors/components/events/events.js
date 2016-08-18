@@ -12,6 +12,7 @@ import linkTmpl from './events-view-provide-link.html!text';
 import responseTmpl from './events-view-provide-response.html!text';
 import editProfileTmpl from './events-view-edit-profile.html!text';
 import codeTmpl from './events-view-provide-code.html!text';
+import mcqTmpl from './events-view-provide-mcq.html!text';
 import './events.css!';
 import ace from '../../../jspm_packages/github/ajaxorg/ace-builds@1.2.3/ace.js';
 import monokai from '../../../jspm_packages/github/ajaxorg/ace-builds@1.2.3/theme-monokai.js';
@@ -3430,6 +3431,46 @@ function ClmEventResultsTableCtrl($scope, $q, $log, $mdDialog, $document,
             };
         }
     };
+    
+    this.viewMultipleChoiceResponse = function (eventId, taskId, task, participant, userSolution){
+        $mdDialog.show({
+            clickOutsideToClose: true,
+            parent: $document.body,
+            template: mcqTmpl,
+            controller: DialogController,
+            controllerAs: 'ctrl'
+        });
+
+        function DialogController() {
+            this.task = task;
+            this.viewOnly = true;
+            this.questions = angular.fromJson(this.task.mcqQuestions);
+            this.isChecked = function(answers, index){
+                return answers.indexOf(index) > -1;
+            }
+            this.show = function(answers){
+                return answers.length > 1;
+            }
+
+            // If userSolution is not null and userSolution given
+            // taskId is not null
+            if (
+                userSolution &&
+                userSolution[taskId]
+            ) {
+                this.solution = userSolution[taskId];
+            }
+            var userAnswers = angular.fromJson(this.solution).userAnswers;
+            console.log(userAnswers);
+            for(var i = 0; i < this.questions.length; i++){
+                this.questions[i].answers = userAnswers[i];
+            }
+            console.log(this.questions);
+            this.cancel = function () {
+                $mdDialog.hide();
+            };
+        }
+    }
 
     this.viewTextResponse = function (eventId, taskId, task, participant, userSolution) {
         $mdDialog.show({
