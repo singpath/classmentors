@@ -1617,9 +1617,11 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
     if(self.event.owner.publicId == self.profile.$id) {
         self.isReviewSuperUser = true;
     }
-    if(self.event.assistants[self.profile.$id]) {
-        if(self.event.assistants[self.profile.$id].canReview) {
-            self.isReviewSuperUser = true;
+    if(self.event.assistants) {
+        if(self.event.assistants[self.profile.$id]) {
+            if(self.event.assistants[self.profile.$id].canReview) {
+                self.isReviewSuperUser = true;
+            }
         }
     }
 
