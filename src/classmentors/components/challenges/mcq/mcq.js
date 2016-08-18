@@ -212,6 +212,8 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
   self.questions = loadQuestions(quesFromJson);
   self.multipleAns = initMultipleAns(correctAnswers);
 
+  self.isMcqValid = false;
+
   // what is dah output?
   //console.log(self.multipleAns);
 
@@ -235,9 +237,22 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
     else {
       list.push(item);
     }
+
+    checkMCQValid();
+    
   }
 
-  self.isMcqValid = false;
+
+  function checkMCQValid(){
+    for (var i = 0; i < self.questions.length; i ++){
+      if(self.questions[i].answers.length == 0){
+        self.isMcqValid = false;
+
+        return;
+      }
+    }
+    self.isMcqValid = true;
+  }
 
   function arraysEqual(arr1, arr2) {
     if(arr1.length !== arr2.length)
@@ -266,6 +281,8 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
     }
     return quesFromJson;
   };
+
+
 
   self.submit = function(){
     var submission = {};
