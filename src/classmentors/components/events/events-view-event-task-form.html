@@ -35,10 +35,9 @@
         </div>
 
         <div>
-            <md-input-container>
+            <md-input-container class="md-block" flex>
                 <label for="edit-task-desc">Description</label>
                 <textarea name="editTaskDesc" id="edit-task-desc"
-
                     ng-model="ctrl.task.description"
                     required="required" ng-minLength="3" md-maxLength="200"
                     placeholder="Challenge description"
@@ -121,6 +120,7 @@
 
 
                             <md-radio-button value="code" class="md-primary">Code</md-radio-button>
+                            <md-radio-button value="profileEdit" class="md-primary">Profile Edit</md-radio-button>
                             <md-radio-button ng-disabled="!ctrl.enableBeta" value="video" class="md-primary">Video*</md-radio-button>
                             <md-radio-button ng-disabled="!ctrl.enableBeta" value="journalling" class="md-primary">Journalling*</md-radio-button>
                             <md-radio-button ng-disabled="!ctrl.enableBeta" value="survey" class="md-primary">Survey*</md-radio-button>
@@ -279,6 +279,15 @@
             <md-input-container>
                 Journalling
             </md-input-container>
+        </div>
+
+        <div ng-if="ctrl.taskType == 'profileEdit'">
+            Select fields for participants to edit:
+            <md-list  ng-repeat="metaData in ['Year of Birth', 'School']">
+                <md-checkbox ng-checked="ctrl.exists(metaData, ctrl.selectedMetaData)" ng-click="ctrl.toggle(metaData, ctrl.selectedMetaData)">
+                    {{metaData}}</br>
+                </md-checkbox>
+            </md-list>
         </div>
 
         <div layout="row" layout-align="center center">

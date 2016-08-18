@@ -7,6 +7,18 @@ const tools = require('@singpath/tools');
 
 sh.set('-e');
 
+sh.echo(`NOTICE:
+
+  Make sure to update JSPM to version "0.17.0-beta.25".
+
+  To update, reinstall all dependencies:
+
+      rm -rf node_modules/ src/jspm_packages/ && npm install
+
+  The build might freeze if you only update JSPM.
+
+`);
+
 // setup
 tools.clean(config.build.root);
 sh.echo(`Setting up "${config.build.app.root}/"...`);
@@ -42,10 +54,10 @@ sh.echo(`Removing source map directive from ${config.build.app.minJs}...`);
 sh.sed('-i', /^\/\/# sourceMappingURL=.*$/, '', config.build.app.minJs);
 
 sh.echo(`Analysing source map using ${config.build.app.minJs}...`);
-sh.exec(
+tools.execPipe(
   `source-map-explorer --html "${config.build.app.minJs}" "${config.build.app.minJs}.map"`,
-  {silent: true}
-).to(config.build.app.tree);
+  {stdout: config.build.app.tree}
+);
 
 sh.echo(`open "${config.build.app.tree}" to find weight of each modules.`);
 

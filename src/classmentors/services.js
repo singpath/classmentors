@@ -295,6 +295,11 @@ export function clmDataStoreFactory(
   var clmDataStore;
 
   clmDataStore = {
+      
+    // setAuthInfo: function () {
+    //
+    // }
+      
     _profileFactory: spfFirebase.objFactory({
       canView: function(obj) {
         var kind = obj && obj.$ref && obj.$ref().parent().path.toString();
@@ -305,6 +310,11 @@ export function clmDataStoreFactory(
 
         if (obj.owner && obj.owner.publicId && this.$id === obj.owner.publicId) {
           return true;
+        }
+
+        if (obj.assistants && obj.assistants[this.$id]) {
+            // console.log(obj.assistants );
+            return true;
         }
 
         if (
@@ -370,10 +380,20 @@ export function clmDataStoreFactory(
       });
     },
 
+    logging: {
+        inputLog: function (actionObj) {
+            spfFirebase.push(['classMentors/userActions'], actionObj);
+        }
+    },
+
     profile: function(publicId) {
       return $q.when(publicId).then(function(id) {
         return clmDataStore._profileFactory(['classMentors/userProfiles', id]).$loaded();
       });
+    },
+
+    getProfileData: function(publicId) {
+      return spfFirebase.loadedObj(['classMentors/userProfiles', publicId, 'user']);
     },
 
     updateProfile: function(userData) {
@@ -389,6 +409,10 @@ export function clmDataStoreFactory(
       ).then(function() {
         return clmDataStore.profile(userData.publicId);
       });
+    },
+
+    getSchools: function() {
+        return spfFirebase.loadedObj(['classMentors/schools']);
     },
 
     initProfile: function() {
@@ -1141,7 +1165,6 @@ export function clmDataStoreFactory(
         var delay = 300;
         var unWatchSolution = solutions.$watch(debouncedUpdate);
         var unWatchParticipants = participants.$watch(debouncedUpdate);
-
         function update() {
           return participants.map(function(participant) {
             return clmDataStore.events.updateProgress(
@@ -1380,6 +1403,12 @@ export function clmDataStoreFactory(
           'classMentors/eventSolutions', eventId, publicId, taskId
         ], link);
       },
+
+        setProgress: function(eventId, taskId, publicId, progress){
+            
+            return spfFirebase.set(['classMentors/eventProgress', eventId, publicId, taskId], progress[publicId][taskId]);
+
+        },
 
       saveScore: function(eventId, publicId, taskId, score) {
           if (!eventId) {

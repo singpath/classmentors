@@ -10,6 +10,7 @@ import pagerTmpl from './events-view-pager.html!text';
 import passwordTmpl from './events-view-password.html!text';
 import linkTmpl from './events-view-provide-link.html!text';
 import responseTmpl from './events-view-provide-response.html!text';
+import editProfileTmpl from './events-view-edit-profile.html!text';
 import codeTmpl from './events-view-provide-code.html!text';
 import mcqTmpl from './events-view-provide-mcq.html!text';
 import './events.css!';
@@ -733,16 +734,16 @@ editEventCtrllInitialData.$inject = ['$q', '$route', 'spfAuthData', 'clmDataStor
 function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataStore) {
     var self = this;
 
-  this.currentUser = initialData.currentUser;
-  this.participants = initialData.participants;
-  this.event = initialData.event;
-  this.tasks = initialData.tasks;
-  this.showingAssistants = false;
-  this.showingTasks = true;
-  this.assistants = initialData.assistants;
-  this.newPassword = '';
-  this.isOwner = false;
-  this.savingEvent = false;
+    this.currentUser = initialData.currentUser;
+    this.participants = initialData.participants;
+    this.event = initialData.event;
+    this.tasks = initialData.tasks;
+    this.showingAssistants = false;
+    this.showingTasks = true;
+    this.assistants = initialData.assistants;
+    this.newPassword = '';
+    this.isOwner = false;
+    this.savingEvent = false;
 
     if (
         self.event &&
@@ -979,6 +980,8 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
     this.enableBeta = true;
     var location;
 
+    this.selectedMetaData = [];
+
     spfNavBarService.update(
         'New Challenge', [{
             title: 'Events',
@@ -991,6 +994,20 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
             url: `#${urlFor('editEvent', {eventId: this.event.$id})}`
         }]
     );
+
+    this.toggle = function(item, list) {
+        var idx = list.indexOf(item);
+        if (idx > -1) {
+            list.splice(idx, 1);
+        }
+        else {
+            list.push(item);
+        }
+    };
+
+    this.exists = function(item, list) {
+        return list.indexOf(item) > -1;
+    };
 
 
     this.loadLevels = function (selected) {
@@ -1047,6 +1064,8 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
             clmSurvey.set(initialData.event.$id, initialData.event, task, tasktype, isOpen);
             var obj = clmSurvey.get();
             return '/challenges/survey'
+        } else if(tasktype === 'profileEdit') {
+            return 'Save';
         } else {
             return 'Save'; // by default should show 'save'
         }
@@ -1081,22 +1100,26 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
     }
 
 
-  //this function double checks with user if he wishes to go back and discard all changes thus far
-  this.discardChanges = function (ev){
-      var confirm = $mdDialog.confirm()
-          .title('You have not saved your input information')
-          .textContent('All of the information input will be discarded. Are you sure you want to continue?')
-          .ariaLabel('Discard all')
-          .targetEvent(ev)
-          .ok('Discard All')
-          .cancel('Continue editing');
-      $mdDialog.show(confirm).then(function() {
-          // decided to discard data, bring user to previous page
-          $location.path(urlFor('editEvent', {eventId: self.event.$id}));
-      });
-  };
+    //this function double checks with user if he wishes to go back and discard all changes thus far
+    this.discardChanges = function (ev) {
+        var confirm = $mdDialog.confirm()
+            .title('You have not saved your input information')
+            .textContent('All of the information input will be discarded. Are you sure you want to continue?')
+            .ariaLabel('Discard all')
+            .targetEvent(ev)
+            .ok('Discard All')
+            .cancel('Continue editing');
+        $mdDialog.show(confirm).then(function () {
+            // decided to discard data, bring user to previous page
+            $location.path(urlFor('editEvent', {eventId: self.event.$id}));
+        });
+    };
 
     this.saveTask = function (event, _, task, taskType, isOpen) {
+        if(taskType === 'profileEdit') {
+            task.toEdit = self.selectedMetaData;
+            task.textResponse = "Placeholder";
+        }
         var copy = spfFirebase.cleanObj(task);
         console.log("what is this copy?: ", copy);
         var data = {
@@ -1267,38 +1290,38 @@ editEventTaskCtrlInitialData.$inject = ['$q', '$route', 'spfAuthData', 'clmDataS
 
 
 /**Todo: enable edit to multiple choice, index card, etc. **/
-function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBarService, clmDataStore, eventService, $mdDialog,$location) {
-  var self = this;
+function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBarService, clmDataStore, eventService, $mdDialog, $location) {
+    var self = this;
 
-  this.event = initialData.event;
-  this.badges = initialData.badges;
-  this.taskId = initialData.taskId;
-  this.task = initialData.task;
+    this.event = initialData.event;
+    this.badges = initialData.badges;
+    this.taskId = initialData.taskId;
+    this.task = initialData.task;
 
-  this.isOpen = Boolean(this.task.openedAt);
-  this.savingTask = false;
-  this.enableBeta = true;
-  var location;
+    this.isOpen = Boolean(this.task.openedAt);
+    this.savingTask = false;
+    this.enableBeta = true;
+    var location;
 
-  this.taskType = null;
+    this.taskType = null;
 
-  /**todo: append tasktype here **/
+    /**todo: append tasktype here **/
 
-  if (this.task.serviceId) {
-    this.taskType = 'service';
+    if (this.task.serviceId) {
+        this.taskType = 'service';
 
-  } else if (this.task.linkPattern) {
-    this.taskType = 'linkPattern';
+    } else if (this.task.linkPattern) {
+        this.taskType = 'linkPattern';
 
-  } else if (this.task.lang) {
-      this.taskType = 'code';
+    } else if (this.task.lang) {
+        this.taskType = 'code';
 
-  } else if (this.task.textResponse) {
-    this.taskType = 'textResponse';
+    } else if (this.task.textResponse) {
+        this.taskType = 'textResponse';
 
-  }else if (this.task.mcqQuestions) {
-    this.taskType = 'multipleChoice';
-  }
+    } else if (this.task.mcqQuestions) {
+        this.taskType = 'multipleChoice';
+    }
     // md-select badge list and the the ng-model are compared
     // by reference.
     if (
@@ -1323,96 +1346,71 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBar
         }]
     );
 
-  this.challengeRouteProvider = function(){
-    //console.log("task type passed in is",tasktype);
-    //console.log("this task type passed in is", this.taskType);
+    this.challengeRouteProvider = function () {
+        //console.log("task type passed in is",tasktype);
+        //console.log("this task type passed in is", this.taskType);
 
-    if(this.taskType == 'service'){
-      console.log('service is clicked');
-      return 'Save';
+        if (this.taskType == 'service') {
+            console.log('service is clicked');
+            return 'Save';
 
-    }else if(this.taskType == 'singPath'){
-      console.log('singpath is clicked');
-      return 'Save';
+        } else if (this.taskType == 'singPath') {
+            console.log('singpath is clicked');
+            return 'Save';
 
-    }else if(this.taskType == 'linkPattern'){
-      console.log('linkPattern is clicked');
-      return 'Save';
+        } else if (this.taskType == 'linkPattern') {
+            console.log('linkPattern is clicked');
+            return 'Save';
 
-    }else if(this.taskType == 'textResponse'){
-      console.log('textResponse is clicked');
-      return 'Save';
+        } else if (this.taskType == 'textResponse') {
+            console.log('textResponse is clicked');
+            return 'Save';
 
-    }else if(this.taskType == 'indexCard'){
-      console.log('indexCard is clicked');
-      return 'Save';
+        } else if (this.taskType == 'indexCard') {
+            console.log('indexCard is clicked');
+            return 'Save';
 
-    }else if(this.taskType == 'multipleChoice'){
-      console.log('multipleChoice is clicked');
-      console.log("this event url", urlFor('oneEvent', {eventId: this.event.$id}));
-      location = "/challenges/mcq/edit";
-      return 'Continue';
+        } else if (this.taskType == 'multipleChoice') {
+            console.log('multipleChoice is clicked');
+            console.log("this event url", urlFor('oneEvent', {eventId: this.event.$id}));
+            location = "/challenges/mcq/edit";
+            return 'Continue';
 
-    }else if(this.taskType == 'code'){
-      console.log('code is clicked');
-      return 'Save';
+        } else if (this.taskType == 'code') {
+            console.log('code is clicked');
+            return 'Save';
 
-    }else if(this.taskType == 'video'){
-      console.log('video is clicked');
-      return 'Continue';
+        } else if (this.taskType == 'video') {
+            console.log('video is clicked');
+            return 'Continue';
 
-    }else if(this.taskType == 'journalling'){
-      console.log('journalling is clicked');
-      return 'Continue';
+        } else if (this.taskType == 'journalling') {
+            console.log('journalling is clicked');
+            return 'Continue';
 
-    }else{
-      return 'Save';
+        } else {
+            return 'Save';
+        }
     }
-  }
 
-  //this function double checks with user if he wishes to go back and discard all changes thus far
-  this.discardChanges = function (ev){
-    var confirm = $mdDialog.confirm()
-        .title('You have not saved your changes')
-        .textContent('All of your changes will be discarded. Are you sure you want to continue?')
-        .ariaLabel('Discard changes')
-        .targetEvent(ev)
-        .ok('Discard my changes')
-        .cancel('Continue editing');
-    $mdDialog.show(confirm).then(function() {
-      // decided to discard data, bring user to previous page
-      $location.path(urlFor('editEvent', {eventId: self.event.$id}));
+    //this function double checks with user if he wishes to go back and discard all changes thus far
+    this.discardChanges = function (ev) {
+        var confirm = $mdDialog.confirm()
+            .title('You have not saved your changes')
+            .textContent('All of your changes will be discarded. Are you sure you want to continue?')
+            .ariaLabel('Discard changes')
+            .targetEvent(ev)
+            .ok('Discard my changes')
+            .cancel('Continue editing');
+        $mdDialog.show(confirm).then(function () {
+            // decided to discard data, bring user to previous page
+            $location.path(urlFor('editEvent', {eventId: self.event.$id}));
 
-    });
-  };
-
-  this.saveTask = function(event, taskId, task, taskType, isOpen) {
-    var copy = spfFirebase.cleanObj(task);
-
-    if (taskType === 'linkPattern') {
-      delete copy.badge;
-      delete copy.serviceId;
-      delete copy.singPathProblem;
-    } else if (copy.serviceId === 'singPath') {
-      delete copy.badge;
-      if (copy.singPathProblem) {
-        copy.singPathProblem.path = spfFirebase.cleanObj(task.singPathProblem.path);
-        copy.singPathProblem.level = spfFirebase.cleanObj(task.singPathProblem.level);
-        copy.singPathProblem.problem = spfFirebase.cleanObj(task.singPathProblem.problem);
-      }
-    } else {
-      delete copy.singPathProblem;
-      copy.badge = spfFirebase.cleanObj(task.badge);
-    }
+        });
+    };
 
     this.saveTask = function (event, taskId, task, taskType, isOpen) {
         var copy = spfFirebase.cleanObj(task);
-        var data = {
-            taskType: taskType,
-            isOpen: isOpen,
-            event: event,
-            task: task
-        };
 
         if (taskType === 'linkPattern') {
             delete copy.badge;
@@ -1430,108 +1428,133 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBar
             copy.badge = spfFirebase.cleanObj(task.badge);
         }
 
-        if (!copy.link) {
-            // delete empty link. Can't be empty string
-            delete copy.link;
-        }
+        this.saveTask = function (event, taskId, task, taskType, isOpen) {
+            var copy = spfFirebase.cleanObj(task);
+            var data = {
+                taskType: taskType,
+                isOpen: isOpen,
+                event: event,
+                task: task
+            };
+
+            if (taskType === 'linkPattern') {
+                delete copy.badge;
+                delete copy.serviceId;
+                delete copy.singPathProblem;
+            } else if (copy.serviceId === 'singPath') {
+                delete copy.badge;
+                if (copy.singPathProblem) {
+                    copy.singPathProblem.path = spfFirebase.cleanObj(task.singPathProblem.path);
+                    copy.singPathProblem.level = spfFirebase.cleanObj(task.singPathProblem.level);
+                    copy.singPathProblem.problem = spfFirebase.cleanObj(task.singPathProblem.problem);
+                }
+            } else {
+                delete copy.singPathProblem;
+                copy.badge = spfFirebase.cleanObj(task.badge);
+            }
+
+            if (!copy.link) {
+                // delete empty link. Can't be empty string
+                delete copy.link;
+            }
 
 
-    self.creatingTask = true;
-    if(taskType === 'multipleChoice' || taskType === 'journalling' || taskType === 'video'){
-      var data = {
-        taskType: taskType,
-        isOpen: isOpen,
-        event: event,
-        task: task
-      };
-      console.log('Data shows... ', data);
-      spfNavBarService.update(
-          'New Challenge Details', [{
-            title: 'Events',
-            url: `#${urlFor('events')}`
-          }, {
-            title: this.event.title,
-            url: `#${urlFor('oneEvent', {eventId: this.event.$id})}`
-          }, {
-            title: 'Challenges',
-            url: `#${urlFor('editEvent', {eventId: this.event.$id})}`
-          }]
-      );
-      console.log(data)
-      eventService.set(data);
+            self.creatingTask = true;
+            if (taskType === 'multipleChoice' || taskType === 'journalling' || taskType === 'video') {
+                var data = {
+                    taskType: taskType,
+                    isOpen: isOpen,
+                    event: event,
+                    task: task
+                };
+                console.log('Data shows... ', data);
+                spfNavBarService.update(
+                    'New Challenge Details', [{
+                        title: 'Events',
+                        url: `#${urlFor('events')}`
+                    }, {
+                        title: this.event.title,
+                        url: `#${urlFor('oneEvent', {eventId: this.event.$id})}`
+                    }, {
+                        title: 'Challenges',
+                        url: `#${urlFor('editEvent', {eventId: this.event.$id})}`
+                    }]
+                );
+                console.log(data)
+                eventService.set(data);
 
-      console.log("location is at ", location);
-      $location.path(location);
+                console.log("location is at ", location);
+                $location.path(location);
 
-    }else{
-      self.savingTask = true;
-      clmDataStore.events.updateTask(event.$id, taskId, copy).then(function() {
-        if (
-            (isOpen && task.openedAt) ||
-            (!isOpen && task.closedAt)
-        ) {
-          return;
-        } else if (isOpen) {
-          return clmDataStore.events.openTask(event.$id, taskId);
-        }
+            } else {
+                self.savingTask = true;
+                clmDataStore.events.updateTask(event.$id, taskId, copy).then(function () {
+                    if (
+                        (isOpen && task.openedAt) ||
+                        (!isOpen && task.closedAt)
+                    ) {
+                        return;
+                    } else if (isOpen) {
+                        return clmDataStore.events.openTask(event.$id, taskId);
+                    }
 
-                return clmDataStore.events.closeTask(event.$id, taskId);
-            }).then(function () {
-                spfAlert.success('Task saved');
-            }).catch(function () {
-                spfAlert.error('Failed to save the task.');
-            }).finally(function () {
-                self.savingTask = false;
-            });
-        }
+                    return clmDataStore.events.closeTask(event.$id, taskId);
+                }).then(function () {
+                    spfAlert.success('Task saved');
+                }).catch(function () {
+                    spfAlert.error('Failed to save the task.');
+                }).finally(function () {
+                    self.savingTask = false;
+                });
+            }
 
-    };
+        };
 
-    // this.saveTask = function(event, taskId, task, taskType, isOpen) {
-    //   var copy = spfFirebase.cleanObj(task);
-    //
-    //   if (taskType === 'linkPattern') {
-    //     delete copy.badge;
-    //     delete copy.serviceId;
-    //     delete copy.singPathProblem;
-    //   } else if (copy.serviceId === 'singPath') {
-    //     delete copy.badge;
-    //     if (copy.singPathProblem) {
-    //       copy.singPathProblem.path = spfFirebase.cleanObj(task.singPathProblem.path);
-    //       copy.singPathProblem.level = spfFirebase.cleanObj(task.singPathProblem.level);
-    //       copy.singPathProblem.problem = spfFirebase.cleanObj(task.singPathProblem.problem);
-    //     }
-    //   } else {
-    //     delete copy.singPathProblem;
-    //     copy.badge = spfFirebase.cleanObj(task.badge);
-    //   }
-    //
-    //   if (!copy.link) {
-    //     // delete empty link. Can't be empty string
-    //     delete copy.link;
-    //   }
-    //
-    //   self.savingTask = true;
-    //   clmDataStore.events.updateTask(event.$id, taskId, copy).then(function() {
-    //     if (
-    //       (isOpen && task.openedAt) ||
-    //       (!isOpen && task.closedAt)
-    //     ) {
-    //       return;
-    //     } else if (isOpen) {
-    //       return clmDataStore.events.openTask(event.$id, taskId);
-    //     }
-    //
-    //     return clmDataStore.events.closeTask(event.$id, taskId);
-    //   }).then(function() {
-    //     spfAlert.success('Task saved');
-    //   }).catch(function() {
-    //     spfAlert.error('Failed to save the task.');
-    //   }).finally(function() {
-    //     self.savingTask = false;
-    //   });
-    // };
-}
+        // this.saveTask = function(event, taskId, task, taskType, isOpen) {
+        //   var copy = spfFirebase.cleanObj(task);
+        //
+        //   if (taskType === 'linkPattern') {
+        //     delete copy.badge;
+        //     delete copy.serviceId;
+        //     delete copy.singPathProblem;
+        //   } else if (copy.serviceId === 'singPath') {
+        //     delete copy.badge;
+        //     if (copy.singPathProblem) {
+        //       copy.singPathProblem.path = spfFirebase.cleanObj(task.singPathProblem.path);
+        //       copy.singPathProblem.level = spfFirebase.cleanObj(task.singPathProblem.level);
+        //       copy.singPathProblem.problem = spfFirebase.cleanObj(task.singPathProblem.problem);
+        //     }
+        //   } else {
+        //     delete copy.singPathProblem;
+        //     copy.badge = spfFirebase.cleanObj(task.badge);
+        //   }
+        //
+        //   if (!copy.link) {
+        //     // delete empty link. Can't be empty string
+        //     delete copy.link;
+        //   }
+        //
+        //   self.savingTask = true;
+        //   clmDataStore.events.updateTask(event.$id, taskId, copy).then(function() {
+        //     if (
+        //       (isOpen && task.openedAt) ||
+        //       (!isOpen && task.closedAt)
+        //     ) {
+        //       return;
+        //     } else if (isOpen) {
+        //       return clmDataStore.events.openTask(event.$id, taskId);
+        //     }
+        //
+        //     return clmDataStore.events.closeTask(event.$id, taskId);
+        //   }).then(function() {
+        //     spfAlert.success('Task saved');
+        //   }).catch(function() {
+        //     spfAlert.error('Failed to save the task.');
+        //   }).finally(function() {
+        //     self.savingTask = false;
+        //   });
+        // };
+    }
 }
 EditEventTaskCtrl.$inject = [
     'initialData',
@@ -1546,7 +1569,6 @@ EditEventTaskCtrl.$inject = [
     '$location',
     'eventService'
 ];
-
 
 
 /**
@@ -1571,13 +1593,11 @@ export function clmEventTableFactory() {
     };
 }
 
-function ClmEventTableCtrl(
-  $scope, $q, $log, $mdDialog, $document,
-  urlFor, spfAlert, clmServicesUrl, clmDataStore, clmPagerOption,
-  eventService, $location, routes, $route
-) {
-  var self = this;
-  var unwatchers = [];
+function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
+                           urlFor, spfAlert, clmServicesUrl, clmDataStore, clmPagerOption,
+                           eventService, $location, routes, $route) {
+    var self = this;
+    var unwatchers = [];
 
     this.currentUserParticipant = undefined;
     this.participantsView = [];
@@ -1858,6 +1878,93 @@ function ClmEventTableCtrl(
         );
     };
 
+    this.editProfileInfo = function (eventId, taskId, task, participant) {
+        console.log(task);
+        $mdDialog.show({
+            clickOutsideToClose: true,
+            parent: $document.body,
+            template: editProfileTmpl,
+            controller: DialogController,
+            controllerAs: 'ctrl'
+        });
+
+        function DialogController() {
+            var self = this;
+            this.task = task;
+            this.yearOpts = ['born before 1990'];
+            this.userData = {};
+            for(var y = 1991; y <= 2011; y++) {
+                self.yearOpts.push(y);
+            }
+
+            clmDataStore.getProfileData(participant.$id).then(function (promise) {
+                return promise;
+            }).then(function (data) {
+                self.participantInfo = data;
+                console.log(self.participantInfo);
+                if(self.participantInfo.yearOfBirth) {
+                    self.userData.yearOfBirth = self.participantInfo.yearOfBirth;
+                }
+                if(self.participantInfo.school) {
+                    self.userData.school = self.participantInfo.school;
+                }
+            }).catch(function (err) {
+                $log.error(err);
+                return err;
+            });
+
+            clmDataStore.getSchools().then(function (promise) {
+                return promise;
+            }).then(function (data) {
+                self.schools = data;
+            }).catch(function (err) {
+                $log.error(err);
+                return err;
+            });
+
+            this.camelText = function (input) {
+                return input.replace(/(?:^\w|[A-Z]|\b\w)/g, function(letter, index) {
+                    return index == 0 ? letter.toLowerCase() : letter.toUpperCase();
+                }).replace(/\s+/g, '');
+            };
+
+            this.save = function () {
+                self.userData.displayName = self.participantInfo.displayName;
+                self.userData.gravatar = self.participantInfo.gravatar;
+
+                if(!self.userData.yearOfBirth) {
+                    self.userData.yearOfBirth = self.participantInfo.yearOfBirth;
+                }
+                if(!self.userData.school) {
+                    self.userData.school = self.participantInfo.school;
+                }
+                // if(!self.userData.country) {
+                //     self.userData.country = self.participantInfo.country;
+                // }
+
+                self.userData.publicId = participant.$id;
+                clmDataStore.events.submitSolution(eventId, taskId, participant.$id, "Responded").then(function () {
+
+                }).catch(function (err) {
+                    $log.error(err);
+                    spfAlert.error('Failed to register submission.');
+                    return err;
+                });
+                clmDataStore.updateProfile(self.userData).then(function () {
+                    $mdDialog.hide();
+                    spfAlert.success('Profile updated.');
+                }).catch(function (err) {
+                    $log.error(err);
+                    spfAlert.error('Failed to update your profile.');
+                    return err;
+                });
+            };
+
+            this.cancel = function () {
+                $mdDialog.hide();
+            };
+        }
+    };
 
     this.promptForLink = function (eventId, taskId, task, participant, userSolution) {
         $mdDialog.show({
@@ -1885,6 +1992,12 @@ function ClmEventTableCtrl(
                     spfAlert.error('Failed to save the link.');
                     return err;
                 });
+                clmDataStore.logging.inputLog({
+                    action: "submitLinkResponse",
+                    publicId: self.profile.$id,
+                    eventId: self.event.$id,
+                    timestamp: Firebase.ServerValue.TIMESTAMP
+                });
             };
 
             this.cancel = function () {
@@ -1893,13 +2006,12 @@ function ClmEventTableCtrl(
         }
     };
 
-    //////////////added survey/////////////////////
     this.promptForSurvey = function (eventId, taskId, task, participant, userSolution) {
-        //mdDialog opens the dialog over the app aka modal popup
+
         console.log("prompt for survey task : ", task.survey);
 
         if (task.survey === "School engagement scale") {
-            //TODO: implement config route to route to survey form template
+
             $location.path('/events/' + eventId + '/' + taskId + '/' + 'survey1' + '/' + task.survey);
 
         }
@@ -1942,6 +2054,12 @@ function ClmEventTableCtrl(
                     $log.error(err);
                     spfAlert.error('Failed to save your response.');
                     return err;
+                });
+                clmDataStore.logging.inputLog({
+                    action: "submitTextResponse",
+                    publicId: self.profile.$id,
+                    eventId: self.event.$id,
+                    timestamp: Firebase.ServerValue.TIMESTAMP
                 });
             };
 
@@ -1998,6 +2116,12 @@ function ClmEventTableCtrl(
                     $log.error(err);
                     spfAlert.error('Failed to save your response.');
                     return err;
+                });
+                clmDataStore.logging.inputLog({
+                    action: "submitCodeResponse",
+                    publicId: self.profile.$id,
+                    eventId: self.event.$id,
+                    timestamp: Firebase.ServerValue.TIMESTAMP
                 });
             };
 
@@ -2131,7 +2255,7 @@ function addSurveyEventTaskCtrlInitialData(spfFirebase, $q, $route, spfAuthData,
 
     var errNoEvent = new Error('Event not found-1');
     var eventId = $route.current.params.eventId;
-    console.log("this event is ", $route.current.params);
+
     var profilePromise = clmDataStore.currentUserProfile().catch(noop);
 
     var eventPromise = clmDataStore.events.get(eventId).then(function (event) {
@@ -2149,7 +2273,6 @@ function addSurveyEventTaskCtrlInitialData(spfFirebase, $q, $route, spfAuthData,
     });
 
 
-    //lky newly added codes
     //returns a promise object from firebase
     var surveyPromise = spfFirebase.loadedArray(['classMentors/surveyTemplate']);
     console.log("this motivated promise is ", surveyPromise);
@@ -2194,12 +2317,20 @@ function addSurveyEventTaskCtrlInitialData(spfFirebase, $q, $route, spfAuthData,
 
 }
 
-addSurveyEventTaskCtrlInitialData.$inject = ['spfFirebase', '$q', '$route', 'spfAuthData', 'clmDataStore'];
+addSurveyEventTaskCtrlInitialData.$inject = [
+    'spfFirebase',
+    '$q',
+    '$route',
+    'spfAuthData',
+    'clmDataStore'];
 
 //TODO: include controller for the survey
 function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $routeParams, clmDataStore, spfFirebase, clmPagerOption, spfAlert, $log) {
     this.pagerOpts = clmPagerOption();
+
     var self = this;
+
+
     this.questions = initialData.survey2;
     this.ratingOptions = [
         {id: 1},
@@ -2300,21 +2431,21 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
 
         //this.selectEthnicity = [];
 
-        this.eduDissResp = [];
-
+        this.eduDissResp = {};
+        this.questionJson = {};
+        //console.log("initial data before: ", initialData.survey2[0]);
         for (var i = 1; i < Object.keys(initialData.survey2[0]).length - 1; i++) {
 
-            this.eduDissResp.push({[initialData.survey2[0][i]['title']]: []});
-            for (var k = 1; k <= Object.keys(initialData.survey2[0][i]).length - 1; k++) {
-                //console.log("this initial data is::", initialData.survey2[0][i][k]);
-                this.eduDissResp[i-1][initialData.survey2[0][i]['title']].push({[k]:0});
+            this.eduDissResp[initialData.survey2[0][i]['title']] = {};
 
+            for (var k = 0; k < Object.keys(initialData.survey2[0][i]).length - 1; k++) {
+                this.eduDissResp[initialData.survey2[0][i]['title']][k + 1] = 0;
             }
-            //     console.log("break");
+
         }
-        console.log("test", this.eduDissResp);
-        // this.eduDissResp[0]['What do I think about school?'].push({[1]: 'testing'});
-        // console.log("this edudissresp is:", this.eduDissResp[0]['What do I think about school?'][0][1]);
+
+        //console.log("testing titles: ", this.eduDissResp);
+
 
         //this.eduDissResp[0]['What do I think about school?']=({'1' : 'trying only'});
         //console.log("these titles: ", this.eduDissResp[0]['What do I think about school?'][1]);
@@ -2453,16 +2584,22 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             }
         }
         if (!allResponses) {
-            spfAlert.warning('Failed to save the responses.');
+            spfAlert.warning('Failed to save the responses. Please answer all questions.');
         } else {
             var taskId = $routeParams.taskId;
             var eventId = initialData.event.$id;
             var userId = initialData.currentUser.publicId;
             var surveyType = $routeParams.surveyTask;
+            var completed = true;
+
+            initialData.progress[userId][taskId] = {completed: completed};
+
             spfAlert.success('Response has been submitted. Thank you for doing this survey!');
             clmDataStore.events.saveSurveyResponseOnSubmit(taskId, eventId, userId, surveyType, schEngageResp);
             clmDataStore.events.submitSolution(eventId, taskId, userId, "Completed");
-            console.log(eventId, taskId, userId);
+            clmDataStore.events.setProgress(eventId, taskId, userId, initialData.progress);
+
+            //console.log(eventId, taskId, userId);
             $location.path(urlFor('oneEvent', {eventId: self.event.$id}));
 
         }
@@ -2474,7 +2611,6 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
         var allResponses = true;
         console.log("trying ", motiResp);
         for (var i = 1; i < motiResp.length; i++) {
-            //console.log("this motiresp:", motiResp[i]);
             if (motiResp[i][i + 1] === 0) {
                 allResponses = false;
                 break;
@@ -2487,21 +2623,84 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             var eventId = initialData.event.$id;
             var userId = initialData.currentUser.publicId;
             var surveyType = $routeParams.surveyTask;
+            var completed = true;
+
+            initialData.progress[userId][taskId] = {completed: completed};
+
             spfAlert.success('Response has been submitted. Thank you for doing this survey!');
             clmDataStore.events.saveSurveyResponseOnSubmit(taskId, eventId, userId, surveyType, motiResp);
+            clmDataStore.events.submitSolution(eventId, taskId, userId, "Completed");
+            clmDataStore.events.setProgress(eventId, taskId, userId, initialData.progress);
+
             $location.path(urlFor('oneEvent', {eventId: self.event.$id}));
 
         }
     }
 
-    this.submitEduDissResponse = function (eduDissResp) {
+    this.submitEduDissResponse = function (eduDissResp, selectedFamily, selectedRaceEthnicity) {
+
+        //add checkbox values into json
+        var allResponses = true;
+        for (var title in eduDissResp) {
+            if (title == "Tell us about YOURSELF:") {
+                eduDissResp[title][2] = selectedFamily;
+                eduDissResp[title][5] = selectedRaceEthnicity;
+            }else if (title == "What do you like BEST about Learning Gardens?"){
+                //ignore
+            }
+            else {
+
+                for (var qn in eduDissResp[title]) {
+                    if (eduDissResp[title][qn] == 0) {
+                        allResponses = false;
+                        break;
+                    }
+                }
+            }
+            if (!allResponses) {
+                break;
+            }
+        }
         console.log("edudissresp values: ", eduDissResp);
+        if (!allResponses) {
+            spfAlert.warning('Failed to save the responses.');
+        } else {
+
+            //retrieving all required variables to be added into firebase
+            var taskId = $routeParams.taskId;
+            var eventId = initialData.event.$id;
+            var userId = initialData.currentUser.publicId;
+            var surveyType = $routeParams.surveyTask;
+            var completed = true;
+
+            initialData.progress[userId][taskId] = {completed: completed};
+
+
+            spfAlert.success('Response has been submitted. Thank you for doing this survey!');
+            //add into firebase
+            clmDataStore.events.saveSurveyResponseOnSubmit(taskId, eventId, userId, surveyType, eduDissResp);
+            clmDataStore.events.submitSolution(eventId, taskId, userId, "Completed");
+            clmDataStore.events.setProgress(eventId, taskId, userId, initialData.progress);
+
+            $location.path(urlFor('oneEvent', {eventId: self.event.$id}));
+        }
     };
 
 
 };
 
-SurveyFormFillCtrl.$inject = ['spfNavBarService', '$location', 'urlFor', 'initialData', '$routeParams', 'clmDataStore', 'spfFirebase', 'clmPagerOption', 'spfAlert', '$log'];
+SurveyFormFillCtrl.$inject = [
+    'spfNavBarService',
+    '$location',
+    'urlFor',
+    'initialData',
+    '$routeParams',
+    'clmDataStore',
+    'spfFirebase',
+    'clmPagerOption',
+    'spfAlert',
+    '$log'
+];
 
 export function clmEventRankTableFactory() {
     return {
@@ -2510,7 +2709,8 @@ export function clmEventRankTableFactory() {
         bindToController: true,
         scope: {
             event: '=',
-            profile: '='
+            profile: '=',
+            assistants: '='
         },
         controller: ClmEventRankTableCtrl,
         controllerAs: 'ctrl'
@@ -2551,6 +2751,15 @@ function ClmEventRankTableCtrl($scope, $log, spfFirebase, clmDataStore, clmPager
     // };
 
     // this.rankingView = [];
+
+    var updateLog = function (actionObj) {
+        actionObj.publicId = self.profile.$id;
+        actionObj.timestamp = Firebase.ServerValue.TIMESTAMP;
+        //console.log(actionObj);
+        // spfFirebase.push(['classMentors/userActions'], actionObj);
+        clmDataStore.logging.inputLog(actionObj);
+        // spfFirebase.push(['queue/tasks'], { id: profileId, service: "freeCodeCamp" });
+    };
 
     // June 2016
     this.rankingView2 = []; // 2016 update to new cm-worker
@@ -2620,7 +2829,11 @@ function ClmEventRankTableCtrl($scope, $log, spfFirebase, clmDataStore, clmPager
             temp.displayName = result.user.displayName;
             temp.name = result.user.displayName;
             temp.user = result.user;
-            parentScope.rankingView2.push(temp);
+            // console.log(parentScope.event);
+            // console.log(parentScope.profile);
+            if(parentScope.assistants.indexOf(result.$id) < 0 && parentScope.event.owner.publicId !== result.$id) {
+                parentScope.rankingView2.push(temp);
+            }
         }, function (reason) {
             console.log(`Failed ${reason}`);
         });
@@ -2635,6 +2848,7 @@ function ClmEventRankTableCtrl($scope, $log, spfFirebase, clmDataStore, clmPager
 
     this.updateAllParticipantUserProfiles = function () {
         // console.log("Requesting all users in ranking to be updated.");
+        updateLog({action: "updateAllParticipantUserProfiles", "eventId": self.event.$id});
         // For each user in the ranking
         for (var i = 0; i < self.rankingView2.length; i++) {
             var publicId = self.rankingView2[i].$id;
@@ -2807,6 +3021,8 @@ function ClmEventRankTableCtrl($scope, $log, spfFirebase, clmDataStore, clmPager
             });
             self.orderOpts = self.orderOpts.slice(0, 2);
         }
+        
+        updateLog({action: "eventRankingOrderby", "eventId": self.event.$id, "key":key, "reversed":self.orderOpts[0].reversed});
 
         // TODO: Revisit when 2nd order ranking becomes a priority.
         // There was an issue with getting both strings and numbers to rank properly.

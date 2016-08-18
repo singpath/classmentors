@@ -88,6 +88,16 @@
       }
     },
     "classMentors": {
+      "userActions":{
+        "$userActions":{
+          ".write":"newData.hasChildren(['publicId','action','timestamp'])",
+          "publicId":{
+            ".validate":"newData.isString() && root.child('auth/publicIds').child(newData.val()).val() === auth.uid"
+          }
+        },
+        ".write": "auth !== null",
+        ".read": "auth !== null && root.child('classMentors/admins').child(auth.uid).val() === true"
+      },
       "surveyTemplate":{
         ".read": true,
         ".write": true
@@ -421,7 +431,7 @@
           },
           ".indexOn": "archived",
           ".read": "auth !== null && (\n  root.child('classMentors/eventApplications/').child($eventId).child(auth.uid).exists()\n  || root.child('classMentors/events').child($eventId).child('owner/publicId').val() === root.child('auth/users').child(auth.uid).child('publicId').val()\n  || root.child('classMentors/admins').child(auth.uid).val() === true\n)",
-          ".write": "auth !== null && (\n  root.child('classMentors/events').child($eventId).child('owner/publicId').val() === root.child('auth/users').child(auth.uid).child('publicId').val()\n  || root.child('classMentors/admins').child(auth.uid).val() === true\n)"
+          ".write": "auth !== null && (\n  root.child('classMentors/events').child($eventId).child('owner/publicId').val() === root.child('auth/users').child(auth.uid).child('publicId').val()\n  || root.child('classMentors/admins').child(auth.uid).val() === true\n || root.child('classMentors/events').child($eventId).child('assistants').child(root.child('auth/users').child(auth.uid).child('publicId').val()).exists())"
         }
       },
       "events": {
@@ -735,10 +745,10 @@
             "country": {
               ".validate": "newData.hasChildren(['code', 'name'])",
               "code": {
-                ".validate": "newData.val() === root.child('auth/users').child(auth.uid).child('country/code').val()"
+                ".validate": true
               },
               "name": {
-                ".validate": "newData.val() === root.child('auth/users').child(auth.uid).child('country/name').val()"
+                ".validate": true
               }
             },
             "displayName": {
@@ -756,17 +766,17 @@
             "school": {
               ".validate": "newData.hasChildren(['name', 'type'])",
               "iconUrl": {
-                ".validate": "newData.val() === root.child('auth/users').child(auth.uid).child('school/iconUrl').val()"
+                ".validate": true
               },
               "name": {
-                ".validate": "newData.val() === root.child('auth/users').child(auth.uid).child('school/name').val()"
+                ".validate": true
               },
               "type": {
-                ".validate": "newData.val() === root.child('auth/users').child(auth.uid).child('school/type').val()"
+                ".validate": true
               }
             },
             "yearOfBirth": {
-              ".validate": "newData.val() === root.child('auth/users').child(auth.uid).child('yearOfBirth').val()"
+              ".validate": true
             }
           },
           ".write": "auth !== null && root.child('auth/publicIds/' + $publicId).val() === auth.uid"
