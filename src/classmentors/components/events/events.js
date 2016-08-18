@@ -2328,6 +2328,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
 
 
     this.questions = initialData.survey2;
+    console.log("testing for questions:: ", initialData.survey2);
     this.ratingOptions = [
         {id: 1},
         {id: 2},
@@ -2641,7 +2642,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             if (title == "Tell us about YOURSELF:") {
                 eduDissResp[title][2] = selectedFamily;
                 eduDissResp[title][5] = selectedRaceEthnicity;
-            }else if (title == "What do you like BEST about Learning Gardens?"){
+            }else if (title == "What do you like BEST in this class?"){
                 //ignore
             }
             else {
