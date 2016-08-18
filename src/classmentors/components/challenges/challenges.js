@@ -75,6 +75,7 @@ editMCQInitialData.$inject = [
 ];
 
 // Initial data for starting an MCQ
+//todo: tidy up the codes; should be using promises to access some objects as well as validation
 function startMCQInitialData($q, spfAuthData, eventService, clmDataStore){
     //promise object
    // var currentUser = spfAuthData.user().catch(noop);
