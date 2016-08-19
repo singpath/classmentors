@@ -22,7 +22,7 @@ describe('icon sets', function() {
     });
 
     it('should register the default icon set', function() {
-      expect(mdIconProvider.defaultIconSet).to.have.been.calledOnce;
+      expect(mdIconProvider.defaultIconSet).to.have.been.calledOnce();
       expect(mdIconProvider.defaultIconSet).to.have.been.calledWithExactly(
         'icons/svgdefs.svg', 1024
       );

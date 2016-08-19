@@ -1,3 +1,10 @@
+/**
+ * singpath-core/services/index.js - register spfShared services.
+ *
+ * TODO: refactor datastore.
+ * TODO: refactor firebase.
+ */
+
 import {spfShared} from 'singpath-core/module.js';
 
 import './countries.js';
@@ -5,7 +12,6 @@ import {config as configIcons, run as cacheIcon} from './icons/icons.js';
 import * as crypto from './crypto.js';
 import * as routes from './routes.js';
 
-// TODO: refactor
 import './datastore.js';
 import './firebase.js';
 

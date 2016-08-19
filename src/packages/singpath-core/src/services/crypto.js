@@ -25,6 +25,8 @@ class PasswordService {
    * The options will include the hashing algorithm name, the
    * salt an other parameters.
    *
+   * @param  {string} password password to hash
+   * @return {{value: string, options: {salt: string, iterations: number, keySize: number, hasher: string}}}
    */
   newHash(password) {
     const salt = random(this.settings.saltSize);
@@ -51,13 +53,19 @@ class PasswordService {
   * hashing options.
   *
   * The salt should be hex encoded.
-  */
+  *
+   * @param  {string} password password to hash.
+   * @param  {string} hexSalt  hash salt.
+   * @param  {object} options  hash options
+   * @return {string}
+   */
   fromSalt(password, hexSalt, options) {
     const salt = hex.parse(hexSalt);
-    const keySize = options.keySize || this.settings.keySize;
-    const iterations = options.iterations || this.settings.iterations;
-    const hasher = CryptoJS.algo[options.prf || prf];
-    const hash = pbkdf2(password, salt, {keySize, iterations, hasher});
+    const hash = pbkdf2(password, salt, {
+      keySize: options.keySize || this.settings.keySize,
+      iterations: options.iterations || this.settings.iterations,
+      hasher: CryptoJS.algo[options.prf || prf]
+    });
 
     return hex.stringify(hash);
   }
@@ -83,7 +91,7 @@ export class Service {
    *  const hash = spfCrypto.md5();
    *  const hex = hash.toString();
    *
-   * @param  {string} message
+   * @param  {string} message message to hash.
    * @return {object}
    */
   md5(message) {

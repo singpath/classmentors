@@ -15,7 +15,7 @@
     "babel-eslint": "^6.0.4",
     "coveralls": "^2.11.9",
     "eslint": "^2.13.1",
-    "eslint-config-singpath": "0.0.3",
+    "eslint-config-singpath": "0.0.4",
     "eslint-plugin-babel": "^3.2.0",
     "eslint-plugin-html": "^1.5.1",
     "http-server": "^0.9.0",
@@ -30,7 +30,9 @@
   "jspm": {
     "name": "singpath-core",
     "main": "singpath-core.js",
-    "dependencies": {},
+    "dependencies": {
+      "dirty-chai": "npm:dirty-chai@^1.2.2"
+    },
     "devDependencies": {
       "plugin-babel": "npm:systemjs-plugin-babel@^0.0.11"
     },
@@ -47,12 +49,20 @@
       "buffer": "github:jspm/nodelibs-buffer@^0.2.0-alpha",
       "chai": "npm:chai@^3.5.0",
       "child_process": "github:jspm/nodelibs-child_process@^0.2.0-alpha",
+      "constants": "github:jspm/nodelibs-constants@^0.2.0-alpha",
+      "crypto": "github:jspm/nodelibs-crypto@^0.2.0-alpha",
       "cryptojs": "github:sytelus/cryptojs@^3.1.2",
       "css": "github:systemjs/plugin-css@^0.1.22",
+      "events": "github:jspm/nodelibs-events@^0.2.0-alpha",
       "firebase": "github:firebase/firebase-bower@^2.4.1",
+      "fs": "github:jspm/nodelibs-fs@^0.2.0-alpha",
+      "os": "github:jspm/nodelibs-os@^0.2.0-alpha",
+      "path": "github:jspm/nodelibs-path@^0.2.0-alpha",
       "process": "github:jspm/nodelibs-process@^0.2.0-alpha",
       "sinon": "npm:sinon@^1.17.4",
       "sinon-chai": "npm:sinon-chai@^2.8.0",
+      "stream": "github:jspm/nodelibs-stream@^0.2.0-alpha",
+      "string_decoder": "github:jspm/nodelibs-string_decoder@^0.2.0-alpha",
       "text": "github:systemjs/plugin-text@^0.0.8",
       "util": "github:jspm/nodelibs-util@^0.2.0-alpha",
       "vm": "github:jspm/nodelibs-vm@^0.2.0-alpha"

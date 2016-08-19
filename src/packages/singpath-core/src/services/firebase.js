@@ -1,3 +1,4 @@
+/* eslint valid-jsdoc: "off", newline-after-var: "off" */
 import angular from 'angular';
 import Firebase from 'firebase';
 import {spfShared} from 'singpath-core/module.js';

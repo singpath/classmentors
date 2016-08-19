@@ -1,3 +1,5 @@
+/* global document */
+
 import angular from 'angular';
 import {module as spfShared} from 'singpath-core';
 

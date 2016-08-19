@@ -16,6 +16,7 @@ export function urlForFactory(routes) {
 
   return function(name, params) {
     var fn = routeFns[name] || routeFns.home;
+
     return fn(params);
   };
 }
@@ -25,6 +26,7 @@ urlForFactory.$inject = ['routes'];
 export function urlForFilterFactory(urlFor) {
   return function urlForFilter(name, params) {
     var url = urlFor(name, params);
+
     return url;
   };
 }

@@ -76,7 +76,7 @@ spfShared.directive('spfUniqPublicId', [
           }
           return spfAuthData.isPublicIdAvailable(viewValue).then(function(available) {
             if (!available) {
-              return $q.reject(new Error(viewValue + ' is already taken.'));
+              return $q.reject(new Error(`${viewValue} is already taken.`));
             }
             return true;
           });

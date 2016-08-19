@@ -14,26 +14,25 @@ spfShared.directive('spfEditor', [
     var editorIds = 1;
 
     var languageToMode = {
-      'angularjs': 'html',
-      'python': 'python',
-      'javascript': 'javascript',
-      'java': 'java'
+      angularjs: 'html',
+      python: 'python',
+      javascript: 'javascript',
+      java: 'java'
     };
 
     return {
       restrict: 'A',
       require: 'ngModel',
       link: function spfAceLink(scope, elm, attrs, ngModel) {
-        var editorId = 'spf-editor-' + editorIds++;
-        var editor;
-        var session;
+        var editorId = `spf-editor-${editorIds++}`;
+        var editor, session;
         var render = ngModel.$render || angular.noop;
         var container = elm.parent();
         var label = container.find('label');
         var watchers = [];
 
         // Setup DOM
-        elm.after('<div class="spf-ace-editor" id="' + editorId + '"/>');
+        elm.after(`<div class="spf-ace-editor" id="${editorId}"/>`);
         editor = ace.edit(elm.next()[0]);
         session = editor.getSession();
         elm.css('display', 'none');
@@ -86,15 +85,16 @@ spfShared.directive('spfEditor', [
 
           mode = languageToMode[value];
           if (!mode) {
-            $log.error('No mode for ' + value);
+            $log.error(`No mode for ${value}`);
             return;
           }
 
-          session.setMode('ace/mode/' + mode);
+          session.setMode(`ace/mode/${mode}`);
         }));
 
         watchers.push(attrs.$observe('spfReadonly', function(value) {
           var isReadOnly = scope.$eval(value);
+
           editor.setReadOnly(isReadOnly);
         }));
 
@@ -116,8 +116,8 @@ spfShared.directive('spfEditor', [
 
         // Decorate container with input state
         ['pristine', 'valid', 'invalid'].map(function(state) {
-          var attrName = '$' + state;
-          var className = 'is-' + state;
+          var attrName = `$${state}`;
+          var className = `is-${state}`;
 
           watchers.push(scope.$watch(function() {
             return ngModel[attrName];

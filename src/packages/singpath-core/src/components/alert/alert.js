@@ -2,6 +2,29 @@ import {spfShared} from 'singpath-core/module.js';
 import tmpl from './alert-view-toaster.html!text';
 import './alert.css!text';
 
+spfShared.factory('spfAlert', spfAlertFactory);
+
+function SpfAlertCtrl($mdToast, notifications, toastOptions) {
+  var self = this;
+
+  this.notifications = notifications;
+
+  this.prev = function() {
+    if (self.notifications && self.notifications.length > 0) {
+      self.notifications.splice(0, 1);
+      $mdToast.show(toastOptions);
+    }
+  };
+
+  this.close = function() {
+    if (self.notifications && self.notifications.length > 0) {
+      self.notifications.splice(0);
+      $mdToast.hide();
+    }
+  };
+}
+SpfAlertCtrl.$inject = ['$mdToast', 'notifications', 'toastOptions'];
+
 /**
  * Service to show notification m.
  *
@@ -15,66 +38,42 @@ import './alert.css!text';
  * `spfAlert.success`, `spfAlert.info`, `spfAlert.warning`, `spfAlert.error`
  * and `spfAlert.danger` are shortcut for the spfAlert function.
  *
+ * @param  {function} $q       Angular Promise factory.
+ * @param  {object}   $mdToast ngMaterial mdToast service.
+ * @return {function}
  */
-spfShared.factory('spfAlert', [
-  '$q',
-  '$mdToast',
-  function spfAlertFactory($q, $mdToast) {
-    var notifications = [];
-    var options = {
-      hideDelay: 5000,
-      controller: 'SpfAlertCtrl',
-      controllerAs: 'ctrl',
-      parent: '.main-view',
-      position: 'top left right',
-      template: tmpl,
-      locals: {notifications: notifications}
-    };
-    options.locals.toastOptions = options;
+function spfAlertFactory($q, $mdToast) {
+  var notifications = [];
+  var options = {
+    hideDelay: 5000,
+    controller: SpfAlertCtrl,
+    controllerAs: 'ctrl',
+    parent: '.main-view',
+    position: 'top left right',
+    template: tmpl,
+    locals: {notifications: notifications}
+  };
 
-    function newNotification(nType, message) {
-      return {
-        notificationType: nType || 'success',
-        message: message
-      };
-    }
+  options.locals.toastOptions = options;
 
-    var spfAlert = function(nType, message) {
-      notifications.splice(0, 0, newNotification(nType, message));
-      $mdToast.show(options);
-    };
-
-    spfAlert.success = spfAlert.bind(null, 'success');
-    spfAlert.info = spfAlert.bind(null, 'info');
-    spfAlert.warning = spfAlert.bind(null, 'warning');
-    spfAlert.danger = spfAlert.bind(null, 'danger');
-    spfAlert.error = spfAlert.bind(null, 'error');
-
-    return spfAlert;
-  }
-]);
-
-spfShared.controller('SpfAlertCtrl', [
-  '$mdToast',
-  'notifications',
-  'toastOptions',
-  function SpfAlertCtrl($mdToast, notifications, toastOptions) {
-    var self = this;
-
-    this.notifications = notifications;
-
-    this.prev = function() {
-      if (self.notifications && self.notifications.length > 0) {
-        self.notifications.splice(0, 1);
-        $mdToast.show(toastOptions);
-      }
-    };
-
-    this.close = function() {
-      if (self.notifications && self.notifications.length > 0) {
-        self.notifications.splice(0);
-        $mdToast.hide();
-      }
+  function newNotification(nType, message) {
+    return {
+      notificationType: nType || 'success',
+      message: message
     };
   }
-]);
+
+  function spfAlert(nType, message) {
+    notifications.splice(0, 0, newNotification(nType, message));
+    $mdToast.show(options);
+  }
+
+  spfAlert.success = spfAlert.bind(null, 'success');
+  spfAlert.info = spfAlert.bind(null, 'info');
+  spfAlert.warning = spfAlert.bind(null, 'warning');
+  spfAlert.danger = spfAlert.bind(null, 'danger');
+  spfAlert.error = spfAlert.bind(null, 'error');
+
+  return spfAlert;
+}
+spfAlertFactory.$inject = ['$q', '$mdToast'];
