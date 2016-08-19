@@ -1,5 +1,3 @@
-'use strict';
-
 import {spfShared} from '../../module.js';
 import tmpl from './alert-view-toaster.html!text';
 import './alert.css!text';

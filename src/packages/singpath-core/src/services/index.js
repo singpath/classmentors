@@ -1,5 +1,3 @@
-'use strict';
-
 import {spfShared} from '../module.js';
 
 import './countries.js';

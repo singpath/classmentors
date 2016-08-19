@@ -1,5 +1,3 @@
-'use strict';
-
 import angular from 'angular';
 import {spfShared} from '../../module.js';
 import tmpl from './navbar-view.html!text';

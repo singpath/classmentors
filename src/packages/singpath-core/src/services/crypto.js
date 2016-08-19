@@ -1,5 +1,3 @@
-'use strict';
-
 import CryptoJS from 'cryptojs';
 import 'cryptojs/md5.js';
 import 'cryptojs/pbkdf2.js';
