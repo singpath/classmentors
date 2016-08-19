@@ -14,42 +14,48 @@
         <br>
         <md-input container flex>
 
-            <table>
-                <tr ng-repeat="question in ctrl.questionsArr">
+            <table ng-repeat="question in ctrl.questionsArr" width="100%">
+                <tr ng-class="'index-' + $index + ' ' + ($odd ? 'odd' : 'even')" style="height: 50px">
                     <!--<div  style="height: 80px">-->
-                    <td>
+                    <td style="width:50px">
                         {{question.qnid}}.
                     </td>
-                    <td>
+                    <td style="width:700px">
                         {{question.name}}
                     </td>
                     <!--ng-change="ctrl.motiResp.push(ans)"-->
-                    <td>
+                    <td align="right">
                         <md-radio-group layout="row" ng-model="ans" ng-change="ctrl.motiResp[question.qnid] = ans">
                             <div ng-repeat="ratingOption in ctrl.ratingOptions">
-                                <md-radio-button style="margin-right:20px" class="md-primary"
+                                <md-radio-button style="margin-right:60px" class="md-primary"
                                                  ng-value="ratingOption.id">
                                     {{ratingOption.id}}
                                 </md-radio-button>
                             </div>
                         </md-radio-group>
                     </td>
-                    <td>
-                        <md-button class="md-raised md-primary" data-id="{{question.qnid}}"
-                                   ng-click="ctrl.saveSurveyResponse(ans , $event, task.$id)">
-                            Save
-                        </md-button>
-                    </td>
                 </tr>
             </table>
-            <clm-pager options="ctrl.pagerOpts" class="md-padding"></clm-pager>
+            <!--<clm-pager options="ctrl.pagerOpts" class="md-padding"></clm-pager>-->
             <!--<pagination-->
             <!--ng-model="currentPage"-->
             <!--total-items="questions.length"-->
             <!--max-size="maxSize"-->
             <!--boundary-links="true">-->
             <!--</pagination>-->
-            <md-button type="submit" class="md-primary md-raised">Submit</md-button>
+            <table>
+                <tr>
+                    <td>
+                        <md-button type="submit" class="md-primary md-raised">Submit</md-button>
+                    </td>
+                    <td>
+                        <md-button ng-click="ctrl.backToChallenge()" class="md-raised md-primary" style="width: 150px;">
+                            Discard
+                        </md-button>
+                    </td>
+                </tr>
+            </table>
+
         </md-input>
 
         <!--<hr style="background: #808080; border: 0; height: 3px"/>-->

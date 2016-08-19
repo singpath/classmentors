@@ -26,7 +26,7 @@
                         <h3>Cognitive Engagement</h3>
                     </td>
                 </tr>
-                <tr>
+                <tr ng-class="'index-' + $index + ' ' + ($odd ? 'odd' : 'even')">
                     <td ng-if="key != '0'" style="width: 600px">
                         {{key}}. {{value}}
                     </td>
@@ -40,12 +40,12 @@
                             </div>
                         </md-radio-group>
                     </td>
-                    <td ng-if="key != '0'">
-                        <md-button class="md-raised md-primary" data-id="{{key}}"
-                                   ng-click="ctrl.saveSurveyResponse(ans , $event, task.$id)">
-                            Save
-                        </md-button>
-                    </td>
+                    <!--<td ng-if="key != '0'">-->
+                    <!--<md-button class="md-raised md-primary" data-id="{{key}}"-->
+                    <!--ng-click="ctrl.saveSurveyResponse(ans , $event, task.$id)">-->
+                    <!--Save-->
+                    <!--</md-button>-->
+                    <!--</td>-->
                 </tr>
 
             </table>
@@ -53,9 +53,21 @@
 
             <br>
 
-            <div>
-                <md-button type="submit" class="md-raised md-primary" style="width: 150px;">Submit</md-button>
-            </div>
+            <table>
+                <tr>
+                    <td>
+                        <md-button type="submit" class="md-raised md-primary" style="width: 150px;">Submit</md-button>
+
+                    </td>
+                    <td>
+                        <md-button ng-click="ctrl.backToChallenge()" class="md-raised md-primary" style="width: 150px;">
+                            Discard
+                        </md-button>
+                    </td>
+                </tr>
+
+            </table>
+
         </md-input>
     </form>
 </md-content>
