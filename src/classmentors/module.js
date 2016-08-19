@@ -10,7 +10,7 @@ import 'angular-route';
 // import 'd3';
 // import 'c3';
 
-import {spfShared} from 'singpath-core';
+import {module as spfShared} from 'singpath-core';
 
 const classMentors = angular.module('clm', [
   'angular-loading-bar',
