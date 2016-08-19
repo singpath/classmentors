@@ -32,3 +32,33 @@ export function urlForFilterFactory(urlFor) {
 }
 
 urlForFilterFactory.$inject = ['urlFor'];
+
+/**
+ * Listen for routing error to alert the user of the error and
+ * redirect to the default route if not is selected.
+ *
+ * No route will be selected if the user reload the page in an invalid state
+ * for her/his last route. It that case the app should redirect the user
+ * to the home route.
+ *
+ * @param  {object} $rootScope Angular root scope service.
+ * @param  {object} $location  Angular location service.
+ * @param  {object} routes     Route dictionary.
+ * @param  {object} spfAlert   singpath-core alert service
+ */
+function run($rootScope, $location, routes, spfAlert) {
+  $rootScope.$on('$routeChangeError', function(e, failedRoute, currentRoute, err) {
+    spfAlert.error(err.message || err.toString());
+
+    if (!currentRoute) {
+      $location.path(routes.home);
+    }
+  });
+}
+
+run.$inject = [
+  '$rootScope',
+  '$location',
+  'routes',
+  'spfAlert'
+];

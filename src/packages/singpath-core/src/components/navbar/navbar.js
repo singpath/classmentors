@@ -59,7 +59,7 @@ spfNavBarServiceFactory.$inject = [];
  * @param {object}   spfAuth          singpath-core authentication service.
  * @param {object}   spfNavBarService singpath-core nav bar service.
  */
-export function SpfSharedMaterialNavBarCtrl($q, $mdSidenav, spfAlert, spfAuth, spfNavBarService) {
+export function SpfSharedNavBarCtrl($q, $mdSidenav, spfAlert, spfAuth, spfNavBarService) {
   this.auth = spfAuth;
   this.currentPage = spfNavBarService;
 
@@ -78,7 +78,7 @@ export function SpfSharedMaterialNavBarCtrl($q, $mdSidenav, spfAlert, spfAuth, s
     $mdSidenav(name).toggle();
   };
 }
-SpfSharedMaterialNavBarCtrl.$inject = [
+SpfSharedNavBarCtrl.$inject = [
   '$q',
   '$mdSidenav',
   'spfAlert',
