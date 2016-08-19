@@ -56,9 +56,7 @@ spfShared.directive('spfSignForm', [
     return {
       template: tmpl,
       restrict: 'E',
-      scope: {
-        currentUser: '='
-      },
+      scope: {currentUser: '='},
       controller: 'SpfSignFormCtrl',
       controllerAs: 'ctrl'
     };

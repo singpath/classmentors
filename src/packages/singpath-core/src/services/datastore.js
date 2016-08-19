@@ -15,11 +15,10 @@ spfShared.factory('spfAuth', [
   'spfFirebaseRef',
   function($q, $route, $log, $firebaseAuth, spfFirebaseRef) {
     var auth = $firebaseAuth(spfFirebaseRef());
-    var options = {
-      scope: 'email'
-    };
+    var options = {scope: 'email'};
 
     var spfAuth = {
+
       // The current user auth data (null is not authenticated).
       user: auth.$getAuth(),
 
@@ -40,6 +39,7 @@ spfShared.factory('spfAuth', [
           self.user = user;
           return user;
         }, function(error) {
+
           // spfAlert.warning('You failed to authenticate with Google');
           if (error.code === 'TRANSPORT_UNAVAILABLE') {
             return auth.$authWithOAuthRedirect('google', options);
@@ -188,9 +188,7 @@ spfShared.factory('spfAuthData', [
           displayName: name,
           email: email,
           gravatar: gravatarBaseUrl + spfCrypto.md5(email),
-          createdAt: {
-            '.sv': 'timestamp'
-          }
+          createdAt: {'.sv': 'timestamp'}
         };
 
         return userDataObj.$save().then(function() {

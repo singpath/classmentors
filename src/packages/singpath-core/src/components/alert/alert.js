@@ -30,9 +30,7 @@ spfShared.factory('spfAlert', [
       parent: '.main-view',
       position: 'top left right',
       template: tmpl,
-      locals: {
-        notifications: notifications
-      }
+      locals: {notifications: notifications}
     };
     options.locals.toastOptions = options;
 

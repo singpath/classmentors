@@ -1,4 +1,5 @@
 import {expect} from 'chai';
+
 // import * as sinon from 'sinon';
 
 import {urlForFactory} from './routes';
