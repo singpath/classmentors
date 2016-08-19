@@ -1,21 +1,17 @@
-import angular from 'angular';
-import {spfShared} from 'singpath-core/module.js';
 import tmpl from './navbar-view.html!text';
 import './navbar.css!';
 
-spfShared.factory('spfNavBarService', spfNavBarServiceFactory);
-spfShared.controller('SpfSharedMaterialNavBarCtrl', SpfSharedMaterialNavBarCtrl);
-spfShared.run(fillCache);
+const noop = () => undefined;
 
 /**
  * Fill the template cache to the navbar template.
  *
  * @param  {object} $templateCache Angular template cache service.
  */
-function fillCache($templateCache) {
+export function initNavBar($templateCache) {
   $templateCache.put('shared/navbar-view.html', tmpl);
 }
-fillCache.$inject = ['$templateCache'];
+initNavBar.$inject = ['$templateCache'];
 
 /**
  * NavBarService factory.
@@ -24,7 +20,7 @@ fillCache.$inject = ['$templateCache'];
  *
  * @return {function}
  */
-function spfNavBarServiceFactory() {
+export function spfNavBarServiceFactory() {
   return {
     title: 'Singpath',
     section: undefined,
@@ -39,7 +35,7 @@ function spfNavBarServiceFactory() {
         this.parents = [];
       }
       this.menuItems = (menuItems || []).map(function(item) {
-        item.onClick = item.onClick || angular.noop;
+        item.onClick = item.onClick || noop;
         return item;
       });
     }
@@ -63,7 +59,7 @@ spfNavBarServiceFactory.$inject = [];
  * @param {object}   spfAuth          singpath-core authentication service.
  * @param {object}   spfNavBarService singpath-core nav bar service.
  */
-function SpfSharedMaterialNavBarCtrl($q, $mdSidenav, spfAlert, spfAuth, spfNavBarService) {
+export function SpfSharedMaterialNavBarCtrl($q, $mdSidenav, spfAlert, spfAuth, spfNavBarService) {
   this.auth = spfAuth;
   this.currentPage = spfNavBarService;
 

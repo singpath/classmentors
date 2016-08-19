@@ -1,8 +1,5 @@
-import {spfShared} from 'singpath-core/module.js';
 import tmpl from './alert-view-toaster.html!text';
 import './alert.css!text';
-
-spfShared.factory('spfAlert', spfAlertFactory);
 
 function SpfAlertCtrl($mdToast, notifications, toastOptions) {
   var self = this;
@@ -42,7 +39,7 @@ SpfAlertCtrl.$inject = ['$mdToast', 'notifications', 'toastOptions'];
  * @param  {object}   $mdToast ngMaterial mdToast service.
  * @return {function}
  */
-function spfAlertFactory($q, $mdToast) {
+export function spfAlertFactory($q, $mdToast) {
   var notifications = [];
   var options = {
     hideDelay: 5000,

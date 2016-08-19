@@ -1,10 +1,9 @@
+/**
+ * singpath-core/services/datastore.js - singpath-core services accessing data
+ * share between singpath and classmentors.
+ *
+ */
 /* eslint no-underscore-dangle: ["error", { "allow": ["_user", "_factory"] }]*/
-
-import angular from 'angular';
-import {spfShared} from 'singpath-core/module.js';
-
-spfShared.factory('spfAuth', spfAuthFactory);
-spfShared.factory('spfAuthData', spfAuthDataFactory);
 
 /**
  * Returns an object with `user` (Firebase auth user data) property,
@@ -17,7 +16,7 @@ spfShared.factory('spfAuthData', spfAuthDataFactory);
  * @param  {function} spfFirebaseRef singpath-core firebase reference factory service.
  * @return {{user: object, login: function, logout: function, onAuth: function}}
  */
-function spfAuthFactory($q, $route, $log, $firebaseAuth, spfFirebaseRef) {
+export function spfAuthFactory($q, $route, $log, $firebaseAuth, spfFirebaseRef) {
   var auth = $firebaseAuth(spfFirebaseRef());
   var options = {scope: 'email'};
 
@@ -103,7 +102,7 @@ spfAuthFactory.$inject = [
  * @param  {object}   spfCrypto   singpath-core crypto helpers service.
  * @return {{user: function, register: function, publicId: function, isPublicIdAvailable: function}}
  */
-function spfAuthDataFactory($q, $log, spfFirebase, spfAuth, spfCrypto) {
+export function spfAuthDataFactory($q, $log, spfFirebase, spfAuth, spfCrypto) {
   var userData, userDataPromise, spfAuthData;
 
   spfAuth.onAuth(function(auth) {
@@ -181,7 +180,7 @@ function spfAuthDataFactory($q, $log, spfFirebase, spfAuth, spfCrypto) {
       var gravatarBaseUrl = '//www.gravatar.com/avatar/';
       var email, name;
 
-      if (angular.isUndefined(userDataObj)) {
+      if (userDataObj == null) {
         return $q.reject(new Error('A user should be logged in to register'));
       }
 
@@ -253,6 +252,7 @@ function spfAuthDataFactory($q, $log, spfFirebase, spfAuth, spfCrypto) {
 
   return spfAuthData;
 }
+
 spfAuthDataFactory.$inject = [
   '$q',
   '$log',
@@ -261,14 +261,22 @@ spfAuthDataFactory.$inject = [
   'spfCrypto'
 ];
 
-spfShared.factory('spfSchools', [
-  '$q',
-  'spfFirebase',
-  function spfSchoolsFactory($q, spfFirebase) {
-    var promise = spfFirebase.loadedObj(['classMentors/schools']);
+/**
+ * Return the list of schools from Singapore.
+ *
+ * Load the list as soon as the the service is created. The service will return
+ * the same promise over again as a way to cache the result.
+ *
+ * @param  {function} $q          Angular promise factory service.
+ * @param  {object}   spfFirebase singpath-core firebase helpers service.
+ * @return {function}
+ */
+export function spfSchoolsFactory($q, spfFirebase) {
+  var promise = spfFirebase.loadedObj(['classMentors/schools']);
 
-    return function spfSchools() {
-      return promise;
-    };
-  }
-]);
+  return function spfSchools() {
+    return promise;
+  };
+}
+
+spfSchoolsFactory.$inject = ['$q', 'spfFirebase'];

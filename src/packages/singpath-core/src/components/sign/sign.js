@@ -1,87 +1,99 @@
-import {spfShared} from 'singpath-core/module.js';
 import tmpl from './sign-view.html!text';
 
-spfShared.controller('SpfSignFormCtrl', [
-  '$scope',
-  'SPF_COUNTRIES',
-  'spfSchools',
-  function SpfSignFormCtrl($scope, SPF_COUNTRIES, spfSchools) {
-    var self = this;
-    var year;
+/**
+ * Signin form controller.
+ *
+ * @param {object}   $scope        Angular schild scope of the form.
+ * @param {array}    SPF_COUNTRIES List of country name and code.
+ * @param {sunction} spfSchools    School list service.
+ */
+function SpfSignFormCtrl($scope, SPF_COUNTRIES, spfSchools) {
+  var self = this;
+  var year;
 
-    spfSchools().then(function(schools) {
+  spfSchools().then(function(schools) {
 
-      self.schools = Object.keys(schools).map(function(id) {
-        return schools[id];
-      });
-
-      // Make sure the items in the profile attribute are in the list
-      // of options; or ng-select will show empty select box
-      if ($scope.currentUser.school) {
-        $scope.currentUser.school = schools[$scope.currentUser.school.id];
-      }
-
-      self.loaded = true;
+    self.schools = Object.keys(schools).map(function(id) {
+      return schools[id];
     });
-
-    this.loaded = false;
-    this.publicIdIsReadOnly = Boolean($scope.currentUser.publicId);
-    this.countries = SPF_COUNTRIES;
-    this.schools = [];
-    this.ageGroups = [];
-
-    year = 1990;
-    while (year <= 2011) {
-      this.ageGroups.push(year++);
-    }
 
     // Make sure the items in the profile attribute are in the list
     // of options; or ng-select will show empty select box
-    if ($scope.currentUser.country) {
-      $scope.currentUser.country = this.countries.find(function(country) {
-        return country.code === $scope.currentUser.country.code;
-      });
+    if ($scope.currentUser.school) {
+      $scope.currentUser.school = schools[$scope.currentUser.school.id];
     }
 
-    // Current year used to calculate age
-    $scope.currentYear = new Date().getFullYear();
+    self.loaded = true;
+  });
+
+  this.loaded = false;
+  this.publicIdIsReadOnly = Boolean($scope.currentUser.publicId);
+  this.countries = SPF_COUNTRIES;
+  this.schools = [];
+  this.ageGroups = [];
+
+  year = 1990;
+  while (year <= 2011) {
+    this.ageGroups.push(year++);
   }
-]);
 
-spfShared.directive('spfSignForm', [
-
-  function spfSignFormFactory() {
-    return {
-      template: tmpl,
-      restrict: 'E',
-      scope: {currentUser: '='},
-      controller: 'SpfSignFormCtrl',
-      controllerAs: 'ctrl'
-    };
+  // Make sure the items in the profile attribute are in the list
+  // of options; or ng-select will show empty select box
+  if ($scope.currentUser.country) {
+    $scope.currentUser.country = this.countries.find(function(country) {
+      return country.code === $scope.currentUser.country.code;
+    });
   }
-]);
 
-spfShared.directive('spfUniqPublicId', [
-  '$q',
-  'spfAuthData',
-  function spfUniqPublicIdFactory($q, spfAuthData) {
-    return {
-      restrict: 'A',
-      scope: false,
-      require: 'ngModel',
-      link: function spfUniqPublicIdPostLink(s, e, a, model) {
-        model.$asyncValidators.spfUniqPublicId = function(modelValue, viewValue) {
-          if (!viewValue) {
-            return $q.when(true);
+  // Current year used to calculate age
+  $scope.currentYear = new Date().getFullYear();
+}
+
+SpfSignFormCtrl.$inject = ['$scope', 'SPF_COUNTRIES', 'spfSchools'];
+
+/**
+ * Signin form directive factory.
+ *
+ * @return {object}
+ */
+export function spfSignFormDirectiveFactory() {
+  return {
+    template: tmpl,
+    restrict: 'E',
+    scope: {currentUser: '='},
+    controller: SpfSignFormCtrl,
+    controllerAs: 'ctrl'
+  };
+}
+
+spfSignFormDirectiveFactory.$inject = [];
+
+/**
+ * Form validator checking the the model value is an available public id.
+ *
+ * @param  {function} $q          Angular promise factory service.
+ * @param  {object}   spfAuthData singpath-core current user data service.
+ * @return {object}
+ */
+export function spfUniqPublicIdFactory($q, spfAuthData) {
+  return {
+    restrict: 'A',
+    scope: false,
+    require: 'ngModel',
+    link: function spfUniqPublicIdPostLink(s, e, a, model) {
+      model.$asyncValidators.spfUniqPublicId = function(modelValue, viewValue) {
+        if (!viewValue) {
+          return $q.when(true);
+        }
+        return spfAuthData.isPublicIdAvailable(viewValue).then(function(available) {
+          if (!available) {
+            return $q.reject(new Error(`${viewValue} is already taken.`));
           }
-          return spfAuthData.isPublicIdAvailable(viewValue).then(function(available) {
-            if (!available) {
-              return $q.reject(new Error(`${viewValue} is already taken.`));
-            }
-            return true;
-          });
-        };
-      }
-    };
-  }
-]);
+          return true;
+        });
+      };
+    }
+  };
+}
+
+spfUniqPublicIdFactory.$inject = ['$q', 'spfAuthData'];

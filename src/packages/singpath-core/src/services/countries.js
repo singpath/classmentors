@@ -1,6 +1,8 @@
-import {spfShared} from 'singpath-core/module.js';
+/**
+ * singpath-core/services/countries.js - list of country names and code.
+ */
 
-spfShared.constant('SPF_COUNTRIES', [
+const list = [
   {name: 'Afghanistan', code: 'AF'},
   {name: 'Åland Islands', code: 'AX'},
   {name: 'Albania', code: 'AL'},
@@ -244,4 +246,6 @@ spfShared.constant('SPF_COUNTRIES', [
   {name: 'Yemen', code: 'YE'},
   {name: 'Zambia', code: 'ZM'},
   {name: 'Zimbabwe', code: 'ZW'}
-]);
+];
+
+export default list;
