@@ -1,0 +1,24 @@
+<md-sidenav md-component-id="left" md-is-locked-open="$mdMedia('gt-md')" class="md-whiteframe-z2">
+  <md-toolbar>
+    <h1 class="md-toolbar-tools">
+      <a href="#/">Singpath-Core demo</a>
+    </h1>
+  </md-toolbar>
+    <md-list flex>
+      <md-item>
+        <md-item-content>
+          <md-button  class="md-padding" href="#{{ 'icons' | urlFor }}">
+            Icons
+          </md-button>
+        </md-item-content>
+      </md-item>
+    </md-list>
+</md-sidenav>
+
+<div layout="column" role="main" flex>
+  <md-toolbar class="md-hue-2" layout="row" ng-include="'shared/navbar-view.html'"></md-toolbar>
+
+  <md-content flex class="main-view" layout="column">
+    <div ng-view="" layout="column" flex></div>
+  </md-content>
+</div>

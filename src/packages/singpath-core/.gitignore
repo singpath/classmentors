@@ -1,0 +1,10 @@
+node_modules/
+jspm_packages/
+dist/
+coverage/
+npm-debug.log
+*.sublime-project
+*.sublime-workspace
+.idea/classmentors.iml
+.idea/vcs.xml
+.idea/modules.xml
