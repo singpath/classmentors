@@ -1,4 +1,4 @@
-import {spfShared} from '../module.js';
+import {spfShared} from 'singpath-core/module.js';
 
 import './countries.js';
 import {config as configIcons, run as cacheIcon} from './icons/icons.js';

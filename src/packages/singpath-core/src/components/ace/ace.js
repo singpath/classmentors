@@ -1,5 +1,5 @@
 import angular from 'angular';
-import {spfShared} from '../../module.js';
+import {spfShared} from 'singpath-core/module.js';
 import ace from 'ace';
 import 'ace/mode-html.js';
 import 'ace/mode-java.js';

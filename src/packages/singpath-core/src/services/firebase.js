@@ -1,6 +1,6 @@
 import angular from 'angular';
 import Firebase from 'firebase';
-import {spfShared} from '../module.js';
+import {spfShared} from 'singpath-core/module.js';
 
 /**
  * spfFirebaseRef return a Firebase reference to singpath database,

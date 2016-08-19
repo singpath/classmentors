@@ -1,4 +1,4 @@
-import {spfShared} from './module.js';
+import {spfShared} from 'singpath-core/module.js';
 import './filters.js';
 import './services/index.js';
 import './components/index.js';

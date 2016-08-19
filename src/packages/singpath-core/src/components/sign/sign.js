@@ -1,4 +1,4 @@
-import {spfShared} from '../../module.js';
+import {spfShared} from 'singpath-core/module.js';
 import tmpl from './sign-view.html!text';
 
 spfShared.controller('SpfSignFormCtrl', [

@@ -1,4 +1,4 @@
-import {spfShared} from '../../module.js';
+import {spfShared} from 'singpath-core/module.js';
 import tmpl from './alert-view-toaster.html!text';
 import './alert.css!text';
 

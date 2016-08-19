@@ -1,5 +1,5 @@
 import angular from 'angular';
-import {spfShared} from '../module.js';
+import {spfShared} from 'singpath-core/module.js';
 
 /**
  * Returns an object with `user` (Firebase auth user data) property,

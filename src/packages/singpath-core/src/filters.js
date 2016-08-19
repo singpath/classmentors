@@ -1,4 +1,4 @@
-import {spfShared} from './module.js';
+import {spfShared} from 'singpath-core/module.js';
 
 spfShared.filter('spfEmpty', [
   function spfEmptyFactory() {

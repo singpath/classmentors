@@ -1,5 +1,5 @@
 import angular from 'angular';
-import {spfShared} from '../../module.js';
+import {spfShared} from 'singpath-core/module.js';
 import tmpl from './navbar-view.html!text';
 import './navbar.css!';
 
