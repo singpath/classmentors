@@ -15,8 +15,8 @@ sh.set('-e');
 
 // paths
 const dist = process.env.npm_package_config_build_dir || 'dist';
-const assets = process.env.npm_package_config_build_assets_dir || path.join('tools', 'assets');
-const distAssests = path.join(assets, 'dist', '*');
+const assets = process.env.npm_package_config_build_assets_dir || 'tools/assets';
+const distAssests = `${assets}/*`;
 const output = path.join(dist, 'singpath-core.js');
 const outputMin = path.join(dist, 'singpath-core.min.js');
 const outputTree = path.join(dist, 'singpath-core.tree.html');
@@ -71,10 +71,11 @@ const depsOpts = `--global-name spfShared --global-deps '${JSON.stringify(global
 
 
 // Setup
+sh.echo(`CWD: ${process.cwd()}`);
 tools.clean(dist);
 sh.echo(`Setting up "${dist}/"...`);
 sh.mkdir('-p', dist);
-sh.cp('LICENSE', distAssests, dist);
+sh.cp('-r', 'LICENSE', distAssests, dist);
 
 
 // Bundles
