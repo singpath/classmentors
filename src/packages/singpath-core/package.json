@@ -38,13 +38,13 @@
     },
     "peerDependencies": {
       "ace": "github:ajaxorg/ace-builds@^1.2.3",
-      "angular": "github:angular/bower-angular@^1.5.5",
-      "angular-animate": "github:angular/bower-angular-animate@^1.5.5",
+      "angular": "github:angular/bower-angular@^1.5.8",
+      "angular-animate": "github:angular/bower-angular-animate@^1.5.8",
       "angular-loading-bar": "github:chieffancypants/angular-loading-bar@^0.8.0",
-      "angular-material": "github:angular/bower-material@1.0.6",
-      "angular-messages": "github:angular/bower-angular-messages@^1.5.5",
-      "angular-route": "github:angular/bower-angular-route@^1.5.5",
-      "angularfire": "github:firebase/angularfire@1.1.4",
+      "angular-material": "github:angular/bower-material@1.0.9",
+      "angular-messages": "github:angular/bower-angular-messages@^1.5.8",
+      "angular-route": "github:angular/bower-angular-route@^1.5.8",
+      "angularfire": "github:firebase/angularfire@^2.0.2",
       "assert": "github:jspm/nodelibs-assert@^0.2.0-alpha",
       "buffer": "github:jspm/nodelibs-buffer@^0.2.0-alpha",
       "chai": "npm:chai@^3.5.0",
@@ -54,7 +54,7 @@
       "cryptojs": "github:sytelus/cryptojs@^3.1.2",
       "css": "github:systemjs/plugin-css@^0.1.22",
       "events": "github:jspm/nodelibs-events@^0.2.0-alpha",
-      "firebase": "github:firebase/firebase-bower@^2.4.1",
+      "firebase": "github:firebase/firebase-bower@^3.3.0",
       "fs": "github:jspm/nodelibs-fs@^0.2.0-alpha",
       "os": "github:jspm/nodelibs-os@^0.2.0-alpha",
       "path": "github:jspm/nodelibs-path@^0.2.0-alpha",
@@ -68,7 +68,7 @@
       "vm": "github:jspm/nodelibs-vm@^0.2.0-alpha"
     },
     "overrides": {
-      "github:ajaxorg/ace-builds@1.2.3": {
+      "github:ajaxorg/ace-builds@1.2.5": {
         "main": "ace",
         "format": "global",
         "directories": {
@@ -90,7 +90,7 @@
           }
         }
       },
-      "github:angular/bower-angular-animate@1.5.6": {
+      "github:angular/bower-angular-animate@1.5.8": {
         "main": "angular-animate",
         "registry": "jspm",
         "dependencies": {
@@ -105,7 +105,7 @@
           }
         }
       },
-      "github:angular/bower-angular-aria@1.5.6": {
+      "github:angular/bower-angular-aria@1.5.8": {
         "main": "angular-aria",
         "registry": "jspm",
         "dependencies": {
@@ -120,7 +120,7 @@
           }
         }
       },
-      "github:angular/bower-angular-messages@1.5.6": {
+      "github:angular/bower-angular-messages@1.5.8": {
         "main": "angular-messages",
         "registry": "jspm",
         "dependencies": {
@@ -135,7 +135,7 @@
           }
         }
       },
-      "github:angular/bower-angular-route@1.5.6": {
+      "github:angular/bower-angular-route@1.5.8": {
         "main": "angular-route",
         "registry": "jspm",
         "dependencies": {
@@ -150,7 +150,7 @@
           }
         }
       },
-      "github:angular/bower-angular@1.5.6": {
+      "github:angular/bower-angular@1.5.8": {
         "main": "angular",
         "meta": {
           "angular.js": {
@@ -159,7 +159,7 @@
           }
         }
       },
-      "github:angular/bower-material@1.0.6": {
+      "github:angular/bower-material@1.0.9": {
         "main": "angular-material",
         "registry": "jspm",
         "dependencies": {
@@ -197,12 +197,12 @@
           }
         }
       },
-      "github:firebase/angularfire@1.1.4": {
+      "github:firebase/angularfire@2.0.2": {
         "main": "dist/angularfire.js",
         "registry": "jspm",
         "dependencies": {
           "angular": "^1.3.0",
-          "firebase": "^2.0.0"
+          "firebase": "^3.0.0"
         },
         "meta": {
           "dist/angularfire.js": {
@@ -214,7 +214,7 @@
           }
         }
       },
-      "github:firebase/firebase-bower@2.4.2": {
+      "github:firebase/firebase-bower@3.3.0": {
         "main": "firebase",
         "registry": "jspm"
       },
