@@ -9,7 +9,7 @@ const services = {
   countries,
   icons,
   crypto,
-  routeServices,
+  routes: routeServices,
   datastore,
   firebase
 };

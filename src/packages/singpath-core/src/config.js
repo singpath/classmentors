@@ -21,7 +21,7 @@ loadingBar.$inject = ['cfpLoadingBarProvider'];
  *
  * @param  {object} $mdThemingProvider ngMaterial theming provider.
  */
-function mdTheme($mdThemingProvider) {
+export function mdTheme($mdThemingProvider) {
   $mdThemingProvider.theme('default')
     .primaryPalette('brown')
     .accentPalette('amber')

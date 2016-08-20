@@ -46,7 +46,7 @@ urlForFilterFactory.$inject = ['urlFor'];
  * @param  {object} routes     Route dictionary.
  * @param  {object} spfAlert   singpath-core alert service
  */
-function run($rootScope, $location, routes, spfAlert) {
+export function run($rootScope, $location, routes, spfAlert) {
   $rootScope.$on('$routeChangeError', function(e, failedRoute, currentRoute, err) {
     spfAlert.error(err.message || err.toString());
 
