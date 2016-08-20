@@ -1,71 +1,68 @@
 {
-  "name": "classmentors",
-  "version": "0.5.0",
-  "description": "Class Mentors UI",
-  "repository": "github:singpath/classmentors",
-  "main": "src/classmentors/index.js",
+  "name": "singpath-core",
+  "version": "0.5.0-beta.0",
+  "description": "Shared components for Class Mentors and Singpath",
+  "main": "src/singpath-core.js",
+  "config": {
+    "port": 8083,
+    "build_dir": "dist",
+    "build_assets_dir": "tools/assets"
+  },
   "dependencies": {},
   "devDependencies": {
     "@singpath/tools": "0.0.7",
+    "archiver": "^1.0.0",
     "babel-eslint": "^6.0.4",
-    "compression": "^1.6.1",
     "coveralls": "^2.11.9",
     "eslint": "^2.13.1",
     "eslint-config-singpath": "0.0.4",
+    "eslint-plugin-babel": "^3.2.0",
     "eslint-plugin-html": "^1.5.1",
-    "finalhandler": "^0.4.1",
-    "firebase-tools": "^3.0.2",
-    "http2": "^3.3.2",
-    "istanbul": "^0.4.4",
-    "js-yaml": "^3.5.5",
+    "http-server": "^0.9.0",
+    "istanbul": "^0.4.3",
+    "js-yaml": "^3.6.1",
     "jspm": "0.17.0-beta.25",
-    "mocha": "^2.4.5",
-    "morgan": "^1.7.0",
-    "npm-run-all": "^1.5.3",
-    "serve-static": "^1.10.2",
+    "mocha": "^2.5.3",
     "shelljs": "^0.7.0",
-    "source-map-explorer": "^1.3.2"
-  },
-  "config": {
-    "buildDir": "dist/",
-    "certsDir": "tools/certs",
-    "exportAs": "classmentors",
-    "port": 8081
+    "source-map-explorer": "^1.3.2",
+    "systemjs-istanbul-hook": "^0.1.0"
   },
   "jspm": {
-    "name": "classmentors",
-    "main": "index.js",
-    "directories": {
-      "baseURL": "src",
-      "lib": "src/classmentors"
+    "name": "singpath-core",
+    "main": "singpath-core.js",
+    "dependencies": {
+      "dirty-chai": "npm:dirty-chai@^1.2.2"
     },
-    "dependencies": {},
     "devDependencies": {
       "plugin-babel": "npm:systemjs-plugin-babel@^0.0.11"
     },
     "peerDependencies": {
       "ace": "github:ajaxorg/ace-builds@^1.2.3",
-      "angular": "github:angular/bower-angular@^1.5.7",
-      "angular-animate": "github:angular/bower-angular-animate@^1.5.7",
-      "angular-aria": "github:angular/bower-angular-aria@^1.5.7",
+      "angular": "github:angular/bower-angular@^1.5.5",
+      "angular-animate": "github:angular/bower-angular-animate@^1.5.5",
       "angular-loading-bar": "github:chieffancypants/angular-loading-bar@^0.8.0",
-      "angular-material": "github:angular/bower-material@^1.0.9",
-      "angular-messages": "github:angular/bower-angular-messages@^1.5.7",
-      "angular-route": "github:angular/bower-angular-route@^1.5.7",
+      "angular-material": "github:angular/bower-material@1.0.6",
+      "angular-messages": "github:angular/bower-angular-messages@^1.5.5",
+      "angular-route": "github:angular/bower-angular-route@^1.5.5",
       "angularfire": "github:firebase/angularfire@1.1.4",
       "assert": "github:jspm/nodelibs-assert@^0.2.0-alpha",
       "buffer": "github:jspm/nodelibs-buffer@^0.2.0-alpha",
-      "chai": "npm:chai@^3",
+      "chai": "npm:chai@^3.5.0",
       "child_process": "github:jspm/nodelibs-child_process@^0.2.0-alpha",
-      "core-js": "npm:core-js@^1.1.4",
+      "constants": "github:jspm/nodelibs-constants@^0.2.0-alpha",
+      "crypto": "github:jspm/nodelibs-crypto@^0.2.0-alpha",
       "cryptojs": "github:sytelus/cryptojs@^3.1.2",
       "css": "github:systemjs/plugin-css@^0.1.22",
+      "events": "github:jspm/nodelibs-events@^0.2.0-alpha",
       "firebase": "github:firebase/firebase-bower@^2.4.1",
       "fs": "github:jspm/nodelibs-fs@^0.2.0-alpha",
+      "os": "github:jspm/nodelibs-os@^0.2.0-alpha",
       "path": "github:jspm/nodelibs-path@^0.2.0-alpha",
       "process": "github:jspm/nodelibs-process@^0.2.0-alpha",
-      "sinon": "npm:sinon@^1.4.0",
+      "sinon": "npm:sinon@^1.17.4",
       "sinon-chai": "npm:sinon-chai@^2.8.0",
+      "stream": "github:jspm/nodelibs-stream@^0.2.0-alpha",
+      "string_decoder": "github:jspm/nodelibs-string_decoder@^0.2.0-alpha",
       "text": "github:systemjs/plugin-text@^0.0.8",
       "util": "github:jspm/nodelibs-util@^0.2.0-alpha",
       "vm": "github:jspm/nodelibs-vm@^0.2.0-alpha"
@@ -93,7 +90,7 @@
           }
         }
       },
-      "github:angular/bower-angular-animate@1.5.7": {
+      "github:angular/bower-angular-animate@1.5.6": {
         "main": "angular-animate",
         "registry": "jspm",
         "dependencies": {
@@ -108,7 +105,7 @@
           }
         }
       },
-      "github:angular/bower-angular-aria@1.5.7": {
+      "github:angular/bower-angular-aria@1.5.6": {
         "main": "angular-aria",
         "registry": "jspm",
         "dependencies": {
@@ -123,7 +120,7 @@
           }
         }
       },
-      "github:angular/bower-angular-messages@1.5.7": {
+      "github:angular/bower-angular-messages@1.5.6": {
         "main": "angular-messages",
         "registry": "jspm",
         "dependencies": {
@@ -138,7 +135,7 @@
           }
         }
       },
-      "github:angular/bower-angular-route@1.5.7": {
+      "github:angular/bower-angular-route@1.5.6": {
         "main": "angular-route",
         "registry": "jspm",
         "dependencies": {
@@ -153,7 +150,7 @@
           }
         }
       },
-      "github:angular/bower-angular@1.5.7": {
+      "github:angular/bower-angular@1.5.6": {
         "main": "angular",
         "meta": {
           "angular.js": {
@@ -162,7 +159,7 @@
           }
         }
       },
-      "github:angular/bower-material@1.0.9": {
+      "github:angular/bower-material@1.0.6": {
         "main": "angular-material",
         "registry": "jspm",
         "dependencies": {
@@ -484,20 +481,24 @@
   },
   "scripts": {
     "build": "node ./tools/bin/build.js",
-    "build:gh-pages": "node ./tools/bin/build-gh-pages.js",
     "clean": "node ./tools/bin/clean.js",
-    "cover": "node ./tools/bin/coverage.js",
-    "coveralls": "bash ./tools/bin/coveralls.sh",
-    "keygen": "node ./tools/bin/keygen.js",
-    "lint": "eslint src/",
+    "cover": "node ./tools/bin/cover.js",
+    "coveralls": "node ./tools/bin/cover.js && cat ./coverage/lcov.info | coveralls",
+    "format": "npm run lint -- --fix",
+    "lint": "eslint src/ packages/ tools/ index.html",
     "postinstall": "jspm install",
-    "serve": "node ./tools/bin/server.js src/",
-    "serve-build": "node ./tools/bin/server.js ${npm_package_config_buildDir}/${npm_package_name}",
-    "start": "node ./tools/bin/server.js src/",
-    "test": "node ./tools/bin/test.js",
-    "travis-setup": "node ./tools/bin/travis-setup.js"
+    "start": "http-server -c-1 -p $npm_package_config_port",
+    "start:build": "http-server dist/ -c-1 -p $npm_package_config_port",
+    "test": "node ./tools/bin/test.js"
   },
-  "keywords": [],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/singpath/singpath-core.git"
+  },
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/singpath/singpath-core/issues"
+  },
+  "homepage": "https://github.com/singpath/singpath-core#readme"
 }

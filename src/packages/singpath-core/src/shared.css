@@ -1,0 +1,76 @@
+html p, body p {
+  line-height: 1.25;
+}
+
+#loading-bar .bar {
+  background: #FFC107;
+  height: 5px;
+  border-bottom-right-radius: 2px;
+  border-top-right-radius: 2px;
+}
+
+/* Fancy blur effect */
+#loading-bar .peg {
+  height: 5px;
+  -moz-box-shadow: #FFC107 1px 0 6px 1px;
+  -ms-box-shadow: #FFC107 1px 0 6px 1px;
+  -webkit-box-shadow: #FFC107 1px 0 6px 1px;
+  box-shadow: #FFC107 1px 0 6px 1px;
+}
+
+.md-button {
+  margin: 16px 8px;
+  padding: 0 8px;
+  line-height: 36px;
+}
+
+.md-button.md-icon-button.small-icon {
+  height: 36px;
+  width: 36px;
+  line-height: 36px;
+  margin: 0;
+}
+
+.small-icon md-icon {
+  line-height: 18px;
+  height: 18px;
+  width: 18px;
+}
+
+md-sidenav md-list .md-button {
+  color: inherit;
+  font-weight: 500;
+  text-align: left;
+  width: 100%;
+  padding: 16px;
+  margin: 0;
+  line-height: normal;
+}
+
+md-toolbar .separator {
+  width: 48px;
+  height: 28px;
+}
+
+md-icon:focus {
+  outline: none;
+}
+
+.even {
+  background-color: #eee;
+}
+
+table .md-button {
+  margin: 4px;
+}
+
+@media (max-width: 600px){
+  .responsive-button{
+    min-width: initial;
+    padding: 0 12px;
+  }
+}
+
+thead th {
+  vertical-align: top;
+}
