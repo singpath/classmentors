@@ -16,7 +16,7 @@ sh.set('-e');
 // paths
 const dist = process.env.npm_package_config_build_dir || 'dist';
 const assets = process.env.npm_package_config_build_assets_dir || 'tools/assets';
-const distAssests = `${assets}/*`;
+const distAssests = `${assets}/dist/*`;
 const output = path.join(dist, 'singpath-core.js');
 const outputMin = path.join(dist, 'singpath-core.min.js');
 const outputTree = path.join(dist, 'singpath-core.tree.html');
