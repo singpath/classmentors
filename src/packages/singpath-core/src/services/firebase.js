@@ -40,7 +40,7 @@ export function SpfFirebaseRefProvider() {
         var filters = ['equalTo', 'startAt', 'endAt'];
         var filter, i;
 
-        paths = [].concat(paths);
+        paths = [].concat(paths || []);
         ref = paths.reduce(function(prevRef, p) {
           return prevRef.child(p);
         }, ref);
