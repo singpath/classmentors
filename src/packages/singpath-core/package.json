@@ -4,7 +4,7 @@
   "description": "Shared components for Class Mentors and Singpath",
   "main": "src/singpath-core.js",
   "config": {
-    "port": 8082,
+    "port": 8083,
     "build_dir": "dist",
     "build_assets_dir": "tools/assets"
   },
