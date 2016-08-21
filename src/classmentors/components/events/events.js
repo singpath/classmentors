@@ -2150,19 +2150,36 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         }
     };
 
-    this.viewTextResponse = function (task, userSolution) {
+    this.viewCodeResponse = function (task, solution) {
         $mdDialog.show({
             clickOutsideToClose: true,
-            parent: $document.body,
-            template: responseTmpl,
-            controller: DialogController,
-            controllerAs: 'ctrl'
+            parent: angular.element(document.body),
+            template: codeTmpl,
+            controller: CodeController,
+            controllerAs: 'ctrl',
+            onComplete: loadEditor
         });
 
-        function DialogController() {
+        this.loadingEditor = true;
+        var parent = this;
+
+        function loadEditor() {
+            var editor = ace.edit(document.querySelector('#editor'));
+            editor.setTheme("ace/theme/monokai");
+            editor.getSession().setMode("ace/mode/" + task.lang.toLowerCase());
+            editor.getSession().setUseWrapMode(true);
+            parent.loadingEditor = false;
+        }
+
+        function CodeController() {
             this.task = task;
-            this.viewOnly = true;
-            this.solution = userSolution;
+
+            this.checkEditor = function () {
+                return parent.loadingEditor;
+                console.log(parent.loadingEditor);
+            };
+
+            this.solution = solution;
 
             this.cancel = function () {
                 $mdDialog.hide();
