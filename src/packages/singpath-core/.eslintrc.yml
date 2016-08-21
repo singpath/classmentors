@@ -1,0 +1,3 @@
+extends: singpath/module
+plugins:
+  - html

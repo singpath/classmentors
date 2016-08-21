@@ -3,8 +3,6 @@
 # exit with nonzero exit code if anything fails
 set -e
 
-npm run build
-
 if [[ "$TRAVIS_BRANCH" != "master" ]]; then
 	>&2 echo "Skipping github pages deployment: not master branch."
 	exit 0
@@ -23,6 +21,9 @@ fi
 if [[ -z "$PROD_FIREBASE_ID" ]]; then
 	echo '$PROD_FIREBASE_ID is not set. Will use default firebase database target.'
 fi
+
+cd src/packages/singpath-core; npm install; npm run build; cd -
+cp -r src/packages/singpath-core/dist dist/classmentors/singpath-core
 
 GIT_REMOTE_URL="https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git"
 GIT_COMMIT_NAME="Travis"

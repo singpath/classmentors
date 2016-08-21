@@ -1,12 +1,10 @@
 node_modules/
-src/jspm_packages/
+jspm_packages/
 dist/**/*
 coverage/
+npm-debug.log
 *.sublime-project
 *.sublime-workspace
-npm-debug.log
-worker/*.env
 .idea/classmentors.iml
-*.xml
 .idea/vcs.xml
 .idea/modules.xml

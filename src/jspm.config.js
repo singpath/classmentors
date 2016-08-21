@@ -2,8 +2,8 @@ SystemJS.config({
   paths: {
     "npm:": "jspm_packages/npm/",
     "github:": "jspm_packages/github/",
-    // "graphing": "jspm_packages/graphing/",
-    "classmentors/": "classmentors/"
+    "classmentors/": "classmentors/",
+    "singpath-core/": "packages/singpath-core/src/"
   },
   browserConfig: {
     "baseURL": "/"
@@ -22,6 +22,14 @@ SystemJS.config({
           "loader": "plugin-babel"
         }
       }
+    },
+    "singpath-core": {
+      "main": "singpath-core.js",
+      "meta": {
+        "*.js": {
+          "loader": "plugin-babel"
+        }
+      }
     }
   }
 });
@@ -34,8 +42,6 @@ SystemJS.config({
   ],
   map: {
     "ace": "github:ajaxorg/ace-builds@1.2.3",
-    // "c3": "graphingc3.min.js",
-    // "d3": "graphingd3.min.js",
     "angular": "github:angular/bower-angular@1.5.7",
     "angular-animate": "github:angular/bower-angular-animate@1.5.7",
     "angular-aria": "github:angular/bower-angular-aria@1.5.7",
@@ -55,7 +61,6 @@ SystemJS.config({
     "fs": "github:jspm/nodelibs-fs@0.2.0-alpha",
     "path": "github:jspm/nodelibs-path@0.2.0-alpha",
     "process": "github:jspm/nodelibs-process@0.2.0-alpha",
-    "singpath-core": "github:singpath/singpath-core@0.4.0",
     "sinon": "npm:sinon@1.17.4",
     "sinon-chai": "npm:sinon-chai@2.8.0",
     "text": "github:systemjs/plugin-text@0.0.8",
