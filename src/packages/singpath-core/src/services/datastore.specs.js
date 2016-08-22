@@ -1,6 +1,7 @@
+import {testInjectMatch, sinon, expect} from 'singpath-core/tools/chai.js';
+
 import * as datastore from './datastore.js';
-import sinon from 'sinon';
-import {expect} from 'chai';
+
 
 describe('datastore service.', function() {
 
@@ -19,6 +20,8 @@ describe('datastore service.', function() {
       authFirebaseApp,
       spfAuth,
       firebaseUser;
+
+    testInjectMatch(datastore.SpfCurrentUserService);
 
     beforeEach(function() {
       $q = (resolve, reject) => new Promise(resolve, reject);
@@ -1010,6 +1013,8 @@ describe('datastore service.', function() {
   describe('run', function() {
     let $log;
 
+    testInjectMatch(datastore.run);
+
     beforeEach(function() {
       $log = {info: sinon.spy()};
     });
@@ -1027,6 +1032,24 @@ describe('datastore service.', function() {
       expect($log.info).to.have.been.calledOnce();
       expect($log.info).to.have.been.calledWith(sinon.match(/some\/path/));
     });
+
+  });
+
+  describe('spfAuth', function() {
+
+    testInjectMatch(datastore.spfAuthFactory);
+
+  });
+
+  describe('spfAuthData', function() {
+
+    testInjectMatch(datastore.spfAuthDataFactory);
+
+  });
+
+  describe('spfSchoolsFactory', function() {
+
+    testInjectMatch(datastore.spfSchoolsFactory);
 
   });
 

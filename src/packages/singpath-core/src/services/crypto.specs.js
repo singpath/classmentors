@@ -1,10 +1,10 @@
-import {expect} from 'chai';
-
-// import * as sinon from 'sinon';
+import {expect, testInjectMatch} from 'singpath-core/tools/chai.js';
 
 import * as crypto from './crypto.js';
 
 describe('crypto service', function() {
+
+  testInjectMatch(crypto.Service);
 
   describe('md5', function() {
 

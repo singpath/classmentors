@@ -1,7 +1,4 @@
-import {expect} from 'chai';
-import sinon from 'sinon';
-
-// import * as sinon from 'sinon';
+import {expect, sinon, testInjectMatch} from 'singpath-core/tools/chai.js';
 
 import {urlForFactory, urlForFilterFactory, run} from './routes';
 
@@ -21,6 +18,8 @@ describe('routes service', function() {
     beforeEach(function() {
       urlFor = urlForFactory(routes);
     });
+
+    testInjectMatch(urlForFactory);
 
     it('should return a static url', function() {
       expect(urlFor('home')).to.equal('/');
@@ -46,6 +45,8 @@ describe('routes service', function() {
       filter = urlForFilterFactory(urlFor);
     });
 
+    testInjectMatch(urlForFilterFactory);
+
     it('should proxy call to urlFor service', function() {
       const name = '';
       const params = {};
@@ -67,6 +68,8 @@ describe('routes service', function() {
       routes = {home: '/foo'};
       spfAlert = {error: sinon.spy()};
     });
+
+    testInjectMatch(run);
 
     it('should listen to route error event', function() {
       run($rootScope, $location, routes, spfAlert);

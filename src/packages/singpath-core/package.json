@@ -31,7 +31,8 @@
     "name": "singpath-core",
     "main": "singpath-core.js",
     "dependencies": {
-      "dirty-chai": "npm:dirty-chai@^1.2.2"
+      "dirty-chai": "npm:dirty-chai@^1.2.2",
+      "get-parameter-names": "npm:get-parameter-names@^0.3.0"
     },
     "devDependencies": {
       "plugin-babel": "npm:systemjs-plugin-babel@^0.0.11"

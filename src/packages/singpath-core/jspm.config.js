@@ -52,6 +52,7 @@ SystemJS.config({
     "events": "github:jspm/nodelibs-events@0.2.0-alpha",
     "firebase": "github:firebase/firebase-bower@3.3.0",
     "fs": "github:jspm/nodelibs-fs@0.2.0-alpha",
+    "get-parameter-names": "npm:get-parameter-names@0.3.0",
     "os": "github:jspm/nodelibs-os@0.2.0-alpha",
     "path": "github:jspm/nodelibs-path@0.2.0-alpha",
     "process": "github:jspm/nodelibs-process@0.2.0-alpha",

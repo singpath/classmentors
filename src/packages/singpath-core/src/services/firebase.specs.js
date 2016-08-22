@@ -1,4 +1,4 @@
-import {expect} from 'chai';
+import {expect, testInjectMatch} from 'singpath-core/tools/chai.js';
 
 import * as firebase from './firebase.js';
 
@@ -40,6 +40,8 @@ describe('firebase service', function() {
   });
 
   describe('run', function() {
+
+    testInjectMatch(firebase.run);
 
     it('should throw if one of the app is not set', function() {
       expect(() => firebase.run({}, null, {})).to.throw(Error);
