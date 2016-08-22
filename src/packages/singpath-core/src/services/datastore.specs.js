@@ -6,7 +6,19 @@ describe('datastore service.', function() {
 
   describe('currentUser service', function() {
     const spfProfilesPath = 'classMentors/userProfiles';
-    let currentUser, $q, $timeout, $log, $rootScope, spfCrypto, spfFirebase, spfAuth, firebaseUser;
+    let
+      currentUser,
+      $q,
+      db,
+      authDb,
+      $timeout,
+      $log,
+      $rootScope,
+      spfCrypto,
+      firebaseApp,
+      authFirebaseApp,
+      spfAuth,
+      firebaseUser;
 
     beforeEach(function() {
       $q = (resolve, reject) => new Promise(resolve, reject);
@@ -22,7 +34,13 @@ describe('datastore service.', function() {
 
       spfCrypto = {md5: sinon.stub()};
 
-      spfFirebase = {ref: sinon.stub()};
+      db = {ref: sinon.stub()};
+      firebaseApp = {database: sinon.stub()};
+      firebaseApp.database.returns(db);
+
+      authDb = {ref: sinon.stub()};
+      authFirebaseApp = {database: sinon.stub()};
+      authFirebaseApp.database.returns(authDb);
 
       spfAuth = {
         user: undefined,
@@ -41,7 +59,7 @@ describe('datastore service.', function() {
       };
 
       currentUser = new datastore.SpfCurrentUserService(
-        $q, $timeout, $log, $rootScope, spfCrypto, spfFirebase, spfAuth, spfProfilesPath
+        $q, $timeout, $log, $rootScope, spfCrypto, firebaseApp, authFirebaseApp, spfAuth, spfProfilesPath
       );
     });
 
@@ -64,7 +82,7 @@ describe('datastore service.', function() {
           on: sinon.spy(),
           off: sinon.spy()
         };
-        spfFirebase.ref.withArgs('auth/users/google:bob').returns(ref);
+        authDb.ref.withArgs('auth/users/google:bob').returns(ref);
         sinon.stub(currentUser, 'patchUser');
       });
 
@@ -189,7 +207,7 @@ describe('datastore service.', function() {
       beforeEach(function() {
         currentUser.firebaseUser = firebaseUser;
         userRef = {once: sinon.stub(), transaction: sinon.stub()};
-        spfFirebase.ref.withArgs('auth/users/google:bob').returns(userRef);
+        authDb.ref.withArgs('auth/users/google:bob').returns(userRef);
         userRef.once.withArgs('value').returns(Promise.resolve());
         userRef.transaction.withArgs(sinon.match.func).returns(Promise.resolve());
       });
@@ -316,7 +334,7 @@ describe('datastore service.', function() {
           on: sinon.spy(),
           off: sinon.spy()
         };
-        spfFirebase.ref.withArgs('classMentors/userProfiles/bob').returns(profileRef);
+        db.ref.withArgs('classMentors/userProfiles/bob').returns(profileRef);
         profileRef.child.withArgs('user').returns(profileDetailsRef);
       });
 
@@ -326,7 +344,7 @@ describe('datastore service.', function() {
           off: sinon.spy()
         };
 
-        spfFirebase.ref.withArgs('auth/users/google:bob').returns(userRef);
+        authDb.ref.withArgs('auth/users/google:bob').returns(userRef);
         sinon.stub(currentUser, 'patchUser');
         sinon.stub(currentUser, 'userChangedHandler');
 
@@ -486,7 +504,7 @@ describe('datastore service.', function() {
 
         detailsRef = {once: sinon.stub(), transaction: sinon.stub()};
         profileRef.child.withArgs('user').returns(detailsRef);
-        spfFirebase.ref.withArgs('classMentors/userProfiles/bob').returns(profileRef);
+        db.ref.withArgs('classMentors/userProfiles/bob').returns(profileRef);
         detailsRef.once.withArgs('value').returns(Promise.resolve());
         detailsRef.transaction.withArgs(sinon.match.func).returns(Promise.resolve());
 
@@ -638,7 +656,7 @@ describe('datastore service.', function() {
           transaction: sinon.spy()
         };
 
-        spfFirebase.ref.withArgs('classMentors/userProfiles/bob').returns(profileRef);
+        db.ref.withArgs('classMentors/userProfiles/bob').returns(profileRef);
         profileDetailsRef.once.withArgs('value').returns(Promise.resolve());
         profileRef.child.withArgs('user').returns(profileDetailsRef);
         sinon.stub(currentUser, 'profileChangedHandler');
@@ -689,15 +707,15 @@ describe('datastore service.', function() {
       let ref;
 
       beforeEach(function() {
-        spfFirebase.ref.returns(ref);
+        authDb.ref.returns(ref);
       });
 
       it('should return a firebase reference to a user auth data', function() {
         expect(currentUser.userRef('google:bob')).to.equal(ref);
-        expect(spfFirebase.ref).to.have.been.calledWith('auth/users/google:bob');
+        expect(authDb.ref).to.have.been.calledWith('auth/users/google:bob');
 
         expect(currentUser.userRef('google:alice')).to.equal(ref);
-        expect(spfFirebase.ref).to.have.been.calledWith('auth/users/google:alice');
+        expect(authDb.ref).to.have.been.calledWith('auth/users/google:alice');
       });
 
       it('should throw if uid is not provided', function() {
@@ -711,15 +729,15 @@ describe('datastore service.', function() {
       let ref;
 
       beforeEach(function() {
-        spfFirebase.ref.returns(ref);
+        db.ref.returns(ref);
       });
 
       it('should return a firebase reference to a user auth data', function() {
         expect(currentUser.profileRef('bob')).to.equal(ref);
-        expect(spfFirebase.ref).to.have.been.calledWith('classMentors/userProfiles/bob');
+        expect(db.ref).to.have.been.calledWith('classMentors/userProfiles/bob');
 
         expect(currentUser.profileRef('alice')).to.equal(ref);
-        expect(spfFirebase.ref).to.have.been.calledWith('classMentors/userProfiles/alice');
+        expect(db.ref).to.have.been.calledWith('classMentors/userProfiles/alice');
       });
 
       it('should throw if uid is not provided', function() {
@@ -736,7 +754,7 @@ describe('datastore service.', function() {
         ref = {on: sinon.stub(), off: sinon.spy()};
 
         currentUser.firebaseUser = {uid: 'bob'};
-        spfFirebase.ref.returns(ref);
+        authDb.ref.returns(ref);
         currentUser.watchUser();
 
         ref.on.reset();
@@ -760,7 +778,7 @@ describe('datastore service.', function() {
         ref = {on: sinon.stub(), off: sinon.spy(), child: sinon.stub().returnsThis()};
 
         currentUser.user = {uid: 'google:bob', publicId: 'bob'};
-        spfFirebase.ref.returns(ref);
+        db.ref.returns(ref);
         currentUser.watchProfile();
 
         ref.on.reset();
@@ -859,7 +877,7 @@ describe('datastore service.', function() {
       beforeEach(function() {
         ref = {update: sinon.stub()};
         ref.update.returns(Promise.resolve());
-        spfFirebase.ref.withArgs('auth').returns(ref);
+        authDb.ref.withArgs('auth').returns(ref);
 
         currentUser.firebaseUser = firebaseUser;
         currentUser.uid = firebaseUser.uid;

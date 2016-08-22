@@ -54,7 +54,7 @@
       "cryptojs": "github:sytelus/cryptojs@^3.1.2",
       "css": "github:systemjs/plugin-css@^0.1.22",
       "events": "github:jspm/nodelibs-events@^0.2.0-alpha",
-      "firebase": "github:firebase/firebase-bower@^3.3.0",
+      "firebase": "github:firebase/firebase-bower@3",
       "fs": "github:jspm/nodelibs-fs@^0.2.0-alpha",
       "os": "github:jspm/nodelibs-os@^0.2.0-alpha",
       "path": "github:jspm/nodelibs-path@^0.2.0-alpha",
@@ -216,7 +216,13 @@
       },
       "github:firebase/firebase-bower@3.3.0": {
         "main": "firebase",
-        "registry": "jspm"
+        "format": "global",
+        "meta": {
+          "firebase.js": {
+            "exports": "firebase",
+            "format": "global"
+          }
+        }
       },
       "github:sytelus/cryptojs@3.1.2": {
         "main": "core.js",
