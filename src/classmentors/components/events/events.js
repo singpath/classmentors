@@ -977,7 +977,7 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
     this.isOpen = true;
     this.singPath = initialData.singPath;
     this.savingTask = false;
-    this.task = {archived: false};
+    this.task = {archived: false, showProgress: true};
     this.enableBeta = true;
     var location;
 
@@ -996,7 +996,7 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
         }]
     );
 
-    this.toggle = function(item, list) {
+    this.toggle = function (item, list) {
         var idx = list.indexOf(item);
         if (idx > -1) {
             list.splice(idx, 1);
@@ -1006,7 +1006,7 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
         }
     };
 
-    this.exists = function(item, list) {
+    this.exists = function (item, list) {
         return list.indexOf(item) > -1;
     };
 
@@ -1065,7 +1065,7 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
             clmSurvey.set(initialData.event.$id, initialData.event, task, tasktype, isOpen);
             var obj = clmSurvey.get();
             return '/challenges/survey'
-        } else if(tasktype === 'profileEdit') {
+        } else if (tasktype === 'profileEdit') {
             return 'Save';
         } else {
             return 'Save'; // by default should show 'save'
@@ -1117,7 +1117,7 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
     };
 
     this.saveTask = function (event, _, task, taskType, isOpen) {
-        if(taskType === 'profileEdit') {
+        if (taskType === 'profileEdit') {
             task.toEdit = self.selectedMetaData;
             task.textResponse = "Placeholder";
         }
@@ -1909,7 +1909,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             this.task = task;
             this.yearOpts = ['born before 1990'];
             this.userData = {};
-            for(var y = 1991; y <= 2011; y++) {
+            for (var y = 1991; y <= 2011; y++) {
                 self.yearOpts.push(y);
             }
 
@@ -1918,10 +1918,10 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             }).then(function (data) {
                 self.participantInfo = data;
                 console.log(self.participantInfo);
-                if(self.participantInfo.yearOfBirth) {
+                if (self.participantInfo.yearOfBirth) {
                     self.userData.yearOfBirth = self.participantInfo.yearOfBirth;
                 }
-                if(self.participantInfo.school) {
+                if (self.participantInfo.school) {
                     self.userData.school = self.participantInfo.school;
                 }
             }).catch(function (err) {
@@ -1939,7 +1939,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             });
 
             this.camelText = function (input) {
-                return input.replace(/(?:^\w|[A-Z]|\b\w)/g, function(letter, index) {
+                return input.replace(/(?:^\w|[A-Z]|\b\w)/g, function (letter, index) {
                     return index == 0 ? letter.toLowerCase() : letter.toUpperCase();
                 }).replace(/\s+/g, '');
             };
@@ -1948,10 +1948,10 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                 self.userData.displayName = self.participantInfo.displayName;
                 self.userData.gravatar = self.participantInfo.gravatar;
 
-                if(!self.userData.yearOfBirth) {
+                if (!self.userData.yearOfBirth) {
                     self.userData.yearOfBirth = self.participantInfo.yearOfBirth;
                 }
-                if(!self.userData.school) {
+                if (!self.userData.school) {
                     self.userData.school = self.participantInfo.school;
                 }
                 // if(!self.userData.country) {
@@ -2150,19 +2150,36 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         }
     };
 
-    this.viewTextResponse = function (task, userSolution) {
+    this.viewCodeResponse = function (task, solution) {
         $mdDialog.show({
             clickOutsideToClose: true,
-            parent: $document.body,
-            template: responseTmpl,
-            controller: DialogController,
-            controllerAs: 'ctrl'
+            parent: angular.element(document.body),
+            template: codeTmpl,
+            controller: CodeController,
+            controllerAs: 'ctrl',
+            onComplete: loadEditor
         });
 
-        function DialogController() {
+        this.loadingEditor = true;
+        var parent = this;
+
+        function loadEditor() {
+            var editor = ace.edit(document.querySelector('#editor'));
+            editor.setTheme("ace/theme/monokai");
+            editor.getSession().setMode("ace/mode/" + task.lang.toLowerCase());
+            editor.getSession().setUseWrapMode(true);
+            parent.loadingEditor = false;
+        }
+
+        function CodeController() {
             this.task = task;
-            this.viewOnly = true;
-            this.solution = userSolution;
+
+            this.checkEditor = function () {
+                return parent.loadingEditor;
+                console.log(parent.loadingEditor);
+            };
+
+            this.solution = solution;
 
             this.cancel = function () {
                 $mdDialog.hide();
@@ -2369,6 +2386,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
 
 
     this.questions = initialData.survey2;
+    console.log("testing for questions:: ", initialData.survey2);
     this.ratingOptions = [
         {id: 1},
         {id: 2},
@@ -2504,29 +2522,19 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
     );
     this.saveSurveyResponse = function (response, item, task) {
 
+
         var surveyResp = response;
         var questionNumber = item.currentTarget.getAttribute("data-id");
-
         var taskId = $routeParams.taskId;
         var eventId = initialData.event.$id;
         var userId = initialData.currentUser.publicId;
         var surveyType = $routeParams.surveyTask;
 
-        /*var tempValue;
-         console.log("value before: ", promise);
-         var p = Promise.resolve(promise);
-         p.then(function(value){
-         var count = 1;
-
-         //this is to retrieve the total length of the json object
-         console.log("value? ", Object.keys(value[0]).length);
-         console.log("values: ", value[0]);
-         for(var i = 1; i < Object.keys(value[0]).length -1 ; i++){
-         console.log("looped value: " + value[0]["Q"+i]);
-         }*/
-
-        console.log("all the VALUES HERE: " + surveyResp + ", " + questionNumber + "," + taskId + ", " + eventId + ", " + userId + ", " + surveyType)
+        //console.log("all the VALUES HERE: " + surveyResp + ", " + questionNumber + "," + taskId + ", " + eventId + ", " + userId + ", " + surveyType)
         clmDataStore.events.saveSurveyResponse(surveyResp, questionNumber, taskId, eventId, userId, surveyType);
+
+
+        console.log("testt for questions::", this.questions);
     }
     this.saveEduDisMultiResponse = function (selectedArr, item, task, qnTitle) {
 
@@ -2637,6 +2645,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             clmDataStore.events.setProgress(eventId, taskId, userId, initialData.progress);
 
             //console.log(eventId, taskId, userId);
+
             $location.path(urlFor('oneEvent', {eventId: self.event.$id}));
 
         }
@@ -2682,7 +2691,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             if (title == "Tell us about YOURSELF:") {
                 eduDissResp[title][2] = selectedFamily;
                 eduDissResp[title][5] = selectedRaceEthnicity;
-            }else if (title == "What do you like BEST about Learning Gardens?"){
+            } else if (title == "What do you like BEST in this class?") {
                 //ignore
             }
             else {
@@ -2721,8 +2730,11 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
 
             $location.path(urlFor('oneEvent', {eventId: self.event.$id}));
         }
-    };
+    }
 
+    this.backToChallenge = function(){
+        $location.path(urlFor('oneEvent', {eventId: self.event.$id}));
+    }
 
 };
 
@@ -2868,7 +2880,7 @@ function ClmEventRankTableCtrl($scope, $log, spfFirebase, clmDataStore, clmPager
             temp.user = result.user;
             // console.log(parentScope.event);
             // console.log(parentScope.profile);
-            if(parentScope.assistants.indexOf(result.$id) < 0 && parentScope.event.owner.publicId !== result.$id) {
+            if (parentScope.assistants.indexOf(result.$id) < 0 && parentScope.event.owner.publicId !== result.$id) {
                 parentScope.rankingView2.push(temp);
             }
         }, function (reason) {
@@ -3058,8 +3070,13 @@ function ClmEventRankTableCtrl($scope, $log, spfFirebase, clmDataStore, clmPager
             });
             self.orderOpts = self.orderOpts.slice(0, 2);
         }
-        
-        updateLog({action: "eventRankingOrderby", "eventId": self.event.$id, "key":key, "reversed":self.orderOpts[0].reversed});
+
+        updateLog({
+            action: "eventRankingOrderby",
+            "eventId": self.event.$id,
+            "key": key,
+            "reversed": self.orderOpts[0].reversed
+        });
 
         // TODO: Revisit when 2nd order ranking becomes a priority.
         // There was an issue with getting both strings and numbers to rank properly.
