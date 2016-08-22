@@ -213,12 +213,12 @@
                     </th>
 
                     <td ng-repeat="task in ctrl.visibleTasks track by task.$id">
-                        <div ng-if="ctrl.progress[participant.$id][task.$id].completed && (ctrl.isReviewSuperUser || task.showProgress)">
-                            <span ng-if="(!task.textResponse && !task.linkPattern) || !ctrl.isReviewSuperUser">
-                                Completed
-                            </span>
+                        <div ng-if="ctrl.progress[participant.$id][task.$id].completed && task.showProgress">
+                            <!--<span ng-if="(!task.textResponse && !task.linkPattern) || !ctrl.isReviewSuperUser">-->
+                                <!--Completed-->
+                            <!--</span>-->
 
-                            <span ng-if="task.showLinks && ctrl.isReviewSuperUser">
+                            <span ng-if="task.showLinks">
                                 <span ng-if="task.linkPattern">
                                     <a ng-href="{{ctrl.solutions[participant.$id][task.$id]}}" target="_blank">completed</a>
                                 </span>
@@ -228,14 +228,14 @@
                                          {{ ctrl.solutions[participant.$id][task.$id]}}
                                     </md-tooltip>
                                 </span>
-                                <span ng-if="task.textResponse && task.lang">
+                                <span ng-if="task.lang">
                                     <md-button aria-label="viewCode" ng-click="ctrl.viewCodeResponse(task, ctrl.solutions[participant.$id][task.$id])">
                                         view code
                                     </md-button>
                                 </span>
                             </span>
 
-                            <span ng-if="!task.showLinks && ctrl.isReviewSuperUser">
+                            <span ng-if="!task.showLinks">
                                 Completed
                             </span>
                         </div>

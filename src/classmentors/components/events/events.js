@@ -977,7 +977,7 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
     this.isOpen = true;
     this.singPath = initialData.singPath;
     this.savingTask = false;
-    this.task = {archived: false};
+    this.task = {archived: false, showProgress: true};
     this.enableBeta = true;
     var location;
 
