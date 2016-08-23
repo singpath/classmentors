@@ -1121,8 +1121,18 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
             task.toEdit = self.selectedMetaData;
             task.textResponse = "Placeholder";
         }
+
         var copy = spfFirebase.cleanObj(task);
-        console.log("what is this copy?: ", copy);
+
+        //check if user keys in http inside Link Pattern
+        var checkLinkPattern = copy['linkPattern'];
+        if(checkLinkPattern != null){
+            if(checkLinkPattern.indexOf("http:") > -1){
+                checkLinkPattern = checkLinkPattern.replace("http:", "https:");
+            }
+        }
+        copy['linkPattern'] = checkLinkPattern;
+
         var data = {
             taskType: taskType,
             isOpen: isOpen,
@@ -1431,6 +1441,16 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBar
 
         this.saveTask = function (event, taskId, task, taskType, isOpen) {
             var copy = spfFirebase.cleanObj(task);
+
+            //check if user keys in http inside Link Pattern
+            var checkLinkPattern = copy['linkPattern'];
+            if(checkLinkPattern != null){
+                if(checkLinkPattern.indexOf("http:") > -1){
+                    checkLinkPattern = checkLinkPattern.replace("http:", "https:");
+                }
+            }
+            copy['linkPattern'] = checkLinkPattern;
+
             var data = {
                 taskType: taskType,
                 isOpen: isOpen,
@@ -2000,6 +2020,9 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             }
 
             this.save = function (link) {
+                if(link.indexOf("http:") > -1){
+                    link = link.replace("http:", "https:");
+                }
                 clmDataStore.events.submitSolution(eventId, taskId, participant.$id, link).then(function () {
                     $mdDialog.hide();
                     spfAlert.success('Link is saved.');
@@ -2637,6 +2660,9 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             var surveyType = $routeParams.surveyTask;
             var completed = true;
 
+            console.log("user id is:", userId);
+            console.log("task id is:", taskId);
+            console.log("which is undefined?", initialData.progress);
             initialData.progress[userId][taskId] = {completed: completed};
 
             spfAlert.success('Response has been submitted. Thank you for doing this survey!');
@@ -2670,6 +2696,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             var userId = initialData.currentUser.publicId;
             var surveyType = $routeParams.surveyTask;
             var completed = true;
+
 
             initialData.progress[userId][taskId] = {completed: completed};
 
