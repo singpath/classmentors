@@ -14,12 +14,12 @@ import editProfileTmpl from './events-view-edit-profile.html!text';
 import codeTmpl from './events-view-provide-code.html!text';
 import mcqTmpl from './events-view-provide-mcq.html!text';
 import './events.css!';
-import ace from '../../../jspm_packages/github/ajaxorg/ace-builds@1.2.3/ace.js';
-import monokai from '../../../jspm_packages/github/ajaxorg/ace-builds@1.2.3/theme-monokai.js';
-import javascript from '../../../jspm_packages/github/ajaxorg/ace-builds@1.2.3/mode-javascript.js';
-import html from '../../../jspm_packages/github/ajaxorg/ace-builds@1.2.3/mode-html.js';
-import java from '../../../jspm_packages/github/ajaxorg/ace-builds@1.2.3/mode-java.js';
-import python from '../../../jspm_packages/github/ajaxorg/ace-builds@1.2.3/mode-python.js';
+import ace from 'ace';
+import 'ace/theme-monokai.js';
+import 'ace/mode-javascript.js';
+import 'ace/mode-html.js';
+import 'ace/mode-java.js';
+import 'ace/mode-python.js';
 
 import schEngageScaleTmpl from './events-view-schEngageScale-task-form.html!text';
 import motiStratLearnTmpl from './events-view-motiStratLearn-task-form.html!text';
