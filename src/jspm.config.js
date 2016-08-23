@@ -13,16 +13,6 @@ SystemJS.config({
       "github:": "jspm_packages/github/",
       "singpath-core/": "packages/singpath-core/src/",
       "classmentors/": "classmentors/"
-    },
-    "map": {
-      "css": "github:systemjs/plugin-text@0.0.8",
-      "ace/mode-html.js": "@empty",
-      "ace/mode-java.js": "@empty",
-      "ace/mode-javascript.js": "@empty",
-      "ace/mode-python.js": "@empty",
-      "ace/theme-twilight.js": "@empty",
-      "ace": "@empty",
-      "firebase": "@empty"
     }
   },
   devConfig: {
