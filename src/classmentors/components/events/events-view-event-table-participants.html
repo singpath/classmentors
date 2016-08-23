@@ -224,7 +224,7 @@
                                 </span>
                                 <span ng-if="task.textResponse && !task.lang && !task.linkPattern">
                                     {{ ctrl.solutions[participant.$id][task.$id] | cmTruncate: 10 }}
-                                    <md-tooltip>
+                                    <md-tooltip ng-if="(ctrl.solutions[participant.$id][task.$id] | cmTruncated: 10).truncated">
                                          {{ ctrl.solutions[participant.$id][task.$id]}}
                                     </md-tooltip>
                                 </span>
