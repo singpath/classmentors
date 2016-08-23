@@ -17,4 +17,13 @@ tools.clean(config.coverage.root, {message: 'Removing coverage data'});
 sh.echo(`Setting up "${config.coverage.root}/"...`);
 sh.mkdir('-p', config.coverage.root);
 
-tools.instanbul(config.test.main, {coverage: config.coverage.root});
+tools.instanbul(config.test.main, {
+  coverage: config.coverage.root,
+  config(loader) {
+    loader.config({
+      map: {
+        css: loader.map.text
+      }
+    });
+  }
+});

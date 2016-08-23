@@ -13,4 +13,12 @@ const tools = require('@singpath/tools');
 sh.set('-e');
 
 // test
-tools.mocha(config.test.main);
+tools.mocha(config.test.main, {
+  config(loader) {
+    loader.config({
+      map: {
+        css: loader.map.text
+      }
+    });
+  }
+});

@@ -10,7 +10,7 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "@singpath/tools": "0.0.7",
+    "@singpath/tools": "0.0.8",
     "archiver": "^1.0.0",
     "babel-eslint": "^6.0.4",
     "coveralls": "^2.11.9",

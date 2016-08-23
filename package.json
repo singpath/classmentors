@@ -6,7 +6,7 @@
   "main": "src/classmentors/index.js",
   "dependencies": {},
   "devDependencies": {
-    "@singpath/tools": "0.0.7",
+    "@singpath/tools": "0.0.8",
     "babel-eslint": "^6.0.4",
     "compression": "^1.6.1",
     "coveralls": "^2.11.9",
@@ -550,4 +550,4 @@
   "keywords": [],
   "author": "",
   "license": "MIT"
-}
+}
