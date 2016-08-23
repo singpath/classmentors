@@ -1596,7 +1596,7 @@ export function clmEventTableFactory() {
 
 function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                            urlFor, spfAlert, clmServicesUrl, clmDataStore, clmPagerOption,
-                           eventService, $location, routes, $route) {
+                           eventService, $location, routes, $route, spfAuthData) {
     var self = this;
     var unwatchers = [];
 
@@ -1611,8 +1611,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
     };
 
     //Find superReviewUser rights
-    console.log(self.event);
-    console.log(self.profile);
+    // console.log(self.profile);
     this.isReviewSuperUser = false;
     if(self.event.owner.publicId == self.profile.$id) {
         self.isReviewSuperUser = true;
@@ -1974,6 +1973,9 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                     spfAlert.error('Failed to update your profile.');
                     return err;
                 });
+                // if(self.userData.school) {
+                //     spfFirebase.set(['auth/users'], actionObj);
+                // }
             };
 
             this.cancel = function () {
@@ -2297,7 +2299,7 @@ ClmEventTableCtrl.$inject = [
     'eventService',
     '$location',
     'routes',
-    '$route'
+    '$route', 'spfAuthData'
 ];
 
 //TODO: include the event to load initial data into surveyformfillctrl
