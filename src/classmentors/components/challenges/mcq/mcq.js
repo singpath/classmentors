@@ -307,6 +307,8 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
         spfAlert.success('Your Mcq responses are saved.'),
 
         //todo:set progress to true, and save the progress into firebase
+
+        initialData.progress[userId] = {taskId},
         initialData.progress[userId][taskId] = {completed: true},
         clmDataStore.events.setProgress(eventId, taskId, userId, initialData.progress),
 

@@ -1,4 +1,4 @@
-<md-dialog aria-label="{{ctrl.task.title}}" class="link-dialog">
+<md-dialog aria-label="{{ctrl.task.title}}" class="enlarged-dialog">
     <form name="provideResponseForm" ng-submit="ctrl.save(ctrl.solution)">
         <md-dialog-content class="sticky-container">
             <md-subheader class="md-sticky-no-effect">{{ctrl.task.title}}</md-subheader>
@@ -8,7 +8,7 @@
                     <label for="edit-solution-response">{{ctrl.task.textResponse}}</label>
                     <textarea name="solution" id="edit-solution-response"
                               ng-model="ctrl.solution"
-                              required rows="5" md-select-on-focus>
+                              required md-select-on-focus>
                     </textarea>
                     <div ng-messages="provideResponseForm.linkSolution.$error">
                         <div ng-message="required">Required.</div>
