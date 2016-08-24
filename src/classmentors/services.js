@@ -370,8 +370,7 @@ export function clmDataStoreFactory(
           userData.displayName === resp.currentUser.displayName &&
           userData.gravatar === resp.currentUser.gravatar &&
           userCountry === profileCountry &&
-          userData.yearOfBirth === resp.currentUser.yearOfBirth &&
-          userSchool === profileSchool
+          userData.yearOfBirth === resp.currentUser.yearOfBirth
         ) {
           return resp.profile;
         }

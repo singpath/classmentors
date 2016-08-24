@@ -160,11 +160,11 @@ export function eventServiceFactory($q, $route, spfAuthData, clmDataStore, spfFi
             self.creatingTask = true;
             clmDataStore.events.addTask(event.$id, copy, isOpen);
             // .then(function() {
-            // spfAlert.success('Task created');
+            // spfAlert.success('Challenge created');
             // $location.path(urlFor('editEvent', {eventId: self.event.$id}));
             // }).catch(function(err) {
             //     $log.error(err);
-            //     spfAlert.error('Failed to created new task');
+            //     spfAlert.error('Failed to created new challenge');
             // }).finally(function() {
             //     self.creatingTask = false;
             // });
@@ -222,7 +222,7 @@ function ClmListEvent(initialData, spfNavBarService, urlFor) {
         });
     }
 
-    spfNavBarService.update('Event', undefined, opts);
+    spfNavBarService.update('Events', undefined, opts);
 }
 ClmListEvent.$inject = ['initialData', 'spfNavBarService', 'urlFor'];
 
@@ -304,7 +304,7 @@ function NewEventCtrl($q, $location, initialData, urlFor, spfFirebase, spfAuthDa
         if (!self.profile) {
             cleanProfile();
             next = spfAuthData.publicId(currentUser).then(function () {
-                spfAlert.success('Public id and display name saved');
+                spfAlert.success('Public id and display name saved.');
                 return clmDataStore.initProfile();
             }).then(updateProfile);
         } else if (self.profileNeedsUpdate) {
@@ -581,7 +581,7 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
         ) {
             spfAlert.warning(
                 'Only Students from Singapore can join this event. ' +
-                'Maybe you profile needs to be updated.');
+                'Maybe your profile needs to be updated.');
             return;
         }
         $mdDialog.show({
@@ -596,7 +596,7 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
 
             this.join = function (pw) {
                 clmDataStore.events.join(self.event, pw).then(function () {
-                    spfAlert.success('You joined this event');
+                    spfAlert.success('You joined this event.');
                     $mdDialog.hide();
                     $route.reload();
                 }).catch(function (err) {
@@ -618,12 +618,12 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
     this.register = function (currentUser) {
         cleanProfile(currentUser);
         spfAuthData.publicId(currentUser).then(function () {
-            spfAlert.success('Public id and display name saved');
+            spfAlert.success('Public id and display name saved.');
             return clmDataStore.initProfile();
         }).then(function () {
             $route.reload();
         }).catch(function (err) {
-            spfAlert.error('Failed to save public id');
+            spfAlert.error('Failed to save public id.');
             return err;
         });
     };
@@ -818,7 +818,7 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
             if (self.isOwner) {
                 self.showingAssistants = true;
             } else {
-                spfAlert.error('Only the event owner may manage assistants');
+                spfAlert.error('Only the event owner may manage assistants.');
             }
         }
     };
@@ -837,7 +837,7 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
 
     this.enableReview = function (eventId, assistantId, assistantName) {
         clmDataStore.events.enableAssistantReviewing(eventId, assistantId).then(function () {
-            spfAlert.success(assistantName + ' can now review event challenge submissions');
+            spfAlert.success(assistantName + ' can now review event challenge submissions.');
         }).catch(function () {
             spfAlert.error('Failed to change assistant rights');
         });
@@ -845,36 +845,36 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
 
     this.disableReview = function (eventId, assistantId, assistantName) {
         clmDataStore.events.disableAssistantReviewing(eventId, assistantId).then(function () {
-            spfAlert.success(assistantName + ' can no longer review event challenge submissions');
+            spfAlert.success(assistantName + ' can no longer review event challenge submissions.');
         }).catch(function () {
-            spfAlert.error('Failed to change assistant rights');
+            spfAlert.error('Failed to change assistant rights.');
         });
     };
 
     this.enableEdit = function (eventId, assistantId, assistantName) {
         clmDataStore.events.enableAssistantEditing(eventId, assistantId).then(function () {
-            spfAlert.success(assistantName + ' can now edit the event');
+            spfAlert.success(assistantName + ' can now edit the event.');
         }).catch(function () {
-            spfAlert.error('Failed to change assistant rights');
+            spfAlert.error('Failed to change assistant rights.');
         });
     };
 
     this.disableEdit = function (eventId, assistantId, assistantName) {
         clmDataStore.events.disableAssistantEditing(eventId, assistantId).then(function () {
-            spfAlert.success(assistantName + ' can no longer edit the event');
+            spfAlert.success(assistantName + ' can no longer edit the event.');
         }).catch(function () {
-            spfAlert.error('Failed to change assistant rights');
+            spfAlert.error('Failed to change assistant rights.');
         });
     };
 
     this.removeAssistant = function (eventId, assistantId, assistantName) {
         clmDataStore.events.removeAssistant(eventId, assistantId).then(function () {
-            spfAlert.success(assistantName + ' removed as event assistant');
+            spfAlert.success(assistantName + ' removed as event assistant.');
             if (self.assistantArr.indexOf(assistantId) >= 0) {
                 self.assistantArr.splice(assistantId, 1);
             }
         }).catch(function () {
-            spfAlert.error('Failed to remove assistant');
+            spfAlert.error('Failed to remove assistant.');
         });
     };
 
@@ -907,41 +907,41 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
 
     this.openTask = function (eventId, taskId) {
         clmDataStore.events.openTask(eventId, taskId).then(function () {
-            spfAlert.success('Task opened.');
+            spfAlert.success('Challenge opened.');
         }).catch(function () {
-            spfAlert.error('Failed to open task');
+            spfAlert.error('Failed to open challenge.');
         });
     };
 
     this.closeTask = function (eventId, taskId) {
         clmDataStore.events.closeTask(eventId, taskId).then(function () {
-            spfAlert.success('Task closed.');
+            spfAlert.success('Challenge closed.');
         }).catch(function () {
-            spfAlert.error('Failed to close task.');
+            spfAlert.error('Failed to close challenge.');
         });
     };
 
     this.showTask = function (eventId, taskId) {
         clmDataStore.events.showTask(eventId, taskId).then(function () {
-            spfAlert.success('Task visible.');
+            spfAlert.success('Challenge visible.');
         }).catch(function () {
-            spfAlert.error('Failed to make task visible.');
+            spfAlert.error('Failed to make challenge visible.');
         });
     };
 
     this.hideTask = function (eventId, taskId) {
         clmDataStore.events.hideTask(eventId, taskId).then(function () {
-            spfAlert.success('Task hidden.');
+            spfAlert.success('Challenge hidden.');
         }).catch(function () {
-            spfAlert.error('Failed to make task hidden.');
+            spfAlert.error('Failed to make challenge hidden.');
         });
     };
 
     this.archiveTask = function (eventId, taskId) {
         clmDataStore.events.archiveTask(eventId, taskId).then(function () {
-            spfAlert.success('Task archived.');
+            spfAlert.success('Challenge archived.');
         }).catch(function () {
-            spfAlert.error('Failed to archive task.');
+            spfAlert.error('Failed to archive challenge.');
         });
     };
 }
@@ -977,7 +977,7 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
     this.isOpen = true;
     this.singPath = initialData.singPath;
     this.savingTask = false;
-    this.task = {archived: false};
+    this.task = {archived: false, showProgress: true};
     this.enableBeta = true;
     var location;
 
@@ -1060,11 +1060,16 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
         } else if (tasktype == 'journalling') {
             console.log('journalling is clicked');
             return 'Continue';
+
         } else if (tasktype == 'survey') {
-            console.log("clicked clmdata: ", initialData.event);
+            console.log("clicked clmdataa: ", initialData.event);
+
             clmSurvey.set(initialData.event.$id, initialData.event, task, tasktype, isOpen);
             var obj = clmSurvey.get();
-            return '/challenges/survey'
+            location = '/challenges/survey';
+
+            return 'Continue';
+
         } else if (tasktype === 'profileEdit') {
             return 'Save';
         } else {
@@ -1072,36 +1077,7 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
         }
     }
 
-    //this function double checks with user if he wishes to go back and discard all changes thus far
-    this.discardChanges = function (ev, task) {
-        var confirm = $mdDialog.confirm()
-            .title('Would you like to discard your changes?')
-            .textContent('All of the information input will be discarded. Are you sure you want to continue?')
-            .ariaLabel('Discard changes')
-            .targetEvent(ev)
-            .ok('Discard All')
-            .cancel('Do Not Discard');
-        $mdDialog.show(confirm).then(function () {
-            // decided to discard data, bring user to previous page
-            $location.path(urlFor('editEvent', {eventId: self.event.$id}));
-
-        }), function () {
-            //go back to the current page
-            //todo: preserve the data that was keyed into form. (data should not be saved into the db yet)
-            this.task.title = task.title
-            this.task.priority = task.priority
-            this.task.description = task.description
-            this.task.link = task.link
-
-            this.task.linkPattern = task.linkPattern
-            this.task.textResponse = task.textResponse
-
-            this.task.cards = task.cards
-        };
-    }
-
-
-    //this function double checks with user if he wishes to go back and discard all changes thus far
+       //this function double checks with user if he wishes to go back and discard all changes thus far
     this.discardChanges = function (ev) {
         var confirm = $mdDialog.confirm()
             .title('You have not saved your input information')
@@ -1163,7 +1139,7 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
 
 
         self.creatingTask = true;
-        if (taskType === 'multipleChoice' || taskType === 'journalling' || taskType === 'video') {
+        if (taskType === 'multipleChoice' || taskType === 'journalling' || taskType === 'video' || taskType === 'survey') {
             var data = {
                 taskType: taskType,
                 isOpen: isOpen,
@@ -1187,11 +1163,11 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
             $location.path(location);
         } else {
             clmDataStore.events.addTask(event.$id, copy, isOpen).then(function () {
-                spfAlert.success('Task created');
+                spfAlert.success('Challenge created.');
                 $location.path(urlFor('editEvent', {eventId: self.event.$id}));
             }).catch(function (err) {
                 $log.error(err);
-                spfAlert.error('Failed to created new task');
+                spfAlert.error('Failed to created new challenge.');
             }).finally(function () {
                 self.creatingTask = false;
             });
@@ -1481,7 +1457,7 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBar
 
 
             self.creatingTask = true;
-            if (taskType === 'multipleChoice' || taskType === 'journalling' || taskType === 'video') {
+            if (taskType === 'multipleChoice' || taskType === 'journalling' || taskType === 'video' || taskType === 'survey') {
                 var data = {
                     taskType: taskType,
                     isOpen: isOpen,
@@ -1521,9 +1497,9 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBar
 
                     return clmDataStore.events.closeTask(event.$id, taskId);
                 }).then(function () {
-                    spfAlert.success('Task saved');
+                    spfAlert.success('Challenge saved.');
                 }).catch(function () {
-                    spfAlert.error('Failed to save the task.');
+                    spfAlert.error('Failed to save the challenge.');
                 }).finally(function () {
                     self.savingTask = false;
                 });
@@ -1616,7 +1592,7 @@ export function clmEventTableFactory() {
 
 function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                            urlFor, spfAlert, clmServicesUrl, clmDataStore, clmPagerOption,
-                           eventService, $location, routes, $route) {
+                           eventService, $location, routes, $route, spfAuthData) {
     var self = this;
     var unwatchers = [];
 
@@ -1631,8 +1607,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
     };
 
     //Find superReviewUser rights
-    console.log(self.event);
-    console.log(self.profile);
+    // console.log(self.profile);
     this.isReviewSuperUser = false;
     if(self.event.owner.publicId == self.profile.$id) {
         self.isReviewSuperUser = true;
@@ -1994,6 +1969,9 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                     spfAlert.error('Failed to update your profile.');
                     return err;
                 });
+                // if(self.userData.school) {
+                //     spfFirebase.set(['auth/users'], actionObj);
+                // }
             };
 
             this.cancel = function () {
@@ -2320,7 +2298,7 @@ ClmEventTableCtrl.$inject = [
     'eventService',
     '$location',
     'routes',
-    '$route'
+    '$route', 'spfAuthData'
 ];
 
 //TODO: include the event to load initial data into surveyformfillctrl
@@ -2665,7 +2643,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             console.log("which is undefined?", initialData.progress);
             initialData.progress[userId][taskId] = {completed: completed};
 
-            spfAlert.success('Response has been submitted. Thank you for doing this survey!');
+            spfAlert.success('Survey responses have been submitted.');
             clmDataStore.events.saveSurveyResponseOnSubmit(taskId, eventId, userId, surveyType, schEngageResp);
             clmDataStore.events.submitSolution(eventId, taskId, userId, "Completed");
             clmDataStore.events.setProgress(eventId, taskId, userId, initialData.progress);
@@ -2700,7 +2678,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
 
             initialData.progress[userId][taskId] = {completed: completed};
 
-            spfAlert.success('Response has been submitted. Thank you for doing this survey!');
+            spfAlert.success('Survey response has been submitted.');
             clmDataStore.events.saveSurveyResponseOnSubmit(taskId, eventId, userId, surveyType, motiResp);
             clmDataStore.events.submitSolution(eventId, taskId, userId, "Completed");
             clmDataStore.events.setProgress(eventId, taskId, userId, initialData.progress);
@@ -2749,7 +2727,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             initialData.progress[userId][taskId] = {completed: completed};
 
 
-            spfAlert.success('Response has been submitted. Thank you for doing this survey!');
+            spfAlert.success('Survey response has been submitted.');
             //add into firebase
             clmDataStore.events.saveSurveyResponseOnSubmit(taskId, eventId, userId, surveyType, eduDissResp);
             clmDataStore.events.submitSolution(eventId, taskId, userId, "Completed");

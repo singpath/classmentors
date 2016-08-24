@@ -175,7 +175,8 @@
                         </div>
 
                         <div ng-if="task.survey">
-                                <span ng-if="ctrl.currentUserSolutions[task.$id]">Survey Completed
+                                <span ng-if="ctrl.currentUserSolutions[task.$id]">
+                                    Survey Completed
                                     <span ng-if="!ctrl.currentUserProgress[task.$id].completed"></span>
                                 </span>
 
@@ -187,13 +188,24 @@
                         </div>
 
                         <div ng-if="task.toEdit">
-                            <div ng-if="ctrl.currentUserSolutions[task.$id]">Profile up to date</div>
+                            <div ng-if="ctrl.profile.school">
+                                {{ctrl.profile.school.name}}
+                                <md-button class="md-icon-button md-primary small-icon"
+                                           aria-label="Update_profile"
+                                           ng-click="ctrl.editProfileInfo(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant)"
+                                           ng-if="task.openedAt"
+                                >
+                                    <md-icon md-svg-icon="create"></md-icon>
+                                </md-button>
+                            </div>
 
-                            <md-button class="md-raised md-primary"
-                                       aria-label="Enter_profile_info"
-                                       ng-click="ctrl.editProfileInfo(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant)" ng-disabled="task.closedAt" ng-if="!ctrl.currentUserSolutions[task.$id]">
-                                Enter Information
-                            </md-button>
+                            <div ng-if="!ctrl.profile.school">
+                                <md-button class="md-raised md-primary"
+                                           aria-label="Enter_profile_info"
+                                           ng-click="ctrl.editProfileInfo(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant)" ng-disabled="task.closedAt">
+                                    Enter Information
+                                </md-button>
+                            </div>
                         </div>
                     </td>
                 </tr>
@@ -213,29 +225,39 @@
                     </th>
 
                     <td ng-repeat="task in ctrl.visibleTasks track by task.$id">
-                        <div ng-if="ctrl.progress[participant.$id][task.$id].completed && (ctrl.isReviewSuperUser || task.showProgress)">
-                            <span ng-if="(!task.textResponse && !task.linkPattern) || !ctrl.isReviewSuperUser">
-                                Completed
-                            </span>
+                        <div ng-if="ctrl.progress[participant.$id][task.$id].completed && task.showProgress">
+                            <!--<span ng-if="(!task.textResponse && !task.linkPattern) || !ctrl.isReviewSuperUser">-->
+                                <!--Completed-->
+                            <!--</span>-->
 
-                            <span ng-if="task.showLinks && ctrl.isReviewSuperUser">
+                            <span ng-if="task.showLinks">
                                 <span ng-if="task.linkPattern">
                                     <a ng-href="{{ctrl.solutions[participant.$id][task.$id]}}" target="_blank">completed</a>
                                 </span>
                                 <span ng-if="task.textResponse && !task.lang && !task.linkPattern">
-                                    {{ ctrl.solutions[participant.$id][task.$id] | cmTruncate: 10 }}
-                                    <md-tooltip>
-                                         {{ ctrl.solutions[participant.$id][task.$id]}}
-                                    </md-tooltip>
+                                    <md-menu>
+                                        <md-button ng-click="$mdOpenMenu()">
+                                            {{ ctrl.solutions[participant.$id][task.$id] | cmTruncate: 10 }}
+                                        </md-button>
+                                        <md-menu-content>
+                                            <div style="white-space: pre-wrap;">{{ ctrl.solutions[participant.$id][task.$id]}}</div>
+                                        </md-menu-content>
+                                    </md-menu>
+                                    <!--<md-tooltip ng-if="(ctrl.solutions[participant.$id][task.$id] | cmTruncated: 10).truncated">-->
+                                         <!--<div style="white-space: pre-wrap;">{{ ctrl.solutions[participant.$id][task.$id]}}</div>-->
+                                    <!--</md-tooltip>-->
                                 </span>
-                                <span ng-if="task.textResponse && task.lang">
+                                <span ng-if="task.lang">
                                     <md-button aria-label="viewCode" ng-click="ctrl.viewCodeResponse(task, ctrl.solutions[participant.$id][task.$id])">
                                         view code
                                     </md-button>
                                 </span>
+                                <!--<span ng-if="task.toEdit">-->
+                                    <!--<div ng-if="ctrl.currentUserSolutions[task.$id]">Profile up to date</div>-->
+                                <!--</span>-->
                             </span>
 
-                            <span ng-if="!task.showLinks && ctrl.isReviewSuperUser">
+                            <span ng-if="!task.showLinks">
                                 Completed
                             </span>
                         </div>
