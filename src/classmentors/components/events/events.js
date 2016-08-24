@@ -1092,7 +1092,7 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
         });
     };
 
-    this.saveTask = function (event, _, task, taskType, isOpen) {
+    this.saveTask = function (event, taskId, task, taskType, isOpen) {
         if (taskType === 'profileEdit') {
             task.toEdit = self.selectedMetaData;
             task.textResponse = "Placeholder";
@@ -1106,8 +1106,8 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
             if(checkLinkPattern.indexOf("http:") > -1){
                 checkLinkPattern = checkLinkPattern.replace("http:", "https:");
             }
+            copy['linkPattern'] = checkLinkPattern;
         }
-        copy['linkPattern'] = checkLinkPattern;
 
         var data = {
             taskType: taskType,
