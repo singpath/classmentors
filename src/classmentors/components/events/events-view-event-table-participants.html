@@ -235,10 +235,17 @@
                                     <a ng-href="{{ctrl.solutions[participant.$id][task.$id]}}" target="_blank">completed</a>
                                 </span>
                                 <span ng-if="task.textResponse && !task.lang && !task.linkPattern">
-                                    {{ ctrl.solutions[participant.$id][task.$id] | cmTruncate: 10 }}
-                                    <md-tooltip ng-if="(ctrl.solutions[participant.$id][task.$id] | cmTruncated: 10).truncated">
-                                         <div style="white-space: pre-wrap;">{{ ctrl.solutions[participant.$id][task.$id]}}</div>
-                                    </md-tooltip>
+                                    <md-menu>
+                                        <md-button ng-click="$mdOpenMenu()">
+                                            {{ ctrl.solutions[participant.$id][task.$id] | cmTruncate: 10 }}
+                                        </md-button>
+                                        <md-menu-content>
+                                            <div style="white-space: pre-wrap;">{{ ctrl.solutions[participant.$id][task.$id]}}</div>
+                                        </md-menu-content>
+                                    </md-menu>
+                                    <!--<md-tooltip ng-if="(ctrl.solutions[participant.$id][task.$id] | cmTruncated: 10).truncated">-->
+                                         <!--<div style="white-space: pre-wrap;">{{ ctrl.solutions[participant.$id][task.$id]}}</div>-->
+                                    <!--</md-tooltip>-->
                                 </span>
                                 <span ng-if="task.lang">
                                     <md-button aria-label="viewCode" ng-click="ctrl.viewCodeResponse(task, ctrl.solutions[participant.$id][task.$id])">
