@@ -1060,11 +1060,16 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
         } else if (tasktype == 'journalling') {
             console.log('journalling is clicked');
             return 'Continue';
+
         } else if (tasktype == 'survey') {
-            console.log("clicked clmdata: ", initialData.event);
+            console.log("clicked clmdataa: ", initialData.event);
+
             clmSurvey.set(initialData.event.$id, initialData.event, task, tasktype, isOpen);
             var obj = clmSurvey.get();
-            return '/challenges/survey'
+            location = '/challenges/survey';
+
+            return 'Continue';
+
         } else if (tasktype === 'profileEdit') {
             return 'Save';
         } else {
@@ -1124,7 +1129,7 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
 
 
         self.creatingTask = true;
-        if (taskType === 'multipleChoice' || taskType === 'journalling' || taskType === 'video') {
+        if (taskType === 'multipleChoice' || taskType === 'journalling' || taskType === 'video' || taskType === 'survey') {
             var data = {
                 taskType: taskType,
                 isOpen: isOpen,
@@ -1432,7 +1437,7 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBar
 
 
             self.creatingTask = true;
-            if (taskType === 'multipleChoice' || taskType === 'journalling' || taskType === 'video') {
+            if (taskType === 'multipleChoice' || taskType === 'journalling' || taskType === 'video' || taskType === 'survey') {
                 var data = {
                     taskType: taskType,
                     isOpen: isOpen,

@@ -275,11 +275,11 @@ function surveyFormEvent($scope, clmSurvey, spfFirebase, clmDataStore, $log, spf
         console.log("survey type is " + surveyType);
         copy.survey = surveyType;
         clmDataStore.events.addTask(sharedData.eventId, copy, sharedData.isOpen).then(function () {
-            spfAlert.success('Task created');
+            spfAlert.success('Challenge created');
             $location.path(urlFor('editEvent', {eventId: sharedData.eventId}));
         }).catch(function (err) {
             $log.error(err);
-            spfAlert.error('Failed to create new task');
+            spfAlert.error('Failed to create new challenge.');
         }).finally(function () {
             self.creatingTask = false;
         });
