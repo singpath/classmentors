@@ -222,7 +222,7 @@ function ClmListEvent(initialData, spfNavBarService, urlFor) {
         });
     }
 
-    spfNavBarService.update('Event', undefined, opts);
+    spfNavBarService.update('Events', undefined, opts);
 }
 ClmListEvent.$inject = ['initialData', 'spfNavBarService', 'urlFor'];
 
