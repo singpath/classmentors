@@ -21,6 +21,9 @@ SystemJS.config({
     }
   },
   transpiler: "plugin-babel",
+  babelOptions: {
+    "compact": true
+  },
   packages: {
     "classmentors": {
       "main": "index.js",
