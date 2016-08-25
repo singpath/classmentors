@@ -5,11 +5,12 @@
 /**
  * Check the firebase app references are set.
  *
- * @param  {firebase.app.App}           firebaseApp     Main firebase app
- * @param  {firebase.app.App}           authFirebaseApp Firebase app handling authentication.
- * @param  {firebase.auth.AuthProvider} authProvider    Firebase app auth provider.
+ * @param {object}                     $log            Angular logger service
+ * @param {firebase.app.App}           firebaseApp     Main firebase app
+ * @param {firebase.app.App}           authFirebaseApp Firebase app handling authentication.
+ * @param {firebase.auth.AuthProvider} authProvider    Firebase app auth provider.
  */
-export function run(firebaseApp, authFirebaseApp, authProvider) {
+export function run($log, firebaseApp, authFirebaseApp, authProvider) {
   if (!firebaseApp || !authFirebaseApp) {
     throw new Error('Firebase Apps (main and auth) are not set.');
   }
@@ -17,8 +18,11 @@ export function run(firebaseApp, authFirebaseApp, authProvider) {
   if (!authProvider) {
     throw new Error('Firebase auth provider is not set.');
   }
+
+  $log.info(`Auth Firebase app: ${authFirebaseApp.options.authDomain}`);
+  $log.info(`Main Firebase app: ${firebaseApp.options.authDomain}`);
 }
-run.$inject = ['firebaseApp', 'authFirebaseApp', 'authProvider'];
+run.$inject = ['$log', 'firebaseApp', 'authFirebaseApp', 'authProvider'];
 
 const invalidChar = ['.', '#', '$', '/', '[', ']'];
 
