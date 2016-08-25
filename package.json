@@ -54,7 +54,7 @@
       "angular-animate": "github:angular/bower-angular-animate@^1.5.8",
       "angular-aria": "github:angular/bower-angular-aria@^1.5.8",
       "angular-loading-bar": "github:chieffancypants/angular-loading-bar@^0.8.0",
-      "angular-material": "github:angular/bower-material@^1.0.9",
+      "angular-material": "github:angular/bower-material@~1.0.9",
       "angular-messages": "github:angular/bower-angular-messages@^1.5.8",
       "angular-route": "github:angular/bower-angular-route@^1.5.8",
       "assert": "github:jspm/nodelibs-assert@^0.2.0-alpha",
@@ -176,7 +176,7 @@
           }
         }
       },
-      "github:angular/bower-material@1.1.1": {
+      "github:angular/bower-material@1.0.9": {
         "main": "angular-material",
         "registry": "jspm",
         "dependencies": {
@@ -231,7 +231,7 @@
           }
         }
       },
-      "github:firebase/firebase-bower@3.3.1": {
+      "github:firebase/firebase-bower@3.3.2": {
         "main": "firebase.js",
         "registry": "jspm",
         "meta": {
