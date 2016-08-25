@@ -2627,6 +2627,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             console.log("user id is:", userId);
             console.log("task id is:", taskId);
             console.log("which is undefined?", initialData.progress);
+            initialData.progress[userId] = {taskId};
             initialData.progress[userId][taskId] = {completed: completed};
 
             spfAlert.success('Survey responses have been submitted.');
@@ -2661,7 +2662,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             var surveyType = $routeParams.surveyTask;
             var completed = true;
 
-
+            initialData.progress[userId] = {taskId};
             initialData.progress[userId][taskId] = {completed: completed};
 
             spfAlert.success('Survey response has been submitted.');
@@ -2709,7 +2710,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             var userId = initialData.currentUser.publicId;
             var surveyType = $routeParams.surveyTask;
             var completed = true;
-
+            initialData.progress[userId] = {taskId};
             initialData.progress[userId][taskId] = {completed: completed};
 
 
@@ -2719,7 +2720,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             clmDataStore.events.submitSolution(eventId, taskId, userId, "Completed");
             clmDataStore.events.setProgress(eventId, taskId, userId, initialData.progress);
 
-            //$location.path(urlFor('oneEvent', {eventId: self.event.$id}));
+            $location.path(urlFor('oneEvent', {eventId: self.event.$id}));
         }
     }
 
