@@ -31,7 +31,7 @@
                         {{key}}. {{value}}
                     </td>
                     <td ng-if="key != '0'">
-                        <md-radio-group layout="row" ng-model="$parent.ans" ng-change="ctrl.schEngageResp[key] = ans">
+                        <md-radio-group layout="row" ng-model="$parent.ans" ng-change="ctrl.schEngageResp[key] = ans" required>
                             <div ng-repeat="(key2, value2) in ctrl.responseRating">
                                 <md-radio-button style="margin-right:20px" class="md-primary"
                                                  ng-value="value2.option">
@@ -56,7 +56,7 @@
             <table>
                 <tr>
                     <td>
-                        <md-button type="submit" class="md-raised md-primary" style="width: 150px;">Submit</md-button>
+                        <md-button type="submit" ng-disabled="surveyForm.$invalid" class="md-raised md-primary" style="width: 150px;">Submit</md-button>
 
                     </td>
                     <td>
