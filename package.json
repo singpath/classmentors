@@ -539,6 +539,7 @@
     "clean": "node ./tools/bin/clean.js",
     "cover": "node ./tools/bin/coverage.js",
     "coveralls": "bash ./tools/bin/coveralls.sh",
+    "format": "npm lint -- --fix",
     "keygen": "node ./tools/bin/keygen.js",
     "lint": "eslint src/",
     "postinstall": "jspm install",
@@ -552,4 +553,3 @@
   "author": "",
   "license": "MIT"
 }
-
