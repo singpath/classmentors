@@ -34,6 +34,13 @@ const module = angular.module('clm', [
   spfShared.name
 ]);
 
+module.value('clmServicesUrl', {
+  backend: 'http://api.singpath.com/',
+  singPath: 'http://www.singpath.com/',
+  codeCombat: 'https://codecombat.com',
+  codeSchool: 'https://www.codeschool.com'
+});
+
 // module.component('challenges', components.challenges.component);
 module.component('ace', components.ace.component);
 module.component('classmentors', components.classmentors.component);
