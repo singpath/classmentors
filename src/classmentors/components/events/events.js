@@ -1077,7 +1077,7 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
         }
     }
 
-       //this function double checks with user if he wishes to go back and discard all changes thus far
+    //this function double checks with user if he wishes to go back and discard all changes thus far
     this.discardChanges = function (ev) {
         var confirm = $mdDialog.confirm()
             .title('You have not saved your input information')
@@ -1609,12 +1609,12 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
     //Find superReviewUser rights
     // console.log(self.profile);
     this.isReviewSuperUser = false;
-    if(self.event.owner.publicId == self.profile.$id) {
+    if (self.event.owner.publicId == self.profile.$id) {
         self.isReviewSuperUser = true;
     }
-    if(self.event.assistants) {
-        if(self.event.assistants[self.profile.$id]) {
-            if(self.event.assistants[self.profile.$id].canReview) {
+    if (self.event.assistants) {
+        if (self.event.assistants[self.profile.$id]) {
+            if (self.event.assistants[self.profile.$id].canReview) {
                 self.isReviewSuperUser = true;
             }
         }
@@ -2409,11 +2409,12 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             {option: 'All of the Time'}
         ];
 
-        self.schEngageResp = [];
+        self.schEngageResp = {};
+        //console.log("schEngageResp length before", Object.keys(self.schEngageResp).length);
+        // for (var k = 0; k <= Object.keys(initialData.survey2[2]).length - 2; k++) {
+        //     self.schEngageResp.push({[k + 1]: 0});
+        // }
 
-        for (var k = 0; k <= Object.keys(initialData.survey2[2]).length - 2; k++) {
-            self.schEngageResp.push({[k + 1]: 0});
-        }
 
 
     }
@@ -2426,11 +2427,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             self.questionsArr.push({'name': initialData.survey2[1]["Q" + i], 'qnid': i});
         }
 
-        self.motiResp = [];
-        for (var k = 0; k <= self.questionsArr.length; k++) {
-            self.motiResp.push({[k + 1]: 0});
-
-        }
+        self.motiResp = {};
 
     }
 
@@ -2489,26 +2486,17 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
 
         this.eduDissResp = {};
         this.questionJson = {};
+        console.log("this initialdata is", initialData.survey2[0]);
         //console.log("initial data before: ", initialData.survey2[0]);
         for (var i = 1; i < Object.keys(initialData.survey2[0]).length - 1; i++) {
 
             this.eduDissResp[initialData.survey2[0][i]['title']] = {};
 
-            for (var k = 0; k < Object.keys(initialData.survey2[0][i]).length - 1; k++) {
-                this.eduDissResp[initialData.survey2[0][i]['title']][k + 1] = 0;
-            }
-
         }
 
-        //console.log("testing titles: ", this.eduDissResp);
 
 
-        //this.eduDissResp[0]['What do I think about school?']=({'1' : 'trying only'});
-        //console.log("these titles: ", this.eduDissResp[0]['What do I think about school?'][1]);
-        // for (var k = 0; k <= Object.keys(initialData.survey2[2]).length - 2; k++) {
-        //     self.schEngageResp.push({[k + 1]: 0});
-        // }
-        //console.log("this edu diss promise has:", initialData.survey2[0]);
+
     }
 
     this.event = initialData.event;
@@ -2534,8 +2522,6 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
         //console.log("all the VALUES HERE: " + surveyResp + ", " + questionNumber + "," + taskId + ", " + eventId + ", " + userId + ", " + surveyType)
         clmDataStore.events.saveSurveyResponse(surveyResp, questionNumber, taskId, eventId, userId, surveyType);
 
-
-        console.log("testt for questions::", this.questions);
     }
     this.saveEduDisMultiResponse = function (selectedArr, item, task, qnTitle) {
 
@@ -2620,7 +2606,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
 
     }
     this.submitSchEngageResponse = function (schEngageResp) {
-        console.log("sch engage goes in here:", schEngageResp);
+        console.log("sch engage length:", Object.keys(schEngageResp).length);
 
         var allResponses = true;
         for (var i = 1; i < schEngageResp.length; i++) {
@@ -2702,7 +2688,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             else {
 
                 for (var qn in eduDissResp[title]) {
-                    if (eduDissResp[title][qn] == 0) {
+                    if (eduDissResp[title][qn] == undefined) {
                         allResponses = false;
                         break;
                     }
@@ -2733,11 +2719,11 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             clmDataStore.events.submitSolution(eventId, taskId, userId, "Completed");
             clmDataStore.events.setProgress(eventId, taskId, userId, initialData.progress);
 
-            $location.path(urlFor('oneEvent', {eventId: self.event.$id}));
+            //$location.path(urlFor('oneEvent', {eventId: self.event.$id}));
         }
     }
 
-    this.backToChallenge = function(){
+    this.backToChallenge = function () {
         $location.path(urlFor('oneEvent', {eventId: self.event.$id}));
     }
 
@@ -3458,8 +3444,8 @@ function ClmEventResultsTableCtrl($scope, $q, $log, $mdDialog, $document,
             };
         }
     };
-    
-    this.viewMultipleChoiceResponse = function (eventId, taskId, task, participant, userSolution){
+
+    this.viewMultipleChoiceResponse = function (eventId, taskId, task, participant, userSolution) {
         $mdDialog.show({
             clickOutsideToClose: true,
             parent: $document.body,
@@ -3472,10 +3458,10 @@ function ClmEventResultsTableCtrl($scope, $q, $log, $mdDialog, $document,
             this.task = task;
             this.viewOnly = true;
             this.questions = angular.fromJson(this.task.mcqQuestions);
-            this.isChecked = function(answers, index){
+            this.isChecked = function (answers, index) {
                 return answers.indexOf(index) > -1;
             }
-            this.show = function(answers){
+            this.show = function (answers) {
                 return answers.length > 1;
             }
 
@@ -3489,7 +3475,7 @@ function ClmEventResultsTableCtrl($scope, $q, $log, $mdDialog, $document,
             }
             var userAnswers = angular.fromJson(this.solution).userAnswers;
             console.log(userAnswers);
-            for(var i = 0; i < this.questions.length; i++){
+            for (var i = 0; i < this.questions.length; i++) {
                 this.questions[i].answers = userAnswers[i];
             }
             console.log(this.questions);

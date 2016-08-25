@@ -25,7 +25,7 @@
                     </td>
                     <!--ng-change="ctrl.motiResp.push(ans)"-->
                     <td align="right">
-                        <md-radio-group layout="row" ng-model="ans" ng-change="ctrl.motiResp[question.qnid] = ans">
+                        <md-radio-group layout="row" ng-model="ans" ng-change="ctrl.motiResp[question.qnid] = ans" required>
                             <div ng-repeat="ratingOption in ctrl.ratingOptions">
                                 <md-radio-button style="margin-right:60px" class="md-primary"
                                                  ng-value="ratingOption.id">
@@ -46,7 +46,7 @@
             <table>
                 <tr>
                     <td>
-                        <md-button type="submit" class="md-primary md-raised">Submit</md-button>
+                        <md-button type="submit" ng-disabled="surveyForm.$invalid" class="md-primary md-raised">Submit</md-button>
                     </td>
                     <td>
                         <md-button ng-click="ctrl.backToChallenge()" class="md-raised md-primary" style="width: 150px;">
