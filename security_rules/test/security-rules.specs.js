@@ -129,14 +129,13 @@ describe('With current security rules', function() {
 
   describe('Queue-workers', function() {
     var customAuth = {uid: 'queue-worker'};
-    var data = {};
 
     it('can write to classMentors/userProfiles', function() {
-      expect(customAuth).can.write(data).path('classMentors/userProfiles');
+      expect(customAuth).can.write(null).path('classMentors/userProfiles');
     });
 
     it('can write to classMentors/userAchievements', function() {
-      expect(customAuth).can.write(data).path('classMentors/userAchievements');
+      expect(customAuth).can.write(null).path('classMentors/userAchievements');
     });
 
   });

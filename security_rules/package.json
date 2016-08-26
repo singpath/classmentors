@@ -11,7 +11,7 @@
     "request": "latest"
   },
   "devDependencies": {
-    "@dinoboff/targaryen": "^2.2.1",
+    "@dinoboff/targaryen": "^2.2.2",
     "chai": "3.5.0",
     "coveralls": "^2.11.9",
     "eslint": "^2.13.1",
