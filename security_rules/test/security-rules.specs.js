@@ -23,7 +23,7 @@ describe('With current security rules', function() {
   describe('Unauthorized users', function() {
     var chris = {uid: 'google:110893970871115341770'};
 
-    it('can not write bad data to classMentors/userActions/$userActions', function() {
+    it.skip('can not write bad data to classMentors/userActions/$userActions', function() {
       expect(chris)
         .cannot.write({action: 'button'}).path('classMentors/userActions/someAction');
     });
@@ -45,7 +45,7 @@ describe('With current security rules', function() {
         .cannot.write(goodAction).path('classMentors/userActions/someAction');
     });
 
-    it('cannot read classMentors/userActions', function() {
+    it.skip('cannot read classMentors/userActions', function() {
       expect(chris).cannot.read.path('classMentors/userActions');
     });
 
