@@ -1424,8 +1424,8 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBar
                 if(checkLinkPattern.indexOf("http:") > -1){
                     checkLinkPattern = checkLinkPattern.replace("http:", "https:");
                 }
+                copy['linkPattern'] = checkLinkPattern;
             }
-            copy['linkPattern'] = checkLinkPattern;
 
             var data = {
                 taskType: taskType,
