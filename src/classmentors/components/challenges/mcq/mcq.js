@@ -209,7 +209,7 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
   //console.log(correctAnswers);
   self.task = data.task;
   var quesFromJson = angular.fromJson(self.task.mcqQuestions);
-  self.questions = loadQuestions(quesFromJson);
+  self.questions = quesFromJson
   self.multipleAns = initMultipleAns(correctAnswers);
 
   self.isMcqValid = false;
@@ -222,6 +222,7 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
     for(var i = 0; i < correctAnswers.length; i ++){
       if(correctAnswers[i].length > 1){
         multipleAnsList.push(true);
+        self.questions[i].answers = [];
       }else {
         multipleAnsList.push(false);
       }
@@ -230,6 +231,7 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
   }
 
   self.toggle = function(list, item){
+    console.log(list);
     var idx = list.indexOf(item);
     if (idx > -1) {
       list.splice(idx, 1);
@@ -237,21 +239,6 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
     else {
       list.push(item);
     }
-
-    checkMCQValid();
-    
-  }
-
-
-  function checkMCQValid(){
-    for (var i = 0; i < self.questions.length; i ++){
-      if(self.questions[i].answers.length == 0){
-        self.isMcqValid = false;
-
-        return;
-      }
-    }
-    self.isMcqValid = true;
   }
 
   function arraysEqual(arr1, arr2) {
@@ -261,7 +248,6 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
       if(arr1[i] !== arr2[i])
         return 0;
     }
-
     return 1;
   }
 
@@ -275,12 +261,6 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
     return score;
   }
 
-  function loadQuestions(quesFromJson){
-    for(var i = 0; i < quesFromJson.length; i++){
-      quesFromJson[i].answers = [];
-    }
-    return quesFromJson;
-  };
 
 
 
@@ -298,8 +278,8 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
 
     var score = markQuestions(userAnswers);
     var answerString = angular.toJson(submission);
-    //console.log(submission.score);
-    //console.log(answerString);
+    console.log(submission.score);
+    console.log(answerString);
 
     clmDataStore.events.submitSolution(eventId, taskId, participant.$id, answerString)
       .then(
