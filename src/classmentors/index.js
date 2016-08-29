@@ -52,6 +52,10 @@ module.factory('clmPagerOption', events.clmPagerOptionFactory);
 
 //added new survey factory for tryout purpose
 module.factory('clmSurvey',events.clmSurveyTaskFactory);
+
+// needed by singpath-core current user service.
+module.constant('spfProfilesPath', 'classMentors/userProfiles');
+
 /**
  * Label route paths.
  *

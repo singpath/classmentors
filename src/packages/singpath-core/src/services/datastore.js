@@ -5,6 +5,521 @@
  */
 /* eslint no-underscore-dangle: ["error", { "allow": ["_user", "_factory"] }]*/
 
+export const gravatarBaseUrl = '//www.gravatar.com/avatar/';
+export const eventName = 'spfCurrentUser.authChanged';
+
+/**
+ * Singleton holding the current user auth data and profile.
+ *
+ * The goal is deprecated spfAuthData and some app profile services, to replace
+ * it with an easier API, which doesn't require angularFire.
+ *
+ * It should also ease keeping auth data and profile data in sync.
+ *
+ * TODO: add method to update the profile data.
+ * TODO: add method to set and verify a security key.
+ * TODO: add method to test a public id is available.
+ *
+ */
+export class SpfCurrentUserService {
+
+  constructor($q, $timeout, $log, $rootScope, spfCrypto, spfFirebase, spfAuth, spfProfilesPath) {
+
+
+    this.$q = $q;
+    this.$timeout = $timeout;
+    this.$log = $log;
+    this.$rootScope = $rootScope;
+    this.$spfFirebase = spfFirebase;
+    this.$spfAuth = spfAuth;
+    this.$spfCrypto = spfCrypto;
+    this.$spfProfilesPath = spfProfilesPath;
+    this.$watchers = {};
+
+    this.uid = null;
+    this.firebaseUser = null;
+    this.publicId = null;
+    this.user = null;
+    this.isAdmin = false;
+    this.isPremium = false;
+    this.profile = null;
+
+    this.$watchers.firebaseUser = spfAuth.onAuth(
+      firebaseUser => this.authChangedHandler(firebaseUser)
+    );
+  }
+
+  /**
+   * Return a promise resolving once the profile/auth data currently loading
+   * finishes.
+   *
+   * Reject if the it times out (2000ms timeout delay by default).
+   *
+   * @param  {number} delay timeout delay
+   * @return {Promise<void, Error>}
+   */
+  $loaded(delay) {
+    const defaultTimeout = 2000;
+
+    delay = isNaN(delay) ? defaultTimeout : delay;
+
+    return this.$q((resolve, reject) => {
+      const loaded = () => this.user !== undefined && this.profile !== undefined;
+
+      if (loaded()) {
+        resolve();
+        return;
+      }
+
+      let timer;
+      const stop = this.$rootScope.$on(eventName, () => {
+        if (!loaded()) {
+          return;
+        }
+
+        stop();
+        resolve();
+        this.$timeout.cancel(timer);
+      });
+
+      timer = this.$timeout(() => {
+        stop();
+        reject(new Error('timeout'));
+      }, delay);
+    });
+  }
+
+  /**
+   * Stop watching user's data and profile and reset them.
+   *
+   * It should notify (event and digest trigger) the changed state.
+   *
+   * @param {any} value to set the value to null (loaded) instead indefined.
+   */
+  resetUser(value) {
+    this.publicId = value !== undefined ? null : undefined;
+    this.user = value !== undefined ? null : undefined;
+    this.doResetProfile(value);
+
+    if (this.$watchers.user) {
+      this.$watchers.user();
+      this.$watchers.user = undefined;
+    }
+
+    this.$rootScope.$emit(eventName, {user: true, profile: true});
+    this.$rootScope.$applyAsync();
+  }
+
+  /**
+   * Stop watching user's profile and reset it.
+   *
+   * It should notify (event and digest trigger) the changed state.
+   *
+   * @param {any} value to set the value to null (loaded) instead indefined.
+   */
+  resetProfile(value) {
+    this.doResetProfile(value);
+    this.$rootScope.$emit(eventName, {profile: true});
+    this.$rootScope.$applyAsync();
+  }
+
+  doResetProfile(value) {
+    this.profile = value !== undefined ? null : undefined;
+    this.isAdmin = false;
+    this.isPremium = false;
+
+    if (this.$watchers.profile) {
+      this.$watchers.profile();
+      this.$watchers.profile = undefined;
+    }
+  }
+
+  userRef(uid) {
+    if (!uid) {
+      throw new Error('The user uid provided.');
+    }
+
+    return this.$spfFirebase.ref(`auth/users/${uid}`);
+  }
+
+  profileRef(publicId) {
+    if (!publicId) {
+      throw new Error('The user publicId provided.');
+    }
+
+    return this.$spfFirebase.ref(`${this.$spfProfilesPath}/${publicId}`);
+  }
+
+  profileDetailsRef(publicId) {
+    return this.profileRef(publicId).child('user');
+  }
+
+  /**
+   * Set or update the saved user data at "auth/users/$userId".
+   *
+   * @return {Promise<void, Error>}
+   */
+  patchUser() {
+    const ref = this.userRef(this.firebaseUser.uid);
+
+    return ref.once('value').then(
+      () => ref.transaction(value => this.updateUser(value))
+    );
+  }
+
+  updateUser(user) {
+    const info = this.info();
+
+    if (!info) {
+      return undefined;
+    }
+
+    if (!user) {
+      return {
+        id: this.firebaseUser.uid,
+        fullName: info.name,
+        displayName: info.name,
+        email: info.email,
+        gravatar: this.gravatar(info.email),
+        createdAt: {'.sv': 'timestamp'}
+      };
+    }
+
+    let updated = false;
+
+    if (info.name !== user.fullName) {
+      user.fullName = info.name;
+      updated = true;
+    }
+
+    if (info.email !== user.email) {
+      user.email = info.email;
+      user.gravatar = this.gravatar(info.email);
+      updated = true;
+    }
+
+    return updated ? user : undefined;
+  }
+
+  /**
+   * Set or update the Profile data at "path/to/profile/$publicId/user".
+   *
+   * The path to app profile location is set via the "spfProfilesPath" angular
+   * module constant.
+   *
+   * @return {Promise<void, Error>}
+   */
+  patchProfile() {
+    const ref = this.profileDetailsRef(this.user.publicId);
+
+    return ref.once('value').then(
+      () => ref.transaction(value => this.updateProfile(value))
+    );
+  }
+
+  updateProfile(profile) {
+    if (!this.user || !this.user.displayName || !this.user.gravatar) {
+      return undefined;
+    }
+
+    const newProfile = {
+      displayName: this.user.displayName,
+      gravatar: this.user.gravatar,
+      yearOfBirth: this.user.yearOfBirth || null,
+      school: this.user.school || null,
+      country: this.user.country || null
+    };
+
+    if (!profile) {
+      return newProfile;
+    }
+
+    const updatedProfile = Object.assign({}, profile, newProfile);
+
+    let updated = Object.keys(updatedProfile).some(key => {
+      const value = updatedProfile[key];
+      const old = profile[key] || null;
+      const isObject = value instanceof Object;
+
+      if (!isObject) {
+        return value !== old;
+      }
+
+      if (Boolean(value) !== Boolean(old)) {
+        return true;
+      }
+
+      const propsChanged = Object.keys(value).some(
+        p => value[p] !== old[p]
+      );
+
+      if (propsChanged) {
+        return true;
+      }
+
+      const propsDeleted = Object.keys(old).some(
+        p => !value[p]
+      );
+
+      return propsDeleted;
+    });
+
+    return updated ? Object.assign(profile, updatedProfile) : undefined;
+  }
+
+  /**
+   * Handle changes to the current user auth status.
+   *
+   * It should update the firebaseUser and uid properties and notify (event and
+   * digest trigger) the changed state.
+   *
+   * The changes should cascade to the auth and profile data, and the related
+   * properties related.
+   *
+   * @param  {?{uid: string, provider: string, google: object}} firebaseUser firebase auth data
+   */
+  authChangedHandler(firebaseUser) {
+    const isLogged = firebaseUser && firebaseUser.uid;
+    const wasAlreadyLogged = (
+      isLogged &&
+      this.firebaseUser &&
+      this.firebaseUser.uid &&
+      this.firebaseUser.uid
+    );
+
+    this.uid = firebaseUser && firebaseUser.uid || null;
+    this.firebaseUser = firebaseUser || null;
+
+    if (!isLogged) {
+      this.resetUser(null);
+      this.$rootScope.$emit(eventName, {firebaseUser: true});
+      return;
+    }
+
+    this.patchUser();
+
+    if (!wasAlreadyLogged) {
+      this.watchUser();
+    }
+
+    this.$rootScope.$emit(eventName, {firebaseUser: true});
+    this.$rootScope.$applyAsync();
+  }
+
+  /**
+   * Handle changes to the current user saved auth data.
+   *
+   * It should update the user and public properties and notify (event and
+   * digest trigger) the changed state.
+   *
+   * The changes should cascade to the save profile data and to profile related
+   * properties
+   *
+   * @param {?{publicId: string, displayName: string, gravatar: string}} user saved firebase auth data
+   */
+  userChangedHandler(user) {
+    const dataSaved = user !== null;
+    const newPublicId = (
+      user &&
+      user.publicId && (
+        !this.user ||
+        !this.user.publicId
+      )
+    );
+
+    this.publicId = user && user.publicId || null;
+    this.user = user;
+
+    if (!dataSaved || !user.publicId) {
+      this.resetProfile(null);
+      this.$rootScope.$emit(eventName, {user: true});
+      return;
+    }
+
+    this.patchProfile();
+
+    if (!this.$watchers.profile || newPublicId) {
+      this.watchProfile();
+    }
+
+    this.$rootScope.$emit(eventName, {user: true});
+    this.$rootScope.$applyAsync();
+  }
+
+  /**
+   * Handle changes to the current user saved auth data.
+   *
+   * update the profile. isAdmin and isPremium properties, and notify (event and
+   * digest trigger) the changed state.
+   *
+   * @param  {?{isAdmin: boolean, isPremium: boolean}} profile profile data
+   */
+  profileChangedHandler(profile) {
+    this.isAdmin = profile && profile.isAdmin || false;
+    this.isPremium = profile && profile.isPremium || false;
+    this.profile = profile;
+
+    this.$rootScope.$emit(eventName, {profile: true});
+    this.$rootScope.$applyAsync();
+  }
+
+  watchUser() {
+    if (!this.firebaseUser || !this.firebaseUser.uid) {
+      this.resetUser(null);
+      return;
+    }
+
+    const ref = this.userRef(this.firebaseUser.uid);
+    const handler = snapshot => this.userChangedHandler(snapshot.val());
+    const onError = err => {
+      this.$log.error(err);
+      this.resetUser(null);
+    };
+
+    this.resetUser();
+    this.$watchers.user = () => ref.off('value', handler);
+    ref.on('value', handler, onError);
+  }
+
+  watchProfile() {
+    if (!this.user || !this.user.publicId) {
+      this.resetProfile(null);
+      return;
+    }
+
+    const ref = this.profileDetailsRef(this.user.publicId);
+    const handler = snapshot => this.profileChangedHandler(snapshot.val());
+    const onError = err => {
+      this.$log.error(err);
+      this.resetProfile(null);
+    };
+
+    this.resetProfile();
+    this.$watchers.profile = () => ref.off('value', handler);
+    ref.on('value', handler, onError);
+  }
+
+  /**
+   * Extract the current user name and email from the auth data.
+   *
+   * Only support google and custom provided data.
+   *
+   * @return {?{name: string, email: string}}
+   */
+  info() {
+    if (!this.firebaseUser || !this.firebaseUser.provider) {
+      return null;
+    }
+
+    if (this.firebaseUser.provider === 'google') {
+      return {
+        email: this.firebaseUser.google.email,
+        name: this.firebaseUser.google.displayName
+      };
+    }
+
+    if (this.firebaseUser.provider === 'custom') {
+      return {
+        email: 'custom@example.com',
+        name: 'Custom User'
+      };
+    }
+
+    throw new Error(`Wrong provider: ${this.firebaseUser.provider}`);
+  }
+
+  /**
+   * Return the gravatar url for an email.
+   *
+   * @param  {string} email email to calculate gravatar url for.
+   * @return {string}
+   */
+  gravatar(email) {
+    return gravatarBaseUrl + this.$spfCrypto.md5(email);
+  }
+
+  /**
+   * Register a handler for any changes to the current user authentication state
+   *
+   * @param  {function} handler function run for any changed state.
+   * @return {function}         function to register the hanlder.
+   */
+  onChange(handler) {
+    return this.$rootScope.$on(eventName, handler);
+  }
+
+  /**
+   * Log user in.
+   *
+   * @return {Promise<void, Error>}
+   */
+  login() {
+    return this.$spfAuth.login();
+  }
+
+  /**
+   * Log user out.
+   *
+   * @return {void}
+   */
+  logout() {
+    return this.$spfAuth.logout();
+  }
+
+  /**
+   * Register user's public id and display name (optional).
+   *
+   * @param  {{publicId: string, displayName: string}} options user chosen public id and display name.
+   * @return {Promise<void, Error>}
+   */
+  register(options) {
+    return new Promise((resolve, reject) => {
+      if (!this.uid) {
+        reject(new Error('You are not logged and cannot register.'));
+      }
+
+      if (this.publicId) {
+        reject(new Error(`you are already registered as "${this.publicId}"`));
+      }
+
+      const publicId = options && options.publicId;
+      const displayName = options && options.displayName;
+
+      if (!publicId) {
+        reject(new Error('The public id was not provided.'));
+      }
+
+      const patch = {
+        [`publicIds/${publicId}`]: this.uid,
+        [`usedPublicIds/${publicId}`]: true,
+        [`users/${this.uid}/publicId`]: publicId
+      };
+
+      if (displayName) {
+        patch[`users/${this.uid}/displayName`] = displayName;
+      }
+
+      resolve(patch);
+    }).then(patch => {
+      var ref = this.$spfFirebase.ref('auth');
+
+      return ref.update(patch);
+    });
+  }
+
+}
+
+SpfCurrentUserService.$inject = [
+  '$q',
+  '$timeout',
+  '$log',
+  '$rootScope',
+  'spfCrypto',
+  'spfFirebase',
+  'spfAuth',
+  'spfProfilesPath'
+];
+
 /**
  * Returns an object with `user` (Firebase auth user data) property,
  * and login/logout methods.
@@ -19,6 +534,7 @@
 export function spfAuthFactory($q, $route, $log, $firebaseAuth, spfFirebaseRef) {
   var auth = $firebaseAuth(spfFirebaseRef());
   var options = {scope: 'email'};
+  var cbs = [];
 
   var spfAuth = {
 
@@ -64,21 +580,37 @@ export function spfAuthFactory($q, $route, $log, $firebaseAuth, spfFirebaseRef) 
      * Register a callback for the authentication event.
      *
      * @param  {function} fn  cb function for auth change events.
-     * @param  {[type]}   ctx cb context.
+     * @param  {object}   ctx cb context.
      * @return {void}
      */
     onAuth: function(fn, ctx) {
-      return auth.$onAuth(fn, ctx);
+      const handler = {fn, ctx};
+
+      cbs.push(handler);
+
+      return () => {
+        const index = cbs.indexOf(handler);
+
+        if (index > -1) {
+          cbs.splice(index, 1);
+        }
+      };
     }
   };
 
-  spfAuth.onAuth(function(currentAuth) {
+  auth.$onAuth(function(currentAuth) {
     $log.debug('reloading');
     $route.reload();
 
-    if (!currentAuth) {
-      spfAuth.user = undefined;
-    }
+    spfAuth.user = currentAuth || undefined;
+
+    cbs.forEach(handler => {
+      try {
+        handler.fn.call(handler.ctx, currentAuth);
+      } catch (e) {
+        $log.error(e);
+      }
+    });
   });
 
   return spfAuth;
@@ -177,7 +709,6 @@ export function spfAuthDataFactory($q, $log, spfFirebase, spfAuth, spfCrypto) {
      * @return {Promise<object, Error>}
      */
     register: function(userDataObj) {
-      var gravatarBaseUrl = '//www.gravatar.com/avatar/';
       var email, name;
 
       if (userDataObj == null) {
@@ -280,3 +811,18 @@ export function spfSchoolsFactory($q, spfFirebase) {
 }
 
 spfSchoolsFactory.$inject = ['$q', 'spfFirebase'];
+
+export function run($log, spfProfilesPath) {
+  if (!spfProfilesPath) {
+    throw new Error(
+      'spfProfilesPath constant is not set\n' +
+      '(set it with e.g. ' +
+      '"myModule.constant(\`spfProfilesPath\`, \'classMentors/userProfiles\');"' +
+      ')'
+    );
+  }
+
+  $log.info(`spfProfilesPath set to "${spfProfilesPath}".`);
+}
+
+run.$inject = ['$log', 'spfProfilesPath'];
