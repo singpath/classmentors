@@ -778,14 +778,36 @@ export function clmCohortsStatsPageFactory() {
 
 function ClmCohortStatsPageCtrl(
     $scope, $q, $log, $mdDialog, $document,
-    urlFor, spfAlert, clmServicesUrl, clmDataStore
+    urlFor, spfAlert, clmServicesUrl, clmDataStore, spfFirebase
 ) {
     var self = this;
     this.selectedStatistic = null;
 
     this.renderDashboard = function() {
         if(self.selectedStatistic) {
-            var dataString = JSON.parse('{"Sprint 1": [10, 20, 30, 40, 50],"Sprint 2": [2, 4, 6, 8, 10],"Sprint 3": [5, 10, 15, 20, 25]}');
+            // var dataString = JSON.parse('{"Sprint 1": [10, 20, 30, 40, 50],"Sprint 2": [2, 4, 6, 8, 10],"Sprint 3": [5, 10, 15, 20, 25]}');
+            var dataObj = {"Code": [], "Text": [], "Link": []};
+            spfFirebase.loadedArray(['classMentors/userActions'], {
+                // limitToLast: 100000
+            }).then(function(promise) {
+                return promise;
+            }).then(function(data) {
+                self.allLogs = data;
+                console.log(self.allLogs);
+            }).catch(function (err) {
+                $log.error(err);
+                return err;
+            }).then(function () {
+                if(self.selectedStatistic = 'Submissions') {
+                    for(var actionIndex = 0; actionIndex < self.allLogs.length; actionIndex++) {
+                        if(self.allLogs[actionIndex].action == 'submitLinkResponse') {
+                            dataObj.Link.push(action.)
+                        }
+                        console.log(self.allLogs[actionIndex].action);
+                    }
+                }
+            });
+
             var chart = c3.generate({
                 bindto: "#chart",
                 data: {
@@ -794,7 +816,7 @@ function ClmCohortStatsPageCtrl(
                     // 	['data1', 50, 70, 30, 20, 10],
                     // 	['data2', 14, 56, 88, 34, 100]
                     // ],
-                    json: dataString,
+                    json: dataObj,
                     type: "spline"
                 }
             });
@@ -811,7 +833,8 @@ ClmCohortStatsPageCtrl.$inject = [
     'urlFor',
     'spfAlert',
     'clmServicesUrl',
-    'clmDataStore'
+    'clmDataStore',
+    'spfFirebase'
 ];
 
 export function clmCohortRankPageFactory() {
