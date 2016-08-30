@@ -1,4 +1,4 @@
-import {expect, testInjectMatch} from 'singpath-core/tools/chai.js';
+import {expect, testInjectMatch, sinon} from 'singpath-core/tools/chai.js';
 
 import * as firebase from './firebase.js';
 
@@ -40,20 +40,34 @@ describe('firebase service', function() {
   });
 
   describe('run', function() {
+    let $log, firebaseApp, authFirebaseApp, authProvider;
+
+    beforeEach(function() {
+      $log = {info: sinon.spy()};
+      firebaseApp = {options: {authDomain: 'singpath.firebaseio.com'}};
+      authFirebaseApp = {options: {authDomain: 'singpath.firebaseio.com'}};
+      authProvider = {};
+    });
 
     testInjectMatch(firebase.run);
 
-    it('should throw if one of the app is not set', function() {
-      expect(() => firebase.run({}, null, {})).to.throw(Error);
-      expect(() => firebase.run(null, {}, {})).to.throw(Error);
+    it('should throw if firebaseApp is not set', function() {
+      firebaseApp = null;
+      expect(() => firebase.run($log, firebaseApp, authFirebaseApp, authProvider)).to.throw(Error);
+    });
+
+    it('should throw if authFirebaseApp is not set', function() {
+      authFirebaseApp = null;
+      expect(() => firebase.run($log, firebaseApp, authFirebaseApp, authProvider)).to.throw(Error);
     });
 
     it('should throw if the provider is not set', function() {
-      expect(() => firebase.run({}, {}, null)).to.throw(Error);
+      authProvider = null;
+      expect(() => firebase.run($log, firebaseApp, authFirebaseApp, authProvider)).to.throw(Error);
     });
 
     it('should not throw if both app and provider are set', function() {
-      expect(() => firebase.run({}, {}, {})).not.to.throw(Error);
+      expect(() => firebase.run($log, firebaseApp, authFirebaseApp, authProvider)).to.not.throw(Error);
     });
 
   });
