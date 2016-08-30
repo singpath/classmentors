@@ -2,8 +2,8 @@ SystemJS.config({
   paths: {
     "npm:": "jspm_packages/npm/",
     "github:": "jspm_packages/github/",
-    "classmentors/": "classmentors/",
-    "singpath-core/": "packages/singpath-core/src/"
+    "singpath-core/": "packages/singpath-core/src/",
+    "classmentors/": "classmentors/"
   },
   browserConfig: {
     "baseURL": "/"

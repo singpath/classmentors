@@ -58,6 +58,7 @@
             ".validate": "newData.isString() && newData.val().matches(/^[-a-z0-9]{3,20}$/) || newData.val() == null"
           },
           "school": {
+            ".write": "newData.val() != null && (auth != null && auth.uid == $userId)",
             "$other": {
               ".validate": "false"
             },

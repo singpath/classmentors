@@ -16,7 +16,7 @@
                     <textarea placeholder="Share some of your most exciting moments here!" type="text" cols="80"
                               rows="5" style="max-width:500px; max-height: 200px"
                               ng-model="$parent.$parent.bestResponse"
-                              ng-change="ctrl.eduDissResp[value.title] = bestResponse"></textarea>
+                              ng-change="ctrl.eduDissResp[value.title] = bestResponse" required></textarea>
 
                     <!--<md-button class="md-raised md-primary" data-id="1"-->
                     <!--ng-click="ctrl.saveEduDisResponse(ansResp , age, $event, task.$id, sib, selectedMonth, country, spokenLanguage, value.title, bestResponse)">-->
@@ -36,7 +36,7 @@
                 <td>
                     <!--to generate radio button-->
                     <md-radio-group ng-if="key != '6'" layout="row" ng-model="$parent.ansResp"
-                                    ng-change="ctrl.eduDissResp[value.title][key2] = ansResp">
+                                    ng-change="ctrl.eduDissResp[value.title][key2] = ansResp" required>
                         <div ng-repeat="ratingOption in ctrl.ratingOptions">
                             <md-radio-button style="margin-right:60px" class="md-primary" ng-value="ratingOption.id">
                                 {{ratingOption.id}}
@@ -46,7 +46,7 @@
                     <div ng-if="key == '6'">
                         <div ng-if="key2 == '1'">
                             <input placeholder="State a valid age" ng-model="$parent.$parent.age" type="number" min="3"
-                                   style="width: 30%" ng-change="ctrl.eduDissResp[value.title][key2] = age"/> years old
+                                   style="width: 30%" ng-change="ctrl.eduDissResp[value.title][key2] = age" required /> years old
                         </div>
                         <div ng-if="key2 == '2'">
                             <table width="100%">
@@ -54,7 +54,7 @@
                                     <td ng-repeat="family in ctrl.familyMembers track by $index">
                                         <md-checkbox value="{{family.name}}"
                                                      ng-click="ctrl.toggle(family, ctrl.selectedFamily)"
-                                                     ng-checked="ctrl.exists(family, ctrl.selectedFamily)">
+                                                     ng-checked="ctrl.exists(family, ctrl.selectedFamily)" required>
                                             {{family.name}}
                                         </md-checkbox>
                                     </td>
@@ -63,13 +63,13 @@
                         </div>
                         <div ng-if="key2 == '3'">
                             <input placeholder="Number of siblings" ng-model="$parent.$parent.sib" type="number" min="0"
-                                   style="width: 30%" ng-change="ctrl.eduDissResp[value.title][key2] = sib"/>
+                                   style="width: 30%" ng-change="ctrl.eduDissResp[value.title][key2] = sib" required/>
                         </div>
                         <div ng-if="key2 == '4'">
                             <md-input-container flex>
                                 <label>Month</label>
                                 <md-select ng-model="$parent.$parent.selectedMonth"
-                                           ng-change="ctrl.eduDissResp[value.title][key2] = selectedMonth">
+                                           ng-change="ctrl.eduDissResp[value.title][key2] = selectedMonth" required>
                                     <md-option ng-repeat="bday in ctrl.bdayMonth" value="{{bday.month}}">
                                         {{bday.month}}
                                     </md-option>
@@ -100,13 +100,13 @@
                         </div>
                         <div ng-if="key2 == '6'">
                             <input type="text" placeholder="State a valid country" ng-model="$parent.$parent.country"
-                                   ng-change="ctrl.eduDissResp[value.title][key2] = country"/>
+                                   ng-change="ctrl.eduDissResp[value.title][key2] = country" required/>
 
                         </div>
                         <div ng-if="key2 == '7'">
                             <input type="text" placeholder="State a valid language"
                                    ng-model="$parent.$parent.spokenLanguage"
-                                   ng-change="ctrl.eduDissResp[value.title][key2] = spokenLanguage"/>
+                                   ng-change="ctrl.eduDissResp[value.title][key2] = spokenLanguage" required />
                             for multiple languages, separate by a comma (,)
                         </div>
 
@@ -145,7 +145,9 @@
         <table>
             <tr>
                 <td>
-                    <md-button type="submit" class="md-raised md-primary" style="width: 150px;">Submit</md-button>
+                    <md-button ng-disabled="surveyForm.$invalid || ctrl.selectedRaceEthnicity.length == 0 || ctrl.selectedFamily.length == 0" type="submit" class="md-raised md-primary"
+                               style="width: 150px;">Submit
+                    </md-button>
                 </td>
                 <td>
                     <md-button ng-click="ctrl.backToChallenge()" class="md-raised md-primary" style="width: 150px;">
