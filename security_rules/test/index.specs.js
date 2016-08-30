@@ -7,3 +7,4 @@ chai.use(targaryen.chai);
 
 require('./security-rules.specs.js');
 require('./auth.specs.js');
+require('./events.specs.js');

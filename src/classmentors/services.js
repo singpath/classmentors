@@ -961,7 +961,7 @@ export function clmDataStoreFactory(
           paths = {
             hashOptions: ['classMentors/eventPasswords', eventId, 'options'],
             application: ['classMentors/eventApplications', eventId, spfAuth.user.uid],
-            participation: ['classMentors/eventParticipants', eventId, authData.publicId, 'user'],
+            participation: ['classMentors/eventParticipants', eventId, authData.publicId],
             profile: ['classMentors/userProfiles', authData.publicId, 'joinedEvents', eventId]
           };
         }).then(function() {
@@ -971,9 +971,12 @@ export function clmDataStoreFactory(
           return spfFirebase.set(paths.application, hash);
         }).then(function() {
           return spfFirebase.set(paths.participation, {
-            displayName: authData.displayName,
-            gravatar: authData.gravatar,
-            school: spfFirebase.cleanObj(authData.school) || null
+            user: {
+              displayName: authData.displayName,
+              gravatar: authData.gravatar,
+              school: spfFirebase.cleanObj(authData.school) || null
+            },
+            joinedAt: {'.sv': 'timestamp'}
           });
         }).then(function() {
           return spfFirebase.set(paths.profile, {

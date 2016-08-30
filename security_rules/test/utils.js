@@ -5,6 +5,15 @@ var rules = require('../security-rules.json');
 var targaryen = require('@dinoboff/targaryen');
 var deepAssign = require('deep-assign');
 
+const timestamp = () => ({'.sv': 'timestamp'});
+
+before(function() {
+  targaryen.setDebug(true);
+  targaryen.setFirebaseRules(rules);
+});
+
+exports.timestamp = timestamp;
+
 /**
  * Set targaryen's firebase data by complining singpath-play-export data
  * with the patch.
@@ -34,7 +43,43 @@ exports.setFirebaseData = function(patch) {
   targaryen.setFirebaseData(data);
 };
 
-before(function() {
-  targaryen.setDebug(true);
-  targaryen.setFirebaseRules(rules);
-});
+exports.bob = function() {
+  const uid = 'github:808';
+  const publicId = 'bob';
+  const firebaseAuth = {
+    uid,
+    id: 808,
+    provider: 'github'
+  };
+  const user = {
+    displayName: 'bob',
+    gravatar: '//www.gravatar.com/avatar/some-hash'
+  };
+  const userData = {
+    displayName: user.displayName,
+    email: 'bob@example.com',
+    fullName: 'Bob Smith',
+    gravatar: user.gravatar,
+    id: uid,
+    publicId: publicId,
+    yearOfBirth: 1990,
+    createdAt: timestamp()
+  };
+  const auth = {
+    publicIds: {[publicId]: uid},
+    usedPublicIds: {[publicId]: true},
+    users: {[uid]: userData}
+  };
+  const profile = {
+    user: {
+      displayName: user.displayName,
+      gravatar: user.gravatar,
+      isAdmin: false,
+      isPremium: false,
+      yearOfBirth: userData.yearOfBirth
+    }
+  };
+  const userProfiles = {[publicId]: profile};
+
+  return {uid, publicId, firebaseAuth, user, userData, auth, profile, userProfiles};
+};

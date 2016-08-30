@@ -1425,8 +1425,8 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBar
                 if (checkLinkPattern.indexOf("http:") > -1) {
                     checkLinkPattern = checkLinkPattern.replace("http:", "https:");
                 }
+                copy['linkPattern'] = checkLinkPattern;
             }
-            copy['linkPattern'] = checkLinkPattern;
 
             var data = {
                 taskType: taskType,
@@ -1585,7 +1585,7 @@ export function clmEventTableFactory() {
             participants: '=',
             tasks: '=',
             progress: '=',
-            solutions: '='
+            solutions: '=',
         },
         controller: ClmEventTableCtrl,
         controllerAs: 'ctrl'
@@ -1594,7 +1594,7 @@ export function clmEventTableFactory() {
 
 function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                            urlFor, spfAlert, clmServicesUrl, clmDataStore, clmPagerOption,
-                           eventService, $location, routes, $route, spfAuthData) {
+                           eventService, $location, routes, $route, spfAuthData, spfFirebase) {
     var self = this;
     var unwatchers = [];
 
@@ -1602,6 +1602,8 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
     this.participantsView = [];
     this.visibleTasks = [];
     this.taskCompletion = {};
+
+    console.log(self.profile);
 
     this.orderOptions = {
         key: undefined,
@@ -1946,16 +1948,39 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
 
                 if (!self.userData.yearOfBirth) {
                     self.userData.yearOfBirth = self.participantInfo.yearOfBirth;
+                } else {
+                    spfAuthData.user().then(function(promise) {
+                        return promise;
+                    }).then(function(data) {
+                        var result = data;
+                        spfFirebase.set(['auth/users', result.$id, 'yearOfBirth'], self.userData.yearOfBirth);
+                    }).catch(noop);
                 }
+
                 if (!self.userData.school) {
                     self.userData.school = self.participantInfo.school;
+                } else {
+                    spfAuthData.user().then(function(promise) {
+                        return promise;
+                    }).then(function(data) {
+                        var result = data;
+                        // delete self.userData.school[$$mdSelectId];
+                        var schObj = {
+                            iconUrl: self.userData.school.iconUrl,
+                            id: self.userData.school.id,
+                            name: self.userData.school.name,
+                            type: self.userData.school.type
+                        };
+                        console.log(schObj);
+                        spfFirebase.set(['auth/users', result.$id, 'school'], schObj);
+                    }).catch(noop);
                 }
                 // if(!self.userData.country) {
                 //     self.userData.country = self.participantInfo.country;
                 // }
 
                 self.userData.publicId = participant.$id;
-                clmDataStore.events.submitSolution(eventId, taskId, participant.$id, "Responded").then(function () {
+                clmDataStore.events.submitSolution(eventId, taskId, participant.$id, JSON.stringify(self.userData)).then(function () {
 
                 }).catch(function (err) {
                     $log.error(err);
@@ -1970,6 +1995,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                     spfAlert.error('Failed to update your profile.');
                     return err;
                 });
+
                 // if(self.userData.school) {
                 //     spfFirebase.set(['auth/users'], actionObj);
                 // }
@@ -2299,7 +2325,7 @@ ClmEventTableCtrl.$inject = [
     'eventService',
     '$location',
     'routes',
-    '$route', 'spfAuthData'
+    '$route', 'spfAuthData', 'spfFirebase'
 ];
 
 //TODO: include the event to load initial data into surveyformfillctrl

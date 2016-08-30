@@ -58,6 +58,7 @@
             ".validate": "newData.isString() && newData.val().matches(/^[-a-z0-9]{3,20}$/) || newData.val() == null"
           },
           "school": {
+            ".write": "newData.val() != null && (auth != null && auth.uid == $userId)",
             "$other": {
               ".validate": "false"
             },
@@ -185,29 +186,25 @@
       "eventParticipants": {
         "$eventId": {
           "$publicId": {
-            ".validate": "newData.hasChildren(['user'])",
-            ".write": "newData.exists() === false && auth !== null && root.child('auth/publicIds').child($publicId).val() === auth.uid && root.child('classMentors/userProfiles').child($publicId).child('joinedEvents').child($eventId).exists() === false",
+            ".validate": "newData.hasChildren(['user', 'joinedAt']) || (data.exists() && data.hasChildren(['joinedAt']) == false && newData.hasChildren(['user']))",
+            ".write": "auth !== null && root.child('auth/publicIds').child($publicId).val() === auth.uid && (newData.exists() == false || root.child('classMentors/eventApplications').child($eventId).child(auth.uid).exists()) && (newData.exists() || root.child('classMentors/userProfiles').child($publicId).child('joinedEvents').child($eventId).exists() === false)",
             "user": {
               ".validate": "newData.hasChildren(['displayName', 'gravatar'])",
-              ".write": "auth !== null && root.child('auth/publicIds').child($publicId).val() === auth.uid && root.child('classMentors/eventApplications').child($eventId).child(auth.uid).exists()",
-              "displayName": {
-                ".validate": "newData.isString() && newData.val().length >= 3"
-              },
-              "gravatar": {
-                ".validate": "newData.isString() && newData.val().matches(/(https?\\:)?\\/\\/.+/)"
-              },
               "school": {
                 ".validate": "newData.hasChildren(['name', 'type'])",
-                "iconUrl": {
-                  ".validate": "newData.isString()"
-                },
-                "name": {
-                  ".validate": "newData.isString()"
-                },
-                "type": {
-                  ".validate": "newData.isString()"
+                "$key": {
+                  ".validate": "($key == 'name' || $key == 'type' || $key == 'id' || $key == 'iconUrl') && newData.val() == root.child('auth/users').child(auth.uid).child('school').child($key).val()"
                 }
+              },
+              "$key": {
+                ".validate": "($key == 'displayName' || $key == 'gravatar') && newData.val() == root.child('auth/users').child(auth.uid).child($key).val()"
               }
+            },
+            "joinedAt": {
+              ".validate": "newData.val() == data.val() || (data.exists() == false && newData.val() == now)"
+            },
+            "$other": {
+              ".validate": "false"
             }
           },
           ".read": "auth !== null && (\n  root.child('classMentors/eventApplications/').child($eventId).child(auth.uid).exists()\n  || root.child('classMentors/events').child($eventId).child('owner/publicId').val() === root.child('auth/users').child(auth.uid).child('publicId').val()\n  || root.child('classMentors/admins').child(auth.uid).val() === true || true)",
