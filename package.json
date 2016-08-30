@@ -39,7 +39,9 @@
       "baseURL": "src",
       "lib": "src/classmentors"
     },
-    "dependencies": {},
+    "dependencies": {
+      "d3": "npm:d3@^4.2.2"
+    },
     "devDependencies": {
       "plugin-babel": "npm:systemjs-plugin-babel@^0.0.11"
     },
