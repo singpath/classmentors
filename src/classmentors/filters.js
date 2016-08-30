@@ -40,3 +40,18 @@ export function cmTruncateFilterBooleanFactory() {
   };
 }
 cmTruncateFilterBooleanFactory.$inject = [];
+
+export function showSchoolFilterFactory() {
+    return function cmTruncate(s, limit) {
+        if (!s || !s.length || !limit) {
+            return '';
+        }
+
+        if (s.length <= limit) {
+            return s;
+        }
+
+        return `${s.slice(0, limit)}...`;
+    };
+}
+cmTruncateFilterFactory.$inject = [];
