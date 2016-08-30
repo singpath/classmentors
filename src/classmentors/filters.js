@@ -42,16 +42,10 @@ export function cmTruncateFilterBooleanFactory() {
 cmTruncateFilterBooleanFactory.$inject = [];
 
 export function showSchoolFilterFactory() {
-    return function cmTruncate(s, limit) {
-        if (!s || !s.length || !limit) {
-            return '';
-        }
+    return function showSchool(s) {
+        var obj = JSON.parse(s);
 
-        if (s.length <= limit) {
-            return s;
-        }
-
-        return `${s.slice(0, limit)}...`;
+        return `${obj.school.name}...`;
     };
 }
-cmTruncateFilterFactory.$inject = [];
+showSchoolFilterFactory.$inject = [];
