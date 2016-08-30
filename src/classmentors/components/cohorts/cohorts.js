@@ -8,6 +8,8 @@ import cohortViewTmpl from './cohorts-view-cohort.html!text';
 import cohortEditTmpl from './cohorts-edit-cohort.html!text';
 import cohortStatsPageTmpl from './cohorts-view-cohort-stats-page.html!text';
 import cohortRankingPageTmpl from './cohorts-view-cohort-ranking-page.html!text';
+import c3 from 'c3';
+import d3 from 'd3';
 import './cohorts.css!';
 // import d3 from '../../../jspm_packages/graphing/d3.min.js';
 // import '../../../jspm_packages/graphing/c3.min.css';
@@ -784,18 +786,18 @@ function ClmCohortStatsPageCtrl(
     this.renderDashboard = function() {
         if(self.selectedStatistic) {
             var dataString = JSON.parse('{"Sprint 1": [10, 20, 30, 40, 50],"Sprint 2": [2, 4, 6, 8, 10],"Sprint 3": [5, 10, 15, 20, 25]}');
-            // var chart = c3.generate({
-            //     bindto: "#chart",
-            //     data: {
-            //         //Test data
-            //         // columns: [
-            //         // 	['data1', 50, 70, 30, 20, 10],
-            //         // 	['data2', 14, 56, 88, 34, 100]
-            //         // ],
-            //         json: dataString,
-            //         type: "spline"
-            //     }
-            // });
+            var chart = c3.generate({
+                bindto: "#chart",
+                data: {
+                    //Test data
+                    // columns: [
+                    // 	['data1', 50, 70, 30, 20, 10],
+                    // 	['data2', 14, 56, 88, 34, 100]
+                    // ],
+                    json: dataString,
+                    type: "spline"
+                }
+            });
         }
     };
 
