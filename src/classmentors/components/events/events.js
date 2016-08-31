@@ -1057,6 +1057,10 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
             console.log('video is clicked');
             return 'Continue';
 
+        } else if (tasktype == 'teamActivity') {
+            console.log('teamActivity is clicked');
+            return 'Continue';
+
         } else if (tasktype == 'journalling') {
             console.log('journalling is clicked');
             return 'Continue';
@@ -1139,7 +1143,7 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
 
 
         self.creatingTask = true;
-        if (taskType === 'multipleChoice' || taskType === 'journalling' || taskType === 'video' || taskType === 'survey') {
+        if (taskType === 'multipleChoice' || taskType === 'journalling' || taskType === 'video' || taskType === 'survey' || taskType === 'teamActivity') {
             var data = {
                 taskType: taskType,
                 isOpen: isOpen,
