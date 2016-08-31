@@ -1163,6 +1163,7 @@ export function clmDataStoreFactory(
       },
 
       monitorEvent: function(event, tasks, participants, solutions, progress) {
+        console.log("monitorevent progress iss:", progress);
         var tid;
         var delay = 300;
         var unWatchSolution = solutions.$watch(debouncedUpdate);
@@ -1198,10 +1199,15 @@ export function clmDataStoreFactory(
         if (!publicId) {
           return $q.reject('User public id is missing missing.');
         }
-
+        console.log("update progress came in here!!");
         if (!solutions || !solutions.$id || solutions.$id !== event.$id) {
           return $q.reject('User solutions are missing');
         }
+        console.log("updated progress event:", event);
+          console.log("updated progress tasks:", tasks);
+          console.log("updated progress solutions:", solutions);
+          console.log("updated progress publicId:", publicId);
+          console.log("updated progress userProgress:", userProgress);
 
         var cmProfilePromise = clmDataStore.profile(publicId);
         var badgesPromise = cmProfilePromise.then(function(profile) {
@@ -1220,8 +1226,11 @@ export function clmDataStoreFactory(
           progress: userProgress
         }).then(function(data) {
           // 4. save data
+
+            console.log("monitorevent tasks:",tasks);
+            console.log("data: ", data);
           return $q.all([
-            // 2. check completness and update progress if needed.
+            // 2. check completeness and update progress if needed.
             $q.when(clmDataStore.events._getProgress(tasks, data)).then(function(progress) {
               var updated = Object.keys(progress).some(function(taskId) {
                 var wasCompleted = data.progress && data.progress[taskId] && data.progress[taskId].completed;
@@ -1407,7 +1416,7 @@ export function clmDataStoreFactory(
       },
 
         setProgress: function(eventId, taskId, publicId, progress){
-            
+
             return spfFirebase.set(['classMentors/eventProgress', eventId, publicId, taskId], progress[publicId][taskId]);
 
         },

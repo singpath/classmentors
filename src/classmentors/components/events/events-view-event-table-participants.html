@@ -188,8 +188,8 @@
                         </div>
 
                         <div ng-if="task.toEdit">
-                            <div ng-if="ctrl.profile.school">
-                                {{ctrl.profile.school.name}}
+                            <div ng-if="ctrl.profile.user.school">
+                                {{ctrl.profile.user.school.name | cmTruncate: 10}}
                                 <md-button class="md-icon-button md-primary small-icon"
                                            aria-label="Update_profile"
                                            ng-click="ctrl.editProfileInfo(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant)"
@@ -199,7 +199,7 @@
                                 </md-button>
                             </div>
 
-                            <div ng-if="!ctrl.profile.school">
+                            <div ng-if="!ctrl.profile.user.school">
                                 <md-button class="md-raised md-primary"
                                            aria-label="Enter_profile_info"
                                            ng-click="ctrl.editProfileInfo(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant)" ng-disabled="task.closedAt">
@@ -234,7 +234,7 @@
                                 <span ng-if="task.linkPattern">
                                     <a ng-href="{{ctrl.solutions[participant.$id][task.$id]}}" target="_blank">completed</a>
                                 </span>
-                                <span ng-if="task.textResponse && !task.lang && !task.linkPattern">
+                                <span ng-if="task.textResponse && !task.lang && !task.linkPattern && !task.toEdit">
                                     <md-menu>
                                         <md-button ng-click="$mdOpenMenu()">
                                             {{ ctrl.solutions[participant.$id][task.$id] | cmTruncate: 10 }}
@@ -252,9 +252,9 @@
                                         view code
                                     </md-button>
                                 </span>
-                                <!--<span ng-if="task.toEdit">-->
-                                    <!--<div ng-if="ctrl.currentUserSolutions[task.$id]">Profile up to date</div>-->
-                                <!--</span>-->
+                                <span ng-if="task.toEdit">
+                                    <div>{{ctrl.solutions[participant.$id][task.$id] | showSchool}}</div>
+                                </span>
                             </span>
 
                             <span ng-if="!task.showLinks">

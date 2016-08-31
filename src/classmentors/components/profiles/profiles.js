@@ -203,6 +203,7 @@ function ClmProfileCtrl(
 
     this.settingPublicId = true;
     cleanProfile(currentUser);
+    console.log(currentUser);
 
     if (!self.profile) {
       saved = spfAuthData.publicId(currentUser).then(function() {

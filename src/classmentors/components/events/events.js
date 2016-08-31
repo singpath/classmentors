@@ -405,6 +405,7 @@ function viewEventCtrlInitialData($q, $route, spfAuth, spfAuthData, clmDataStore
         }),
         progress: canviewPromise.then(function (canView) {
             if (canView) {
+                console.log("get progress is:", clmDataStore.events.getProgress(eventId));
                 return clmDataStore.events.getProgress(eventId);
             }
         }),
@@ -463,7 +464,7 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
     this.assistantObj = initialData.assistantObj;
     this.asstArr = [];
     this.isReviewSuperUser = false;
-
+    console.log("monitorevent this progress", initialData.progress);
     for (var asst in self.assistants) {
         if (self.assistants[asst].$id) {
             self.asstArr.push(self.assistants[asst].$id);
@@ -1106,8 +1107,8 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
 
         //check if user keys in http inside Link Pattern
         var checkLinkPattern = copy['linkPattern'];
-        if(checkLinkPattern != null){
-            if(checkLinkPattern.indexOf("http:") > -1){
+        if (checkLinkPattern != null) {
+            if (checkLinkPattern.indexOf("http:") > -1) {
                 checkLinkPattern = checkLinkPattern.replace("http:", "https:");
             }
             copy['linkPattern'] = checkLinkPattern;
@@ -1424,8 +1425,8 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBar
 
             //check if user keys in http inside Link Pattern
             var checkLinkPattern = copy['linkPattern'];
-            if(checkLinkPattern != null){
-                if(checkLinkPattern.indexOf("http:") > -1){
+            if (checkLinkPattern != null) {
+                if (checkLinkPattern.indexOf("http:") > -1) {
                     checkLinkPattern = checkLinkPattern.replace("http:", "https:");
                 }
                 copy['linkPattern'] = checkLinkPattern;
@@ -1577,6 +1578,7 @@ EditEventTaskCtrl.$inject = [
  *
  */
 export function clmEventTableFactory() {
+    console.log("clmEvent table comes in here");
     return {
         template: eventTableParticipantsTmpl,
         restrict: 'E',
@@ -1587,7 +1589,7 @@ export function clmEventTableFactory() {
             participants: '=',
             tasks: '=',
             progress: '=',
-            solutions: '='
+            solutions: '=',
         },
         controller: ClmEventTableCtrl,
         controllerAs: 'ctrl'
@@ -1596,7 +1598,7 @@ export function clmEventTableFactory() {
 
 function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                            urlFor, spfAlert, clmServicesUrl, clmDataStore, clmPagerOption,
-                           eventService, $location, routes, $route, spfAuthData) {
+                           eventService, $location, routes, $route, spfAuthData, spfFirebase) {
     var self = this;
     var unwatchers = [];
 
@@ -1604,6 +1606,8 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
     this.participantsView = [];
     this.visibleTasks = [];
     this.taskCompletion = {};
+
+    console.log(self.profile);
 
     this.orderOptions = {
         key: undefined,
@@ -1638,7 +1642,6 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         }
 
         self.currentUserParticipant = self.participants.$getRecord(self.profile.$id);
-        console.log("this profile id is " + self.profile.$id);
     }
 
     /**
@@ -1677,9 +1680,9 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         var participantCount, participantsIds;
 
         if (!self.participants || !self.progress) {
+            console.log("there is no self participants!");
             return 0;
         }
-
         participantCount = self.participants.length;
         participantsIds = self.participants.reduce(function (all, participant) {
             if (participant.$id) {
@@ -1949,16 +1952,39 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
 
                 if (!self.userData.yearOfBirth) {
                     self.userData.yearOfBirth = self.participantInfo.yearOfBirth;
+                } else {
+                    spfAuthData.user().then(function(promise) {
+                        return promise;
+                    }).then(function(data) {
+                        var result = data;
+                        spfFirebase.set(['auth/users', result.$id, 'yearOfBirth'], self.userData.yearOfBirth);
+                    }).catch(noop);
                 }
+
                 if (!self.userData.school) {
                     self.userData.school = self.participantInfo.school;
+                } else {
+                    spfAuthData.user().then(function(promise) {
+                        return promise;
+                    }).then(function(data) {
+                        var result = data;
+                        // delete self.userData.school[$$mdSelectId];
+                        var schObj = {
+                            iconUrl: self.userData.school.iconUrl,
+                            id: self.userData.school.id,
+                            name: self.userData.school.name,
+                            type: self.userData.school.type
+                        };
+                        console.log(schObj);
+                        spfFirebase.set(['auth/users', result.$id, 'school'], schObj);
+                    }).catch(noop);
                 }
                 // if(!self.userData.country) {
                 //     self.userData.country = self.participantInfo.country;
                 // }
 
                 self.userData.publicId = participant.$id;
-                clmDataStore.events.submitSolution(eventId, taskId, participant.$id, "Responded").then(function () {
+                clmDataStore.events.submitSolution(eventId, taskId, participant.$id, JSON.stringify(self.userData)).then(function () {
 
                 }).catch(function (err) {
                     $log.error(err);
@@ -1973,6 +1999,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                     spfAlert.error('Failed to update your profile.');
                     return err;
                 });
+
                 // if(self.userData.school) {
                 //     spfFirebase.set(['auth/users'], actionObj);
                 // }
@@ -2002,7 +2029,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             }
 
             this.save = function (link) {
-                if(link.indexOf("http:") > -1){
+                if (link.indexOf("http:") > -1) {
                     link = link.replace("http:", "https:");
                 }
                 clmDataStore.events.submitSolution(eventId, taskId, participant.$id, link).then(function () {
@@ -2302,7 +2329,7 @@ ClmEventTableCtrl.$inject = [
     'eventService',
     '$location',
     'routes',
-    '$route', 'spfAuthData'
+    '$route', 'spfAuthData', 'spfFirebase'
 ];
 
 //TODO: include the event to load initial data into surveyformfillctrl
@@ -2385,6 +2412,7 @@ addSurveyEventTaskCtrlInitialData.$inject = [
 
 //TODO: include controller for the survey
 function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $routeParams, clmDataStore, spfFirebase, clmPagerOption, spfAlert, $log) {
+
     this.pagerOpts = clmPagerOption();
 
     var self = this;
@@ -2414,11 +2442,6 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
         ];
 
         self.schEngageResp = {};
-        //console.log("schEngageResp length before", Object.keys(self.schEngageResp).length);
-        // for (var k = 0; k <= Object.keys(initialData.survey2[2]).length - 2; k++) {
-        //     self.schEngageResp.push({[k + 1]: 0});
-        // }
-
 
 
     }
@@ -2497,8 +2520,6 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             this.eduDissResp[initialData.survey2[0][i]['title']] = {};
 
         }
-
-
 
 
     }
@@ -2628,17 +2649,25 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             var surveyType = $routeParams.surveyTask;
             var completed = true;
 
-            console.log("user id is:", userId);
-            console.log("task id is:", taskId);
-            console.log("which is undefined?", initialData.progress);
             initialData.progress[userId] = {taskId};
+
             initialData.progress[userId][taskId] = {completed: completed};
+
+            clmDataStore.logging.inputLog({
+                action: "submitSchEngageResponse",
+                publicId: userId,
+                eventId: eventId,
+                taskId: taskId,
+                timestamp: Firebase.ServerValue.TIMESTAMP
+            });
+
 
             spfAlert.success('Survey responses have been submitted.');
             clmDataStore.events.saveSurveyResponseOnSubmit(taskId, eventId, userId, surveyType, schEngageResp);
             clmDataStore.events.submitSolution(eventId, taskId, userId, "Completed");
             clmDataStore.events.setProgress(eventId, taskId, userId, initialData.progress);
 
+            //clmDataStore.events.updateProgress(initialData.event, initialData.tasks, initialData.solutions, userId, initialData.progress);
             //console.log(eventId, taskId, userId);
 
             $location.path(urlFor('oneEvent', {eventId: self.event.$id}));

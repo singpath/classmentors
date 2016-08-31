@@ -40,3 +40,12 @@ export function cmTruncateFilterBooleanFactory() {
   };
 }
 cmTruncateFilterBooleanFactory.$inject = [];
+
+export function showSchoolFilterFactory() {
+    return function showSchool(s) {
+        var obj = JSON.parse(s);
+
+        return `${obj.school.name}...`;
+    };
+}
+showSchoolFilterFactory.$inject = [];
