@@ -5,7 +5,7 @@
     <!--<script src="../../../jspm_packages/graphing/c3.min.js"></script>-->
 
     <md-select flex ng-model="ctrl.selectedStatistic" name="selectStatistic" placeholder="Select statistic to view" ng-change="ctrl.renderDashboard()">
-        <md-option ng-repeat="statistic in ['Submissions', 'Ordering']">
+        <md-option ng-repeat="statistic in ['Submission time series', 'Ordering']">
             {{statistic}}
         </md-option>
     </md-select>
