@@ -788,23 +788,24 @@ function ClmCohortStatsPageCtrl(
             // var dataString = JSON.parse('{"Sprint 1": [10, 20, 30, 40, 50],"Sprint 2": [2, 4, 6, 8, 10],"Sprint 3": [5, 10, 15, 20, 25]}');
             var dataObj = {"Code": [], "Text": [], "Link": []};
             spfFirebase.loadedArray(['classMentors/userActions'], {
-                // limitToLast: 100000
+                orderByChild: 'action',
+                equalTo: 'submitLinkResponse'
             }).then(function(promise) {
                 return promise;
             }).then(function(data) {
                 self.allLogs = data;
                 console.log(self.allLogs);
             }).catch(function (err) {
-                $log.error(err);
-                return err;
+                // $log.error(err);
+                // return err;
             }).then(function () {
                 if(self.selectedStatistic = 'Submissions') {
-                    for(var actionIndex = 0; actionIndex < self.allLogs.length; actionIndex++) {
-                        if(self.allLogs[actionIndex].action == 'submitLinkResponse') {
-                            dataObj.Link.push(action.)
-                        }
-                        console.log(self.allLogs[actionIndex].action);
-                    }
+                    // for(var actionIndex = 0; actionIndex < self.allLogs.length; actionIndex++) {
+                    //     if(self.allLogs[actionIndex].action == 'submitLinkResponse') {
+                    //         dataObj.Link.push(action.)
+                    //     }
+                    //     console.log(self.allLogs[actionIndex].action);
+                    // }
                 }
             });
 
@@ -885,7 +886,6 @@ function ClmCohortRankPageCtrl($q, $scope, $log, spfFirebase, clmDataStore, clmP
                         var result = data;
                         oneEventData.title = result.title;
                         self.cohortTotalParticipants += oneEventData.participants.length;
-                        console.log("Length was",self.cohortTotalParticipants );
                         oneEventData.id = result.$id;
                         self.cohortEventData.push(oneEventData);
                         iter++;

@@ -96,6 +96,11 @@
             ".validate":"newData.isString() && root.child('auth/publicIds').child(newData.val()).val() === auth.uid"
           }
         },
+        ".indexOn": [
+          "action",
+          "timestamp",
+          "publicId"
+        ],
         ".write": "auth !== null",
         ".read": "auth !== null && root.child('classMentors/admins').child(auth.uid).val() === true"
       },
