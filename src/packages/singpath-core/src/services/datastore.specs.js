@@ -811,7 +811,7 @@ describe('datastore service.', function() {
       });
     });
 
-    describe('onChange', function() {
+    describe('$watch', function() {
       let deregister;
 
       beforeEach(function() {
@@ -822,13 +822,13 @@ describe('datastore service.', function() {
       it('should register', function() {
         const handler = () => undefined;
 
-        currentUser.onChange(handler);
+        currentUser.$watch(handler);
         expect($rootScope.$on).to.have.been.calledOnce();
         expect($rootScope.$on).to.have.been.calledWith(datastore.eventName, handler);
       });
 
       it('should return a deregistered function', function() {
-        expect(currentUser.onChange(()=> undefined)).to.equal(deregister);
+        expect(currentUser.$watch(()=> undefined)).to.equal(deregister);
       });
 
     });

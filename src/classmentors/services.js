@@ -293,6 +293,7 @@ export function clmDataStoreFactory(
   routes, spfFirebase, spfAuth, spfAuthData, spfCrypto, clmService, clmServicesUrl
 ) {
   var clmDataStore;
+  var settings = spfFirebase.array('classMentors/settings');
 
   clmDataStore = {
       
@@ -1710,6 +1711,20 @@ export function clmDataStoreFactory(
           });
         }
       })
+    },
+
+    settings: {
+
+      /**
+       * Return Classmentors settings as a firebase synchronized array.
+       *
+       * Note that the array might not be loaded yet.
+       *
+       * @return {array}
+       */
+      get: function() {
+        return settings;
+      }
     },
 
     singPath: {

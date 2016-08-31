@@ -444,7 +444,7 @@ export class SpfCurrentUserService {
    * @param  {function} handler function run for any changed state.
    * @return {function}         function to register the hanlder.
    */
-  onChange(handler) {
+  $watch(handler) {
     return this.$rootScope.$on(eventName, handler);
   }
 

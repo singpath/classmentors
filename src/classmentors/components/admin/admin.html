@@ -1,0 +1,48 @@
+<md-content flex layout-padding>
+
+    <p ng-if="$ctrl.loading">Loading...</p>
+
+    <div ng-messages="$ctrl.errors" role="alert">
+    <p ng-message="login">You need to be logged in to edit the application settings.</p>
+    <p ng-message="register">You need to be registered in to edit the application settings.</p>
+    <p ng-message="admin">You need to be registered in to edit the application settings.</p>
+    <p ng-message="admin">You need to be registered in to edit the application settings.</p>
+    <p ng-message="loading">Failed to load this view.</p>
+  </div>
+
+    <div id="settings" ng-if="$ctrl.loaded">
+
+        <div id="settings-switches">
+            <h2 class="md-title">Switches</h2>
+
+            <p ng-if="$ctrl.switches.length == 0">No setting to switch.</p>
+          
+          <md-switch
+              ng-repeat="setting in $ctrl.switches track by setting.$id"
+              ng-model="setting.value"
+              ng-disabled="!$ctrl.currentUser.isAdmin"
+              ng-change="$ctrl.settings.$save(setting)"
+          >
+              {{setting.title}}.
+          </md-switch>
+        </div>
+
+        <div id="settings-input">
+            <h2 class="md-title">Other settings</h2>
+
+            <p ng-if="$ctrl.inputs.length == 0">No setting to edit.</p>
+            
+            <md-input-container class="md-block"
+                ng-repeat="setting in $ctrl.inputs track by setting.$id"
+            >
+          <label>{{setting.title}}</label>
+          <input
+            ng-model="setting.value"
+            ng-disabled="!$ctrl.currentUser.isAdmin"
+            ng-change="$ctrl.settings.$save(setting)"
+          />
+        </md-input-container>
+        </div>
+     </div>
+ 
+ </md-content>
