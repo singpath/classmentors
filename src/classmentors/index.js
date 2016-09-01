@@ -6,6 +6,9 @@ import module from 'classmentors/module.js';
 import * as services from 'classmentors/services.js';
 import * as filters from 'classmentors/filters.js';
 import * as directives from 'classmentors/directives.js';
+import * as d3 from 'd3';
+import * as c3 from 'c3';
+console.log(c3);
 
 import * as app from 'classmentors/components/classmentors/classmentors.js';
 import * as ace from 'classmentors/components/ace/ace.js';

@@ -2,16 +2,18 @@
 
     <!--<link href="../../../jspm_packages/graphing/c3.min.css" rel="stylesheet" type="text/css">-->
     <!--<script src="../../../jspm_packages/graphing/d3.min.js"></script>-->
-    <!--<script src="../../../jspm_packages/graphing/c3.min.js"></script>-->
+    <script src="../../../jspm_packages/npm/c3@0.4.11/c3.css"></script>
 
     <md-select flex ng-model="ctrl.selectedStatistic" name="selectStatistic" placeholder="Select statistic to view" ng-change="ctrl.renderDashboard()">
-        <md-option ng-repeat="statistic in ['General event statistics', 'ClickStream Stats']">
+        <md-option ng-repeat="statistic in ['Submission time series', 'Ordering']">
             {{statistic}}
         </md-option>
     </md-select>
 
-    YOU'RE ON THE STATS CUSTOM DIRECTORY PAGE!
-
     <div id="chart" align="center"></div>
+    <!--<div ng-if="ctrl.selectedStatistic=='Submission time series'">-->
+        <!--<svg width="960" height="960"></svg>-->
+        <!--<canvas width="960" height="960" id="canvas"></canvas>-->
+    <!--</div>-->
 
 </md-content>

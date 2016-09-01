@@ -39,7 +39,10 @@
       "baseURL": "src",
       "lib": "src/classmentors"
     },
-    "dependencies": {},
+    "dependencies": {
+      "c3": "npm:c3@^0.4.11",
+      "d3": "npm:d3@^4.2.2"
+    },
     "devDependencies": {
       "plugin-babel": "npm:systemjs-plugin-babel@^0.0.11"
     },
@@ -471,6 +474,14 @@
               "cryptojs/core.js"
             ],
             "exports": "CryptoJS",
+            "format": "global"
+          }
+        }
+      },
+      "npm:d3@3.5.17": {
+        "meta": {
+          "d3.js": {
+            "exports": "d3",
             "format": "global"
           }
         }
