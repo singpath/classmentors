@@ -11,6 +11,7 @@ import cohortRankingPageTmpl from './cohorts-view-cohort-ranking-page.html!text'
 import c3 from 'c3';
 import d3 from 'd3';
 import './cohorts.css!';
+import '../../../jspm_packages/npm/c3@0.4.11/c3.css!';
 // import d3 from '../../../jspm_packages/graphing/d3.min.js';
 // import '../../../jspm_packages/graphing/c3.min.css';
 // import c3 from '../../../jspm_packages/graphing/c3.min.js';
@@ -808,19 +809,126 @@ function ClmCohortStatsPageCtrl(
                             console.log(new Date(self.allLogs[actionIndex].timestamp));
                         }
                     }
-                });
-
-                var chart = c3.generate({
-                    bindto: "#chart",
-                    data: {
-                        //Test data
-                        // columns: [
-                        // 	['data1', 50, 70, 30, 20, 10],
-                        // 	['data2', 14, 56, 88, 34, 100]
-                        // ],
-                        json: dataObj,
-                        type: "spline"
-                    }
+                }).then(function () {
+                    // var canvas = d3.select('#canvas').node(),
+                    //     context = canvas.getContext("2d");
+                    //
+                    // var margin = {top: 20, right: 20, bottom: 30, left: 40},
+                    //     width = canvas.width - margin.left - margin.right,
+                    //     height = canvas.height - margin.top - margin.bottom;
+                    //
+                    // var svg = d3.select("svg").append("g")
+                    //     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+                    //
+                    // var x = d3.scaleLinear()
+                    //     .rangeRound([0, width - 2]);
+                    //
+                    // var y = d3.scaleLinear()
+                    //     .rangeRound([height - 2, 0]);
+                    //
+                    // context.translate(margin.left, margin.top);
+                    // context.globalCompositeOperation = "multiply";
+                    // context.fillStyle = "rgba(60,180,240,0.6)";
+                    //
+                    // d3.tsv("diamonds.tsv", type, function(error, diamonds) {
+                    //     if (error) throw error;
+                    //
+                    //     x.domain(d3.extent(diamonds, function(d) { return d.carat; }));
+                    //     y.domain(d3.extent(diamonds, function(d) { return d.price; }));
+                    //
+                    //     svg.append("g")
+                    //         .attr("class", "grid grid--x")
+                    //         .call(d3.axisLeft(y)
+                    //             .tickSize(-width)
+                    //             .tickFormat(""));
+                    //
+                    //     svg.append("g")
+                    //         .attr("class", "grid grid--y")
+                    //         .attr("transform", "translate(0," + height + ")")
+                    //         .call(d3.axisBottom(x)
+                    //             .tickSize(-height)
+                    //             .tickFormat(""));
+                    //
+                    //     svg.append("g")
+                    //         .attr("class", "axis axis--y")
+                    //         .call(d3.axisLeft(y)
+                    //             .ticks(10, "s"))
+                    //         .append("text")
+                    //         .attr("x", 10)
+                    //         .attr("y", 10)
+                    //         .attr("dy", ".71em")
+                    //         .attr("fill", "#000")
+                    //         .attr("font-weight", "bold")
+                    //         .attr("text-anchor", "start")
+                    //         .text("Price (US$)");
+                    //
+                    //     svg.append("g")
+                    //         .attr("class", "axis axis--x")
+                    //         .attr("transform", "translate(0," + height + ")")
+                    //         .call(d3.axisBottom(x))
+                    //         .append("text")
+                    //         .attr("x", width - 10)
+                    //         .attr("y", -10)
+                    //         .attr("dy", "-.35em")
+                    //         .attr("fill", "#000")
+                    //         .attr("font-weight", "bold")
+                    //         .attr("text-anchor", "end")
+                    //         .text("Mass (carats)");
+                    //
+                    //     d3.shuffle(diamonds);
+                    //     var t = d3.timer(function() {
+                    //         for (var i = 0, n = 500, d; i < n; ++i) {
+                    //             if (!(d = diamonds.pop())) return t.stop();
+                    //             context.fillRect(x(d.carat), y(d.price), Math.max(2, x(d.carat + 0.01) - x(d.carat)), 2);
+                    //         }
+                    //     });
+                    // });
+                    //
+                    // function type(d) {
+                    //     d.carat = +d.carat;
+                    //     d.price = +d.price;
+                    //     return d;
+                    // }
+                    // var chart = c3.generate({
+                    //     bindto: "#chart",
+                    //     data: {
+                    //         //Test data
+                    //         // columns: [
+                    //         // 	['data1', 50, 70, 30, 20, 10],
+                    //         // 	['data2', 14, 56, 88, 34, 100]
+                    //         // ],
+                    //         json: dataObj,
+                    //         type: "spline"
+                    //     }
+                    // });
+                    var chart = c3.generate({
+                        bindto: "#chart",
+                        data: {
+                            xs: {
+                                setosa: 'setosa_x',
+                                versicolor: 'versicolor_x',
+                            },
+                            // iris data from R
+                            columns: [
+                                ["setosa_x", 3.5, 3.0, 3.2, 3.1, 3.6, 3.9, 3.4, 3.4, 2.9, 3.1, 3.7, 3.4, 3.0, 3.0, 4.0, 4.4, 3.9, 3.5, 3.8, 3.8, 3.4, 3.7, 3.6, 3.3, 3.4, 3.0, 3.4, 3.5, 3.4, 3.2, 3.1, 3.4, 4.1, 4.2, 3.1, 3.2, 3.5, 3.6, 3.0, 3.4, 3.5, 2.3, 3.2, 3.5, 3.8, 3.0, 3.8, 3.2, 3.7, 3.3],
+                                ["versicolor_x", 3.2, 3.2, 3.1, 2.3, 2.8, 2.8, 3.3, 2.4, 2.9, 2.7, 2.0, 3.0, 2.2, 2.9, 2.9, 3.1, 3.0, 2.7, 2.2, 2.5, 3.2, 2.8, 2.5, 2.8, 2.9, 3.0, 2.8, 3.0, 2.9, 2.6, 2.4, 2.4, 2.7, 2.7, 3.0, 3.4, 3.1, 2.3, 3.0, 2.5, 2.6, 3.0, 2.6, 2.3, 2.7, 3.0, 2.9, 2.9, 2.5, 2.8],
+                                ["setosa", 0.2, 0.2, 0.2, 0.2, 0.2, 0.4, 0.3, 0.2, 0.2, 0.1, 0.2, 0.2, 0.1, 0.1, 0.2, 0.4, 0.4, 0.3, 0.3, 0.3, 0.2, 0.4, 0.2, 0.5, 0.2, 0.2, 0.4, 0.2, 0.2, 0.2, 0.2, 0.4, 0.1, 0.2, 0.2, 0.2, 0.2, 0.1, 0.2, 0.2, 0.3, 0.3, 0.2, 0.6, 0.4, 0.3, 0.2, 0.2, 0.2, 0.2],
+                                ["versicolor", 1.4, 1.5, 1.5, 1.3, 1.5, 1.3, 1.6, 1.0, 1.3, 1.4, 1.0, 1.5, 1.0, 1.4, 1.3, 1.4, 1.5, 1.0, 1.5, 1.1, 1.8, 1.3, 1.5, 1.2, 1.3, 1.4, 1.4, 1.7, 1.5, 1.0, 1.1, 1.0, 1.2, 1.6, 1.5, 1.6, 1.5, 1.3, 1.3, 1.3, 1.2, 1.4, 1.2, 1.0, 1.3, 1.2, 1.3, 1.3, 1.1, 1.3],
+                            ],
+                            type: 'scatter'
+                        },
+                        axis: {
+                            x: {
+                                label: 'Sepal.Width',
+                                tick: {
+                                    fit: false
+                                }
+                            },
+                            y: {
+                                label: 'Petal.Width'
+                            }
+                        }
+                    });
                 });
             }
         }

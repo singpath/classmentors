@@ -51,11 +51,7 @@ export function SpfFirebaseRefProvider() {
         } else if (queryOptions.hasOwnProperty('orderByKey')) {
           ref = ref.orderByKey();
         } else if (queryOptions.orderByChild) {
-          if(queryOptions.equalTo) {
-              ref = ref.orderByChild(queryOptions.orderByChild).equalTo(queryOptions.equalTo);
-          } else {
-              ref = ref.orderByChild(queryOptions.orderByChild);
-          }
+            ref = ref.orderByChild(queryOptions.orderByChild);
         } else if (queryOptions.orderByValue) {
           ref = ref.orderByValue(queryOptions.orderByValue);
         }
@@ -71,7 +67,9 @@ export function SpfFirebaseRefProvider() {
             ref = ref[filters[i]](filter);
           } else if (queryOptions.hasOwnProperty('orderByPriority')) {
             ref = ref[filters[i]].apply(ref, filter);
-          } else {
+          } else if(queryOptions.hasOwnProperty('equalTo')) {
+            ref = ref.equalTo(queryOptions.equalTo);
+          }else {
             // $log.warning('The query should be ordered by priority to filter by value and key');
           }
 
