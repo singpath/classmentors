@@ -32,6 +32,7 @@ spfShared.constant('SPF_COUNTRIES', services.countries);
 spfShared.constant('spfCryptoHashKeySize', services.crypto.keySize);
 spfShared.constant('spfCryptoIteration', services.crypto.iterations);
 spfShared.constant('spfCryptoSaltSize', services.crypto.saltSize);
+spfShared.constant('spfProfilesPath', null);
 spfShared.controller('SpfSharedNavBarCtrl', components.navbar.SpfSharedNavBarCtrl);
 spfShared.directive('spfEditor', components.ace.spfEditorDirectiveFactory);
 spfShared.directive('spfSignForm', components.sign.spfSignFormDirectiveFactory);
@@ -49,9 +50,11 @@ spfShared.filter('spfToArray', filters.spfToArrayFilterFactory);
 spfShared.filter('urlFor', services.routes.urlForFilterFactory);
 spfShared.provider('spfFirebaseRef', services.firebase.SpfFirebaseRefProvider);
 spfShared.run(components.navbar.initNavBar);
+spfShared.run(services.datastore.run);
 spfShared.run(services.icons.run);
 spfShared.run(services.routes.run);
 spfShared.service('spfCrypto', services.crypto.Service);
+spfShared.service('spfCurrentUser', services.datastore.SpfCurrentUserService);
 
 import './shared.css!';
 
