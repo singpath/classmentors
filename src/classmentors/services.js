@@ -1250,14 +1250,16 @@ export function clmDataStoreFactory(
             spfFirebase.set(
               ['classMentors/eventRankings', event.$id, data.classMentors.$id],
               clmDataStore.events._getRanking(data)
-            ),
+            )
+            // This was causing the endless loop of failed updates when viewing the ranking.  
+            //,
             // 5. update participants data
             // TODO: only update it if necessary.
-            spfFirebase.set(['classMentors/eventParticipants', event.$id, data.classMentors.$id, 'user'], {
-              displayName: data.classMentors.user.displayName,
-              gravatar: data.classMentors.user.gravatar,
-              school: data.classMentors.user.school || null
-            })
+            //spfFirebase.set(['classMentors/eventParticipants', event.$id, data.classMentors.$id, 'user'], {
+            //  displayName: data.classMentors.user.displayName,
+            //  gravatar: data.classMentors.user.gravatar,
+            //  school: data.classMentors.user.school || null
+            //})
           ]);
         }).catch(function(err) {
           $log.error(`Failed to update progress of ${publicId}: ${err.toString()}`);
