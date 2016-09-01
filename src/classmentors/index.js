@@ -81,7 +81,7 @@ module.constant('routes', {
   startMcq: '/challenges/mcq/start',
   editMcq: '/challenges/mcq/edit',
   viewSurvey: '/challenges/survey',
-  createTeamActivity: '/events/teamActivity/create'
+  createTeamActivity: '/challenges/team-activity/create'
 });
 
 module.config([
