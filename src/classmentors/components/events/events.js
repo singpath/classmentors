@@ -464,7 +464,6 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
     this.assistantObj = initialData.assistantObj;
     this.asstArr = [];
     this.isReviewSuperUser = false;
-    console.log("monitorevent this progress", initialData.progress);
     for (var asst in self.assistants) {
         if (self.assistants[asst].$id) {
             self.asstArr.push(self.assistants[asst].$id);
@@ -489,7 +488,7 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
             unwatch: noop
         };
     }
-
+    console.log("monitorHandler is::", monitorHandler);
     if (self.event && self.currentUser && self.asstArr.indexOf(self.currentUser.publicId) >= 0) {
         var asst = self.assistantObj[self.currentUser.publicId];
         if (asst.canReview) {
@@ -1058,6 +1057,11 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
             console.log('video is clicked');
             return 'Continue';
 
+        } else if (tasktype == 'teamActivity') {
+            console.log('teamActivity is clicked');
+            location = '/challenges/team-activity/create'
+            return 'Continue';
+
         } else if (tasktype == 'journalling') {
             console.log('journalling is clicked');
             return 'Continue';
@@ -1140,7 +1144,7 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
 
 
         self.creatingTask = true;
-        if (taskType === 'multipleChoice' || taskType === 'journalling' || taskType === 'video' || taskType === 'survey') {
+        if (taskType === 'multipleChoice' || taskType === 'journalling' || taskType === 'video' || taskType === 'survey' || taskType === 'teamActivity') {
             var data = {
                 taskType: taskType,
                 isOpen: isOpen,
@@ -1602,8 +1606,6 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
     this.participantsView = [];
     this.visibleTasks = [];
     this.taskCompletion = {};
-
-    console.log(self.profile);
 
     this.orderOptions = {
         key: undefined,
@@ -2254,6 +2256,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         }),
         userSolution: clmDataStore.events.getUserSolutions(this.event.$id, this.profile.$id).then(function (solutions) {
             self.currentUserSolutions = solutions;
+            console.log("this currentUserSolution:", solutions);
             unwatchers.push(solutions.$destroy.bind(solutions));
             return solutions;
         }),
@@ -2262,6 +2265,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             return paths;
         })
     }).then(function (results) {
+        
         visibleTasks();
 
         // Set the participant view (via the pager range update event)
@@ -2280,14 +2284,14 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
     }).then(function (results) {
         var update = function () {
             // Removed due to June 2016 profile updating process change.
-            /*
-             return clmDataStore.events.updateCurrentUserProfile(
-             self.event,
-             self.tasks,
-             results.userSolution,
-             self.profile
-             );
-             */
+
+             // return clmDataStore.events.updateCurrentUserProfile(
+             // self.event,
+             // self.tasks,
+             // results.userSolution,
+             // self.profile
+             // );
+
         };
 
         // Watch for singpath problem getting updated
@@ -2666,7 +2670,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             //clmDataStore.events.updateProgress(initialData.event, initialData.tasks, initialData.solutions, userId, initialData.progress);
             //console.log(eventId, taskId, userId);
 
-            $location.path(urlFor('oneEvent', {eventId: self.event.$id}));
+            //$location.path(urlFor('oneEvent', {eventId: self.event.$id}));
 
         }
 
@@ -3239,6 +3243,7 @@ function ClmEventResultsTableCtrl($scope, $q, $log, $mdDialog, $document,
         }
 
         participantCount = self.participants.length;
+        console.log("participant count is:", participantCount);
         participantsIds = self.participants.reduce(function (all, participant) {
             if (participant.$id) {
                 all[participant.$id] = true;
@@ -3259,6 +3264,7 @@ function ClmEventResultsTableCtrl($scope, $q, $log, $mdDialog, $document,
                     self.progress[publicId][taskId].completed
                 );
             }).length / participantCount * 100;
+
     }
 
     function _completionComparer(options) {
@@ -3670,6 +3676,8 @@ function ClmEventResultsTableCtrl($scope, $q, $log, $mdDialog, $document,
             return paths;
         })
     }).then(function (results) {
+
+        console.log("clmeventresultstable results:",results);
         visibleTasks();
 
         // Set the participant view (via the pager range update event)
