@@ -786,7 +786,6 @@ function ClmCohortStatsPageCtrl(
 
     this.renderDashboard = function() {
         if(self.selectedStatistic) {
-            // var dataString = JSON.parse('{"Sprint 1": [10, 20, 30, 40, 50],"Sprint 2": [2, 4, 6, 8, 10],"Sprint 3": [5, 10, 15, 20, 25]}');
             if(self.selectedStatistic == 'Submission time series') {
                 // How formatted data should look like
                 var dataObj = {};
@@ -832,7 +831,7 @@ function ClmCohortStatsPageCtrl(
                         var logHolder = self.submissionLogs[actionIndex];
                         if(self.cohort.events.indexOf(logHolder.eventId) >= 0) {
                             dataObj[logHolder.eventId + "_x"].push(logHolder.timestamp);
-                            dataObj[logHolder.eventId].push(new Date(logHolder.timestamp).getHours());
+                            dataObj[logHolder.eventId].push(new Date(logHolder.timestamp).getMinutes());
                             // console.log(new Date(logHolder.timestamp).getDate());
                         }
                         // if(self.allLogs[actionIndex].action == 'submitLinkResponse') {
