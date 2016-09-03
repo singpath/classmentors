@@ -6,6 +6,7 @@
 //TODO: Add various imports for challenge(s)
 import * as mcq from './mcq/mcq.js';
 import * as survey from './survey/survey.js';
+import * as team from './teamActivity/teamactivity.js';
 
 const noop = () => undefined;
 
@@ -47,6 +48,14 @@ export function configRoute($routeProvider, routes){
             controllerAs: 'ctrl',
             resolve:{
               initialData: startMCQInitialData
+            }
+        })
+        .when(routes.createTeamActivity, {
+            template: team.teamActivityCreateTmpl,
+            controller: team.createTeamActivityController,
+            controllerAs: 'ctrl',
+            resolve:{
+                initialData: team.createTeamActivityInitialData
             }
         });
 
