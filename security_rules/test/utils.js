@@ -43,7 +43,12 @@ exports.setFirebaseData = function(patch) {
   targaryen.setFirebaseData(data);
 };
 
-exports.bob = function() {
+exports.bob = function(opts) {
+  opts = Object.assign({
+    isAdmin: false,
+    isPremium: false
+  }, opts);
+
   const uid = 'github:808';
   const publicId = 'bob';
   const firebaseAuth = {
@@ -74,12 +79,25 @@ exports.bob = function() {
     user: {
       displayName: user.displayName,
       gravatar: user.gravatar,
-      isAdmin: false,
-      isPremium: false,
+      isAdmin: opts.isAdmin,
+      isPremium: opts.isPremium,
       yearOfBirth: userData.yearOfBirth
     }
   };
   const userProfiles = {[publicId]: profile};
+  const premiumUsers = {[uid]: opts.isPremium};
+  const admins = {[uid]: opts.isAdmin};
 
-  return {uid, publicId, firebaseAuth, user, userData, auth, profile, userProfiles};
+  return {
+    admins,
+    auth,
+    firebaseAuth,
+    premiumUsers,
+    profile,
+    publicId,
+    uid,
+    user,
+    userData,
+    userProfiles
+  };
 };
