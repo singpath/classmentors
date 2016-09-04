@@ -293,6 +293,7 @@ export function clmDataStoreFactory(
   routes, spfFirebase, spfAuth, spfAuthData, spfCrypto, clmService, clmServicesUrl
 ) {
   var clmDataStore;
+  var settings = spfFirebase.array('classMentors/settings');
 
   clmDataStore = {
       
@@ -1093,6 +1094,14 @@ export function clmDataStoreFactory(
         );
       },
 
+        _hasDoneSurvey: function (task, solutions) {
+            return(
+              task.survey &&
+              solutions &&
+              solutions[task.$id]
+            );
+        },
+
       _solvedProblems: function(singPathProfile) {
         var queueId = 'default';
 
@@ -1129,13 +1138,16 @@ export function clmDataStoreFactory(
           ) {
             return progress;
           }
-
+            //console.log("this fucking progress is:", progress);
+            //console.log("this fucking data solutions is ", data.solutions);
+            console.log("this fucking task is ", task);
           var solved = (
             clmDataStore.events._isSolutionLinkValid(task, data.solutions) ||
             clmDataStore.events._isResponseValid(task, data.solutions) ||
             clmDataStore.events._hasRegistered(task, data.classMentors, data.singPath) ||
             clmDataStore.events._hasBadge(task, badges) ||
-            clmDataStore.events._hasSolvedSingpathProblem(task, data.singPath)
+            clmDataStore.events._hasSolvedSingpathProblem(task, data.singPath) ||
+            clmDataStore.events._hasDoneSurvey(task, data.solutions)
           );
 
           if (solved) {
@@ -1163,9 +1175,9 @@ export function clmDataStoreFactory(
       },
 
       monitorEvent: function(event, tasks, participants, solutions, progress) {
-        console.log("monitorevent progress iss:", progress);
         var tid;
         var delay = 300;
+          console.log("debouncedUpdate iss:", debouncedUpdate);
         var unWatchSolution = solutions.$watch(debouncedUpdate);
         var unWatchParticipants = participants.$watch(debouncedUpdate);
         function update() {
@@ -1250,14 +1262,16 @@ export function clmDataStoreFactory(
             spfFirebase.set(
               ['classMentors/eventRankings', event.$id, data.classMentors.$id],
               clmDataStore.events._getRanking(data)
-            ),
+            )
+            // This was causing the endless loop of failed updates when viewing the ranking.  
+            //,
             // 5. update participants data
             // TODO: only update it if necessary.
-            spfFirebase.set(['classMentors/eventParticipants', event.$id, data.classMentors.$id, 'user'], {
-              displayName: data.classMentors.user.displayName,
-              gravatar: data.classMentors.user.gravatar,
-              school: data.classMentors.user.school || null
-            })
+            //spfFirebase.set(['classMentors/eventParticipants', event.$id, data.classMentors.$id, 'user'], {
+            //  displayName: data.classMentors.user.displayName,
+            //  gravatar: data.classMentors.user.gravatar,
+            //  school: data.classMentors.user.school || null
+            //})
           ]);
         }).catch(function(err) {
           $log.error(`Failed to update progress of ${publicId}: ${err.toString()}`);
@@ -1717,6 +1731,20 @@ export function clmDataStoreFactory(
           });
         }
       })
+    },
+
+    settings: {
+
+      /**
+       * Return Classmentors settings as a firebase synchronized array.
+       *
+       * Note that the array might not be loaded yet.
+       *
+       * @return {array}
+       */
+      get: function() {
+        return settings;
+      }
     },
 
     singPath: {

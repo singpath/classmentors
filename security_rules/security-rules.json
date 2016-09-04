@@ -96,6 +96,11 @@
             ".validate":"newData.isString() && root.child('auth/publicIds').child(newData.val()).val() === auth.uid"
           }
         },
+        ".indexOn": [
+          "action",
+          "timestamp",
+          "publicId"
+        ],
         ".write": "auth !== null",
         ".read": "auth !== null && root.child('classMentors/admins').child(auth.uid).val() === true"
       },
@@ -638,6 +643,31 @@
           }
         },
         ".read": true
+      },
+      "settings": {
+        ".read": "true",
+        "$settingId": {
+          ".validate": "newData.hasChildren(['value', 'title', 'type'])",
+          ".write": "newData.exists() && auth != null && root.child('classMentors/admins').child(auth.uid).val() == true",
+          "value": {
+            ".validate": "true"
+          },
+          "title": {
+            ".validate": "newData.isString()"
+          },
+          "type": {
+            ".validate": "newData.isString()"
+          },
+          "description": {
+            ".validate": "newData.isString()"
+          },
+          "defaultValue": {
+            ".validate": "true"
+          },
+          "$other": {
+            ".validate": "false"
+          }
+        }
       },
       "userAchievements": {
         ".read": true,

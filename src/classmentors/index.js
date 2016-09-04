@@ -6,9 +6,13 @@ import module from 'classmentors/module.js';
 import * as services from 'classmentors/services.js';
 import * as filters from 'classmentors/filters.js';
 import * as directives from 'classmentors/directives.js';
+import * as d3 from 'd3';
+import * as c3 from 'c3';
+console.log(c3);
 
 import * as app from 'classmentors/components/classmentors/classmentors.js';
 import * as ace from 'classmentors/components/ace/ace.js';
+import admin from 'classmentors/components/admin/admin.js';
 import * as events from 'classmentors/components/events/events.js';
 import * as profiles from 'classmentors/components/profiles/profiles.js';
 import * as cohorts from 'classmentors/components/cohorts/cohorts.js';
@@ -50,8 +54,15 @@ module.directive('clmPager', events.clmPagerFactory);
 module.factory('clmRowPerPage', events.clmRowPerPageFactory);
 module.factory('clmPagerOption', events.clmPagerOptionFactory);
 
+module.component('clmAdmin', admin.component);
+module.config(admin.configRoute);
+
 //added new survey factory for tryout purpose
 module.factory('clmSurvey',events.clmSurveyTaskFactory);
+
+// needed by singpath-core current user service.
+module.constant('spfProfilesPath', 'classMentors/userProfiles');
+
 /**
  * Label route paths.
  *
@@ -64,6 +75,7 @@ module.factory('clmSurvey',events.clmSurveyTaskFactory);
 module.constant('routes', {
   home: '/ace-of-coders', // The default route
   aceOfCoders: '/ace-of-coders',
+  admin: '/admin',
   events: '/events',
   newEvent: '/new-event',
   oneEvent: '/events/:eventId',

@@ -11,6 +11,7 @@ export const module = angular.module('singpath-core.demo', [spfShared.name]);
 module.component('demo', demoApp.component);
 module.component('iconsDemo', iconsDemo.component);
 module.config(iconsDemo.config);
+module.constant('spfProfilesPath', 'classMentors/userProfiles');
 
 module.constant('routes', {
   home: '/icons',
