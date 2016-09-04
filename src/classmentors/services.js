@@ -1138,9 +1138,7 @@ export function clmDataStoreFactory(
           ) {
             return progress;
           }
-            //console.log("this fucking progress is:", progress);
-            //console.log("this fucking data solutions is ", data.solutions);
-            console.log("this fucking task is ", task);
+            
           var solved = (
             clmDataStore.events._isSolutionLinkValid(task, data.solutions) ||
             clmDataStore.events._isResponseValid(task, data.solutions) ||

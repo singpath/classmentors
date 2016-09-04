@@ -2670,7 +2670,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             //clmDataStore.events.updateProgress(initialData.event, initialData.tasks, initialData.solutions, userId, initialData.progress);
             //console.log(eventId, taskId, userId);
 
-            //$location.path(urlFor('oneEvent', {eventId: self.event.$id}));
+            $location.path(urlFor('oneEvent', {eventId: self.event.$id}));
 
         }
 
