@@ -589,8 +589,8 @@ export function clmDataStoreFactory(
     events: {
       addTaskWithAns: function(eventId, task, isOpen, answers) {
         var priority = task.priority || 0;
-        // console.log('Eventid is ? ', eventId);
-        // console.log('task is : ', task);
+        console.log('Eventid is ? ', eventId);
+        console.log('task is : ', task);
         if (isOpen) {
           task.openedAt = {'.sv': 'timestamp'};
           task.closedAt = null;
@@ -846,8 +846,8 @@ export function clmDataStoreFactory(
 
       addTask: function(eventId, task, isOpen) {
         var priority = task.priority || 0;
-        // console.log('Eventid is ? ', eventId);
-        // console.log('task is : ', task);
+        console.log('Eventid is ? ', eventId);
+        console.log('task is : ', task);
         if (isOpen) {
           task.openedAt = {'.sv': 'timestamp'};
           task.closedAt = null;
@@ -1187,7 +1187,7 @@ export function clmDataStoreFactory(
       monitorEvent: function(event, tasks, participants, solutions, progress) {
         var tid;
         var delay = 300;
-          // console.log("debouncedUpdate iss:", debouncedUpdate);
+          console.log("debouncedUpdate iss:", debouncedUpdate);
         var unWatchSolution = solutions.$watch(debouncedUpdate);
         var unWatchParticipants = participants.$watch(debouncedUpdate);
         function update() {
@@ -1221,15 +1221,15 @@ export function clmDataStoreFactory(
         if (!publicId) {
           return $q.reject('User public id is missing missing.');
         }
-        // console.log("update progress came in here!!");
+        console.log("update progress came in here!!");
         if (!solutions || !solutions.$id || solutions.$id !== event.$id) {
           return $q.reject('User solutions are missing');
         }
-        // console.log("updated progress event:", event);
-        //   console.log("updated progress tasks:", tasks);
-        //   console.log("updated progress solutions:", solutions);
-        //   console.log("updated progress publicId:", publicId);
-        //   console.log("updated progress userProgress:", userProgress);
+        console.log("updated progress event:", event);
+          console.log("updated progress tasks:", tasks);
+          console.log("updated progress solutions:", solutions);
+          console.log("updated progress publicId:", publicId);
+          console.log("updated progress userProgress:", userProgress);
 
         var cmProfilePromise = clmDataStore.profile(publicId);
         var badgesPromise = cmProfilePromise.then(function(profile) {
@@ -1249,8 +1249,8 @@ export function clmDataStoreFactory(
         }).then(function(data) {
           // 4. save data
 
-            // console.log("monitorevent tasks:",tasks);
-            // console.log("data: ", data);
+            console.log("monitorevent tasks:",tasks);
+            console.log("data: ", data);
           return $q.all([
             // 2. check completeness and update progress if needed.
             $q.when(clmDataStore.events._getProgress(tasks, data)).then(function(progress) {
