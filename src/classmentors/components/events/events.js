@@ -25,6 +25,7 @@ import schEngageScaleTmpl from './events-view-schEngageScale-task-form.html!text
 import motiStratLearnTmpl from './events-view-motiStratLearn-task-form.html!text';
 import eduDisLearnTmpl from './events-view-eduDisLearn-task-form.html!text';
 
+import teamFormationTmpl from './events-view-teamFormation.html!text';
 const noop = () => undefined;
 
 export function configRoute($routeProvider, routes) {
@@ -1950,9 +1951,9 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                 if (!self.userData.yearOfBirth) {
                     self.userData.yearOfBirth = self.participantInfo.yearOfBirth;
                 } else {
-                    spfAuthData.user().then(function(promise) {
+                    spfAuthData.user().then(function (promise) {
                         return promise;
-                    }).then(function(data) {
+                    }).then(function (data) {
                         var result = data;
                         spfFirebase.set(['auth/users', result.$id, 'yearOfBirth'], self.userData.yearOfBirth);
                     }).catch(noop);
@@ -1961,9 +1962,9 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                 if (!self.userData.school) {
                     self.userData.school = self.participantInfo.school;
                 } else {
-                    spfAuthData.user().then(function(promise) {
+                    spfAuthData.user().then(function (promise) {
                         return promise;
-                    }).then(function(data) {
+                    }).then(function (data) {
                         var result = data;
                         // delete self.userData.school[$$mdSelectId];
                         var schObj = {
@@ -2053,9 +2054,25 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
     };
 
 
-    this.promptForTeamFormation = function(eventId, taskId, task, participant, userSolution){
+    this.promptForTeamFormation = function (eventId, taskId, task, participant, userSolution) {
+        $mdDialog.show({
+            parent: $document.body,
+            template: teamFormationTmpl,
+            controller: DialogController,
+            controllerAs: 'ctrl'
+        });
 
-        console.log("this is where i prompt for team formation");
+        function DialogController() {
+            this.save = function(){
+
+            };
+
+            this.cancel = function () {
+                $mdDialog.hide();
+            };
+
+        }
+
     };
 
 
@@ -2270,7 +2287,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             return paths;
         })
     }).then(function (results) {
-        
+
         visibleTasks();
 
         // Set the participant view (via the pager range update event)
@@ -2290,12 +2307,12 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         var update = function () {
             // Removed due to June 2016 profile updating process change.
 
-             // return clmDataStore.events.updateCurrentUserProfile(
-             // self.event,
-             // self.tasks,
-             // results.userSolution,
-             // self.profile
-             // );
+            // return clmDataStore.events.updateCurrentUserProfile(
+            // self.event,
+            // self.tasks,
+            // results.userSolution,
+            // self.profile
+            // );
 
         };
 

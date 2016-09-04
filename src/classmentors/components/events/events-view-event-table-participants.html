@@ -228,10 +228,15 @@
                 </td>
                 <!--team activity challenge button!-->
                 <td ng-if="ctrl.currentUserParticipant">
-                    <md-button class="md-raised md-primary" align="middle" ng-href="#{{'viewIRAT' | urlFor:{'publicId': participant.$id} }}">Start IRAT</md-button>
+                    <md-button class="md-raised md-primary" align="middle"
+                               ng-href="#{{'viewIRAT' | urlFor:{'publicId': participant.$id} }}">Start IRAT
+                    </md-button>
                 </td>
                 <td ng-if="ctrl.currentUserParticipant">
-                    <md-button class="md-raised md-primary" align="middle" ng-click="ctrl.promptForTeamFormation(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant, ctrl.currentUserSolutions)">Join Team</md-button>
+                    <md-button class="md-raised md-primary" align="middle"
+                               ng-click="ctrl.promptForTeamFormation(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant, ctrl.currentUserSolutions)">
+                        Join Team
+                    </md-button>
                 </td>
             </tr>
 
@@ -292,15 +297,9 @@
                     </div>
                 </td>
                 <td>
-                    <table width="100%">
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                    </table>
                 </td>
-
+                <td>
+                </td>
             </tr>
 
             <tr ng-if="ctrl.participantsView | spfEmpty">
