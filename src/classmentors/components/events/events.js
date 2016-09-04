@@ -1059,7 +1059,7 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
 
         } else if (tasktype == 'teamActivity') {
             console.log('teamActivity is clicked');
-            location = '/challenges/team-activity/create'
+            location = '/challenges/team-activity/create';
             return 'Continue';
 
         } else if (tasktype == 'journalling') {
@@ -1067,7 +1067,7 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
             return 'Continue';
 
         } else if (tasktype == 'survey') {
-            console.log("clicked clmdataa: ", initialData.event);
+            // console.log("clicked clmdataa: ", initialData.event);
 
             clmSurvey.set(initialData.event.$id, initialData.event, task, tasktype, isOpen);
             var obj = clmSurvey.get();
@@ -1077,6 +1077,7 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
 
         } else if (tasktype === 'profileEdit') {
             return 'Save';
+
         } else {
             return 'Save'; // by default should show 'save'
         }
@@ -1313,7 +1314,12 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBar
 
     } else if (this.task.mcqQuestions) {
         this.taskType = 'multipleChoice';
+
     }
+    // else if (this.task.profileEdit) {
+    //     return 'Save';
+    // }
+
     // md-select badge list and the the ng-model are compared
     // by reference.
     if (
@@ -1364,7 +1370,7 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBar
 
         } else if (this.taskType == 'multipleChoice') {
             console.log('multipleChoice is clicked');
-            console.log("this event url", urlFor('oneEvent', {eventId: this.event.$id}));
+            // console.log("this event url", urlFor('oneEvent', {eventId: this.event.$id}));
             location = "/challenges/mcq/edit";
             return 'Continue';
 
@@ -1380,7 +1386,15 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBar
             console.log('journalling is clicked');
             return 'Continue';
 
-        } else {
+        } else if (tasktype == 'teamActivity') {
+            console.log('teamActivity is clicked');
+            location = '/challenges/team-activity/edit';
+            return 'Continue';
+
+        } else if (tasktype === 'profileEdit') {
+            return 'Save';
+
+        }else {
             return 'Save';
         }
     }

@@ -22,7 +22,6 @@ export function configRoute($routeProvider, routes){
             }
         })
 
-        //todo: change the controller to one in mcq.js
         .when(routes.editMcq, {
             template: mcq.editMcqTmpl,
             controller: mcq.editMcqController,
@@ -50,6 +49,7 @@ export function configRoute($routeProvider, routes){
               initialData: startMCQInitialData
             }
         })
+
         .when(routes.createTeamActivity, {
             template: team.teamActivityCreateTmpl,
             controller: team.createTeamActivityController,
