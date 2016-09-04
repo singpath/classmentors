@@ -405,7 +405,6 @@ function viewEventCtrlInitialData($q, $route, spfAuth, spfAuthData, clmDataStore
         }),
         progress: canviewPromise.then(function (canView) {
             if (canView) {
-                console.log("get progress is:", clmDataStore.events.getProgress(eventId));
                 return clmDataStore.events.getProgress(eventId);
             }
         }),
@@ -488,7 +487,7 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
             unwatch: noop
         };
     }
-    console.log("monitorHandler is::", monitorHandler);
+
     if (self.event && self.currentUser && self.asstArr.indexOf(self.currentUser.publicId) >= 0) {
         var asst = self.assistantObj[self.currentUser.publicId];
         if (asst.canReview) {
@@ -2053,6 +2052,13 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         }
     };
 
+
+    this.promptForTeamFormation = function(eventId, taskId, task, participant, userSolution){
+
+        console.log("this is where i prompt for team formation");
+    };
+
+
     this.promptForSurvey = function (eventId, taskId, task, participant, userSolution) {
 
         console.log("prompt for survey task : ", task.survey);
@@ -2256,7 +2262,6 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         }),
         userSolution: clmDataStore.events.getUserSolutions(this.event.$id, this.profile.$id).then(function (solutions) {
             self.currentUserSolutions = solutions;
-            console.log("this currentUserSolution:", solutions);
             unwatchers.push(solutions.$destroy.bind(solutions));
             return solutions;
         }),
@@ -2361,16 +2366,7 @@ function addSurveyEventTaskCtrlInitialData(spfFirebase, $q, $route, spfAuthData,
 
     //returns a promise object from firebase
     var surveyPromise = spfFirebase.loadedArray(['classMentors/surveyTemplate']);
-    console.log("this motivated promise is ", surveyPromise);
-    // var p = Promise.resolve(motivatedPromise);
-    //
-    // var p2 = p.then(function(value){
-    //     console.log("what is this value? ", value);
-    //     return value;
-    // });
-    //
-    // console.log("p2 isssa: ", p2);
-    //assign the promise to survey2
+
     return $q.all({
         currentUser: spfAuthData.user().catch(noop),
         profile: profilePromise,
@@ -3243,7 +3239,6 @@ function ClmEventResultsTableCtrl($scope, $q, $log, $mdDialog, $document,
         }
 
         participantCount = self.participants.length;
-        console.log("participant count is:", participantCount);
         participantsIds = self.participants.reduce(function (all, participant) {
             if (participant.$id) {
                 all[participant.$id] = true;
@@ -3677,7 +3672,6 @@ function ClmEventResultsTableCtrl($scope, $q, $log, $mdDialog, $document,
         })
     }).then(function (results) {
 
-        console.log("clmeventresultstable results:",results);
         visibleTasks();
 
         // Set the participant view (via the pager range update event)

@@ -19,7 +19,10 @@
                     <md-button ng-click="ctrl.orderBy(task.$id)">{{ task.title }}</md-button>
                 </th>
                 <th>
-                    <md-button rowspan="3"><b>TEAM ACTIVITY</b></md-button>
+                    <md-button rowspan="3">TEAM ACTIVITY - BATTLE!</md-button>
+                </th>
+                <th>
+                    <md-button rowspan="3">TEAM ACTIVITY - BATTLE!</md-button>
                 </th>
             </tr>
             <tr>
@@ -28,13 +31,10 @@
                     {{ task.description }}
                 </th>
                 <th>
-                    <table width="100%">
-                        <tr ng-class="'index-' + $index + ' ' + ($odd ? 'odd' : 'even')">
-                            <td width="100px" height="50px">IRAT</td>
-                            <td width="100px">Team Formation</td>
-                            <td width="100px">TRAT</td>
-                        </tr>
-                    </table>
+                    This quiz comprises of 10 questions which will test on your understanding of Lesson 2's materials.
+                </th>
+                <th>
+                    Join a team! (button will be enabled once progress for IRAT reaches 100%)
                 </th>
             </tr>
             <tr>
@@ -226,14 +226,12 @@
                         </div>
                     </div>
                 </td>
+                <!--team activity challenge button!-->
                 <td ng-if="ctrl.currentUserParticipant">
-                    <table width="100%">
-                        <tr>
-                            <td align="center"><md-button class="md-raised md-primary" align="middle">Start Challenge</md-button></td>
-                            <td align="center"><md-button class="md-raised md-primary" align="middle">Join Team</md-button></td>
-                            <td align="center"><md-button class="md-raised md-primary" align="middle">Start Challenge</md-button></td>
-                        </tr>
-                    </table>
+                    <md-button class="md-raised md-primary" align="middle" ng-href="#{{'viewIRAT' | urlFor:{'publicId': participant.$id} }}">Start IRAT</md-button>
+                </td>
+                <td ng-if="ctrl.currentUserParticipant">
+                    <md-button class="md-raised md-primary" align="middle" ng-click="ctrl.promptForTeamFormation(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant, ctrl.currentUserSolutions)">Join Team</md-button>
                 </td>
             </tr>
 
@@ -296,9 +294,9 @@
                 <td>
                     <table width="100%">
                         <tr>
-                            <td>Completed</td>
-                            <td>Completed</td>
-                            <td>Completed</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
                         </tr>
                     </table>
                 </td>
