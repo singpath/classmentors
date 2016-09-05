@@ -8,7 +8,7 @@ function createTeamActivityInitialData($q, eventService, clmDataStore) {
 }
 createTeamActivityInitialData.$inject = ['$q', 'eventService', 'clmDataStore'];
 
-function createTeamActivityController($q, initialData, clmDataStore){
+function createTeamActivityController($q, initialData, clmDataStore, $location, urlFor){
     var self = this;
 
     // console.log(initialData);
@@ -21,8 +21,20 @@ function createTeamActivityController($q, initialData, clmDataStore){
 
     self.taskType = initialData.taskType;
 
+    self.submit = function(){
+        console.log('form its submitted');
+        // todo: Validation for form data, saving of form data, direct to MCQ page.
+        $location.path(urlFor('viewMcq'));
+    }
+
 }
-createTeamActivityController.$inject = ['$q', 'initialData', 'clmDataStore'];
+createTeamActivityController.$inject = [
+    '$q', 
+    'initialData', 
+    'clmDataStore',
+    '$location',
+    'urlFor'
+    ];
 
 
 function startIRATController($q, initialData, clmDataStore, $location, urlFor) {
@@ -50,6 +62,3 @@ export {
     startIRATController,
     teamIRATTmpl
 };
-// export function teamActivityCreateView(){
-//   return teamActivityCreateTmpl;
-// }
