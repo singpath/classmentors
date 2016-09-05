@@ -600,7 +600,9 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
                     $mdDialog.hide();
                     $route.reload();
                 }).catch(function (err) {
-                    spfAlert.error(`Failed to add you: ${err}`);
+                    spfAlert.error(`Failed to join event. Please ensure that your password is valid and try again.`);
+                    console.log(`Failed to add you: ${err}`);
+                    // spfAlert.error(`Failed to add you: ${err}`);
                 });
             };
 
