@@ -1,0 +1,73 @@
+<md-content flex class="md-padding">
+    <form name="tratForm" ng-submit="ctrl.submitTrat()">
+        <table width="100%">
+            <tr>
+                <td>
+                    <table width="100%">
+                        <tr>
+                            <td>
+                                <h2>Question 1</h2>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <hr>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h3>What is the meaning of life?</h3>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <md-radio-group ng-model="radio1">
+                                    <md-radio-button value="1" class="md-primary">
+                                        <div style="display:inline-block">1)</div>
+                                        To be happy
+                                    </md-radio-button>
+                                    <md-radio-button value="2" class="md-primary">
+                                        <div style="display:inline-block">2)</div>
+                                        To get good grades
+                                    </md-radio-button>
+                                    <md-radio-button value="3" class="md-primary">
+                                        <div style="display:inline-block">3)</div>
+                                        To love
+                                    </md-radio-button>
+                                </md-radio-group>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div>
+                                    <md-button type="submit" class="md-raised md-primary" style="width: 150px;">
+                                        Continue
+                                    </md-button>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+                <td>
+
+                    <table style="border: 1px solid black">
+                        <tr ng-class="'index-' + $index + ' ' + ($odd ? 'odd' : 'even')">
+                            <td align="center">
+                                <h2>Team Progress Log</h2>
+                            </td>
+                        </tr>
+                        <tr style="height:50px">
+                            <td>ShiQuanLim selected 'to get good grades'</td>
+                        </tr>
+                        <tr ng-class="'index-' + $index + ' ' + ($odd ? 'odd' : 'even')" style="height:50px">
+                            <td>Sheryl Toh selected 'to be happy'</td>
+                        </tr>
+                        <tr style="height:50px">
+                            <td>ShiQuanLim selected 'to love'</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </form>
+</md-content>
