@@ -1102,6 +1102,14 @@ export function clmDataStoreFactory(
             );
         },
 
+        _hasDoneMcq: function (task, solutions) {
+            return(
+                task.mcqQuestions &&
+                solutions &&
+                solutions[task.$id]
+            );
+        },
+
       _solvedProblems: function(singPathProfile) {
         var queueId = 'default';
 
@@ -1145,7 +1153,8 @@ export function clmDataStoreFactory(
             clmDataStore.events._hasRegistered(task, data.classMentors, data.singPath) ||
             clmDataStore.events._hasBadge(task, badges) ||
             clmDataStore.events._hasSolvedSingpathProblem(task, data.singPath) ||
-            clmDataStore.events._hasDoneSurvey(task, data.solutions)
+            clmDataStore.events._hasDoneSurvey(task, data.solutions) ||
+            clmDataStore.events._hasDoneMcq(task, data.solutions)
           );
 
           if (solved) {
@@ -1371,7 +1380,7 @@ export function clmDataStoreFactory(
         if(!qnTitle){
             return $q.reject(new Error('No question title provided'));
         }
-          console.log("qntitle isss", qnTitle);
+          // console.log("qntitle isss", qnTitle);
           return spfFirebase.set(['classMentors/surveyResponse', eventId, taskId, surveyTask, userId, qnTitle, questionNumber], surveyResp);
       },
     
@@ -1397,7 +1406,7 @@ export function clmDataStoreFactory(
             if(!qnTitle){
                 return $q.reject(new Error('No question title provided'));
             }
-            console.log("qntitle isss", qnTitle);
+
             return spfFirebase.set(['classMentors/surveyResponse', eventId, taskId, surveyTask, userId, qnTitle, questionNumber], responses);
         },
 
