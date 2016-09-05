@@ -1,7 +1,14 @@
 <md-content flex class="md-padding">
   <div layout="column" layout-align="center stretch">
     <form name="createTeamActivity" submit="ctrl.submit()">
-      <label>Select Activity Type</label>
+
+      <div align="center">
+        <h4>Title: {{ctrl.task.title}}</h4>
+        <h4>Description: {{ctrl.task.description}}</h4>
+        <br>
+      </div>
+
+      <label><b>Select Activity Type</b></label><br>
       <div flex layout="column" layout-align="center stretch">
         
         <!--Radio group for Activity Types-->
@@ -16,38 +23,57 @@
           </md-input-container>
         </div>
       </div>
+
       <md-divider layout-padding ng-if="!$last"></md-divider>
+      <label><b>Team Formation</b></label><br><br>
+
+      <!--team formation segment-->
       <div flex layout="column" layout-align="center stretch">
-        {{ctrl.isNewTeams}}
+        <!--{{ctrl.newExistingTeams}}-->
         <div>
+          <label for="newExistingTeams">Select team formation method:</label><br>
           <md-input-container>
-            <md-checkbox ng-model='ctrl.isNewTeams' checked>Set New Teams</md-checkbox>
-          </md-input-container>
-        </div>
-        <!--if "set new teams" is checked-->
-        <div flex layout="column" layout-align="center stretch" ng-show="ctrl.isNewTeams">
-          {{ctrl.teamFormationMethod}}
-          <label>Select your team formation method</label>
-          <md-input-container>
-            <md-select ng-model="ctrl.teamFormationMethod">
-              <md-option value="teamSize" selected>By Team Size</md-option>
-              <md-option value="noOfTeams">By Number Of Teams</md-option>
+            <md-select ng-model="ctrl.newExistingTeams" id="newExistingTeams">
+              <md-option value="existingTeams" selected>From existing team formation</md-option>
+              <md-option value="newTeams">Create new teams</md-option>
             </md-select>
           </md-input-container>
         </div>
-        <div flex>
-          <md-input-container ng-show="ctrl.isNewTeams" ng-required="true">
-            <label for='edit-teamFormationInput_${{index}}'>{{ctrl.teamFormationMethod === "teamSize" ? "Enter Team Size" : "Enter Number of Teams"}}</label>
-            <input ng-model="ctrl.teamFormationParameter"
+
+        <!--if "set new teams" is checked-->
+        <div flex layout="column" layout-align="center stretch" ng-show="ctrl.newExistingTeams == 'newTeams'">
+          <br>
+          <!--{{ctrl.teamFormationMethod}}-->
+          <label>Select create new team method:</label>
+          <md-input-container>
+            <md-select ng-model="ctrl.teamFormationMethod">
+              <md-option value="teamSize" >By Team Size</md-option>
+              <md-option value="noOfTeams" selected>By Number Of Teams</md-option>
+            </md-select>
+          </md-input-container>
+        </div>
+
+         <!--setting for team size/ number of teams-->
+
+        <div flex layout="column">
+          <md-input-container ng-show="ctrl.newExistingTeams == 'newTeams'" ng-required="true">
+            <label for='edit-teamFormationInput_${{index}}'>{{ctrl.teamFormationMethod === "teamSize" ? "Maximum number of students per team" : "Number of Teams"}}</label>
+            <input type ="number" ng-model="ctrl.teamFormationParameter"
               name="teamFormationInput"
               id='edit-teamFormationInput_${{index}}' 
               >
           </md-input-container>
+          <!--todo: add remarks to assist user.-->
+          <!--if number of teams, "Each team will have a maximum enrollment of # students"; #= roundup (# of stud / # of teams)-->
+          <!--if max number of student, "You will have # teams"; #= round up (# of students / # stud per team)-->
         </div>
+
+
         <!--if "set new teams" is unchecked-->
-        <div ng-hide="ctrl.isNewTeams" flex layout="column" layout-align="center stretch">
+        <div ng-hide="ctrl.newExistingTeams == 'newTeams'" ng-show="ctrl.newExistingTeams == 'existingTeams'" flex layout="column" layout-align="center stretch">
+
           {{ctrl.teams}}
-          <label>Assign teams from previous team challenges</label>
+          <label>Select from existing team activity challenges</label>
           <md-input-container ng-disabled="ctrl.teams">
             <label ng-show="ctrl.teams">Assign teams from previous team challenges</label>
             <label ng-hide="ctrl.teams || ctrl.teams.length == 0">No team challenges available</label>
@@ -56,8 +82,20 @@
             </md-select>
           </md-input-container>
         </div>
+
+
+        <!--multiple choice segment-->
         <div flex layout="column" layout-align="center stretch" ng-show="ctrl.activityType == 'gameShow'">
+
+          <md-divider layout-padding ng-if="!$last"></md-divider>
+          <label><b>IRAT/TRAT Questions</b></label><br>
+
           {{ctrl.selectedMCQ}}
+          <md-input-container>
+            <label for="q-timelimit">Time limit for each question (in minutes)</label>
+            <input type="number" ng-model="ctrl.questionTimeLimit" id="q-timelimit">
+          </md-input-container>
+
           <label>Select existing or create new multiple choice question</label>
           <md-input-container>
             <md-select ng-model="ctrl.selectedMCQ">
@@ -66,9 +104,11 @@
             </md-select>
           </md-input-container>
         </div>
+
         <div>
           <md-button class="md-raised md-primary" type="submit" ng-disabled="createTeamActivity.$invalid">CREATE</md-button>
         </div>
+
       </div>
     </form>
   </div>
