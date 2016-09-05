@@ -57,6 +57,14 @@ export function configRoute($routeProvider, routes){
             resolve:{
                 initialData: team.createTeamActivityInitialData
             }
+        })
+        .when(routes.viewIRAT,{
+            template: team.teamIRATTmpl,
+            controller: team.startIRATController,
+            controllerAs:'ctrl',
+            resolve:{
+                initialData: team.createTeamActivityInitialData
+            }
         });
 
 }

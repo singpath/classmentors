@@ -1102,6 +1102,14 @@ export function clmDataStoreFactory(
             );
         },
 
+        _hasDoneMcq: function (task, solutions) {
+            return(
+                task.mcqQuestions &&
+                solutions &&
+                solutions[task.$id]
+            );
+        },
+
       _solvedProblems: function(singPathProfile) {
         var queueId = 'default';
 
@@ -1138,16 +1146,15 @@ export function clmDataStoreFactory(
           ) {
             return progress;
           }
-            //console.log("this fucking progress is:", progress);
-            //console.log("this fucking data solutions is ", data.solutions);
-            console.log("this fucking task is ", task);
+
           var solved = (
             clmDataStore.events._isSolutionLinkValid(task, data.solutions) ||
             clmDataStore.events._isResponseValid(task, data.solutions) ||
             clmDataStore.events._hasRegistered(task, data.classMentors, data.singPath) ||
             clmDataStore.events._hasBadge(task, badges) ||
             clmDataStore.events._hasSolvedSingpathProblem(task, data.singPath) ||
-            clmDataStore.events._hasDoneSurvey(task, data.solutions)
+            clmDataStore.events._hasDoneSurvey(task, data.solutions) ||
+            clmDataStore.events._hasDoneMcq(task, data.solutions)
           );
 
           if (solved) {
@@ -1177,7 +1184,6 @@ export function clmDataStoreFactory(
       monitorEvent: function(event, tasks, participants, solutions, progress) {
         var tid;
         var delay = 300;
-          console.log("debouncedUpdate iss:", debouncedUpdate);
         var unWatchSolution = solutions.$watch(debouncedUpdate);
         var unWatchParticipants = participants.$watch(debouncedUpdate);
         function update() {
@@ -1211,15 +1217,10 @@ export function clmDataStoreFactory(
         if (!publicId) {
           return $q.reject('User public id is missing missing.');
         }
-        console.log("update progress came in here!!");
+
         if (!solutions || !solutions.$id || solutions.$id !== event.$id) {
           return $q.reject('User solutions are missing');
         }
-        console.log("updated progress event:", event);
-          console.log("updated progress tasks:", tasks);
-          console.log("updated progress solutions:", solutions);
-          console.log("updated progress publicId:", publicId);
-          console.log("updated progress userProgress:", userProgress);
 
         var cmProfilePromise = clmDataStore.profile(publicId);
         var badgesPromise = cmProfilePromise.then(function(profile) {
@@ -1239,8 +1240,6 @@ export function clmDataStoreFactory(
         }).then(function(data) {
           // 4. save data
 
-            console.log("monitorevent tasks:",tasks);
-            console.log("data: ", data);
           return $q.all([
             // 2. check completeness and update progress if needed.
             $q.when(clmDataStore.events._getProgress(tasks, data)).then(function(progress) {
@@ -1381,7 +1380,7 @@ export function clmDataStoreFactory(
         if(!qnTitle){
             return $q.reject(new Error('No question title provided'));
         }
-          console.log("qntitle isss", qnTitle);
+          // console.log("qntitle isss", qnTitle);
           return spfFirebase.set(['classMentors/surveyResponse', eventId, taskId, surveyTask, userId, qnTitle, questionNumber], surveyResp);
       },
     
@@ -1407,7 +1406,7 @@ export function clmDataStoreFactory(
             if(!qnTitle){
                 return $q.reject(new Error('No question title provided'));
             }
-            console.log("qntitle isss", qnTitle);
+
             return spfFirebase.set(['classMentors/surveyResponse', eventId, taskId, surveyTask, userId, qnTitle, questionNumber], responses);
         },
 
