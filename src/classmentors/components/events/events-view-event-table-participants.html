@@ -24,6 +24,9 @@
                 <th>
                     <md-button rowspan="3">TEAM ACTIVITY - BATTLE!</md-button>
                 </th>
+                <th>
+                    <md-button rowspan="3">TEAM ACTIVITY - BATTLE!</md-button>
+                </th>
             </tr>
             <tr>
                 <th ng-if="ctrl.visibleTasks.length == 0"></th>
@@ -35,6 +38,9 @@
                 </th>
                 <th>
                     Join a team! (button will be enabled once progress for IRAT reaches 100%)
+                </th>
+                <th>
+                    As a team, complete the quiz again. This time, it is more tricky as your team will also be submitting answers at the same time. Communicate well!
                 </th>
             </tr>
             <tr>
@@ -229,13 +235,20 @@
                 <!--team activity challenge button!-->
                 <td ng-if="ctrl.currentUserParticipant">
                     <md-button class="md-raised md-primary" align="middle"
-                               ng-href="#{{'viewIRAT' | urlFor:{'publicId': participant.$id} }}">Start IRAT
+                               ng-href="#{{'viewIRAT' | urlFor:{'publicId': participant.$id} }}">
+                        Start IRAT
                     </md-button>
                 </td>
                 <td ng-if="ctrl.currentUserParticipant">
                     <md-button class="md-raised md-primary" align="middle"
                                ng-click="ctrl.promptForTeamFormation(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant, ctrl.currentUserSolutions)">
                         Join Team
+                    </md-button>
+                </td>
+                <td ng-if="ctrl.currentUserParticipant">
+                    <md-button class="md-raised md-primary" align="middle"
+                               ng-href="#{{'viewTRAT' | urlFor:{'publicId': participant.$id} }}">
+                        Start TRAT
                     </md-button>
                 </td>
             </tr>
@@ -295,6 +308,9 @@
                                 Completed
                             </span>
                     </div>
+                </td>
+                <!--for team activity (temporary)-->
+                <td>
                 </td>
                 <td>
                 </td>

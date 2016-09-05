@@ -1,5 +1,6 @@
 import teamActivityCreateTmpl from './team-view-create.html!text';
 import teamIRATTmpl from './teamactivity-view-irat-start.html!text';
+import teamTRATTmpl from './teamactivity-view-trat-start.html!text';
 
 function createTeamActivityInitialData($q, eventService, clmDataStore) {
     var data = eventService.get();
@@ -61,10 +62,29 @@ startIRATController.$inject = [
     'urlFor'
 ]
 
+function startTRATController($q, initialData, clmDataStore, $location, urlFor){
+    this.submitTrat = function(){
+        $location.path(urlFor('oneEvent'));
+    }
+}
+
+startTRATController.$inject = [
+    '$q',
+    'initialData',
+    'clmDataStore',
+    '$location',
+    'urlFor'
+]
 export {
     teamActivityCreateTmpl,
     createTeamActivityInitialData,
     createTeamActivityController,
     startIRATController,
-    teamIRATTmpl
+    teamIRATTmpl,
+    startTRATController,
+    teamTRATTmpl
+
 };
+// export function teamActivityCreateView(){
+//   return teamActivityCreateTmpl;
+// }

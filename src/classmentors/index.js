@@ -94,7 +94,8 @@ module.constant('routes', {
   editMcq: '/challenges/mcq/edit',
   viewSurvey: '/challenges/survey',
   createTeamActivity: '/challenges/team-activity/create',
-  viewIRAT:'/challenges/IRAT'
+  viewIRAT:'/challenges/IRAT',
+  viewTRAT:'/challenges/TRAT'
 });
 
 module.config([

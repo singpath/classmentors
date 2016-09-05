@@ -65,6 +65,15 @@ export function configRoute($routeProvider, routes){
             resolve:{
                 initialData: team.createTeamActivityInitialData
             }
+        })
+        .when(routes.viewTRAT,{
+            template: team.teamTRATTmpl,
+            controller: team.startTRATController,
+            controllerAs:'ctrl',
+            resolve:{
+                initialData: team.createTeamActivityInitialData
+            }
+
         });
 
 }
