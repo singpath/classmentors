@@ -8,7 +8,7 @@ function createTeamActivityInitialData($q, eventService, clmDataStore) {
 }
 createTeamActivityInitialData.$inject = ['$q', 'eventService', 'clmDataStore'];
 
-function createTeamActivityController($q, initialData, clmDataStore, $location, urlFor){
+function createTeamActivityController($q, initialData, clmDataStore, $location, urlFor,eventService){
     var self = this;
 
     // console.log(initialData);
@@ -20,10 +20,15 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
     self.task = initialData.task;
 
     self.taskType = initialData.taskType;
-
+    
     self.submit = function(){
         console.log('form its submitted');
         // todo: Validation for form data, saving of form data, direct to MCQ page.
+        eventService.set({
+            taskType: self.taskType,
+            event: self.event,
+            task: self.task
+        })
         $location.path(urlFor('viewMcq'));
     }
 
@@ -33,7 +38,8 @@ createTeamActivityController.$inject = [
     'initialData', 
     'clmDataStore',
     '$location',
-    'urlFor'
+    'urlFor',
+    'eventService'
     ];
 
 
