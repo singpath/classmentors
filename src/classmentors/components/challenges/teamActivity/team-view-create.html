@@ -55,7 +55,7 @@
 
          <!--setting for team size/ number of teams-->
 
-        <div flex>
+        <div flex layout="column">
           <md-input-container ng-show="ctrl.newExistingTeams == 'newTeams'" ng-required="true">
             <label for='edit-teamFormationInput_${{index}}'>{{ctrl.teamFormationMethod === "teamSize" ? "Maximum number of students per team" : "Number of Teams"}}</label>
             <input type ="number" ng-model="ctrl.teamFormationParameter"
