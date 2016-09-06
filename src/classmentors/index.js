@@ -2,6 +2,14 @@
 
 import angular from 'angular';
 import module from 'classmentors/module.js';
+import 'core-js/fn/object/assign.js';
+import 'core-js/fn/array/every.js';
+import 'core-js/fn/array/find.js';
+import 'core-js/fn/array/find-index.js';
+import 'core-js/fn/array/from.js';
+import 'core-js/fn/array/some.js';
+import 'core-js/fn/string/starts-with.js';
+import 'core-js/fn/function/bind.js';
 
 import * as services from 'classmentors/services.js';
 import * as filters from 'classmentors/filters.js';

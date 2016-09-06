@@ -279,7 +279,7 @@ SystemJS.config({
     "c3": "npm:c3@0.4.11",
     "chai": "npm:chai@3.5.0",
     "child_process": "github:jspm/nodelibs-child_process@0.2.0-alpha",
-    "core-js": "npm:core-js@1.2.6",
+    "core-js": "npm:core-js@2.4.1",
     "cryptojs": "github:sytelus/cryptojs@3.1.2",
     "css": "github:systemjs/plugin-css@0.1.22",
     "d3": "npm:d3@4.2.2",
