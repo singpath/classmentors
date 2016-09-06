@@ -900,7 +900,7 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
             spfAlert.success('Event saved.');
             self.newPassword = '';
             editEventForm.$setPristine(true);
-        }).catch(function () {
+        }).catch(function (err) {
             spfAlert.error('Failed to save event.');
         }).finally(function () {
             self.savingEvent = false;
