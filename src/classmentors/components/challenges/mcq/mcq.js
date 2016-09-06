@@ -384,7 +384,7 @@ export function newMcqController(initialData, challengeService, $filter,$mdDialo
     task.mcqQuestions = answersJsonText;
     task.answers = angular.toJson(setAnswers);
     console.log(task);
-    challengeService.save(event, taskId, task,taskType, isOpen);
+    // challengeService.save(event, taskId, task,taskType, isOpen);
   }
 
   // Add question when add question button is clicked

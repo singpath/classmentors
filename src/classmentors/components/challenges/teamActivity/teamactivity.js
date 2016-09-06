@@ -48,7 +48,7 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
 
     // if number of teams, "Each team will have a maximum enrollment of # students"; #= roundup (totalParticipants / # of teams)
     // if max number of student, "You will have # teams"; #= round up (totalParticipants / # stud per team)
-    $scope.calculateTeamMaximumStudent = function (noTeamsOrStudents){
+    self.calculateTeamMaximumStudent = function (noTeamsOrStudents){
         // var noTeamsOrStudents = $scope.teamFormationInput;
         var totalParticipants = self.participants.length;
 
@@ -58,7 +58,7 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
 
     }
 
-    $scope.calculationResult = function (){
+    self.calculationResult = function (){
         console.log("t", teamsMaximumStudents);
 
         return teamsMaximumStudents;
