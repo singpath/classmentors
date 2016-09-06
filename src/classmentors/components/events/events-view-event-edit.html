@@ -27,7 +27,7 @@
 
         <div class="information">Created by {{ctrl.event.owner.displayName}} on ({{ctrl.event.createdAt|date}})</div>
         <div layout="row" layout-align="center center">
-            <md-button type="submit" class="md-raised md-primary" ng-disabled="editEventForm.$pristine || editEventForm.$invalid || ctrl.savingEvent">Save</md-button>
+            <md-button type="submit" class="md-raised md-primary" ng-disabled="editEventForm.$pristine || editEventForm.$invalid || ctrl.savingEvent || !ctrl.isOwner">Save</md-button>
             <md-button type="reset" class="md-raised" ng-click="ctrl.reset(editEventForm)" ng-disabled="ctrl.savingEvent || editEventForm.$pristine">Reset</md-button>
         </div>
     </form>
