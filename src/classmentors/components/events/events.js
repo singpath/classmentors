@@ -1042,10 +1042,6 @@ function AddEventTaskCtrl(initialData, $location, $log, spfFirebase, spfAlert, u
             console.log('textResponse is clicked');
             return 'Save';
 
-        } else if (tasktype == 'indexCard') {
-            console.log('indexCard is clicked');
-            return 'Save';
-
         } else if (tasktype == 'multipleChoice') {
             console.log('multipleChoice is clicked');
             location = '/challenges/mcq';
@@ -1364,10 +1360,6 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfFirebase, spfNavBar
 
         } else if (this.taskType == 'textResponse') {
             console.log('textResponse is clicked');
-            return 'Save';
-
-        } else if (this.taskType == 'indexCard') {
-            console.log('indexCard is clicked');
             return 'Save';
 
         } else if (this.taskType == 'multipleChoice') {
