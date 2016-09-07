@@ -429,6 +429,9 @@ function ViewCohortCtrl(
                     });
             } else {
                 spfAlert.success(self.selectedChallenge.title + " inserted into selected events");
+                self.selectedEvent = null;
+                self.selectedChallenge = null;
+                self.selectedEvents = null;
             }
         }
     };
