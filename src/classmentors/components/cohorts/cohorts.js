@@ -352,7 +352,8 @@ function ViewCohortCtrl(
     this.isOwner = false;
     this.joinedEvents = initialData.joinedEvents;
 
-    console.log(self.events);
+    this.selectedEvent = null;
+    this.eventChallenges = null;
 
     if (
         self.cohort &&
@@ -393,6 +394,44 @@ function ViewCohortCtrl(
 
         return options;
     }
+    
+    this.loadEventChallenges = function () {
+      spfFirebase.loadedObj(['classMentors/eventTasks', self.selectedEvent])
+          .then(function(promise) {
+              return promise;
+          }).then(function(data) {
+              self.eventChallenges = data;
+          }).catch(function (err) {
+              $log.error(err);
+              return err;
+          });
+    };
+
+    this.duplicateChallenges = function() {
+        self.selectedChallenge.archived = false;
+        delete self.selectedChallenge.$$mdSelectId;
+        var eventIndex = 0;
+        insertChallenge();
+        function insertChallenge() {
+            if(eventIndex < self.selectedEvents.length) {
+                var eventId = self.selectedEvents[eventIndex];
+                clmDataStore.events.addTask(eventId, self.selectedChallenge, true)
+                    .then( function () {
+                        console.log(self.selectedChallenge.title + " inserted into " + eventId);
+                        eventIndex++;
+                    })
+                    .then(function () {
+                        insertChallenge();
+                    })
+                    .catch(function (err) {
+                        $log.error(err);
+                        return err;
+                    });
+            } else {
+                spfAlert.success(self.selectedChallenge.title + " inserted into selected events");
+            }
+        }
+    };
 
     this.viewFullAnnouncement = function(content, title) {
         $mdDialog.show({

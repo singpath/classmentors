@@ -1382,8 +1382,8 @@ export function clmDataStoreFactory(
           // console.log("qntitle isss", qnTitle);
           return spfFirebase.set(['classMentors/surveyResponse', eventId, taskId, surveyTask, userId, qnTitle, questionNumber], surveyResp);
       },
-    
-        saveSurveyEduDisMultiResponse: function (responses, questionNumber, taskId, eventId, userId, surveyTask, qnTitle ){
+
+      saveSurveyEduDisMultiResponse: function (responses, questionNumber, taskId, eventId, userId, surveyTask, qnTitle ){
             if (!responses) {
                 return $q.reject(new Error('No responses provided'));
             }
@@ -1427,7 +1427,7 @@ export function clmDataStoreFactory(
         ], link);
       },
 
-        setProgress: function(eventId, taskId, publicId, progress){
+      setProgress: function(eventId, taskId, publicId, progress){
 
             return spfFirebase.set(['classMentors/eventProgress', eventId, publicId, taskId], progress[publicId][taskId]);
 
