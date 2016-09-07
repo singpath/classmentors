@@ -487,6 +487,24 @@
           }
         }
       },
+      "npm:c3@0.4.11": {
+        "registry": "jspm",
+        "format": "global",
+        "dependencies": {
+          "d3": "~3.5.0",
+          "css": "^0.1.0"
+        },
+        "meta": {
+          "c3.js": {
+            "deps": [
+              "d3",
+              "./c3.css!"
+            ],
+            "exports": "c3",
+            "format": "global"
+          }
+        }
+      },
       "npm:d3@3.5.17": {
         "meta": {
           "d3.js": {
@@ -520,5 +538,4 @@
   "keywords": [],
   "author": "",
   "license": "MIT"
-}
-
+}
