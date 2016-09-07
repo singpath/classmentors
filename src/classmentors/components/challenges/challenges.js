@@ -162,42 +162,45 @@ export function challengeServiceFactory
       var copy = spfFirebase.cleanObj(task);
       var answers = copy.answers;
       console.log('COPY IS ... ', copy);
-      if (taskType === 'linkPattern') {
-        delete copy.badge;
-        delete copy.serviceId;
-        delete copy.singPathProblem;
-      } else if (copy.serviceId === 'singPath') {
-        delete copy.badge;
-        if (copy.singPathProblem) {
-          copy.singPathProblem.path = spfFirebase.cleanObj(task.singPathProblem.path);
-          copy.singPathProblem.level = spfFirebase.cleanObj(task.singPathProblem.level);
-          copy.singPathProblem.problem = spfFirebase.cleanObj(task.singPathProblem.problem);
-        }
-      }else if (taskType === 'multipleChoice'){
+      self.creatingTask = true;
+      if (taskType === 'multipleChoice'){
         delete copy.singPathProblem;
         delete copy.badge;
         delete copy.answers;
-      } else {
-        delete copy.singPathProblem;
-        copy.badge = spfFirebase.cleanObj(task.badge);
-      }
 
-      if (!copy.link) {
-        // delete empty link. Can't be empty string
-        delete copy.link;
-      }
-
-      self.creatingTask = true;
-      var ref = clmDataStore.events.addTaskWithAns(event.$id, copy, isOpen,answers);
-      ref.then(function() {
-          spfAlert.success('Task created');
-          $location.path(urlFor('editEvent', {eventId: event.$id}));
+        var ref = clmDataStore.events.addTaskWithAns(event.$id, copy, isOpen,answers);
+        ref.then(function() {
+            spfAlert.success('Task created');
+            $location.path(urlFor('editEvent', {eventId: event.$id}));
         }).catch(function(err) {
             $log.error(err);
             spfAlert.error('Failed to created new task');
         }).finally(function() {
             self.creatingTask = false;
         });
+
+      } else if(taskType === 'teamActivity'){
+        delete copy.singPathProblem;
+        delete copy.badge;
+        delete copy.answers;
+        console.log(copy);
+        // Create reccord in eventTeams
+
+        // Create reccord in answers and tasks
+        var ref = clmDataStore.events.addTaskWithAns(event.$id, copy, isOpen,answers);
+        ref.then(function() {
+            spfAlert.success('Task created');
+            $location.path(urlFor('editEvent', {eventId: event.$id}));
+        }).catch(function(err) {
+            $log.error(err);
+            spfAlert.error('Failed to created new task');
+        }).finally(function() {
+            self.creatingTask = false;
+        }); 
+      }
+
+      
+
     },
     update: function(event, taskId, task, taskType, isOpen) {
       var copy = spfFirebase.cleanObj(task);
