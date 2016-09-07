@@ -1,6 +1,6 @@
 <md-content flex class="md-padding">
   <div layout="column" layout-align="center stretch">
-    <form name="createTeamActivity" submit="ctrl.submit()">
+    <form name="createTeamActivity" ng-submit="ctrl.submit()">
 
       <div align="center">
         <h4>Title: {{ctrl.task.title}}</h4>
@@ -60,13 +60,13 @@
             <label for='edit-teamFormationInput_${{index}}'>{{ctrl.teamFormationMethod === "teamSize" ? "Maximum number of students per team" : "Number of Teams"}}</label>
             <input type ="number" ng-model="ctrl.teamFormationParameter"
               name="teamFormationInput"
-              id='edit-teamFormationInput_${{index}}' ng-change="calculateTeamMaximumStudent(ctrl.teamFormationParameter)"
+              id='edit-teamFormationInput_${{index}}' ng-change="ctrl.calculateTeamMaximumStudent(ctrl.teamFormationParameter)"
               >
           </md-input-container>
 
           <!--added remarks to assist user.-->
-          <label ng-show="ctrl.teamFormationMethod == 'noOfTeams'" ng-hide="ctrl.teamFormationMethod == 'teamSize'" ><font color="red"> A team may have maximum enrollment of <b>{{calculationResult()}}</b> student(s).</font></label>
-          <label ng-hide="ctrl.teamFormationMethod == 'noOfTeams'" ng-show="ctrl.teamFormationMethod == 'teamSize'" ><font color="red">You will have <b>{{calculationResult()}}</b> team(s).</font></label>
+          <label ng-show="ctrl.teamFormationMethod == 'noOfTeams'" ng-hide="ctrl.teamFormationMethod == 'teamSize'" ><font color="red"> A team may have maximum enrollment of <b>{{ctrl.calculationResult()}}</b> student(s).</font></label>
+          <label ng-hide="ctrl.teamFormationMethod == 'noOfTeams'" ng-show="ctrl.teamFormationMethod == 'teamSize'" ><font color="red">You will have <b>{{ctrl.calculationResult()}}</b> team(s).</font></label>
           <br>
         </div>
 

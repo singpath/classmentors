@@ -384,6 +384,7 @@ export function newMcqController(initialData, challengeService, $filter,$mdDialo
     task.mcqQuestions = answersJsonText;
     task.answers = angular.toJson(setAnswers);
     console.log(task);
+    console.log(taskType);
     challengeService.save(event, taskId, task,taskType, isOpen);
   }
 
