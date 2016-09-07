@@ -17,11 +17,10 @@ function createTeamActivityInitialData($q, eventService, clmDataStore) {
 }
 createTeamActivityInitialData.$inject = ['$q', 'eventService', 'clmDataStore'];
 
-function createTeamActivityController($q, initialData, clmDataStore,$scope){
+function createTeamActivityController($q, initialData, clmDataStore, $location, urlFor,eventService){
     var self = this;
 
     console.log("initialdata are",initialData);
-
     // event variable consist of event id,timecreated,owner and event title
     self.event = initialData.data.event;
 
@@ -29,32 +28,60 @@ function createTeamActivityController($q, initialData, clmDataStore,$scope){
     self.task = initialData.data.task;
 
     self.taskType = initialData.data.taskType;
-
+    
     self.participants = initialData.participants;
+    self.teamsMaximumStudents = 0;
+    self.taskType = initialData.data.taskType;
+    self.activityType = null;
+    self.newExistingTeams = null;
+    self.teamFormationMethod = null;
+    self.teamFormationParameter = null;
 
-    var teamsMaximumStudents = 0;
+    self.submit = function(){
+        console.log('form its submitted');
+        self.task.activityType = self.activityType;
+        self.task.newExistingTeams = self.newExistingTeams;
+        self.task.teamFormationMethod = self.teamFormationMethod;
+        self.task.teamFormationParameter = self.teamFormationParameter;
+        console.log(self.task);
+        // todo: Validation for form data, saving of form data, direct to MCQ page.
+        console.log(self.taskType);
+        eventService.set({
+            taskType: self.taskType,
+            event: self.event,
+            task: self.task,
+            isOpen: initialData.data.isOpen
+        })
+        $location.path(urlFor('viewMcq'));
+    }
 
     // if number of teams, "Each team will have a maximum enrollment of # students"; #= roundup (totalParticipants / # of teams)
     // if max number of student, "You will have # teams"; #= round up (totalParticipants / # stud per team)
-    $scope.calculateTeamMaximumStudent = function (noTeamsOrStudents){
-        // var noTeamsOrStudents = $scope.teamFormationInput;
+    self.calculateTeamMaximumStudent = function (noTeamsOrStudents){
+        // var noTeamsOrStudents = self.teamFormationInput;
         var totalParticipants = self.participants.length;
 
-        console.log("number is ",noTeamsOrStudents);
-
-        console.log("cal",Math.ceil(totalParticipants/noTeamsOrStudents) );
-        teamsMaximumStudents = Math.ceil(totalParticipants/noTeamsOrStudents) ? Math.ceil(totalParticipants/noTeamsOrStudents):0 ;
+        console.log("number is ", noTeamsOrStudents);
+        console.log("cal", Math.ceil(totalParticipants / noTeamsOrStudents) );
+        self.teamsMaximumStudents = Math.ceil(totalParticipants / noTeamsOrStudents) ? Math.ceil(totalParticipants / noTeamsOrStudents):0 ;
 
     }
 
-    $scope.calculationResult = function (){
-        console.log("t", teamsMaximumStudents);
+    self.calculationResult = function (){
+        console.log("t", self.teamsMaximumStudents);
 
-        return teamsMaximumStudents;
+        return self.teamsMaximumStudents;
     }
 
 }
-createTeamActivityController.$inject = ['$q', 'initialData', 'clmDataStore','$scope'];
+createTeamActivityController.$inject = [
+    '$q', 
+    'initialData', 
+    'clmDataStore',
+    '$location',
+    'urlFor',
+    'eventService'
+    ];
 
 
 function startIRATController($q, initialData, clmDataStore, $location, urlFor) {

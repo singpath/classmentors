@@ -18,7 +18,7 @@
                 >
                     <md-button ng-click="ctrl.orderBy(task.$id)">{{ task.title }}</md-button>
                 </th>
-                <th>
+                <!--<th>
                     <md-button rowspan="3">TEAM ACTIVITY - BATTLE!</md-button>
                 </th>
                 <th>
@@ -26,14 +26,14 @@
                 </th>
                 <th>
                     <md-button rowspan="3">TEAM ACTIVITY - BATTLE!</md-button>
-                </th>
+                </th>-->
             </tr>
             <tr>
                 <th ng-if="ctrl.visibleTasks.length == 0"></th>
                 <th ng-repeat="task in ctrl.visibleTasks track by task.$id">
                     {{ task.description }}
                 </th>
-                <th>
+                <!--<th>
                     This quiz comprises of 10 questions which will test on your understanding of Lesson 2's materials.
                 </th>
                 <th>
@@ -41,7 +41,7 @@
                 </th>
                 <th>
                     As a team, complete the quiz again. This time, it is more tricky as your team will also be submitting answers at the same time. Communicate well!
-                </th>
+                </th>-->
             </tr>
             <tr>
                 <th ng-if="ctrl.visibleTasks.length == 0"></th>
@@ -232,7 +232,7 @@
                         </div>
                     </div>
                 </td>
-                <!--team activity challenge button!-->
+                <!--team activity challenge button!
                 <td ng-if="ctrl.currentUserParticipant">
                     <md-button class="md-raised md-primary" align="middle"
                                ng-href="#{{'viewIRAT' | urlFor:{'publicId': participant.$id} }}">
@@ -250,7 +250,7 @@
                                ng-href="#{{'viewTRAT' | urlFor:{'publicId': participant.$id} }}">
                         Start TRAT
                     </md-button>
-                </td>
+                </td>-->
             </tr>
 
             <tr ng-repeat="participant in ctrl.participantsView track by participant.$id"
@@ -309,13 +309,13 @@
                             </span>
                     </div>
                 </td>
-                <!--for team activity (temporary)-->
+                <!--for team activity (temporary)
                 <td>
                 </td>
                 <td>
                 </td>
                 <td>
-                </td>
+                </td>-->
             </tr>
 
             <tr ng-if="ctrl.participantsView | spfEmpty">
