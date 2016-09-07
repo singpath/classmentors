@@ -352,6 +352,8 @@ function ViewCohortCtrl(
     this.isOwner = false;
     this.joinedEvents = initialData.joinedEvents;
 
+    console.log(self.events);
+
     if (
         self.cohort &&
         self.cohort.owner &&

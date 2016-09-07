@@ -636,10 +636,9 @@ export function clmDataStoreFactory(
 
       listAll: function() {
         return spfFirebase.loadedObj(['classMentors/events'], {
-            orderByChild: 'createdAt',
-            limitToLast: 50
+            orderByChild: 'createdAt'
         });
-    },
+      },
 
       listAllArr: function() {
             return spfFirebase.loadedArray(['classMentors/events'], {
