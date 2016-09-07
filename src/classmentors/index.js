@@ -59,6 +59,7 @@ module.directive('clmCohortsStatsPage', cohorts.clmCohortsStatsPageFactory);
 module.directive('clmCohortsRankingPage', cohorts.clmCohortRankPageFactory);
 
 module.directive('clmPager', events.clmPagerFactory);
+
 module.factory('clmRowPerPage', events.clmRowPerPageFactory);
 module.factory('clmPagerOption', events.clmPagerOptionFactory);
 
