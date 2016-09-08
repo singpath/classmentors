@@ -354,6 +354,7 @@ function ViewCohortCtrl(
 
     this.selectedEvent = null;
     this.eventChallenges = null;
+    this.selectedAction = null;
 
     if (
         self.cohort &&
