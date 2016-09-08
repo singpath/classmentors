@@ -22,7 +22,6 @@ tools.instanbul(config.test.main, {
   config(loader) {
     loader.config({
       map: {
-        css: loader.map.text,
         'ace/mode-html.js': '@empty',
         'ace/mode-java.js': '@empty',
         'ace/mode-javascript.js': '@empty',
@@ -30,7 +29,8 @@ tools.instanbul(config.test.main, {
         'ace/theme-twilight.js': '@empty',
         'ace/theme-monokai.js': '@empty',
         ace: '@empty',
-        firebase: '@empty'
+        firebase: '@empty',
+        c3: '@empty'
       }
     });
   }

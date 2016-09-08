@@ -65,7 +65,7 @@
       "core-js": "npm:core-js@^2.4.1",
       "crypto": "github:jspm/nodelibs-crypto@^0.2.0-alpha",
       "cryptojs": "github:sytelus/cryptojs@^3.1.2",
-      "css": "github:systemjs/plugin-css@^0.1.22",
+      "css": "github:systemjs/plugin-css@master",
       "dirty-chai": "npm:dirty-chai@^1.2.2",
       "events": "github:jspm/nodelibs-events@^0.2.0-alpha",
       "firebase": "github:firebase/firebase-bower@^3.3.0",
@@ -552,4 +552,4 @@
   "keywords": [],
   "author": "",
   "license": "MIT"
-}
+}

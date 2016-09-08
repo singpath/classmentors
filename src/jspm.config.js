@@ -69,7 +69,7 @@ SystemJS.config({
     "core-js": "npm:core-js@2.4.1",
     "crypto": "github:jspm/nodelibs-crypto@0.2.0-alpha",
     "cryptojs": "github:sytelus/cryptojs@3.1.2",
-    "css": "github:systemjs/plugin-css@0.1.27",
+    "css": "github:systemjs/plugin-css@master",
     "d3": "npm:d3@4.2.2",
     "dirty-chai": "npm:dirty-chai@1.2.2",
     "events": "github:jspm/nodelibs-events@0.2.0-alpha",
@@ -94,7 +94,7 @@ SystemJS.config({
     "npm:c3@0.4.11": {
       "map": {
         "d3": "npm:d3@3.5.17",
-        "css": "github:systemjs/plugin-css@0.1.27"
+        "css": "github:systemjs/plugin-css@master"
       }
     },
     "npm:sinon@1.17.5": {
@@ -187,7 +187,7 @@ SystemJS.config({
     },
     "github:chieffancypants/angular-loading-bar@0.8.0": {
       "map": {
-        "css": "github:systemjs/plugin-css@0.1.27",
+        "css": "github:systemjs/plugin-css@master",
         "angular": "github:angular/bower-angular@1.5.8"
       }
     },
@@ -306,7 +306,7 @@ SystemJS.config({
     },
     "github:angular/bower-material@1.0.9": {
       "map": {
-        "css": "github:systemjs/plugin-css@0.1.27",
+        "css": "github:systemjs/plugin-css@master",
         "angular": "github:angular/bower-angular@1.5.8",
         "angular-animate": "github:angular/bower-angular-animate@1.5.8",
         "angular-aria": "github:angular/bower-angular-aria@1.5.8"
