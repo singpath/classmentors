@@ -75,8 +75,13 @@
                     Move events:<br>
                     Select event
                     <md-select ng-model="ctrl.selectedEvent" aria-label="select_event" required placeholder="Select the event with the challenge you wish to duplicate" ng-change="ctrl.loadEventChallenges()">
+                        <h2>Cohort events</h2>
                         <md-option ng-value="e" ng-repeat="e in ctrl.cohort.events">
                             {{ctrl.events[e].title}}
+                        </md-option>
+                        <h2>Your events</h2>
+                        <md-option ng-value="e.$id" ng-repeat="e in ctrl.createdEvents">
+                            {{ctrl.events[e.$id].title}}
                         </md-option>
                     </md-select>
                     <div ng-if="ctrl.selectedEvent">
