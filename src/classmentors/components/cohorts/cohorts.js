@@ -8,7 +8,10 @@ import cohortViewTmpl from './cohorts-view-cohort.html!text';
 import cohortEditTmpl from './cohorts-edit-cohort.html!text';
 import cohortStatsPageTmpl from './cohorts-view-cohort-stats-page.html!text';
 import cohortRankingPageTmpl from './cohorts-view-cohort-ranking-page.html!text';
+import c3 from 'c3';
+import d3 from 'd3';
 import './cohorts.css!';
+import '../../../jspm_packages/npm/c3@0.4.11/c3.css!';
 // import d3 from '../../../jspm_packages/graphing/d3.min.js';
 // import '../../../jspm_packages/graphing/c3.min.css';
 // import c3 from '../../../jspm_packages/graphing/c3.min.js';
@@ -349,6 +352,9 @@ function ViewCohortCtrl(
     this.isOwner = false;
     this.joinedEvents = initialData.joinedEvents;
 
+    this.selectedEvent = null;
+    this.eventChallenges = null;
+
     if (
         self.cohort &&
         self.cohort.owner &&
@@ -377,28 +383,6 @@ function ViewCohortCtrl(
             return options;
         }
 
-        // add join/leave button
-        // if (
-        //     self.participants &&
-        //     self.participants.$indexFor(self.currentUser.publicId) > -1
-        // ) {
-        //     options.push({
-        //         title: 'Leave',
-        //         onClick: function() {
-        //             clmDataStore.events.leave(self.event.$id).then(function() {
-        //                 $route.reload();
-        //             });
-        //         },
-        //         icon: 'clear'
-        //     });
-        // } else {
-        //     options.push({
-        //         title: 'Join',
-        //         onClick: promptPassword,
-        //         icon: 'add'
-        //     });
-        // }
-
         // Add edit button
         if (self.cohort.owner.publicId === self.currentUser.publicId) {
             options.push({
@@ -406,18 +390,51 @@ function ViewCohortCtrl(
                 url: `#${urlFor('editCohort', {cohortId: self.cohort.$id})}`,
                 icon: 'create'
             });
-            // Add update button (May not be necessary for cohorts)
-            // options.push({
-            //     title: 'Update',
-            //     onClick: function() {
-            //         monitorHandler.update();
-            //     },
-            //     icon: 'loop'
-            // });
         }
 
         return options;
     }
+    
+    this.loadEventChallenges = function () {
+      spfFirebase.loadedObj(['classMentors/eventTasks', self.selectedEvent])
+          .then(function(promise) {
+              return promise;
+          }).then(function(data) {
+              self.eventChallenges = data;
+          }).catch(function (err) {
+              $log.error(err);
+              return err;
+          });
+    };
+
+    this.duplicateChallenges = function() {
+        self.selectedChallenge.archived = false;
+        delete self.selectedChallenge.$$mdSelectId;
+        var eventIndex = 0;
+        insertChallenge();
+        function insertChallenge() {
+            if(eventIndex < self.selectedEvents.length) {
+                var eventId = self.selectedEvents[eventIndex];
+                clmDataStore.events.addTask(eventId, self.selectedChallenge, true)
+                    .then( function () {
+                        console.log(self.selectedChallenge.title + " inserted into " + eventId);
+                        eventIndex++;
+                    })
+                    .then(function () {
+                        insertChallenge();
+                    })
+                    .catch(function (err) {
+                        $log.error(err);
+                        return err;
+                    });
+            } else {
+                spfAlert.success(self.selectedChallenge.title + " inserted into selected events");
+                self.selectedEvent = null;
+                self.selectedChallenge = null;
+                self.selectedEvents = null;
+            }
+        }
+    };
 
     this.viewFullAnnouncement = function(content, title) {
         $mdDialog.show({
@@ -776,26 +793,187 @@ export function clmCohortsStatsPageFactory() {
 
 function ClmCohortStatsPageCtrl(
     $scope, $q, $log, $mdDialog, $document,
-    urlFor, spfAlert, clmServicesUrl, clmDataStore
+    urlFor, spfAlert, clmServicesUrl, clmDataStore, spfFirebase
 ) {
     var self = this;
     this.selectedStatistic = null;
 
     this.renderDashboard = function() {
         if(self.selectedStatistic) {
-            var dataString = JSON.parse('{"Sprint 1": [10, 20, 30, 40, 50],"Sprint 2": [2, 4, 6, 8, 10],"Sprint 3": [5, 10, 15, 20, 25]}');
-            // var chart = c3.generate({
-            //     bindto: "#chart",
-            //     data: {
-            //         //Test data
-            //         // columns: [
-            //         // 	['data1', 50, 70, 30, 20, 10],
-            //         // 	['data2', 14, 56, 88, 34, 100]
-            //         // ],
-            //         json: dataString,
-            //         type: "spline"
-            //     }
-            // });
+            if(self.selectedStatistic == 'Submission time series') {
+                // How formatted data should look like
+                var dataObj = {};
+                // dataObj = {"setosa_x": [3.5, 3.0, 3.2, 3.1, 3.6, 3.9, 3.4, 3.4, 2.9, 3.1, 3.7, 3.4, 3.0, 3.0, 4.0, 4.4, 3.9, 3.5, 3.8, 3.8, 3.4, 3.7, 3.6, 3.3, 3.4, 3.0, 3.4, 3.5, 3.4, 3.2, 3.1, 3.4, 4.1, 4.2, 3.1, 3.2, 3.5, 3.6, 3.0, 3.4, 3.5, 2.3, 3.2, 3.5, 3.8, 3.0, 3.8, 3.2, 3.7, 3.3],
+                //     "versicolor_x": [3.2, 3.2, 3.1, 2.3, 2.8, 2.8, 3.3, 2.4, 2.9, 2.7, 2.0, 3.0, 2.2, 2.9, 2.9, 3.1, 3.0, 2.7, 2.2, 2.5, 3.2, 2.8, 2.5, 2.8, 2.9, 3.0, 2.8, 3.0, 2.9, 2.6, 2.4, 2.4, 2.7, 2.7, 3.0, 3.4, 3.1, 2.3, 3.0, 2.5, 2.6, 3.0, 2.6, 2.3, 2.7, 3.0, 2.9, 2.9, 2.5, 2.8],
+                //     "setosa": [0.2, 0.2, 0.2, 0.2, 0.2, 0.4, 0.3, 0.2, 0.2, 0.1, 0.2, 0.2, 0.1, 0.1, 0.2, 0.4, 0.4, 0.3, 0.3, 0.3, 0.2, 0.4, 0.2, 0.5, 0.2, 0.2, 0.4, 0.2, 0.2, 0.2, 0.2, 0.4, 0.1, 0.2, 0.2, 0.2, 0.2, 0.1, 0.2, 0.2, 0.3, 0.3, 0.2, 0.6, 0.4, 0.3, 0.2, 0.2, 0.2, 0.2],
+                //     "versicolor": [1.4, 1.5, 1.5, 1.3, 1.5, 1.3, 1.6, 1.0, 1.3, 1.4, 1.0, 1.5, 1.0, 1.4, 1.3, 1.4, 1.5, 1.0, 1.5, 1.1, 1.8, 1.3, 1.5, 1.2, 1.3, 1.4, 1.4, 1.7, 1.5, 1.0, 1.1, 1.0, 1.2, 1.6, 1.5, 1.6, 1.5, 1.3, 1.3, 1.3, 1.2, 1.4, 1.2, 1.0, 1.3, 1.2, 1.3, 1.3, 1.1, 1.3]};
+
+                var dataArr = [];
+                // dataArr = [["setosa_x", 3.5, 3.0, 3.2, 3.1, 3.6, 3.9, 3.4, 3.4, 2.9, 3.1, 3.7, 3.4, 3.0, 3.0, 4.0, 4.4, 3.9, 3.5, 3.8, 3.8, 3.4, 3.7, 3.6, 3.3, 3.4, 3.0, 3.4, 3.5, 3.4, 3.2, 3.1, 3.4, 4.1, 4.2, 3.1, 3.2, 3.5, 3.6, 3.0, 3.4, 3.5, 2.3, 3.2, 3.5, 3.8, 3.0, 3.8, 3.2, 3.7, 3.3],
+                //     ["versicolor_x", 3.2, 3.2, 3.1, 2.3, 2.8, 2.8, 3.3, 2.4, 2.9, 2.7, 2.0, 3.0, 2.2, 2.9, 2.9, 3.1, 3.0, 2.7, 2.2, 2.5, 3.2, 2.8, 2.5, 2.8, 2.9, 3.0, 2.8, 3.0, 2.9, 2.6, 2.4, 2.4, 2.7, 2.7, 3.0, 3.4, 3.1, 2.3, 3.0, 2.5, 2.6, 3.0, 2.6, 2.3, 2.7, 3.0, 2.9, 2.9, 2.5, 2.8],
+                //     ["setosa", 0.2, 0.2, 0.2, 0.2, 0.2, 0.4, 0.3, 0.2, 0.2, 0.1, 0.2, 0.2, 0.1, 0.1, 0.2, 0.4, 0.4, 0.3, 0.3, 0.3, 0.2, 0.4, 0.2, 0.5, 0.2, 0.2, 0.4, 0.2, 0.2, 0.2, 0.2, 0.4, 0.1, 0.2, 0.2, 0.2, 0.2, 0.1, 0.2, 0.2, 0.3, 0.3, 0.2, 0.6, 0.4, 0.3, 0.2, 0.2, 0.2, 0.2],
+                //     ["versicolor", 1.4, 1.5, 1.5, 1.3, 1.5, 1.3, 1.6, 1.0, 1.3, 1.4, 1.0, 1.5, 1.0, 1.4, 1.3, 1.4, 1.5, 1.0, 1.5, 1.1, 1.8, 1.3, 1.5, 1.2, 1.3, 1.4, 1.4, 1.7, 1.5, 1.0, 1.1, 1.0, 1.2, 1.6, 1.5, 1.6, 1.5, 1.3, 1.3, 1.3, 1.2, 1.4, 1.2, 1.0, 1.3, 1.2, 1.3, 1.3, 1.1, 1.3]];
+
+                //Axis data object
+                var axisParam = {};
+                // axisParam = {
+                //     setosa: 'setosa_x',
+                //     versicolor: 'versicolor_x'
+                // };
+
+                //Initialise dataObj
+                for(var e = 0; e < self.cohort.events.length; e++) {
+                    dataObj[self.cohort.events[e] + "_x"] = [];
+                    dataObj[self.cohort.events[e]] = [];
+                    axisParam[self.cohort.events[e]] = self.cohort.events[e] + "_x";
+                }
+
+                console.log(dataObj);
+
+                spfFirebase.loadedArray(['classMentors/userActions'], {
+                    // orderByChild: 'action',
+                    // equalTo: 'submitLinkResponse'
+                }).then(function(promise) {
+                    return promise;
+                }).then(function(data) {
+                    self.submissionLogs = data;
+                }).catch(function (err) {
+                    $log.error(err);
+                    return err;
+                }).then(function () {
+                    for(var actionIndex = 0; actionIndex < self.submissionLogs.length; actionIndex++) {
+                        var logHolder = self.submissionLogs[actionIndex];
+                        if(self.cohort.events.indexOf(logHolder.eventId) >= 0) {
+                            dataObj[logHolder.eventId + "_x"].push(logHolder.timestamp);
+                            dataObj[logHolder.eventId].push(new Date(logHolder.timestamp).getMinutes());
+                            // console.log(new Date(logHolder.timestamp).getDate());
+                        }
+                        // if(self.allLogs[actionIndex].action == 'submitLinkResponse') {
+                        //     dataObj.Link.push(action.)
+                        // }
+                        // console.log(new Date(self.submissionLogs[actionIndex].timestamp));
+                    }
+                }).then(function () {
+                    // var canvas = d3.select('#canvas').node(),
+                    //     context = canvas.getContext("2d");
+                    //
+                    // var margin = {top: 20, right: 20, bottom: 30, left: 40},
+                    //     width = canvas.width - margin.left - margin.right,
+                    //     height = canvas.height - margin.top - margin.bottom;
+                    //
+                    // var svg = d3.select("svg").append("g")
+                    //     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+                    //
+                    // var x = d3.scaleLinear()
+                    //     .rangeRound([0, width - 2]);
+                    //
+                    // var y = d3.scaleLinear()
+                    //     .rangeRound([height - 2, 0]);
+                    //
+                    // context.translate(margin.left, margin.top);
+                    // context.globalCompositeOperation = "multiply";
+                    // context.fillStyle = "rgba(60,180,240,0.6)";
+                    //
+                    // d3.tsv("diamonds.tsv", type, function(error, diamonds) {
+                    //     if (error) throw error;
+                    //
+                    //     x.domain(d3.extent(diamonds, function(d) { return d.carat; }));
+                    //     y.domain(d3.extent(diamonds, function(d) { return d.price; }));
+                    //
+                    //     svg.append("g")
+                    //         .attr("class", "grid grid--x")
+                    //         .call(d3.axisLeft(y)
+                    //             .tickSize(-width)
+                    //             .tickFormat(""));
+                    //
+                    //     svg.append("g")
+                    //         .attr("class", "grid grid--y")
+                    //         .attr("transform", "translate(0," + height + ")")
+                    //         .call(d3.axisBottom(x)
+                    //             .tickSize(-height)
+                    //             .tickFormat(""));
+                    //
+                    //     svg.append("g")
+                    //         .attr("class", "axis axis--y")
+                    //         .call(d3.axisLeft(y)
+                    //             .ticks(10, "s"))
+                    //         .append("text")
+                    //         .attr("x", 10)
+                    //         .attr("y", 10)
+                    //         .attr("dy", ".71em")
+                    //         .attr("fill", "#000")
+                    //         .attr("font-weight", "bold")
+                    //         .attr("text-anchor", "start")
+                    //         .text("Price (US$)");
+                    //
+                    //     svg.append("g")
+                    //         .attr("class", "axis axis--x")
+                    //         .attr("transform", "translate(0," + height + ")")
+                    //         .call(d3.axisBottom(x))
+                    //         .append("text")
+                    //         .attr("x", width - 10)
+                    //         .attr("y", -10)
+                    //         .attr("dy", "-.35em")
+                    //         .attr("fill", "#000")
+                    //         .attr("font-weight", "bold")
+                    //         .attr("text-anchor", "end")
+                    //         .text("Mass (carats)");
+                    //
+                    //     d3.shuffle(diamonds);
+                    //     var t = d3.timer(function() {
+                    //         for (var i = 0, n = 500, d; i < n; ++i) {
+                    //             if (!(d = diamonds.pop())) return t.stop();
+                    //             context.fillRect(x(d.carat), y(d.price), Math.max(2, x(d.carat + 0.01) - x(d.carat)), 2);
+                    //         }
+                    //     });
+                    // });
+                    //
+                    // function type(d) {
+                    //     d.carat = +d.carat;
+                    //     d.price = +d.price;
+                    //     return d;
+                    // }
+                    // var chart = c3.generate({
+                    //     bindto: "#chart",
+                    //     data: {
+                    //         //Test data
+                    //         // columns: [
+                    //         // 	['data1', 50, 70, 30, 20, 10],
+                    //         // 	['data2', 14, 56, 88, 34, 100]
+                    //         // ],
+                    //         json: dataObj,
+                    //         type: "spline"
+                    //     }
+                    // });
+                    for(var obj in dataObj) {
+                        var newArr = [obj];
+                        dataArr.push(newArr.concat(dataObj[obj]));
+                        console.log(newArr.concat(dataObj[obj]));
+                    }
+                    console.log(dataArr);
+                    console.log(axisParam);
+                    console.log(dataObj);
+                    var chart = c3.generate({
+                        bindto: "#chart",
+                        data: {
+                            xs: axisParam,
+                            columns: dataArr,
+                            type: 'scatter'
+                        },
+                        axis: {
+                            x: {
+                                label: 'timestamp',
+                                tick: {
+                                    fit: false
+                                }
+                            },
+                            y: {
+                                label: 'Date of Action'
+                            }
+                        }
+                    });
+                });
+            }
         }
     };
 
@@ -809,7 +987,8 @@ ClmCohortStatsPageCtrl.$inject = [
     'urlFor',
     'spfAlert',
     'clmServicesUrl',
-    'clmDataStore'
+    'clmDataStore',
+    'spfFirebase'
 ];
 
 export function clmCohortRankPageFactory() {
@@ -860,7 +1039,6 @@ function ClmCohortRankPageCtrl($q, $scope, $log, spfFirebase, clmDataStore, clmP
                         var result = data;
                         oneEventData.title = result.title;
                         self.cohortTotalParticipants += oneEventData.participants.length;
-                        console.log("Length was",self.cohortTotalParticipants );
                         oneEventData.id = result.$id;
                         self.cohortEventData.push(oneEventData);
                         iter++;

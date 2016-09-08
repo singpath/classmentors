@@ -6,6 +6,7 @@
 //TODO: Add various imports for challenge(s)
 import * as mcq from './mcq/mcq.js';
 import * as survey from './survey/survey.js';
+import * as team from './teamActivity/teamactivity.js';
 
 const noop = () => undefined;
 
@@ -21,7 +22,6 @@ export function configRoute($routeProvider, routes){
             }
         })
 
-        //todo: change the controller to one in mcq.js
         .when(routes.editMcq, {
             template: mcq.editMcqTmpl,
             controller: mcq.editMcqController,
@@ -48,6 +48,32 @@ export function configRoute($routeProvider, routes){
             resolve:{
               initialData: startMCQInitialData
             }
+        })
+
+        .when(routes.createTeamActivity, {
+            template: team.teamActivityCreateTmpl,
+            controller: team.createTeamActivityController,
+            controllerAs: 'ctrl',
+            resolve:{
+                initialData: team.createTeamActivityInitialData
+            }
+        })
+        .when(routes.viewIRAT,{
+            template: team.teamIRATTmpl,
+            controller: team.startIRATController,
+            controllerAs:'ctrl',
+            resolve:{
+                initialData: team.createTeamActivityInitialData
+            }
+        })
+        .when(routes.viewTRAT,{
+            template: team.teamTRATTmpl,
+            controller: team.startTRATController,
+            controllerAs:'ctrl',
+            resolve:{
+                initialData: team.createTeamActivityInitialData
+            }
+
         });
 
 }
@@ -136,42 +162,45 @@ export function challengeServiceFactory
       var copy = spfFirebase.cleanObj(task);
       var answers = copy.answers;
       console.log('COPY IS ... ', copy);
-      if (taskType === 'linkPattern') {
-        delete copy.badge;
-        delete copy.serviceId;
-        delete copy.singPathProblem;
-      } else if (copy.serviceId === 'singPath') {
-        delete copy.badge;
-        if (copy.singPathProblem) {
-          copy.singPathProblem.path = spfFirebase.cleanObj(task.singPathProblem.path);
-          copy.singPathProblem.level = spfFirebase.cleanObj(task.singPathProblem.level);
-          copy.singPathProblem.problem = spfFirebase.cleanObj(task.singPathProblem.problem);
-        }
-      }else if (taskType === 'multipleChoice'){
+      self.creatingTask = true;
+      if (taskType === 'multipleChoice'){
         delete copy.singPathProblem;
         delete copy.badge;
         delete copy.answers;
-      } else {
-        delete copy.singPathProblem;
-        copy.badge = spfFirebase.cleanObj(task.badge);
-      }
 
-      if (!copy.link) {
-        // delete empty link. Can't be empty string
-        delete copy.link;
-      }
-
-      self.creatingTask = true;
-      var ref = clmDataStore.events.addTaskWithAns(event.$id, copy, isOpen,answers);
-      ref.then(function() {
-          spfAlert.success('Task created');
-          $location.path(urlFor('editEvent', {eventId: event.$id}));
+        var ref = clmDataStore.events.addTaskWithAns(event.$id, copy, isOpen,answers);
+        ref.then(function() {
+            spfAlert.success('Task created');
+            $location.path(urlFor('editEvent', {eventId: event.$id}));
         }).catch(function(err) {
             $log.error(err);
             spfAlert.error('Failed to created new task');
         }).finally(function() {
             self.creatingTask = false;
         });
+
+      } else if(taskType === 'teamActivity'){
+        delete copy.singPathProblem;
+        delete copy.badge;
+        delete copy.answers;
+        console.log(copy);
+        // Create reccord in eventTeams
+
+        // Create reccord in answers and tasks
+        var ref = clmDataStore.events.addTaskWithAns(event.$id, copy, isOpen,answers);
+        ref.then(function() {
+            spfAlert.success('Task created');
+            $location.path(urlFor('editEvent', {eventId: event.$id}));
+        }).catch(function(err) {
+            $log.error(err);
+            spfAlert.error('Failed to created new task');
+        }).finally(function() {
+            self.creatingTask = false;
+        }); 
+      }
+
+      
+
     },
     update: function(event, taskId, task, taskType, isOpen) {
       var copy = spfFirebase.cleanObj(task);

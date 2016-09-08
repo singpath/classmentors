@@ -14,6 +14,8 @@ import 'core-js/fn/function/bind.js';
 import * as services from 'classmentors/services.js';
 import * as filters from 'classmentors/filters.js';
 import * as directives from 'classmentors/directives.js';
+import * as d3 from 'd3';
+import * as c3 from 'c3';
 
 import * as app from 'classmentors/components/classmentors/classmentors.js';
 import * as ace from 'classmentors/components/ace/ace.js';
@@ -97,7 +99,10 @@ module.constant('routes', {
   viewMcq: '/challenges/mcq',
   startMcq: '/challenges/mcq/start',
   editMcq: '/challenges/mcq/edit',
-  viewSurvey: '/challenges/survey'
+  viewSurvey: '/challenges/survey',
+  createTeamActivity: '/challenges/team-activity/create',
+  viewIRAT:'/challenges/IRAT',
+  viewTRAT:'/challenges/TRAT'
 });
 
 module.config([

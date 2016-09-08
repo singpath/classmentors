@@ -1,0 +1,27 @@
+<md-dialog aria-label="{{ctrl.task.title}}">
+    <form name="teamFormation" ng-submit="ctrl.save()">
+        <md-dialog-content class="sticky-container">
+            <table>
+                <th>Please Select Team to Join</th>
+                <tr>
+                    <td>
+                        <md-radio-group ng-model="radio">
+                            <md-radio-button value="Team 1" class="md-primary"> Team 1</md-radio-button>
+                            <md-radio-button value="Team 2" class="md-primary"> Team 2</md-radio-button>
+                            <md-radio-button value="Team 3" class="md-primary"> Team 3</md-radio-button>
+                        </md-radio-group>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <md-button ng-disabled="true" type="submit" class="md-raised md-primary" style="width: 150px;">Join</md-button>
+                    </td>
+                    <td>
+                        <md-button ng-click="ctrl.cancel()" class="md-raised md-primary" style="width: 150px;">Cancel
+                        </md-button>
+                    </td>
+                </tr>
+            </table>
+        </md-dialog-content>
+    </form>
+</md-dialog>

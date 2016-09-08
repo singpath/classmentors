@@ -636,10 +636,9 @@ export function clmDataStoreFactory(
 
       listAll: function() {
         return spfFirebase.loadedObj(['classMentors/events'], {
-            orderByChild: 'createdAt',
-            limitToLast: 50
+            orderByChild: 'createdAt'
         });
-    },
+      },
 
       listAllArr: function() {
             return spfFirebase.loadedArray(['classMentors/events'], {
@@ -1094,6 +1093,22 @@ export function clmDataStoreFactory(
         );
       },
 
+        _hasDoneSurvey: function (task, solutions) {
+            return(
+              task.survey &&
+              solutions &&
+              solutions[task.$id]
+            );
+        },
+
+        _hasDoneMcq: function (task, solutions) {
+            return(
+                task.mcqQuestions &&
+                solutions &&
+                solutions[task.$id]
+            );
+        },
+
       _solvedProblems: function(singPathProfile) {
         var queueId = 'default';
 
@@ -1136,7 +1151,9 @@ export function clmDataStoreFactory(
             clmDataStore.events._isResponseValid(task, data.solutions) ||
             clmDataStore.events._hasRegistered(task, data.classMentors, data.singPath) ||
             clmDataStore.events._hasBadge(task, badges) ||
-            clmDataStore.events._hasSolvedSingpathProblem(task, data.singPath)
+            clmDataStore.events._hasSolvedSingpathProblem(task, data.singPath) ||
+            clmDataStore.events._hasDoneSurvey(task, data.solutions) ||
+            clmDataStore.events._hasDoneMcq(task, data.solutions)
           );
 
           if (solved) {
@@ -1221,8 +1238,9 @@ export function clmDataStoreFactory(
           progress: userProgress
         }).then(function(data) {
           // 4. save data
+
           return $q.all([
-            // 2. check completness and update progress if needed.
+            // 2. check completeness and update progress if needed.
             $q.when(clmDataStore.events._getProgress(tasks, data)).then(function(progress) {
               var updated = Object.keys(progress).some(function(taskId) {
                 var wasCompleted = data.progress && data.progress[taskId] && data.progress[taskId].completed;
@@ -1361,11 +1379,11 @@ export function clmDataStoreFactory(
         if(!qnTitle){
             return $q.reject(new Error('No question title provided'));
         }
-          console.log("qntitle isss", qnTitle);
+          // console.log("qntitle isss", qnTitle);
           return spfFirebase.set(['classMentors/surveyResponse', eventId, taskId, surveyTask, userId, qnTitle, questionNumber], surveyResp);
       },
-    
-        saveSurveyEduDisMultiResponse: function (responses, questionNumber, taskId, eventId, userId, surveyTask, qnTitle ){
+
+      saveSurveyEduDisMultiResponse: function (responses, questionNumber, taskId, eventId, userId, surveyTask, qnTitle ){
             if (!responses) {
                 return $q.reject(new Error('No responses provided'));
             }
@@ -1387,7 +1405,7 @@ export function clmDataStoreFactory(
             if(!qnTitle){
                 return $q.reject(new Error('No question title provided'));
             }
-            console.log("qntitle isss", qnTitle);
+
             return spfFirebase.set(['classMentors/surveyResponse', eventId, taskId, surveyTask, userId, qnTitle, questionNumber], responses);
         },
 
@@ -1409,8 +1427,8 @@ export function clmDataStoreFactory(
         ], link);
       },
 
-        setProgress: function(eventId, taskId, publicId, progress){
-            
+      setProgress: function(eventId, taskId, publicId, progress){
+
             return spfFirebase.set(['classMentors/eventProgress', eventId, publicId, taskId], progress[publicId][taskId]);
 
         },

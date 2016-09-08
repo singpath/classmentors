@@ -57,19 +57,55 @@
             </md-content>
         </md-tab>
 
-        <md-tab label="Stats" ng-disabled="!ctrl.isOwner || true">
+        <md-tab label="Stats" ng-if="ctrl.isOwner">
             <md-content layout-padding>
-
-                <!--<link href="../../../jspm_packages/graphing/c3.min.css" rel="stylesheet" type="text/css">-->
-                <!--<script src="../../../jspm_packages/graphing/d3.min.js"></script>-->
-                <!--<script src="../../../jspm_packages/graphing/c3.min.js"></script>-->
-
                 <clm-cohorts-stats-page
                         cohort="ctrl.cohort"
                         profile="ctrl.profile">
                 </clm-cohorts-stats-page>
             </md-content>
         </md-tab>
+        <md-tab label="Manage" ng-if="ctrl.isOwner">
+            <md-content layout-padding>
+                Move events:<br>
+                Select event
+                <md-select ng-model="ctrl.selectedEvent" aria-label="select_event" required placeholder="Select the event with the challenge you wish to duplicate" ng-change="ctrl.loadEventChallenges()">
+                    <md-option ng-value="e" ng-repeat="e in ctrl.cohort.events">
+                        {{ctrl.events[e].title}}
+                    </md-option>
+                </md-select>
+                <div ng-if="ctrl.selectedEvent">
+                    You have selected {{ctrl.selectedEvent}}
+                    <md-select ng-model="ctrl.selectedChallenge" aria-label="select_challenge" required placeholder="Select the challenge you wish to duplicate">
+                        <md-option ng-value="c" ng-repeat="c in ctrl.eventChallenges">
+                            {{c.title}}
+                        </md-option>
+                    </md-select>
+                </div>
+                <div ng-if="ctrl.selectedChallenge">
+                    Duplicate {{ctrl.selectedChallenge.title}} from event {{ctrl.events[ctrl.selectedEvent].title}}?<br>
+                    Select events to duplicate the challenge to:
+                    <md-select ng-model="ctrl.selectedEvents"
+                               data-md-container-class="selectdemoSelectHeader"
+                               multiple aria-label="select_events">
+                        <md-select-header class="demo-select-header">
+                            <input ng-model="searchTerm"
+                                   type="search"
+                                   placeholder="Search for a vegetable.."
+                                   class="demo-header-searchbox md-text">
+                        </md-select-header>
+                        <md-optgroup label="vegetables">
+                            <md-option ng-value="e" ng-repeat="e in ctrl.cohort.events |
+              filter:searchTerm" ng-if="e != ctrl.selectedEvent">{{ctrl.events[e].title}}</md-option>
+                        </md-optgroup>
+                    </md-select>
+                </div>
+                <div layout="row" layout-align="center center">
+                    <md-button class="md-raised md-primary" ng-if="ctrl.selectedEvents" ng-click="ctrl.duplicateChallenges()">
+                        Duplicate
+                    </md-button>
+                </div>
+            </md-content>
+        </md-tab>
     </md-tabs>
-
 </md-content>

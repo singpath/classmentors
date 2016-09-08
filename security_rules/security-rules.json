@@ -175,6 +175,14 @@
         ".read": true,
         ".write": "auth !== null && root.child('classMentors/admins').child(auth.uid).val() === true"
       },
+      "eventTeams":{
+        "$teamId":{
+            "$userId":{
+                ".write":true,
+                ".read":true
+            }
+        }
+      },
       "eventApplications": {
         "$eventId": {
           "$userId": {
@@ -370,6 +378,9 @@
               "$timeStamp": {
                 ".validate": "data.val() == newData.val() ||(\n  data.exists() === false\n  && newData.isString()\n  && (newData.val() === 'closed' || newData.val() === 'opened' )\n)"
               }
+            },
+            "teams":{
+                ".validate":"newData.isString()"
             },
             "link": {
               ".validate": "newData.isString() && newData.val().matches(/^(https?:\\/\\/.+|#\\/).+$/)"

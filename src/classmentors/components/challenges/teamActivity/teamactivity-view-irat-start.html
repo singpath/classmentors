@@ -1,0 +1,80 @@
+<md-content flex class="md-padding">
+    <form name="iratForm" ng-submit="ctrl.submitIrat()">
+        <table width="100%">
+            <tr>
+                <td>
+                    <h2>Question 1</h2>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <hr>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <h3>What is the meaning of life?</h3>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <md-radio-group ng-model="radio1">
+                        <md-radio-button value="1" class="md-primary">
+                            <div style="display:inline-block">1)</div>
+                            To be happy
+                        </md-radio-button>
+                        <md-radio-button value="2" class="md-primary">
+                            <div style="display:inline-block">2)</div>
+                            To get good grades
+                        </md-radio-button>
+                        <md-radio-button value="3" class="md-primary">
+                            <div style="display:inline-block">3)</div>
+                            To love
+                        </md-radio-button>
+                    </md-radio-group>
+
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <h2>Question 2</h2>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <hr>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <h3>What is 10x2?</h3>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <md-radio-group ng-model="radio2">
+                        <md-radio-button value="1" class="md-primary">
+                            <div style="display:inline-block">1)</div>
+                            130
+                        </md-radio-button>
+                        <md-radio-button value="2" class="md-primary">
+                            <div style="display:inline-block">2)</div>
+                            120
+                        </md-radio-button>
+                        <md-radio-button value="3" class="md-primary">
+                            <div style="display:inline-block">3)</div>
+                            150
+                        </md-radio-button>
+                    </md-radio-group>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div>
+                        <md-button type="submit" class="md-raised md-primary" style="width: 150px;">Submit</md-button>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </form>
+</md-content>
