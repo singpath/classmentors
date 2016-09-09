@@ -1665,6 +1665,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         });
 
         taskCompletion();
+        console.log("visibleTasks are::", self.visibleTasks);
     }
 
     /**
@@ -3237,7 +3238,7 @@ function ClmEventResultsTableCtrl($scope, $q, $log, $mdDialog, $document,
         self.visibleTasks = self.tasks.filter(function (t) {
             return !t.hidden && !t.archived;
         });
-
+        
         taskCompletion();
     }
 

@@ -183,12 +183,15 @@ export function challengeServiceFactory
         delete copy.singPathProblem;
         delete copy.badge;
         delete copy.answers;
-        console.log(copy);
+        console.log("teamacitivty copy is:",copy);
         // Create reccord in eventTeams
 
         // Create reccord in answers and tasks
-        var ref = clmDataStore.events.addTaskWithAns(event.$id, copy, isOpen,answers);
+
+        var ref = clmDataStore.events.addTaskWithAns(event.$id, copy, isOpen, answers);
+        console.log("this ref is",ref);
         ref.then(function() {
+            console.log("ref after promise", ref);
             spfAlert.success('Task created');
             $location.path(urlFor('editEvent', {eventId: event.$id}));
         }).catch(function(err) {

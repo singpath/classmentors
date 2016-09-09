@@ -342,6 +342,7 @@ export function newMcqController(initialData, challengeService, $filter,$mdDialo
   // Checks if all questions have at least one answer
   self.isMcqValid = false;
   self.task = initialData.task;
+  
   self.questions = [{
     text:"",
     answers:[],
