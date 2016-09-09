@@ -3506,6 +3506,7 @@ function ClmEventResultsTableCtrl($scope, $q, $log, $mdDialog, $document,
         function DialogController() {
             this.task = task;
             this.review = true;
+            this.participant = participant;
             if (
                 userSolution &&
                 userSolution[taskId]

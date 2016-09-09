@@ -325,7 +325,8 @@ function viewCohortCtrlInitialData($q, $route, spfAuth, spfAuthData, clmDataStor
         canView: canviewPromise,
         announcements: clmDataStore.cohorts.getAnnouncements(cohortId),
         events: clmDataStore.events.listAll(),
-        joinedEvents: clmDataStore.events.listJoinedEventsObj()
+        joinedEvents: clmDataStore.events.listJoinedEventsObj(),
+        createdEvents: clmDataStore.events.listCreatedEvents()
     });
 }
 viewCohortCtrlInitialData.$inject = [
@@ -351,9 +352,11 @@ function ViewCohortCtrl(
     this.events = initialData.events;
     this.isOwner = false;
     this.joinedEvents = initialData.joinedEvents;
+    this.createdEvents = initialData.createdEvents;
 
     this.selectedEvent = null;
     this.eventChallenges = null;
+    this.selectedAction = null;
 
     if (
         self.cohort &&
