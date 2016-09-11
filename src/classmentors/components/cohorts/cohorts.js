@@ -325,7 +325,8 @@ function viewCohortCtrlInitialData($q, $route, spfAuth, spfAuthData, clmDataStor
         canView: canviewPromise,
         announcements: clmDataStore.cohorts.getAnnouncements(cohortId),
         events: clmDataStore.events.listAll(),
-        joinedEvents: clmDataStore.events.listJoinedEventsObj()
+        joinedEvents: clmDataStore.events.listJoinedEventsObj(),
+        createdEvents: clmDataStore.events.listCreatedEvents()
     });
 }
 viewCohortCtrlInitialData.$inject = [
@@ -351,6 +352,11 @@ function ViewCohortCtrl(
     this.events = initialData.events;
     this.isOwner = false;
     this.joinedEvents = initialData.joinedEvents;
+    this.createdEvents = initialData.createdEvents;
+
+    this.selectedEvent = null;
+    this.eventChallenges = null;
+    this.selectedAction = null;
 
     if (
         self.cohort &&
@@ -380,28 +386,6 @@ function ViewCohortCtrl(
             return options;
         }
 
-        // add join/leave button
-        // if (
-        //     self.participants &&
-        //     self.participants.$indexFor(self.currentUser.publicId) > -1
-        // ) {
-        //     options.push({
-        //         title: 'Leave',
-        //         onClick: function() {
-        //             clmDataStore.events.leave(self.event.$id).then(function() {
-        //                 $route.reload();
-        //             });
-        //         },
-        //         icon: 'clear'
-        //     });
-        // } else {
-        //     options.push({
-        //         title: 'Join',
-        //         onClick: promptPassword,
-        //         icon: 'add'
-        //     });
-        // }
-
         // Add edit button
         if (self.cohort.owner.publicId === self.currentUser.publicId) {
             options.push({
@@ -409,18 +393,51 @@ function ViewCohortCtrl(
                 url: `#${urlFor('editCohort', {cohortId: self.cohort.$id})}`,
                 icon: 'create'
             });
-            // Add update button (May not be necessary for cohorts)
-            // options.push({
-            //     title: 'Update',
-            //     onClick: function() {
-            //         monitorHandler.update();
-            //     },
-            //     icon: 'loop'
-            // });
         }
 
         return options;
     }
+    
+    this.loadEventChallenges = function () {
+      spfFirebase.loadedObj(['classMentors/eventTasks', self.selectedEvent])
+          .then(function(promise) {
+              return promise;
+          }).then(function(data) {
+              self.eventChallenges = data;
+          }).catch(function (err) {
+              $log.error(err);
+              return err;
+          });
+    };
+
+    this.duplicateChallenges = function() {
+        self.selectedChallenge.archived = false;
+        delete self.selectedChallenge.$$mdSelectId;
+        var eventIndex = 0;
+        insertChallenge();
+        function insertChallenge() {
+            if(eventIndex < self.selectedEvents.length) {
+                var eventId = self.selectedEvents[eventIndex];
+                clmDataStore.events.addTask(eventId, self.selectedChallenge, true)
+                    .then( function () {
+                        console.log(self.selectedChallenge.title + " inserted into " + eventId);
+                        eventIndex++;
+                    })
+                    .then(function () {
+                        insertChallenge();
+                    })
+                    .catch(function (err) {
+                        $log.error(err);
+                        return err;
+                    });
+            } else {
+                spfAlert.success(self.selectedChallenge.title + " inserted into selected events");
+                self.selectedEvent = null;
+                self.selectedChallenge = null;
+                self.selectedEvents = null;
+            }
+        }
+    };
 
     this.viewFullAnnouncement = function(content, title) {
         $mdDialog.show({
