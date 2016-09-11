@@ -1,15 +1,26 @@
 {
-  "rules": "security_rules/security-rules.json",
-  "public": "dist/classmentors",
-  "ignore": [
-    "firebase.json",
-    "**/.*",
-    "**/node_modules/**"
-  ],
   "hosting": {
-    "public": "dist/classmentors"
+    "public": "dist/classmentors",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
   },
   "database": {
-    "rules": "security_rules/security-rules.json"
+    "rules": "database/security-rules.json",
+    "_maintenance": {
+      "defaults": [{
+        "url": "/classMentors/settings",
+        "path": "settings.json"
+      }],
+      "backups": [{
+        "url": "/classMentors/schools",
+        "path": "schools.json"
+      }, {
+        "url": "/classMentors/badges",
+        "path": "badges.json"
+      }]
+    }
   }
 }

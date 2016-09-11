@@ -4,7 +4,11 @@
   "description": "Class Mentors UI",
   "repository": "github:singpath/classmentors",
   "main": "src/classmentors/index.js",
-  "dependencies": {},
+  "dependencies": {
+    "commander": "^2.9.0",
+    "lodash.merge": "^4.6.0",
+    "tmp": "0.0.28"
+  },
   "devDependencies": {
     "@singpath/tools": "0.0.8",
     "babel-eslint": "^6.0.4",
@@ -552,4 +556,4 @@
   "keywords": [],
   "author": "",
   "license": "MIT"
-}
+}
