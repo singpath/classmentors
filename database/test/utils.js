@@ -27,7 +27,7 @@ exports.timestamp = timestamp;
  *   auth : {
  *     publicIds: {cboesch: null},
  *     usedPublicIds: {cboesch: null},
- *     users: {'google:110893970871115341770': null}
+ *     users: {'google:123456': null}
  *   }
  * });
  *
@@ -99,5 +99,33 @@ exports.bob = function(opts) {
     user,
     userData,
     userProfiles
+  };
+};
+
+exports.admin = function(opts) {
+  opts = Object.assign({
+    isAdmin: true,
+    isPremium: true
+  }, opts);
+
+  const uid = 'google:123456';
+  const publicId = 'cboesch';
+  const firebaseAuth = {
+    uid,
+    id: 123456,
+    provider: 'google'
+  };
+  const user = {
+    displayName: 'Chris Boesch',
+    gravatar: '//www.gravatar.com/avatar/somehashsomehashsomehashsomehash'
+  }
+  const userWithId = Object.assign({publicId}, user);
+
+  return {
+    firebaseAuth,
+    publicId,
+    uid,
+    user,
+    userWithId
   };
 };

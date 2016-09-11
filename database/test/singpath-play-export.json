@@ -1,23 +1,23 @@
 {
   "auth": {
     "publicIds": {
-      "cboesch": "google:110893970871115341770"
+      "cboesch": "google:123456"
     },
     "usedPublicIds": {
       "cboesch": true
     },
     "users": {
-      "google:110893970871115341770": {
+      "google:123456": {
         "country": {
           "code": "SG",
           "name": "Singapore"
         },
         "createdAt": 1460273127178,
         "displayName": "Chris Boesch",
-        "email": "scboesch@gmail.com",
+        "email": "cboesch@example.com",
         "fullName": "Chris Boesch",
-        "gravatar": "//www.gravatar.com/avatar/6e64bb2cab5367fd6e201df2aa722512",
-        "id": "google:110893970871115341770",
+        "gravatar": "//www.gravatar.com/avatar/somehashsomehashsomehashsomehash",
+        "id": "google:123456",
         "publicId": "cboesch",
         "yearOfBirth": 1990
       }
@@ -25,7 +25,7 @@
   },
   "classMentors": {
     "admins": {
-      "google:110893970871115341770": true
+      "google:123456": true
     },
     "badges": {
       "codeCombat": {
@@ -103,7 +103,7 @@
     "eventTasks": {},
     "events": {
       "-KJiQi8IBdEK6azah_uj": {
-        "createdAt": 1465362866984,
+        "createdAt": 1460222555000,
         "owner": {
           "displayName": "Chris Boesch",
           "gravatar": "//www.gravatar.com/avatar/6e64bb2cab5367fd6e201df2aa722512",
@@ -113,7 +113,7 @@
       }
     },
     "premiumUsers": {
-      "google:110893970871115341770": true
+      "google:123456": true
     },
     "schools": {
       "Admiralty Secondary School": {
