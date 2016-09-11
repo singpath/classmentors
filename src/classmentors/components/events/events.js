@@ -1134,12 +1134,12 @@ function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNav
         var copy = cleanObj(task);
 
         //check if user keys in http inside Link Pattern
-        var checkLinkPattern = copy['linkPattern'];
+        var checkLinkPattern = copy.linkPattern;
         if (checkLinkPattern != null) {
             if (checkLinkPattern.indexOf("http:") > -1) {
                 checkLinkPattern = checkLinkPattern.replace("http:", "https:");
             }
-            copy['linkPattern'] = checkLinkPattern;
+            copy.linkPattern = checkLinkPattern;
         }
 
         var data = {
@@ -1206,7 +1206,7 @@ function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNav
             });
         }
 
-    }
+    };
 }
 AddEventTaskCtrl.$inject = [
     'initialData',
@@ -1408,18 +1408,18 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
             console.log('journalling is clicked');
             return 'Continue';
 
-        } else if (tasktype == 'teamActivity') {
+        } else if (this.tasktype == 'teamActivity') {
             console.log('teamActivity is clicked');
             location = '/challenges/team-activity/edit';
             return 'Continue';
 
-        } else if (tasktype === 'profileEdit') {
+        } else if (this.tasktype === 'profileEdit') {
             return 'Save';
 
         }else {
             return 'Save';
         }
-    }
+    };
 
     //this function double checks with user if he wishes to go back and discard all changes thus far
     this.discardChanges = function (ev) {
@@ -1440,6 +1440,22 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
     this.saveTask = function (event, taskId, task, taskType, isOpen) {
         var copy = cleanObj(task);
 
+        //check if user keys in http inside Link Pattern
+        var checkLinkPattern = copy.linkPattern;
+        if (checkLinkPattern != null) {
+            if (checkLinkPattern.indexOf("http:") > -1) {
+                checkLinkPattern = checkLinkPattern.replace("http:", "https:");
+            }
+            copy.linkPattern = checkLinkPattern;
+        }
+
+        var data = {
+            taskType: taskType,
+            isOpen: isOpen,
+            event: event,
+            task: task
+        };
+
         if (taskType === 'linkPattern') {
             delete copy.badge;
             delete copy.serviceId;
@@ -1456,18 +1472,13 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
             copy.badge = cleanObj(task.badge);
         }
 
-        this.saveTask = function (event, taskId, task, taskType, isOpen) {
-            var copy = cleanObj(task);
+        if (!copy.link) {
+            // delete empty link. Can't be empty string
+            delete copy.link;
+        }
 
-            //check if user keys in http inside Link Pattern
-            var checkLinkPattern = copy['linkPattern'];
-            if (checkLinkPattern != null) {
-                if (checkLinkPattern.indexOf("http:") > -1) {
-                    checkLinkPattern = checkLinkPattern.replace("http:", "https:");
-                }
-                copy['linkPattern'] = checkLinkPattern;
-            }
-
+        self.creatingTask = true;
+        if (taskType === 'multipleChoice' || taskType === 'journalling' || taskType === 'video' || taskType === 'survey') {
             var data = {
                 taskType: taskType,
                 isOpen: isOpen,
@@ -1475,124 +1486,46 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
                 task: task
             };
 
-            if (taskType === 'linkPattern') {
-                delete copy.badge;
-                delete copy.serviceId;
-                delete copy.singPathProblem;
-            } else if (copy.serviceId === 'singPath') {
-                delete copy.badge;
-                if (copy.singPathProblem) {
-                    copy.singPathProblem.path = cleanObj(task.singPathProblem.path);
-                    copy.singPathProblem.level = cleanObj(task.singPathProblem.level);
-                    copy.singPathProblem.problem = cleanObj(task.singPathProblem.problem);
+            spfNavBarService.update(
+                'New Challenge Details', [{
+                    title: 'Events',
+                    url: `#${urlFor('events')}`
+                }, {
+                    title: this.event.title,
+                    url: `#${urlFor('oneEvent', {eventId: this.event.$id})}`
+                }, {
+                    title: 'Challenges',
+                    url: `#${urlFor('editEvent', {eventId: this.event.$id})}`
+                }]
+            );
+
+            eventService.set(data);
+
+            $location.path(location);
+
+        } else {
+            self.savingTask = true;
+            clmDataStore.events.updateTask(event.$id, taskId, copy).then(function () {
+                if (
+                    (isOpen && task.openedAt) ||
+                    (!isOpen && task.closedAt)
+                ) {
+                    return;
+                } else if (isOpen) {
+                    return clmDataStore.events.openTask(event.$id, taskId);
                 }
-            } else {
-                delete copy.singPathProblem;
-                copy.badge = cleanObj(task.badge);
-            }
 
-            if (!copy.link) {
-                // delete empty link. Can't be empty string
-                delete copy.link;
-            }
+                return clmDataStore.events.closeTask(event.$id, taskId);
+            }).then(function () {
+                spfAlert.success('Challenge saved.');
+            }).catch(function () {
+                spfAlert.error('Failed to save the challenge.');
+            }).then(function() {
+                self.savingTask = false;
+            });
+        }
 
-
-            self.creatingTask = true;
-            if (taskType === 'multipleChoice' || taskType === 'journalling' || taskType === 'video' || taskType === 'survey') {
-                var data = {
-                    taskType: taskType,
-                    isOpen: isOpen,
-                    event: event,
-                    task: task
-                };
-                console.log('Data shows... ', data);
-                spfNavBarService.update(
-                    'New Challenge Details', [{
-                        title: 'Events',
-                        url: `#${urlFor('events')}`
-                    }, {
-                        title: this.event.title,
-                        url: `#${urlFor('oneEvent', {eventId: this.event.$id})}`
-                    }, {
-                        title: 'Challenges',
-                        url: `#${urlFor('editEvent', {eventId: this.event.$id})}`
-                    }]
-                );
-                console.log(data)
-                eventService.set(data);
-
-                console.log("location is at ", location);
-                $location.path(location);
-
-            } else {
-                self.savingTask = true;
-                clmDataStore.events.updateTask(event.$id, taskId, copy).then(function () {
-                    if (
-                        (isOpen && task.openedAt) ||
-                        (!isOpen && task.closedAt)
-                    ) {
-                        return;
-                    } else if (isOpen) {
-                        return clmDataStore.events.openTask(event.$id, taskId);
-                    }
-
-                    return clmDataStore.events.closeTask(event.$id, taskId);
-                }).then(function () {
-                    spfAlert.success('Challenge saved.');
-                }).catch(function () {
-                    spfAlert.error('Failed to save the challenge.');
-                }).finally(function () {
-                    self.savingTask = false;
-                });
-            }
-
-        };
-
-        // this.saveTask = function(event, taskId, task, taskType, isOpen) {
-        //   var copy = cleanObj(task);
-        //
-        //   if (taskType === 'linkPattern') {
-        //     delete copy.badge;
-        //     delete copy.serviceId;
-        //     delete copy.singPathProblem;
-        //   } else if (copy.serviceId === 'singPath') {
-        //     delete copy.badge;
-        //     if (copy.singPathProblem) {
-        //       copy.singPathProblem.path = cleanObj(task.singPathProblem.path);
-        //       copy.singPathProblem.level = cleanObj(task.singPathProblem.level);
-        //       copy.singPathProblem.problem = cleanObj(task.singPathProblem.problem);
-        //     }
-        //   } else {
-        //     delete copy.singPathProblem;
-        //     copy.badge = cleanObj(task.badge);
-        //   }
-        //
-        //   if (!copy.link) {
-        //     // delete empty link. Can't be empty string
-        //     delete copy.link;
-        //   }
-        //
-        //   self.savingTask = true;
-        //   clmDataStore.events.updateTask(event.$id, taskId, copy).then(function() {
-        //     if (
-        //       (isOpen && task.openedAt) ||
-        //       (!isOpen && task.closedAt)
-        //     ) {
-        //       return;
-        //     } else if (isOpen) {
-        //       return clmDataStore.events.openTask(event.$id, taskId);
-        //     }
-        //
-        //     return clmDataStore.events.closeTask(event.$id, taskId);
-        //   }).then(function() {
-        //     spfAlert.success('Task saved');
-        //   }).catch(function() {
-        //     spfAlert.error('Failed to save the task.');
-        //   }).finally(function() {
-        //     self.savingTask = false;
-        //   });
-        // };
-    }
+    };
 }
 EditEventTaskCtrl.$inject = [
     'initialData',
