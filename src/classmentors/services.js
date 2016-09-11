@@ -305,7 +305,6 @@ export function clmDataStoreFactory(
 ) {
   var clmDataStore;
   var db = firebaseApp.database();
-  var settings = $firebaseArray(db.ref('classMentors/settings'));
   var ProfileFirebaseObject = $firebaseObject.$extend({
     canView: function(obj) {
       var kind = obj && obj.$ref && obj.$ref().parent.path.toString();
@@ -1873,8 +1872,20 @@ export function clmDataStoreFactory(
        * @return {array}
        */
       get: function() {
-        return settings;
+        return $firebaseArray(db.ref('classMentors/settings'));
+      },
+
+      /**
+       * Return Classmentors settings as a firebase synchronized array.
+       *
+       * Note that the array might not be loaded yet.
+       *
+       * @return {object}
+       */
+      getObj: function() {
+        return $firebaseObject(db.ref('classMentors/settings'));
       }
+
     },
 
     singPath: {
