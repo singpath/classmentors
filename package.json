@@ -4,6 +4,7 @@
   "description": "Class Mentors UI",
   "repository": "github:singpath/classmentors",
   "main": "src/classmentors/index.js",
+  "bin" : "./bin/classmentors.js",
   "dependencies": {
     "commander": "^2.9.0",
     "lodash.merge": "^4.6.0",
