@@ -22,7 +22,7 @@
         -->
         <button type="submit" ng-click="ctrl.refreshAchievements(ctrl.profile.$id)">Refresh Achievements for {{ctrl.profile.$id}} </button>
          
-        <div id="register-freecodecamp" class="register-service md-whiteframe-z1">
+        <div id="register-freecodecamp" class="register-service md-whiteframe-z1" ng-if="ctrl.settings.enableFreeCodeCamp.value">
                 <h2>FreeCodeCamp</h2>
                 <div ng-hide="ctrl.profile.services.freeCodeCamp.details.id">
                   Not registered.
@@ -33,7 +33,7 @@
                 </div>
             </div>
             
-     <div id="register-pivotalexpert" class="register-service md-whiteframe-z1">
+     <div id="register-pivotalexpert" class="register-service md-whiteframe-z1" ng-if="ctrl.settings.enablePivotalexpert.value">
                 <h2>Pivotal Expert</h2>
                 <div ng-hide="ctrl.profile.services.pivotalExpert.details.id">
                   Not registered.
@@ -44,7 +44,7 @@
                 </div>
             </div>
            
-            <div id="register-codecombat" class="register-service md-whiteframe-z1">
+            <div id="register-codecombat" class="register-service md-whiteframe-z1" ng-if="ctrl.settings.enableCodeCombat.value">
                 <h2>Code Combat</h2>
 
                 <div ng-hide="ctrl.profile.services.codeCombat.details.id">  

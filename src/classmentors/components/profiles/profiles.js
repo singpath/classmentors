@@ -60,7 +60,8 @@ function clmEditProfileInitialDataResolver($q, spfAuth, spfAuthData, clmDataStor
     auth: spfAuth,
     currentUser: spfAuthData.user(),
     profile: profilePromise,
-    currentUserProfile: profilePromise
+    currentUserProfile: profilePromise,
+    settings: clmDataStore.settings.getObj()
   });
 }
 clmEditProfileInitialDataResolver.$inject = ['$q', 'spfAuth', 'spfAuthData', 'clmDataStore'];
@@ -90,7 +91,8 @@ function clmShowProfileInitialDataResolver($q, $route, spfAuth, spfAuthData, clm
     auth: spfAuth,
     currentUser: spfAuthData.user().catch(noop),
     currentUserProfile: clmDataStore.currentUserProfile(),
-    profile: profilePromise
+    profile: profilePromise,
+    settings: clmDataStore.settings.getObj()
   });
 }
 clmShowProfileInitialDataResolver.$inject = ['$q', '$route', 'spfAuth', 'spfAuthData', 'clmDataStore'];
@@ -110,6 +112,9 @@ function ClmProfileCtrl(
   this.currentUser = initialData.currentUser;
   this.currentUserProfile = initialData.currentUserProfile;
   this.profile = initialData.profile;
+  this.settings = initialData.settings;
+
+  console.log(this.settings);
 
   if (
     this.profile &&
