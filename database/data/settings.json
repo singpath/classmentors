@@ -1,0 +1,18 @@
+{
+  "enableCodeCombat" : {
+    "title" : "enable CodeCombat",
+    "type" : "boolean",
+    "value" : true
+  },
+  "enableCodeSchool" : {
+    "title" : "enable CodeSchool",
+    "type" : "boolean",
+    "value" : true
+  },
+  "enableFreeCodeCamp" : {
+    "title" : "enable FreeCodeCamp",
+    "type" : "boolean",
+    "value" : true
+  }
+}
+

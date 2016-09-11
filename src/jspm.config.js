@@ -28,6 +28,10 @@ SystemJS.config({
     "classmentors": {
       "main": "index.js",
       "meta": {
+        "tools/cli/*.js": {
+          "format": "cjs",
+          "loader": "babel"
+        },
         "*.js": {
           "loader": "plugin-babel"
         }
