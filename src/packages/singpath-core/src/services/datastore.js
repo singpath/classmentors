@@ -37,13 +37,15 @@ export class SpfCurrentUserService {
     this.$spfProfilesPath = spfProfilesPath;
     this.$watchers = {};
 
-    this.uid = null;
-    this.firebaseUser = null;
-    this.publicId = null;
-    this.user = null;
+    this.firebaseUser = undefined;
+    this.uid = undefined;
+
+    this.user = undefined;
+    this.publicId = undefined;
+
+    this.profile = undefined;
     this.isAdmin = false;
     this.isPremium = false;
-    this.profile = null;
 
     this.$watchers.firebaseUser = spfAuth.onAuth(
       firebaseUser => this.authChangedHandler(firebaseUser)
@@ -526,6 +528,7 @@ SpfCurrentUserService.$inject = [
  * Returns an object with `user` (Firebase auth user data) property,
  * and login/logout methods.
  *
+ * @param  {object}   $q               Angular loggin service.
  * @param  {object}   $route           Angular router service.
  * @param  {object}   $log             Angular logging service.
  * @param  {object}   $firebaseAuth    Angularfire autentication service.
@@ -533,13 +536,51 @@ SpfCurrentUserService.$inject = [
  * @param  {object}   authProvider     Firebase auth provider
  * @return {{user: object, login: function, logout: function, onAuth: function}}
  */
-export function spfAuthFactory($route, $log, $firebaseAuth, authFirebaseApp, authProvider) {
+export function spfAuthFactory($q, $route, $log, $firebaseAuth, authFirebaseApp, authProvider) {
   var auth = $firebaseAuth(authFirebaseApp.auth());
   var cbs = [];
   var spfAuth = {
 
     // The current user auth data (null is not authenticated).
-    user: auth.$getAuth(),
+    user: undefined,
+
+    /**
+     * Waits for the current user status loads before resolving.
+     *
+     * @return {Promise<void>}
+     */
+    $loaded: function() {
+      return $q(function(resolve) {
+        let cancel;
+
+        if (spfAuth.user !== undefined) {
+          resolve(spfAuth);
+          return;
+        }
+
+        cancel = spfAuth.onAuth(function() {
+          resolve(spfAuth);
+          cancel();
+        });
+      });
+    },
+
+    /**
+     * Rejects is the user is logged off.
+     *
+     * It waits for the status to load before resolving/rejecting.
+     *
+     * @return {Promise<void,Error>}
+     */
+    requireLoggedIn: function() {
+      return spfAuth.$loaded().then(function() {
+        if (!spfAuth.user || !spfAuth.user.uid) {
+          return $q.reject(new Error('You are not logged in.'));
+        }
+
+        return spfAuth;
+      });
+    },
 
     /**
      * Get user info from current user provider data.
@@ -627,7 +668,7 @@ export function spfAuthFactory($route, $log, $firebaseAuth, authFirebaseApp, aut
     $log.debug('reloading');
     $route.reload();
 
-    spfAuth.user = currentAuth || undefined;
+    spfAuth.user = currentAuth || null;
 
     cbs.forEach(handler => {
       try {
@@ -642,6 +683,7 @@ export function spfAuthFactory($route, $log, $firebaseAuth, authFirebaseApp, aut
 }
 
 spfAuthFactory.$inject = [
+  '$q',
   '$route',
   '$log',
   '$firebaseAuth',
@@ -715,15 +757,18 @@ export function spfAuthDataFactory($q, $log, $firebaseObject, authFirebaseApp, s
      * @return {Promise<object, Error>}
      */
     user: function() {
-      if (!spfAuth.user || !spfAuth.user.uid) {
-        return $q.reject(new Error('Your did not login or your session expired.'));
-      }
-
       if (userDataPromise) {
         return userDataPromise;
       }
 
-      userDataPromise = spfAuthData._user().then(
+      userDataPromise = spfAuth.$loaded().then(function() {
+        if (!spfAuth.user || !spfAuth.user.uid) {
+          userDataPromise = undefined;
+          return $q.reject(new Error('Your did not login or your session expired.'));
+        }
+
+        return spfAuthData._user();
+      }).then(
         spfAuthData.register
       );
 

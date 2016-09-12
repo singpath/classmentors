@@ -42,13 +42,13 @@ configRoute.$inject = ['$routeProvider', 'routes'];
  */
 function clmEditProfileInitialDataResolver($q, spfAuth, spfAuthData, clmDataStore) {
   var profilePromise;
-  var errLoggedOff = new Error('You need to be logged to edit her/his profile.');
+  var loggedIn = spfAuth.requireLoggedIn().catch(function() {
+    return $q.reject(new Error('You need to be logged to edit her/his profile.'));
+  });
 
-  if (!spfAuth.user || !spfAuth.user.uid) {
-    return $q.reject(errLoggedOff);
-  }
-
-  profilePromise = clmDataStore.currentUserProfile().then(function(profile) {
+  profilePromise = loggedIn.then(function() {
+    return clmDataStore.currentUserProfile();
+  }).then(function(profile) {
     if (profile && profile.$value === null) {
       return clmDataStore.initProfile();
     }
@@ -57,7 +57,7 @@ function clmEditProfileInitialDataResolver($q, spfAuth, spfAuthData, clmDataStor
   });
 
   return $q.all({
-    auth: spfAuth,
+    auth: spfAuth.$loaded(),
     currentUser: spfAuthData.user(),
     profile: profilePromise,
     currentUserProfile: profilePromise,
@@ -88,7 +88,7 @@ function clmShowProfileInitialDataResolver($q, $route, spfAuth, spfAuthData, clm
   });
 
   return $q.all({
-    auth: spfAuth,
+    auth: spfAuth.$loaded(),
     currentUser: spfAuthData.user().catch(noop),
     currentUserProfile: clmDataStore.currentUserProfile(),
     profile: profilePromise,
@@ -113,8 +113,6 @@ function ClmProfileCtrl(
   this.currentUserProfile = initialData.currentUserProfile;
   this.profile = initialData.profile;
   this.settings = initialData.settings;
-
-  console.log(this.settings);
 
   if (
     this.profile &&

@@ -2,6 +2,13 @@ import {testInjectMatch, sinon, expect} from 'singpath-core/tools/chai.js';
 
 import * as datastore from './datastore.js';
 
+function wait(delay) {
+  delay = delay || 10;
+
+  return new Promise(resolve => {
+    setTimeout(resolve, delay);
+  });
+}
 
 describe('datastore service.', function() {
 
@@ -72,9 +79,9 @@ describe('datastore service.', function() {
     });
 
     it('should set user and profile when the current user is logged off', function() {
-      expect(currentUser.firebaseUser).to.be.null();
-      expect(currentUser.user).to.be.null();
-      expect(currentUser.profile).to.be.null();
+      expect(currentUser.firebaseUser).to.be.undefined();
+      expect(currentUser.user).to.be.undefined();
+      expect(currentUser.profile).to.be.undefined();
     });
 
     describe('authChangedHandler', function() {
@@ -1036,18 +1043,20 @@ describe('datastore service.', function() {
   });
 
   describe('spfAuth', function() {
-    let spfAuth, firebaseAuth, $auth, currentUser, $route, $log, $firebaseAuth, authFirebaseApp, authProvider;
+    let $q, spfAuth, firebaseAuth, $auth, currentUser, $route, $log, $firebaseAuth, authFirebaseApp, authProvider;
 
     beforeEach(function() {
+      $q = fn => new Promise(fn);
+      $q.resolve = v => Promise.resolve(v);
+      $q.reject = v => Promise.reject(v);
+
       currentUser = {};
       firebaseAuth = {};
       $auth = {
-        $getAuth: sinon.stub(),
         $signInWithPopup: sinon.stub(),
         $signOut: sinon.stub(),
         $onAuthStateChanged: sinon.stub()
       };
-      $auth.$getAuth.returns(currentUser);
       $route = {reload: sinon.spy()};
       $log = {error: sinon.spy(), debug: sinon.spy()};
       authFirebaseApp = {auth: sinon.stub()};
@@ -1055,13 +1064,13 @@ describe('datastore service.', function() {
       $firebaseAuth = sinon.stub();
       $firebaseAuth.withArgs(firebaseAuth).returns($auth);
       authProvider = {};
-      spfAuth = datastore.spfAuthFactory($route, $log, $firebaseAuth, authFirebaseApp, authProvider);
+      spfAuth = datastore.spfAuthFactory($q, $route, $log, $firebaseAuth, authFirebaseApp, authProvider);
     });
 
     testInjectMatch(datastore.spfAuthFactory);
 
-    it('should set current user state', function() {
-      expect(spfAuth.user).to.equal(currentUser);
+    it('should set current user state to undefined', function() {
+      expect(spfAuth.user).to.be.undefined();
     });
 
     it('should update current user on state changes', function() {
@@ -1074,7 +1083,7 @@ describe('datastore service.', function() {
       handler(newState);
       expect(spfAuth.user).to.equal(newState);
       handler();
-      expect(spfAuth.user).to.be.undefined();
+      expect(spfAuth.user).to.be.null();
     });
 
     describe('userInfo', function() {
@@ -1179,6 +1188,83 @@ describe('datastore service.', function() {
       });
     });
 
+    describe('$loaded', function() {
+      let unsubscribe;
+
+      beforeEach(function() {
+        unsubscribe = sinon.spy();
+        sinon.stub(spfAuth, 'onAuth');
+        spfAuth.onAuth.returns(unsubscribe);
+      });
+
+      it('should resolve if the user is already set', function() {
+        spfAuth.user = null;
+
+        return spfAuth.$loaded().then(
+          () => expect(spfAuth.onAuth).to.not.have.been.called()
+        );
+      });
+
+      it('should resolve when the user get set', function() {
+        const promise = spfAuth.$loaded();
+
+        return wait().then(() => {
+          expect(spfAuth.onAuth).to.have.been.calledOnce();
+          expect(spfAuth.onAuth).to.have.been.calledWith(sinon.match.func);
+
+          const handler = spfAuth.onAuth.lastCall.args[0];
+
+          spfAuth.user = null;
+          handler();
+
+          return promise;
+        });
+      });
+
+      it('should stop watching for auth change after resolving', function() {
+        const promise = spfAuth.$loaded();
+
+        return wait().then(() => {
+          const handler = spfAuth.onAuth.lastCall.args[0];
+
+          expect(unsubscribe).to.not.have.been.called();
+
+          spfAuth.user = null;
+          handler();
+
+          expect(unsubscribe).to.have.been.calledOnce();
+
+          return promise;
+        });
+      });
+
+    });
+
+    describe('requireLoggedIn', function() {
+
+      beforeEach(function() {
+        sinon.stub(spfAuth, '$loaded');
+        spfAuth.$loaded.returns(Promise.resolve());
+      });
+
+      it('should resolve if the user is logged in', function() {
+        spfAuth.user = {uid: 'google:bob'};
+
+        return spfAuth.requireLoggedIn().then(() => {
+          expect(spfAuth.$loaded).to.have.been.calledOnce();
+        });
+      });
+
+      it('should reject if the user is not logged in', function() {
+        spfAuth.user = null;
+
+        return spfAuth.requireLoggedIn().then(
+          () => Promise.reject(new Error('unexpected')),
+          () => undefined
+        );
+      });
+    });
+
   });
 
   describe('spfAuthData', function() {
@@ -1188,19 +1274,27 @@ describe('datastore service.', function() {
       $q = (resolve, reject) => new Promise(resolve, reject);
       $q.resolve = v => Promise.resolve(v);
       $q.reject = e => Promise.reject(e);
+
       $log = {info: sinon.spy()};
+
       UserObject = sinon.stub();
       $firebaseObject = {$extend: sinon.stub()};
       $firebaseObject.$extend.returns(UserObject);
       db = {ref: sinon.stub()};
+
       authFirebaseApp = {database: sinon.stub()};
       authFirebaseApp.database.returns(db);
+
       spfAuth = {
         user: undefined,
         onAuth: sinon.stub(),
-        userInfo: sinon.stub()
+        userInfo: sinon.stub(),
+        $loaded: sinon.stub()
       };
+      spfAuth.$loaded.returns(Promise.resolve());
+
       spfCrypto = {md5: sinon.stub()};
+
       spfAuthData = datastore.spfAuthDataFactory($q, $log, $firebaseObject, authFirebaseApp, spfAuth, spfCrypto);
     });
 

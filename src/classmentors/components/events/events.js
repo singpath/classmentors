@@ -215,7 +215,7 @@ eventServiceFactory.$inject = [
 function classMentorsEventResolver($q, spfAuth, spfAuthData, clmDataStore) {
     return $q.all({
         events: clmDataStore.events.list(),
-        auth: spfAuth,
+        auth: spfAuth.$loaded(),
         currentUser: spfAuthData.user().catch(function () {
             return;
         }),
@@ -262,14 +262,13 @@ ClmListEvent.$inject = ['initialData', 'spfNavBarService', 'urlFor'];
  */
 function newEventCtrlInitialData($q, spfAuth, spfAuthData, clmDataStore) {
     var profilePromise;
-    var errLoggedOff = new Error('The user should be logged in to create an event.');
-    var errNotPremium = new Error('Only premium users can create events.');
+    var loggedIn = spfAuth.requireLoggedIn().catch(function() {
+        return $q.reject(new Error('The user should be logged in to create an event.'));
+    });
 
-    if (!spfAuth.user || !spfAuth.user.uid) {
-        return $q.reject(errLoggedOff);
-    }
-
-    profilePromise = clmDataStore.currentUserProfile().then(function (profile) {
+    profilePromise = loggedIn.then(function() {
+        return clmDataStore.currentUserProfile();
+    }).then(function (profile) {
         if (profile && profile.$value === null) {
             return clmDataStore.initProfile();
         }
@@ -279,14 +278,14 @@ function newEventCtrlInitialData($q, spfAuth, spfAuthData, clmDataStore) {
         if (
             !profile || !profile.user || !profile.user.isPremium
         ) {
-            return $q.reject(errNotPremium);
+            return $q.reject(new Error('Only premium users can create events.'));
         }
 
         return profile;
     });
 
     return $q.all({
-        auth: spfAuth,
+        auth: spfAuth.$loaded(),
         currentUser: spfAuthData.user(),
         profile: profilePromise
     });
