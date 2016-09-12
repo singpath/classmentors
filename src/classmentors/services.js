@@ -379,10 +379,6 @@ export function clmDataStoreFactory(
      *
      */
     currentUserProfile: function() {
-      if (!spfAuth.user || !spfAuth.user.uid) {
-        return $q.when();
-      }
-
       var currentUserPromise = spfAuthData.user();
       var profilePromise = spfAuthData.user().then(function(currentUser) {
         if (!currentUser.publicId) {
