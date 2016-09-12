@@ -37,13 +37,15 @@ export class SpfCurrentUserService {
     this.$spfProfilesPath = spfProfilesPath;
     this.$watchers = {};
 
-    this.uid = null;
-    this.firebaseUser = null;
-    this.publicId = null;
-    this.user = null;
+    this.firebaseUser = undefined;
+    this.uid = undefined;
+
+    this.user = undefined;
+    this.publicId = undefined;
+
+    this.profile = undefined;
     this.isAdmin = false;
     this.isPremium = false;
-    this.profile = null;
 
     this.$watchers.firebaseUser = spfAuth.onAuth(
       firebaseUser => this.authChangedHandler(firebaseUser)
