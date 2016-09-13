@@ -1014,35 +1014,33 @@ function ClmCohortRankPageCtrl($q, $scope, $log, firebaseApp, $firebaseObject, $
         loopDBEvents();
         function loopDBEvents() {
             var oneEventData = {};
-            var event = self.cohort.events[iter];
+            var eventId = self.cohort.events[iter];
 
             if(iter < self.cohort.events.length) {
-                var participantsRef = db.ref(`classMentors/eventParticipants/${event}`);
+                var participantsRef = db.ref(`classMentors/eventParticipants/${eventId}`);
                 var participantsQuery = participantsRef.limitToLast(100);
-                var participants = $firebaseArray(participantsQuery);
+                var participantsArray = $firebaseArray(participantsQuery);
 
-                participants.$loaded().then(function() {
-                    var result = participants;
-                    oneEventData.participants = result;
-                }).catch(function (err) {
-                    // prevent events with no participants from breaking the code by initialising their participant array to an empty one.
-                    oneEventData.participants = [];
-                    $log.error(err);
-                    return err;
-                }).then(function () {
-                    var eventRef = db.ref(`classMentors/events/${event}`);
-                    var event = $firebaseObject(eventRef);
+                participantsArray.$loaded().then(
+                    () => (oneEventData.participants = participantsArray),
+                    err => {
+                        oneEventData.participants = [];
+                        $log.error(err);
+                    }
+                ).then(function () {
+                    var eventRef = db.ref(`classMentors/events/${eventId}`);
+                    var eventObj = $firebaseObject(eventRef);
 
-                    event.$loaded().then(function() {
-                        var result = event;
+                    eventObj.$loaded().then(function() {
+                        var result = eventObj;
                         oneEventData.title = result.title;
                         self.cohortTotalParticipants += oneEventData.participants.length;
                         oneEventData.id = result.$id;
                         self.cohortEventData.push(oneEventData);
                         iter++;
                         loopDBEvents();
-                    })
-                })
+                    });
+                });
             } else {
                 self.cohortEventData.sort(function(a,b) {
                     return b.participants.length - a.participants.length;
