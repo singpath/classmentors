@@ -15,9 +15,7 @@ describe('ace component', function() {
     let navBarService;
 
     beforeEach(function() {
-      navBarService = {
-        update: sinon.spy()
-      };
+      navBarService = {update: sinon.spy()};
     });
 
     it('should update the navbar title', function() {
@@ -44,9 +42,7 @@ describe('getStats resolver helper', function() {
   let http;
 
   beforeEach(function() {
-    http = {
-      get: sinon.stub().returns(Promise.reject())
-    };
+    http = {get: sinon.stub().returns(Promise.reject())};
   });
 
   it('should fetch the ace stats', function() {

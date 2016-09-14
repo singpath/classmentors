@@ -1,9 +1,9 @@
 /**
  * Created by AMOS on 10/7/16.
  */
+/* eslint indent: ["error", 4] */
 
-
-//TODO: Add various imports for challenge(s)
+// TODO: Add various imports for challenge(s)
 import * as mcq from './mcq/mcq.js';
 import * as survey from './survey/survey.js';
 import * as team from './teamActivity/teamactivity.js';
@@ -11,25 +11,21 @@ import {cleanObj} from 'singpath-core/services/firebase.js';
 
 const noop = () => undefined;
 
-//TODO: Add config for routing to various challenges
-export function configRoute($routeProvider, routes){
+// TODO: Add config for routing to various challenges
+export function configRoute($routeProvider, routes) {
     $routeProvider
         .when(routes.viewMcq, {
             template: mcq.newMcqTmpl,
             controller: mcq.newMcqController,
             controllerAs: 'ctrl',
-            resolve:{
-              initialData: createMCQInitialData
-            }
+            resolve: {initialData: createMCQInitialData}
         })
 
         .when(routes.editMcq, {
             template: mcq.editMcqTmpl,
             controller: mcq.editMcqController,
             controllerAs: 'ctrl',
-            resolve:{
-              initialData: editMCQInitialData
-            }
+            resolve: {initialData: editMCQInitialData}
 
         })
 
@@ -37,43 +33,33 @@ export function configRoute($routeProvider, routes){
             template: survey.showSurveyTmpl,
             controller: surveyFormEvent,
             controllerAs: 'ctrl',
-            resolve: {
-                initialData: getTaskSurveyValues
-            }
+            resolve: {initialData: getTaskSurveyValues}
         })
 
         .when(routes.startMcq, {
             template: mcq.starMcqTmpl,
             controller: mcq.startMcqController,
             controllerAs: 'ctrl',
-            resolve:{
-              initialData: startMCQInitialData
-            }
+            resolve: {initialData: startMCQInitialData}
         })
 
         .when(routes.createTeamActivity, {
             template: team.teamActivityCreateTmpl,
             controller: team.createTeamActivityController,
             controllerAs: 'ctrl',
-            resolve:{
-                initialData: team.createTeamActivityInitialData
-            }
+            resolve: {initialData: team.createTeamActivityInitialData}
         })
-        .when(routes.viewIRAT,{
+        .when(routes.viewIRAT, {
             template: team.teamIRATTmpl,
             controller: team.startIRATController,
-            controllerAs:'ctrl',
-            resolve:{
-                initialData: team.createTeamActivityInitialData
-            }
+            controllerAs: 'ctrl',
+            resolve: {initialData: team.createTeamActivityInitialData}
         })
-        .when(routes.viewTRAT,{
+        .when(routes.viewTRAT, {
             template: team.teamTRATTmpl,
             controller: team.startTRATController,
-            controllerAs:'ctrl',
-            resolve:{
-                initialData: team.createTeamActivityInitialData
-            }
+            controllerAs: 'ctrl',
+            resolve: {initialData: team.createTeamActivityInitialData}
 
         });
 
@@ -81,18 +67,18 @@ export function configRoute($routeProvider, routes){
 configRoute.$inject = ['$routeProvider', 'routes'];
 
 
-function editMCQInitialData($q, eventService, clmDataStore){
-  var data = eventService.get();
-  console.log(data);
-  return clmDataStore.events.getTaskAnswers(data.event.$id, data.task.$id).then(
-      function(result){
-        return {
-          data: data,
-          savedAnswers: result
-        }
-      }, function(error){
+function editMCQInitialData($q, eventService, clmDataStore) {
+    var data = eventService.get();
+    console.log(data);
+    return clmDataStore.events.getTaskAnswers(data.event.$id, data.task.$id).then(
+      function(result) {
+          return {
+              data: data,
+              savedAnswers: result
+          };
+      }, function(error) {
         console.log(error);
-      }
+    }
   );
 }
 editMCQInitialData.$inject = [
@@ -102,27 +88,29 @@ editMCQInitialData.$inject = [
 ];
 
 // Initial data for starting an MCQ
-//todo: tidy up the codes; should be using promises to access some objects as well as validation
-function startMCQInitialData($q, spfAuthData, eventService, clmDataStore){
-    //promise object
+// todo: tidy up the codes; should be using promises to access some objects as well as validation
+function startMCQInitialData($q, spfAuthData, eventService, clmDataStore) {
+
+    // promise object
    // var currentUser = spfAuthData.user().catch(noop);
 
-    var data =  eventService.get();
+    var data = eventService.get();
 
-    console.log("the data is here...,", data);
-    //console.log("current user now is.", currentUser);
+    console.log('the data is here...,', data);
 
-    return $q.all ({
-       currentUser: spfAuthData.user(),
+    // console.log("current user now is.", currentUser);
+
+    return $q.all({
+        currentUser: spfAuthData.user(),
         answers: clmDataStore.events.getTaskAnswers(data.eventId, data.taskId),
         getProgress: clmDataStore.events.getProgress(data.eventId)
-    }).then (function (result){
+    }).then(function(result) {
         return {
             data: data,
             correctAnswers: result.answers,
             currentUser: result.currentUser,
             progress: result.getProgress
-        }
+        };
     });
 
     // return clmDataStore.events.getTaskAnswers(data.eventId, data.taskId).then(
@@ -142,120 +130,120 @@ startMCQInitialData.$inject = [
     'spfAuthData',
     'eventService',
     'clmDataStore'
-]
+];
 
 // Initial data for creating MCQ
-function createMCQInitialData($q, eventService){
-  var data =  eventService.get();
-  console.log("data initialised are............................",data);
-  return data;
+function createMCQInitialData($q, eventService) {
+    var data = eventService.get();
+    console.log('data initialised are............................', data);
+    return data;
 }
 createMCQInitialData.$inject = [
-  '$q',
-  'eventService'
-]
+    '$q',
+    'eventService'
+];
 
-//TODO: Generic save function
-export function challengeServiceFactory
-  ($q, $route, spfAuthData, clmDataStore, $log, spfAlert, $location, urlFor){
-  return {
-    save : function(event, taskId, task, taskType, isOpen) {
-      var copy = cleanObj(task);
-      var answers = copy.answers;
-      console.log('COPY IS ... ', copy);
+// TODO: Generic save function
+export function challengeServiceFactory($q, $route, spfAuthData, clmDataStore, $log, spfAlert, $location, urlFor) {
+    return {
+        save: function(event, taskId, task, taskType, isOpen) {
+            var copy = cleanObj(task);
+            var answers = copy.answers;
+            console.log('COPY IS ... ', copy);
 
-      self.creatingTask = true;
-      if (taskType === 'multipleChoice'){
-        delete copy.singPathProblem;
-        delete copy.badge;
-        delete copy.answers;
+            self.creatingTask = true;
+            if (taskType === 'multipleChoice') {
+                delete copy.singPathProblem;
+                delete copy.badge;
+                delete copy.answers;
 
-        var ref = clmDataStore.events.addTaskWithAns(event.$id, copy, isOpen,answers);
-        ref.then(function() {
-            spfAlert.success('Task created');
-            $location.path(urlFor('editEvent', {eventId: event.$id}));
-        }).catch(function(err) {
-            $log.error(err);
-            spfAlert.error('Failed to created new task');
-        }).finally(function() {
-            self.creatingTask = false;
-        });
+                var ref = clmDataStore.events.addTaskWithAns(event.$id, copy, isOpen, answers);
+                ref.then(function() {
+                    spfAlert.success('Task created');
+                    $location.path(urlFor('editEvent', {eventId: event.$id}));
+                }).catch(function(err) {
+                    $log.error(err);
+                    spfAlert.error('Failed to created new task');
+                }).finally(function() {
+                    self.creatingTask = false;
+                });
 
-      } else if(taskType === 'teamActivity'){
-        delete copy.singPathProblem;
-        delete copy.badge;
-        delete copy.answers;
-        console.log(copy);
+            } else if (taskType === 'teamActivity') {
+                delete copy.singPathProblem;
+                delete copy.badge;
+                delete copy.answers;
+                console.log(copy);
+
         // Create reccord in eventTeams
 
         // Create reccord in answers and tasks
-        var ref = clmDataStore.events.addTaskWithAns(event.$id, copy, isOpen,answers);
-        ref.then(function() {
-            spfAlert.success('Task created');
-            $location.path(urlFor('editEvent', {eventId: event.$id}));
-        }).catch(function(err) {
-            $log.error(err);
-            spfAlert.error('Failed to created new task');
-        }).finally(function() {
-            self.creatingTask = false;
-        });
-      }
+                var ref = clmDataStore.events.addTaskWithAns(event.$id, copy, isOpen, answers);
+                ref.then(function() {
+                    spfAlert.success('Task created');
+                    $location.path(urlFor('editEvent', {eventId: event.$id}));
+                }).catch(function(err) {
+                    $log.error(err);
+                    spfAlert.error('Failed to created new task');
+                }).finally(function() {
+                    self.creatingTask = false;
+                });
+            }
 
 
+        },
+        update: function(event, taskId, task, taskType, isOpen) {
+            var copy = cleanObj(task);
+            var answers = copy.answers;
+            console.log('COPY IS ... ', copy);
+            if (taskType === 'linkPattern') {
+                delete copy.badge;
+                delete copy.serviceId;
+                delete copy.singPathProblem;
+            } else if (copy.serviceId === 'singPath') {
+                delete copy.badge;
+                if (copy.singPathProblem) {
+                    copy.singPathProblem.path = cleanObj(task.singPathProblem.path);
+                    copy.singPathProblem.level = cleanObj(task.singPathProblem.level);
+                    copy.singPathProblem.problem = cleanObj(task.singPathProblem.problem);
+                }
+            } else if (taskType === 'multipleChoice') {
+                delete copy.singPathProblem;
+                delete copy.badge;
+                delete copy.answers;
+            } else {
+                delete copy.singPathProblem;
+                copy.badge = cleanObj(task.badge);
+            }
 
-    },
-    update: function(event, taskId, task, taskType, isOpen) {
-      var copy = cleanObj(task);
-      var answers = copy.answers;
-      console.log('COPY IS ... ', copy);
-      if (taskType === 'linkPattern') {
-        delete copy.badge;
-        delete copy.serviceId;
-        delete copy.singPathProblem;
-      } else if (copy.serviceId === 'singPath') {
-        delete copy.badge;
-        if (copy.singPathProblem) {
-          copy.singPathProblem.path = cleanObj(task.singPathProblem.path);
-          copy.singPathProblem.level = cleanObj(task.singPathProblem.level);
-          copy.singPathProblem.problem = cleanObj(task.singPathProblem.problem);
-        }
-      }else if (taskType === 'multipleChoice'){
-        delete copy.singPathProblem;
-        delete copy.badge;
-        delete copy.answers;
-      } else {
-        delete copy.singPathProblem;
-        copy.badge = cleanObj(task.badge);
-      }
+            if (!copy.link) {
 
-      if (!copy.link) {
         // delete empty link. Can't be empty string
-        delete copy.link;
-      }
+                delete copy.link;
+            }
 
-      self.creatingTask = true;
-      var ref = clmDataStore.events.updateTaskWithAns(event.$id, taskId, copy, answers);
-      ref.then(function() {
-        if (
+            self.creatingTask = true;
+            var ref = clmDataStore.events.updateTaskWithAns(event.$id, taskId, copy, answers);
+            ref.then(function() {
+                if (
             (isOpen && task.openedAt) ||
             (!isOpen && task.closedAt)
         ) {
-          return;
-        } else if (isOpen) {
-          return clmDataStore.events.openTask(event.$id, taskId);
-        }
+                    return;
+                } else if (isOpen) {
+                    return clmDataStore.events.openTask(event.$id, taskId);
+                }
 
-        return clmDataStore.events.closeTask(event.$id, taskId);
-      }).then(function() {
-        spfAlert.success('Task saved');
-        $location.path(urlFor('editEvent', {eventId: event.$id}));
-      }).catch(function() {
-        spfAlert.error('Failed to save the task.');
-      }).finally(function() {
-        self.savingTask = false;
-      });;
-    }
-  }
+                return clmDataStore.events.closeTask(event.$id, taskId);
+            }).then(function() {
+                spfAlert.success('Task saved');
+                $location.path(urlFor('editEvent', {eventId: event.$id}));
+            }).catch(function() {
+                spfAlert.error('Failed to save the task.');
+            }).finally(function() {
+                self.savingTask = false;
+            });
+        }
+    };
 }
 challengeServiceFactory.$inject =
     ['$q', '$route', 'spfAuthData', 'clmDataStore', '$log', 'spfAlert', '$location', 'urlFor'];
@@ -272,13 +260,15 @@ function surveyFormEvent($scope, clmSurvey, clmDataStore, $log, spfAlert, $locat
         {id: 3, name: 'School engagement scale'}
 
     ];
-    //TODO: retrieve selected value, add task into firebase
+
+    // TODO: retrieve selected value, add task into firebase
     var sharedData = clmSurvey.get();
-    //console.log("surveyFormEvent eventId : " + sharedData.taskType);
+
+    // console.log("surveyFormEvent eventId : " + sharedData.taskType);
     var getTask = sharedData.task;
     var self = this;
 
-    this.saveSurveyTask = function (surveyType) {
+    this.saveSurveyTask = function(surveyType) {
         var copy = cleanObj(getTask);
         console.log('my copy is ', copy);
         if (sharedData.taskType === 'linkPattern') {
@@ -298,20 +288,21 @@ function surveyFormEvent($scope, clmSurvey, clmDataStore, $log, spfAlert, $locat
         }
 
         if (!copy.link) {
+
             // delete empty link. Can't be empty string
             delete copy.link;
         }
 
         self.creatingTask = true;
-        console.log("survey type is " + surveyType);
+        console.log('survey type is ' + surveyType);
         copy.survey = surveyType;
-        clmDataStore.events.addTask(sharedData.eventId, copy, sharedData.isOpen).then(function () {
+        clmDataStore.events.addTask(sharedData.eventId, copy, sharedData.isOpen).then(function() {
             spfAlert.success('Challenge created');
             $location.path(urlFor('editEvent', {eventId: sharedData.eventId}));
-        }).catch(function (err) {
+        }).catch(function(err) {
             $log.error(err);
             spfAlert.error('Failed to create new challenge.');
-        }).finally(function () {
+        }).finally(function() {
             self.creatingTask = false;
         });
     };
@@ -333,9 +324,9 @@ function getTaskSurveyValues(clmSurvey, $q, $route, spfAuthData, clmDataStore) {
 
     var data = baseEditCtrlInitialData(sharedData, $q, $route, spfAuthData, clmDataStore, clmSurvey);
     if (data != null) {
-        console.log("Data is not null!!!");
+        console.log('Data is not null!!!');
     } else {
-        console.log("DATA IS NULLLL!!");
+        console.log('DATA IS NULLLL!!');
     }
     data.badges = clmDataStore.badges.all();
     data.singPath = $q.all({
@@ -357,7 +348,7 @@ function baseEditCtrlInitialData(sharedData, $q, $route, spfAuthData, clmDataSto
     var errNotAuthaurized = new Error('You cannot edit this event');
     var eventId = $route.current.params.eventId;
 
-    var eventPromise = clmDataStore.events.get(sharedData.eventId).then(function (event) {
+    var eventPromise = clmDataStore.events.get(sharedData.eventId).then(function(event) {
         if (event.$value === null) {
             return $q.reject(errNoEvent);
         }
@@ -368,11 +359,11 @@ function baseEditCtrlInitialData(sharedData, $q, $route, spfAuthData, clmDataSto
         currentUser: spfAuthData.user(),
         event: eventPromise
     };
-    console.log("current user id: " + data.currentUser);
+    console.log('current user id: ' + data.currentUser);
     data.canEdit = $q.all({
         currentUser: spfAuthData.user(),
         event: eventPromise
-    }).then(function (result) {
+    }).then(function(result) {
         if (
             !result.currentUser.publicId || !result.event.owner || !result.event.owner.publicId ||
             result.event.owner.publicId !== result.currentUser.publicId

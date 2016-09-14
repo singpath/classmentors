@@ -21,31 +21,31 @@ export function cmTruncateFilterBooleanFactory() {
   return function cmTruncateBoolean(s, limit) {
     if (!s || !s.length || !limit) {
       return {
-          content: '',
-          truncated: false
+        content: '',
+        truncated: false
       };
     }
 
     if (s.length <= limit) {
       return {
-          content: s,
-          truncated: false
+        content: s,
+        truncated: false
       };
     }
 
     return {
-        content: `${s.slice(0, limit)}...`,
-        truncated: true
+      content: `${s.slice(0, limit)}...`,
+      truncated: true
     };
   };
 }
 cmTruncateFilterBooleanFactory.$inject = [];
 
 export function showSchoolFilterFactory() {
-    return function showSchool(s) {
-        var obj = JSON.parse(s);
+  return function showSchool(s) {
+    var obj = JSON.parse(s);
 
-        return `${obj.school.name}...`;
-    };
+    return `${obj.school.name}...`;
+  };
 }
 showSchoolFilterFactory.$inject = [];

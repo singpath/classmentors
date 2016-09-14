@@ -1173,21 +1173,21 @@ export function clmDataStoreFactory(
         );
       },
 
-        _hasDoneSurvey: function (task, solutions) {
-            return(
+      _hasDoneSurvey: function(task, solutions) {
+        return (
               task.survey &&
               solutions &&
               solutions[task.$id]
             );
-        },
+      },
 
-        _hasDoneMcq: function (task, solutions) {
-            return(
+      _hasDoneMcq: function(task, solutions) {
+        return (
                 task.mcqQuestions &&
                 solutions &&
                 solutions[task.$id]
             );
-        },
+      },
 
       _solvedProblems: function(singPathProfile) {
         var queueId = 'default';
@@ -1327,6 +1327,7 @@ export function clmDataStoreFactory(
           // 4. save data
 
           return $q.all([
+
             // 2. check completness and update progress if needed.
             $q.when(clmDataStore.events._getProgress(tasks, data)).then(function(progress) {
               var ref = db.ref(`classMentors/eventProgress/${event.$id}/${data.classMentors.$id}`);
@@ -1484,25 +1485,25 @@ export function clmDataStoreFactory(
         var ref;
 
         if (!responses) {
-            return $q.reject(new Error('No responses provided'));
+          return $q.reject(new Error('No responses provided'));
         }
         if (!questionNumber) {
-            return $q.reject(new Error('Invalid survey question'));
+          return $q.reject(new Error('Invalid survey question'));
         }
         if (!taskId) {
-            return $q.reject(new Error('No task id provided'));
+          return $q.reject(new Error('No task id provided'));
         }
         if (!eventId) {
-            return $q.reject(new Error('No event id provided'));
+          return $q.reject(new Error('No event id provided'));
         }
         if (!userId) {
-            return $q.reject(new Error('No user id provided'));
+          return $q.reject(new Error('No user id provided'));
         }
-        if(!surveyTask){
-            return $q.reject(new Error('No survey task provided'));
+        if (!surveyTask) {
+          return $q.reject(new Error('No survey task provided'));
         }
-        if(!qnTitle){
-            return $q.reject(new Error('No question title provided'));
+        if (!qnTitle) {
+          return $q.reject(new Error('No question title provided'));
         }
 
         ref = db.ref(

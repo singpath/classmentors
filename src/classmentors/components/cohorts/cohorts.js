@@ -1,6 +1,8 @@
 /**
  * classmentors/components/cohorts/cohorts.js- define cohort component.
  */
+/* eslint indent: ["error", 4] */
+
 import {cleanObj} from 'singpath-core/services/firebase.js';
 import cohortTmpl from './cohorts-view.html!text';
 import newCohortTmpl from './cohorts-new-cohort.html!text';
@@ -14,9 +16,7 @@ import './cohorts.css!';
 
 const noop = () => undefined;
 
-export const component = {
-    controller: ViewCohortCtrl
-};
+export const component = {controller: ViewCohortCtrl};
 
 export function configRoute($routeProvider, routes) {
     $routeProvider
@@ -24,38 +24,30 @@ export function configRoute($routeProvider, routes) {
             template: cohortTmpl,
             controller: ClmListCohorts,
             controllerAs: 'ctrl',
-            resolve: {
-                initialData: classMentorsCohortResolver
-            }
+            resolve: {initialData: classMentorsCohortResolver}
         })
         .when(routes.newCohort, {
             template: newCohortTmpl,
             controller: NewCohortCtrl,
             controllerAs: 'ctrl',
-            resolve: {
-                initialData: newCohortCtrlInitialData
-            }
+            resolve: {initialData: newCohortCtrlInitialData}
         })
         .when(routes.viewCohort, {
             template: cohortViewTmpl,
             controller: ViewCohortCtrl,
             controllerAs: 'ctrl',
-            resolve: {
-                initialData: viewCohortCtrlInitialData
-            }
+            resolve: {initialData: viewCohortCtrlInitialData}
         })
         .when(routes.editCohort, {
             template: cohortEditTmpl,
             controller: EditCohortCtrl,
             controllerAs: 'ctrl',
-            resolve: {
-                initialData: editCohortCtrlInitialData
-            }
+            resolve: {initialData: editCohortCtrlInitialData}
         });
 }
 configRoute.$inject = ['$routeProvider', 'routes'];
 
-function ClmListCohorts (initialData, spfNavBarService, urlFor, spfAuthData) {
+function ClmListCohorts(initialData, spfNavBarService, urlFor, spfAuthData) {
 
     const title = 'Cohorts';
     const parentPages = [];
@@ -73,12 +65,12 @@ function ClmListCohorts (initialData, spfNavBarService, urlFor, spfAuthData) {
 
     this.joinedCohorts = [];
 
-    for(var i=0; i<this.allCohorts.length; i++) {
+    for (var i = 0; i < this.allCohorts.length; i++) {
         var cohort = this.allCohorts[i];
         var cohortEvents = cohort.events;
-        for(var j=0; j<this.joinedEvents.length; j++) {
+        for (var j = 0; j < this.joinedEvents.length; j++) {
             var eventId = this.joinedEvents[j].$id;
-            if(cohortEvents.indexOf(eventId) > -1) {
+            if (cohortEvents.indexOf(eventId) > -1) {
                 this.joinedCohorts.push(cohort);
                 break;
             }
@@ -207,9 +199,7 @@ function NewCohortCtrl(
                     displayName: currentUser.displayName,
                     gravatar: currentUser.gravatar
                 },
-                createdAt: {
-                    '.sv': 'timestamp'
-                },
+                createdAt: {'.sv': 'timestamp'},
                 events: events,
                 featured: featured
             }, newCohort);
@@ -228,9 +218,7 @@ function NewCohortCtrl(
     };
 
     this.reset = function(cohortForm) {
-        this.newCohort = {
-            data: {}
-        };
+        this.newCohort = {data: {}};
 
         if (cohortForm && cohortForm.$setPristine) {
             cohortForm.$setPristine();
@@ -389,15 +377,15 @@ function ViewCohortCtrl(
         return options;
     }
 
-    this.loadEventChallenges = function () {
-      var ref = db.ref(`classMentors/eventTasks/${self.selectedEvent}`);
-      var obj = $firebaseObject(ref);
+    this.loadEventChallenges = function() {
+        var ref = db.ref(`classMentors/eventTasks/${self.selectedEvent}`);
+        var obj = $firebaseObject(ref);
 
-      obj.$loaded().then(function() {
-        self.eventChallenges = obj;
-      }).catch(function(err) {
-        $log.error(err);
-      });
+        obj.$loaded().then(function() {
+            self.eventChallenges = obj;
+        }).catch(function(err) {
+            $log.error(err);
+        });
     };
 
     this.duplicateChallenges = function() {
@@ -406,22 +394,22 @@ function ViewCohortCtrl(
         var eventIndex = 0;
         insertChallenge();
         function insertChallenge() {
-            if(eventIndex < self.selectedEvents.length) {
+            if (eventIndex < self.selectedEvents.length) {
                 var eventId = self.selectedEvents[eventIndex];
                 clmDataStore.events.addTask(eventId, self.selectedChallenge, true)
-                    .then( function () {
-                        console.log(self.selectedChallenge.title + " inserted into " + eventId);
+                    .then(function() {
+                        console.log(self.selectedChallenge.title + ' inserted into ' + eventId);
                         eventIndex++;
                     })
-                    .then(function () {
+                    .then(function() {
                         insertChallenge();
                     })
-                    .catch(function (err) {
+                    .catch(function(err) {
                         $log.error(err);
                         return err;
                     });
             } else {
-                spfAlert.success(self.selectedChallenge.title + " inserted into selected events");
+                spfAlert.success(self.selectedChallenge.title + ' inserted into selected events');
                 self.selectedEvent = null;
                 self.selectedChallenge = null;
                 self.selectedEvents = null;
@@ -434,9 +422,9 @@ function ViewCohortCtrl(
             clickOutsideToClose: true,
             parent: $document.body,
             template: '<md-dialog aria-label="Announcement dialog" class="announcement-dialog">' +
-            '  <md-dialog-content class="sticky-container">'+
+            '  <md-dialog-content class="sticky-container">' +
             '<md-subheader class="md-sticky-no-effect">{{ctrl.title}}</md-subheader>' +
-            '    <div style="white-space: pre-wrap;">{{ctrl.content}}</div>'+
+            '    <div style="white-space: pre-wrap;">{{ctrl.content}}</div>' +
             '  </md-dialog-content>' +
             '  <md-dialog-actions>' +
             '    <md-button ng-click="ctrl.closeDialog()" class="md-primary">' +
@@ -582,12 +570,12 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
     this.searchEvent = null;
     this.querySearch = querySearch;
 
-    function querySearch (query) {
-        return query ? self.mappedEvents.filter( createFilterFor(query) ) : self.mappedEvents;
+    function querySearch(query) {
+        return query ? self.mappedEvents.filter(createFilterFor(query)) : self.mappedEvents;
     }
 
     function mapAllEvents() {
-        return self.eventsArr.map( function (event) {
+        return self.eventsArr.map(function(event) {
             return {
                 id: event.$id,
                 value: event.title.toLowerCase(),
@@ -599,6 +587,7 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
     function createFilterFor(query) {
         var lowercaseQuery = angular.lowercase(query);
         return function filterFn(event) {
+
             // to filter results based on query and ensure that user cannot select events already in the cohort
             return (event.value.indexOf(lowercaseQuery) >= 0 && self.cohort.events.indexOf(event.id) < 0);
         };
@@ -617,15 +606,15 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
     this.removeCohortEvent = function(eventId, eventIndex) {
         var newEventArray = self.cohort.events;
         newEventArray.splice(eventIndex, 1);
-        clmDataStore.cohorts.removeEvent(self.cohort.$id, newEventArray).then(function () {
+        clmDataStore.cohorts.removeEvent(self.cohort.$id, newEventArray).then(function() {
             spfAlert.success('Removed event');
-        }).catch(function (err) {
+        }).catch(function(err) {
             spfAlert.error('Failed to remove event');
         });
     };
 
-    this.saveAddedEvent = function () {
-        console.log(self.selectedEvent.id + "  " + self.cohort.$id);
+    this.saveAddedEvent = function() {
+        console.log(self.selectedEvent.id + '  ' + self.cohort.$id);
 
         clmDataStore.cohorts.addEvent(self.cohort.$id, self.selectedEvent.id, self.cohort.events.length).then(function() {
             spfAlert.success(self.selectedEvent.title + ' has been added to the cohort!');
@@ -638,31 +627,31 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
         });
     };
 
-    this.addEvent = function () {
+    this.addEvent = function() {
         self.addingEvent = true;
     };
 
-    this.closeAddingEvent = function () {
+    this.closeAddingEvent = function() {
         self.addingEvent = false;
     };
 
-    this.toggleEvents = function () {
-        if(self.showingEvents) {
+    this.toggleEvents = function() {
+        if (self.showingEvents) {
             self.showingEvents = false;
         } else {
             self.showingEvents = true;
         }
     };
 
-    this.toggleAnnouncements = function () {
-        if(self.showingAnnouncements) {
+    this.toggleAnnouncements = function() {
+        if (self.showingAnnouncements) {
             self.showingAnnouncements = false;
         } else {
             self.showingAnnouncements = true;
         }
     };
 
-    this.createNewAnnouncement = function () {
+    this.createNewAnnouncement = function() {
         self.creatingNewAnnouncement = true;
         self.newAnnouncement.featured = false;
         self.newAnnouncement.visible = true;
@@ -690,12 +679,12 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
     this.saveAnnouncement = function(cohortId) {
         clmDataStore.cohorts.addAnnouncement(cohortId, this.currentUser, this.newAnnouncement, false).then(function() {
             spfAlert.success('Announcement created');
-        }).catch(function () {
+        }).catch(function() {
             spfAlert.error('Failed to create announcement');
-        }).finally(function () {
+        }).finally(function() {
             self.creatingNewAnnouncement = false;
             self.newAnnouncement = {};
-        })
+        });
     };
 
     this.featureAnnouncement = function(cohortId, announcementId) {
@@ -796,33 +785,37 @@ function ClmCohortStatsPageCtrl(
     this.selectedStatistic = null;
 
     this.renderDashboard = function() {
-        if(self.selectedStatistic) {
-            if(self.selectedStatistic == 'Submission time series') {
+        if (self.selectedStatistic) {
+            if (self.selectedStatistic == 'Submission time series') {
+
                 // How formatted data should look like
                 var dataObj = {};
+
                 // dataObj = {"setosa_x": [3.5, 3.0, 3.2, 3.1, 3.6, 3.9, 3.4, 3.4, 2.9, 3.1, 3.7, 3.4, 3.0, 3.0, 4.0, 4.4, 3.9, 3.5, 3.8, 3.8, 3.4, 3.7, 3.6, 3.3, 3.4, 3.0, 3.4, 3.5, 3.4, 3.2, 3.1, 3.4, 4.1, 4.2, 3.1, 3.2, 3.5, 3.6, 3.0, 3.4, 3.5, 2.3, 3.2, 3.5, 3.8, 3.0, 3.8, 3.2, 3.7, 3.3],
                 //     "versicolor_x": [3.2, 3.2, 3.1, 2.3, 2.8, 2.8, 3.3, 2.4, 2.9, 2.7, 2.0, 3.0, 2.2, 2.9, 2.9, 3.1, 3.0, 2.7, 2.2, 2.5, 3.2, 2.8, 2.5, 2.8, 2.9, 3.0, 2.8, 3.0, 2.9, 2.6, 2.4, 2.4, 2.7, 2.7, 3.0, 3.4, 3.1, 2.3, 3.0, 2.5, 2.6, 3.0, 2.6, 2.3, 2.7, 3.0, 2.9, 2.9, 2.5, 2.8],
                 //     "setosa": [0.2, 0.2, 0.2, 0.2, 0.2, 0.4, 0.3, 0.2, 0.2, 0.1, 0.2, 0.2, 0.1, 0.1, 0.2, 0.4, 0.4, 0.3, 0.3, 0.3, 0.2, 0.4, 0.2, 0.5, 0.2, 0.2, 0.4, 0.2, 0.2, 0.2, 0.2, 0.4, 0.1, 0.2, 0.2, 0.2, 0.2, 0.1, 0.2, 0.2, 0.3, 0.3, 0.2, 0.6, 0.4, 0.3, 0.2, 0.2, 0.2, 0.2],
                 //     "versicolor": [1.4, 1.5, 1.5, 1.3, 1.5, 1.3, 1.6, 1.0, 1.3, 1.4, 1.0, 1.5, 1.0, 1.4, 1.3, 1.4, 1.5, 1.0, 1.5, 1.1, 1.8, 1.3, 1.5, 1.2, 1.3, 1.4, 1.4, 1.7, 1.5, 1.0, 1.1, 1.0, 1.2, 1.6, 1.5, 1.6, 1.5, 1.3, 1.3, 1.3, 1.2, 1.4, 1.2, 1.0, 1.3, 1.2, 1.3, 1.3, 1.1, 1.3]};
 
                 var dataArr = [];
+
                 // dataArr = [["setosa_x", 3.5, 3.0, 3.2, 3.1, 3.6, 3.9, 3.4, 3.4, 2.9, 3.1, 3.7, 3.4, 3.0, 3.0, 4.0, 4.4, 3.9, 3.5, 3.8, 3.8, 3.4, 3.7, 3.6, 3.3, 3.4, 3.0, 3.4, 3.5, 3.4, 3.2, 3.1, 3.4, 4.1, 4.2, 3.1, 3.2, 3.5, 3.6, 3.0, 3.4, 3.5, 2.3, 3.2, 3.5, 3.8, 3.0, 3.8, 3.2, 3.7, 3.3],
                 //     ["versicolor_x", 3.2, 3.2, 3.1, 2.3, 2.8, 2.8, 3.3, 2.4, 2.9, 2.7, 2.0, 3.0, 2.2, 2.9, 2.9, 3.1, 3.0, 2.7, 2.2, 2.5, 3.2, 2.8, 2.5, 2.8, 2.9, 3.0, 2.8, 3.0, 2.9, 2.6, 2.4, 2.4, 2.7, 2.7, 3.0, 3.4, 3.1, 2.3, 3.0, 2.5, 2.6, 3.0, 2.6, 2.3, 2.7, 3.0, 2.9, 2.9, 2.5, 2.8],
                 //     ["setosa", 0.2, 0.2, 0.2, 0.2, 0.2, 0.4, 0.3, 0.2, 0.2, 0.1, 0.2, 0.2, 0.1, 0.1, 0.2, 0.4, 0.4, 0.3, 0.3, 0.3, 0.2, 0.4, 0.2, 0.5, 0.2, 0.2, 0.4, 0.2, 0.2, 0.2, 0.2, 0.4, 0.1, 0.2, 0.2, 0.2, 0.2, 0.1, 0.2, 0.2, 0.3, 0.3, 0.2, 0.6, 0.4, 0.3, 0.2, 0.2, 0.2, 0.2],
                 //     ["versicolor", 1.4, 1.5, 1.5, 1.3, 1.5, 1.3, 1.6, 1.0, 1.3, 1.4, 1.0, 1.5, 1.0, 1.4, 1.3, 1.4, 1.5, 1.0, 1.5, 1.1, 1.8, 1.3, 1.5, 1.2, 1.3, 1.4, 1.4, 1.7, 1.5, 1.0, 1.1, 1.0, 1.2, 1.6, 1.5, 1.6, 1.5, 1.3, 1.3, 1.3, 1.2, 1.4, 1.2, 1.0, 1.3, 1.2, 1.3, 1.3, 1.1, 1.3]];
 
-                //Axis data object
+                // Axis data object
                 var axisParam = {};
+
                 // axisParam = {
                 //     setosa: 'setosa_x',
                 //     versicolor: 'versicolor_x'
                 // };
 
-                //Initialise dataObj
-                for(var e = 0; e < self.cohort.events.length; e++) {
-                    dataObj[self.cohort.events[e] + "_x"] = [];
+                // Initialise dataObj
+                for (var e = 0; e < self.cohort.events.length; e++) {
+                    dataObj[self.cohort.events[e] + '_x'] = [];
                     dataObj[self.cohort.events[e]] = [];
-                    axisParam[self.cohort.events[e]] = self.cohort.events[e] + "_x";
+                    axisParam[self.cohort.events[e]] = self.cohort.events[e] + '_x';
                 }
 
                 console.log(dataObj);
@@ -832,20 +825,23 @@ function ClmCohortStatsPageCtrl(
 
                 actionObj.$loaded().then(function() {
                     self.submissionLogs = actionObj;
-                }).then(function () {
-                    for(var actionIndex = 0; actionIndex < self.submissionLogs.length; actionIndex++) {
+                }).then(function() {
+                    for (var actionIndex = 0; actionIndex < self.submissionLogs.length; actionIndex++) {
                         var logHolder = self.submissionLogs[actionIndex];
-                        if(self.cohort.events.indexOf(logHolder.eventId) >= 0) {
-                            dataObj[logHolder.eventId + "_x"].push(logHolder.timestamp);
+                        if (self.cohort.events.indexOf(logHolder.eventId) >= 0) {
+                            dataObj[logHolder.eventId + '_x'].push(logHolder.timestamp);
                             dataObj[logHolder.eventId].push(new Date(logHolder.timestamp).getMinutes());
+
                             // console.log(new Date(logHolder.timestamp).getDate());
                         }
+
                         // if(self.allLogs[actionIndex].action == 'submitLinkResponse') {
                         //     dataObj.Link.push(action.)
                         // }
                         // console.log(new Date(self.submissionLogs[actionIndex].timestamp));
                     }
-                }).then(function () {
+                }).then(function() {
+
                     // var canvas = d3.select('#canvas').node(),
                     //     context = canvas.getContext("2d");
                     //
@@ -937,7 +933,7 @@ function ClmCohortStatsPageCtrl(
                     //         type: "spline"
                     //     }
                     // });
-                    for(var obj in dataObj) {
+                    for (var obj in dataObj) {
                         var newArr = [obj];
                         dataArr.push(newArr.concat(dataObj[obj]));
                         console.log(newArr.concat(dataObj[obj]));
@@ -946,7 +942,7 @@ function ClmCohortStatsPageCtrl(
                     console.log(axisParam);
                     console.log(dataObj);
                     var chart = c3.generate({
-                        bindto: "#chart",
+                        bindto: '#chart',
                         data: {
                             xs: axisParam,
                             columns: dataArr,
@@ -955,16 +951,12 @@ function ClmCohortStatsPageCtrl(
                         axis: {
                             x: {
                                 label: 'timestamp',
-                                tick: {
-                                    fit: false
-                                }
+                                tick: {fit: false}
                             },
-                            y: {
-                                label: 'Date of Action'
-                            }
+                            y: {label: 'Date of Action'}
                         }
                     });
-                }).catch(function (err) {
+                }).catch(function(err) {
                     $log.error(err);
                 });
             }
@@ -1016,7 +1008,7 @@ function ClmCohortRankPageCtrl($q, $scope, $log, firebaseApp, $firebaseObject, $
             var oneEventData = {};
             var eventId = self.cohort.events[iter];
 
-            if(iter < self.cohort.events.length) {
+            if (iter < self.cohort.events.length) {
                 var participantsRef = db.ref(`classMentors/eventParticipants/${eventId}`);
                 var participantsQuery = participantsRef.limitToLast(100);
                 var participantsArray = $firebaseArray(participantsQuery);
@@ -1027,7 +1019,7 @@ function ClmCohortRankPageCtrl($q, $scope, $log, firebaseApp, $firebaseObject, $
                         oneEventData.participants = [];
                         $log.error(err);
                     }
-                ).then(function () {
+                ).then(function() {
                     var eventRef = db.ref(`classMentors/events/${eventId}`);
                     var eventObj = $firebaseObject(eventRef);
 
@@ -1042,23 +1034,23 @@ function ClmCohortRankPageCtrl($q, $scope, $log, firebaseApp, $firebaseObject, $
                     });
                 });
             } else {
-                self.cohortEventData.sort(function(a,b) {
+                self.cohortEventData.sort(function(a, b) {
                     return b.participants.length - a.participants.length;
                 });
                 var rank = 1;
-                for(var i = 0; i < self.cohortEventData.length-1; i++) {
-                    if(self.cohortEventData[i].participants.length > self.cohortEventData[i+1].participants.length) {
+                for (var i = 0; i < self.cohortEventData.length - 1; i++) {
+                    if (self.cohortEventData[i].participants.length > self.cohortEventData[i + 1].participants.length) {
                         self.cohortEventData[i].rank = rank;
-                        rank ++;
+                        rank++;
                     } else {
                         self.cohortEventData[i].rank = rank;
                     }
                 }
-                if(self.cohortEventData[self.cohortEventData.length-1].participants.length <= self.cohortEventData[self.cohortEventData.length-2].participants.length) {
-                    self.cohortEventData[self.cohortEventData.length-1].rank = rank;
+                if (self.cohortEventData[self.cohortEventData.length - 1].participants.length <= self.cohortEventData[self.cohortEventData.length - 2].participants.length) {
+                    self.cohortEventData[self.cohortEventData.length - 1].rank = rank;
                 } else {
                     rank--;
-                    self.cohortEventData[self.cohortEventData.length-1].rank = rank;
+                    self.cohortEventData[self.cohortEventData.length - 1].rank = rank;
                 }
             }
         }

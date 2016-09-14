@@ -12,9 +12,7 @@ describe('cohorts component', function() {
     let ctrl, navBarService;
 
     beforeEach(function() {
-      navBarService = {
-        update: sinon.stub()
-      };
+      navBarService = {update: sinon.stub()};
 
       ctrl = new cohort.component.controller(navBarService);
 

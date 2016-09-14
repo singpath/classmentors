@@ -19,14 +19,15 @@ export function cmContainsFactory() {
       });
 
       model.$validators.cmContains = function(modelValue, viewValue) {
-       
+
         var patt = new RegExp(pattern);
-        if(modelValue.indexOf("http:") > -1 && viewValue.indexOf("http:") > -1){
-            return true;
-        }else{
-            return patt.test(modelValue) && patt.test(viewValue);
+        if (modelValue.indexOf('http:') > -1 && viewValue.indexOf('http:') > -1) {
+          return true;
+        } else {
+          return patt.test(modelValue) && patt.test(viewValue);
         }
-        //return viewValue && viewValue.indexOf(pattern) !== -1;
+
+        // return viewValue && viewValue.indexOf(pattern) !== -1;
       };
     }
   };

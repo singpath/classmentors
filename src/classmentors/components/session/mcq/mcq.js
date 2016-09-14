@@ -1,15 +1,17 @@
 /**
  * Created by AMOS on 18/6/16.
  */
-(function(){
-    var mcq = angular.module('mcq',['firebase']);
+/* eslint indent: ["error", 4] */
 
-    mcq.config(function () {
+(function() {
+    var mcq = angular.module('mcq', ['firebase']);
+
+    mcq.config(function() {
         var config = {
-            apiKey: "AIzaSyCDxuAaiTyPmosBL6QLgR94yoRswMyZcIg",
-            authDomain: "project-1180774075744369732.firebaseapp.com",
-            databaseURL: "https://project-1180774075744369732.firebaseio.com",
-            storageBucket: "project-1180774075744369732.appspot.com"
+            apiKey: 'AIzaSyCDxuAaiTyPmosBL6QLgR94yoRswMyZcIg',
+            authDomain: 'project-1180774075744369732.firebaseapp.com',
+            databaseURL: 'https://project-1180774075744369732.firebaseio.com',
+            storageBucket: 'project-1180774075744369732.appspot.com'
         };
         firebase.initializeApp(config);
     });
@@ -19,37 +21,39 @@
     //     $scope.data = $firebaseObject(ref);
     // });
 
-    //Pulls questions from firebase
+    // Pulls questions from firebase
 
-    mcq.factory('retrieveMCQItems', function($firebaseObject, $firebaseArray){
+    mcq.factory('retrieveMCQItems', function($firebaseObject, $firebaseArray) {
         var ref = firebase.database().ref('events/0/challenges/MCQ/0');
 
-        return{
-            getQuestions: function(){
+        return {
+            getQuestions: function() {
                 var list = $firebaseArray(ref.child('questions'));
                 return list;
             },
-            getTest: function(){
+            getTest: function() {
                 var obj = $firebaseObject(ref);
-                return obj
+                return obj;
             }
-        }
+        };
     });
 
 
-    mcq.controller('MCQController', function($scope, retrieveMCQItems){
+    mcq.controller('MCQController', function($scope, retrieveMCQItems) {
+
         // Tentatively hardcoding URL, currently firebase does not support content search
         // Propose new DB design where questions can be selected by type
         // Using new database structure:
         // On retrieving data from database.
         $scope.questions = retrieveMCQItems.getQuestions();
-        $scope.applyClass = function(type){
-            if(type == 'multiple'){
+        $scope.applyClass = function(type) {
+            if (type == 'multiple') {
                 return 'checkbox';
-            }else{
+            } else {
                 return 'radio';
             }
-        }
+        };
+
         // $scope.data = retrieveMCQItems.getTest();
     });
 })();

@@ -118,7 +118,7 @@ exports.admin = function(opts) {
   const user = {
     displayName: 'Chris Boesch',
     gravatar: '//www.gravatar.com/avatar/somehashsomehashsomehashsomehash'
-  }
+  };
   const userWithId = Object.assign({publicId}, user);
 
   return {

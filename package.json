@@ -546,7 +546,7 @@
     "coveralls": "bash ./tools/bin/coveralls.sh",
     "format": "npm run lint -- --fix",
     "keygen": "node ./tools/bin/keygen.js",
-    "lint": "eslint src/classmentors",
+    "lint": "eslint src/classmentors src/packages/singpath-core/src database/test tools/bin",
     "postinstall": "jspm install",
     "serve": "node ./tools/bin/server.js src/",
     "serve-build": "node ./tools/bin/server.js ${npm_package_config_buildDir}/${npm_package_name}",

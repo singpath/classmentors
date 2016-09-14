@@ -3,6 +3,6 @@
  */
 import surveyTmpl from './survey-view-survey.html!text';
 
-export function showSurveyTmpl(){
-    return surveyTmpl;
+export function showSurveyTmpl() {
+  return surveyTmpl;
 }
