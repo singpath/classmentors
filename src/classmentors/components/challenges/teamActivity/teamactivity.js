@@ -44,7 +44,6 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
         self.task.teamFormationParameter = self.teamFormationParameter;
         self.task.startIRAT = true;
         console.log(self.task);
-        // todo: Validation for form data, saving of form data, direct to MCQ page.
         console.log(self.taskType);
         eventService.set({
             taskType: self.taskType,
@@ -68,8 +67,7 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
     }
 
     self.calculationResult = function (){
-        console.log("t", self.teamsMaximumStudents);
-
+        
         return self.teamsMaximumStudents;
     }
 

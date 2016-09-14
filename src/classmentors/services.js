@@ -587,8 +587,6 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
         events: {
             addTaskWithAns: function (eventId, task, isOpen, answers) {
                 var priority = task.priority || 0;
-                console.log('Eventid is ? ', eventId);
-                console.log('task is : ', task);
                 if (isOpen) {
                     task.openedAt = {'.sv': 'timestamp'};
                     task.closedAt = null;
@@ -600,23 +598,25 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                 return spfFirebase.push(['classMentors/eventTasks', eventId], task).then(function (ref) {
                     ref.setPriority(priority);
                     var taskId = ref.key();
-                    //create a new json for team formation, and put all important data inside
-                    var teamFormationTask = {};
-                    teamFormationTask.activityType = task.activityType;
-                    teamFormationTask.archived = task.archived;
-                    teamFormationTask.closedAt = {'.sv': 'timestamp'};
-                    teamFormationTask.openedAt = null;
-                    teamFormationTask.description = 'Click below to join team';
-                    teamFormationTask.title = task.title;
-                    teamFormationTask.TaskFrom = taskId;
-                    teamFormationTask.teamFormationMethod = task.teamFormationMethod;
-                    teamFormationTask.teamFormationParameter = task.teamFormationParameter;
-                    teamFormationTask.mcqQuestions = null;
-                    teamFormationTask.showProgress = true;
-                    teamFormationTask.formationPattern = true;
+                    console.log("fucking task is:", task);
+                    if(task.teamFormationMethod){
+                        //create a new json for team formation, and put all important data inside
+                        var teamFormationTask = {};
+                        teamFormationTask.activityType = task.activityType;
+                        teamFormationTask.archived = task.archived;
+                        teamFormationTask.closedAt = {'.sv': 'timestamp'};
+                        teamFormationTask.openedAt = null;
+                        teamFormationTask.description = 'Click below to join team';
+                        teamFormationTask.title = task.title;
+                        teamFormationTask.TaskFrom = taskId;
+                        teamFormationTask.teamFormationMethod = task.teamFormationMethod;
+                        teamFormationTask.teamFormationParameter = task.teamFormationParameter;
+                        teamFormationTask.mcqQuestions = null;
+                        teamFormationTask.showProgress = true;
+                        teamFormationTask.formationPattern = true;
 
-                    var ref2 = clmDataStore.events.addTeamFormation(eventId, teamFormationTask, priority);
-
+                        var ref2 = clmDataStore.events.addTeamFormation(eventId, teamFormationTask, priority);
+                    }
                     spfFirebase.set(['classMentors/eventAnswers', eventId, taskId], answers);
                     return ref;
                 });
