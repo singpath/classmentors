@@ -598,8 +598,8 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                 return spfFirebase.push(['classMentors/eventTasks', eventId], task).then(function (ref) {
                     ref.setPriority(priority);
                     var taskId = ref.key();
-                    console.log("fucking task is:", task);
-                    if(task.teamFormationMethod){
+                    
+                    // if(task.teamFormationMethod){
                         //create a new json for team formation, and put all important data inside
                         var teamFormationTask = {};
                         teamFormationTask.activityType = task.activityType;
@@ -615,8 +615,8 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                         teamFormationTask.showProgress = true;
                         teamFormationTask.formationPattern = true;
 
-                        var ref2 = clmDataStore.events.addTeamFormation(eventId, teamFormationTask, priority);
-                    }
+                        // var ref2 = clmDataStore.events.addTeamFormation(eventId, teamFormationTask, priority);
+                    // }
                     spfFirebase.set(['classMentors/eventAnswers', eventId, taskId], answers);
                     return ref;
                 });
@@ -643,7 +643,7 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                     tratTask.teamTRAT = true;
                     tratTask.teamFormationMethod = task.teamFormationMethod;
                     tratTask.teamFormationParameter = task.teamFormationParameter;
-                    var ref3 = clmDataStore.events.addTrat(eventId, tratTask, priority);
+                    // var ref3 = clmDataStore.events.addTrat(eventId, tratTask, priority);
                     return ref;
                 });
             },

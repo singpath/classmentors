@@ -185,19 +185,59 @@ export function challengeServiceFactory
         delete copy.answers;
         console.log(copy);
         // Create reccord in eventTeams
-        //TODO: refactor
+        // Add IRAT
+        var teamFormationTask = {};
+        teamFormationTask.activityType = task.activityType;
+        teamFormationTask.archived = task.archived;
+        teamFormationTask.closedAt = {'.sv': 'timestamp'};
+        teamFormationTask.openedAt = null;
+        teamFormationTask.description = 'Click below to join team';
+        teamFormationTask.title = task.title;
+        teamFormationTask.TaskFrom = taskId;
+        teamFormationTask.teamFormationMethod = task.teamFormationMethod;
+        teamFormationTask.teamFormationParameter = task.teamFormationParameter;
+        teamFormationTask.mcqQuestions = null;
+        teamFormationTask.showProgress = true;
+        teamFormationTask.formationPattern = true;
 
-        // Create reccord in answers and tasks
-        var ref = clmDataStore.events.addTaskWithAns(event.$id, copy, isOpen,answers);
-        ref.then(function() {
-            spfAlert.success('Task created');
-            $location.path(urlFor('editEvent', {eventId: event.$id}));
-        }).catch(function(err) {
-            $log.error(err);
-            spfAlert.error('Failed to created new task');
-        }).finally(function() {
-            self.creatingTask = false;
-        }); 
+        clmDataStore.events.addTaskWithAns(event.$id, copy, isOpen,answers)
+          .then(function(ref){
+            //add Team formation task
+            var previousTaskId = ref.key();
+            console.log('IRAT key is :', previousTaskId);
+            clmDataStore.events.addTeamFormation(eventId, {
+              taskFrom: previousTaskId,
+              title: copy.title,
+              description: "Click Below To Join Team",
+              formationPattern: true,
+              closedAt : {'.sv': 'timestamp'},
+              showProgress: copy.showProgress,
+              archived: false,
+            }, priority).then(function(teamRef){
+                //create teams here
+            })
+        })
+          .then(function(ref){
+            //add TRAT
+            var previousTaskId = ref.key();
+            console.log('TRAT ')
+            clmDataStore.events.addTrat()
+        })
+          .then(function(){
+            //add teams
+        })
+          .then(function(){
+
+        });
+        // ref.then(function() {
+        //     spfAlert.success('Task created');
+        //     $location.path(urlFor('editEvent', {eventId: event.$id}));
+        // }).catch(function(err) {
+        //     $log.error(err);
+        //     spfAlert.error('Failed to created new task');
+        // }).finally(function() {
+        //     self.creatingTask = false;
+        // }); 
       }
 
       
