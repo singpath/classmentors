@@ -3,7 +3,7 @@
 var exportData = require('./singpath-play-export.json');
 var rules = require('../security-rules.json');
 var targaryen = require('@dinoboff/targaryen');
-var deepAssign = require('deep-assign');
+var merge = require('lodash.merge');
 
 const timestamp = () => ({'.sv': 'timestamp'});
 
@@ -19,25 +19,25 @@ exports.timestamp = timestamp;
  * with the patch.
  *
  * Note with will merge each data node. To remove a node, the patch needs set it
- * to null:
+ * to "undefined":
  *
  * @example
  * // remove user from initial data
  * setFirebaseData({
  *   auth : {
- *     publicIds: {cboesch: null},
- *     usedPublicIds: {cboesch: null},
- *     users: {'google:123456': null}
+ *     publicIds: {cboesch: undefined},
+ *     usedPublicIds: {cboesch: undefined},
+ *     users: {'google:123456': undefined}
  *   }
  * });
  *
  * @param {Object} patch optional patch to singpath-play-export.json
  */
 exports.setFirebaseData = function(patch) {
-  var data = exportData;
+  var data = merge({}, exportData);
 
   if (patch) {
-    data = deepAssign({}, exportData, patch);
+    data = merge(data, patch);
   }
 
   targaryen.setFirebaseData(data);
@@ -118,7 +118,7 @@ exports.admin = function(opts) {
   const user = {
     displayName: 'Chris Boesch',
     gravatar: '//www.gravatar.com/avatar/somehashsomehashsomehashsomehash'
-  }
+  };
   const userWithId = Object.assign({publicId}, user);
 
   return {
