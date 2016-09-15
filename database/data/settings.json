@@ -1,0 +1,23 @@
+{
+  "enableCodeCombat" : {
+    "title" : "enable Code Combat",
+    "type" : "boolean",
+    "value" : true
+  },
+  "enableCodeSchool" : {
+    "title" : "enable Code School",
+    "type" : "boolean",
+    "value" : false
+  },
+  "enableFreeCodeCamp" : {
+    "title" : "enable FreeCodeCamp",
+    "type" : "boolean",
+    "value" : true
+  },
+  "enablePivotalExpert" : {
+    "title" : "enable Pivotal Expert",
+    "type" : "boolean",
+    "value" : true
+  }
+}
+

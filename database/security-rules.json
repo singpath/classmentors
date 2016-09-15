@@ -89,6 +89,49 @@
       }
     },
     "classMentors": {
+      "eventQuestions":{
+        ".read": "auth !== null && root.child('classMentors/admins').child(auth.uid).val() === true",
+        ".write": "auth !== null && root.child('classMentors/admins').child(auth.uid).val() === true",
+        "$eventId":{
+          ".write": true,
+          ".read": "auth !== null && root.child('classMentors/events').child($eventId).child('owner/publicId').val() === root.child('auth/users').child(auth.uid).child('publicId').val()",
+          "questionOwners":{
+            "$ownerPublicId":{
+              "$questionId":{
+                 ".write":true
+              }
+            }
+          },
+          "questions":{
+            ".read": true,
+            "$questionId":{
+              "upVotes": {
+                "$participantId":{
+                  ".write":true
+                }
+              },
+              "answers":{
+                "$publicId":{
+                  ".write":true,
+                  "upVotes": {
+                    "$participantId":{
+                        ".write":true
+                    }
+                  },
+                  "comments":{
+                    "$commentId":{
+                      ".write":true,
+                      "$commentorId":{
+                        ".write":true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
       "userActions":{
         "$userActions":{
           ".write":"newData.hasChildren(['publicId','action','timestamp'])",

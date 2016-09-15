@@ -13,17 +13,14 @@ describe('events', function() {
   describe('joining', function() {
     const eventId = 'some-event-id';
     const passwordHash = 'x'.repeat(64);
-    let event, bob, init;
+    let event, admin, bob, init;
 
     beforeEach(function() {
       bob = utils.bob();
+      admin = utils.admin();
       event = {
         createdAt: 1465362866984,
-        owner: {
-          displayName: 'Chris Boesch',
-          gravatar: '//www.gravatar.com/avatar/6e64bb2cab5367fd6e201df2aa722512',
-          publicId: 'cboesch'
-        },
+        owner: admin.userWithId,
         title: 'Test event'
       };
       init = {
@@ -59,7 +56,7 @@ describe('events', function() {
       }).path(`classMentors/eventParticipants/${eventId}/${bob.publicId}`);
     });
 
-    it('should not let a user create an event without a timestamp', function() {
+    it('should not let a user join an event without a timestamp', function() {
       init.classMentors.eventApplications = {[eventId]: {[bob.uid]: passwordHash}};
       utils.setFirebaseData(init);
 
@@ -76,6 +73,22 @@ describe('events', function() {
       expect(bob.firebaseAuth).can.write(
         init.auth.users[bob.uid].displayName
       ).path(`classMentors/eventParticipants/${eventId}/${bob.publicId}/user/displayName`);
+    });
+
+    it('should let the owner remove participants', function() {
+      init.classMentors.eventApplications = {[eventId]: {[bob.uid]: passwordHash}};
+      init.classMentors.eventParticipants = {
+        [eventId]: {
+          [bob.publicId]: {
+            user: bob.user,
+            joinedAt: 1234567890
+          }
+        }
+      };
+      utils.setFirebaseData(init);
+
+      expect(admin.firebaseAuth).can.write(null)
+        .path(`classMentors/eventParticipants/${eventId}/${bob.publicId}`);
     });
 
   });
