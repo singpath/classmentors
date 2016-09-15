@@ -594,29 +594,10 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                     task.closedAt = {'.sv': 'timestamp'};
                     task.openedAt = null;
                 }
-
+                
                 return spfFirebase.push(['classMentors/eventTasks', eventId], task).then(function (ref) {
                     ref.setPriority(priority);
                     var taskId = ref.key();
-                    
-                    // if(task.teamFormationMethod){
-                        //create a new json for team formation, and put all important data inside
-                        var teamFormationTask = {};
-                        teamFormationTask.activityType = task.activityType;
-                        teamFormationTask.archived = task.archived;
-                        teamFormationTask.closedAt = {'.sv': 'timestamp'};
-                        teamFormationTask.openedAt = null;
-                        teamFormationTask.description = 'Click below to join team';
-                        teamFormationTask.title = task.title;
-                        teamFormationTask.TaskFrom = taskId;
-                        teamFormationTask.teamFormationMethod = task.teamFormationMethod;
-                        teamFormationTask.teamFormationParameter = task.teamFormationParameter;
-                        teamFormationTask.mcqQuestions = null;
-                        teamFormationTask.showProgress = true;
-                        teamFormationTask.formationPattern = true;
-
-                        // var ref2 = clmDataStore.events.addTeamFormation(eventId, teamFormationTask, priority);
-                    // }
                     spfFirebase.set(['classMentors/eventAnswers', eventId, taskId], answers);
                     return ref;
                 });
@@ -627,25 +608,7 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
             },
 
             addTeamFormation: function (eventId, task, priority) {
-                return spfFirebase.push(['classMentors/eventTasks', eventId], task).then(function (ref) {
-                    ref.setPriority(priority);
-                    var taskId2 = ref.key();
-
-                    var tratTask = {};
-                    tratTask.activityType = task.activityType;
-                    tratTask.archived = task.archived;
-                    tratTask.closedAt = {'.sv': 'timestamp'};
-                    tratTask.openedAt = null;
-                    tratTask.description = 'Click to start TRAT!';
-                    tratTask.title = task.title;
-                    tratTask.TaskFrom = taskId2;
-                    tratTask.showProgress = true;
-                    tratTask.teamTRAT = true;
-                    tratTask.teamFormationMethod = task.teamFormationMethod;
-                    tratTask.teamFormationParameter = task.teamFormationParameter;
-                    // var ref3 = clmDataStore.events.addTrat(eventId, tratTask, priority);
-                    return ref;
-                });
+                return spfFirebase.push(['classMentors/eventTasks', eventId], task);
             },
 
             addTrat: function(eventId, task, priority){

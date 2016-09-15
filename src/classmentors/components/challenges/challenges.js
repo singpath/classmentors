@@ -183,6 +183,9 @@ export function challengeServiceFactory
         delete copy.singPathProblem;
         delete copy.badge;
         delete copy.answers;
+        if(copy.link == ""){
+          delete copy.link;
+        }
         console.log(copy);
         // Create reccord in eventTeams
         // Add IRAT
@@ -205,7 +208,7 @@ export function challengeServiceFactory
             //add Team formation task
             var previousTaskId = ref.key();
             console.log('IRAT key is :', previousTaskId);
-            clmDataStore.events.addTeamFormation(eventId, {
+            clmDataStore.events.addTeamFormation(event.$id, {
               taskFrom: previousTaskId,
               title: copy.title,
               description: "Click Below To Join Team",
@@ -213,22 +216,29 @@ export function challengeServiceFactory
               closedAt : {'.sv': 'timestamp'},
               showProgress: copy.showProgress,
               archived: false,
-            }, priority).then(function(teamRef){
-                //create teams here
+            }, copy.priority).then(function(teamRef){
+              //create teams here
+              var taskId = teamRef.key()
+              console.log('taskId: ', taskId);
+              console.log(event.teams);
+              spfFirebase.set(['classMentors/eventTeams', event.$id, taskId], event.teams)
+              .then(function(){
+                console.log('Its done.');
+              });
             })
-        })
-          .then(function(ref){
-            //add TRAT
-            var previousTaskId = ref.key();
-            console.log('TRAT ')
-            clmDataStore.events.addTrat()
-        })
-          .then(function(){
-            //add teams
-        })
-          .then(function(){
-
         });
+        //   .then(function(ref){
+        //     //add TRAT
+        //     var previousTaskId = ref.key();
+        //     console.log('TRAT ')
+        //     clmDataStore.events.addTrat()
+        // })
+        //   .then(function(){
+        //     //add teams
+        // })
+        //   .then(function(){
+
+        // });
         // ref.then(function() {
         //     spfAlert.success('Task created');
         //     $location.path(urlFor('editEvent', {eventId: event.$id}));
