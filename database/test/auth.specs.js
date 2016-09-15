@@ -28,7 +28,7 @@ describe('registration', function() {
       yearOfBirth: 1990,
       createdAt: {'.sv': 'timestamp'}
     };
-    utils.setFirebaseData({auth: {users: {[bob.uid]: null}}});
+    utils.setFirebaseData({auth: {users: {[bob.uid]: undefined}}});
   });
 
   it('should allow authenticated user to register', function() {
