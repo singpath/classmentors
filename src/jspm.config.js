@@ -82,6 +82,8 @@ SystemJS.config({
     "get-parameter-names": "npm:get-parameter-names@0.3.0",
     "http": "github:jspm/nodelibs-http@0.2.0-alpha",
     "https": "github:jspm/nodelibs-https@0.2.0-alpha",
+    "lodash.camelcase": "npm:lodash.camelcase@4.3.0",
+    "lodash.upperfirst": "npm:lodash.upperfirst@4.3.1",
     "os": "github:jspm/nodelibs-os@0.2.0-alpha",
     "path": "github:jspm/nodelibs-path@0.2.0-alpha",
     "process": "github:jspm/nodelibs-process@0.2.0-alpha",

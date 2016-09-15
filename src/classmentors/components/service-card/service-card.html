@@ -1,0 +1,56 @@
+<md-card ng="$ctrl.canEdit || $ctrl.data.details.id" ng-attr-id="{{$ctrl.serviceId}}-service-card">
+
+    <div ng-transclude="serviceForm" style="visibility: hidden">
+        <clm-service-form class="md-dialog-container"></clm-service-form>
+    </div>
+
+    <md-card-header>
+        <md-card-header-text>
+            <span class="md-headline">{{$ctrl.service.name}}</span>
+            <span class="md-subhead" ng-if="$ctrl.data.details.id">
+                Registered as
+                <a ng-href="{{$ctrl.profileUrl}}" target="_blank">{{$ctrl.data.details.name}}</a>
+            </span>
+        </md-card-header-text>
+    </md-card-header>
+
+    <md-card-content ng-if="$ctrl.canEdit && !$ctrl.data.details.id">
+
+        <p ng-transclude="description"><i>Service description...</i></p>
+
+    </md-card-content>
+
+    <md-card-content ng-if="$ctrl.data.details.id">
+        <p>{{$ctrl.data.totalAchievements || 0}}  achievements</p>
+    </md-card-content>
+
+    <md-card-actions layout="row" layout-align="end center" ng-if="$ctrl.canEdit">
+        <md-button  type="button"
+            class="md-raised md-primary"
+            ng-if="!$ctrl.data.details.id"
+            ng-click=" $ctrl.showAddDialog($event, '#' + $ctrl.serviceId + '-service-card .md-dialog-container')"
+        >
+            Add My {{$ctrl.service.name}} profile
+        </md-button>
+        <md-button type="button"
+            class="md-primary"
+            ng-if="$ctrl.data.details.id"
+            ng-click="$ctrl.refresh()"
+            ng-disabled="!$ctrl.canRefresh"
+            ng-switch="$ctrl.canRefresh"
+            aria-label="Refresh Achievements"
+        >
+            <!--
+                We allow to send a refresh request even if the service data is
+                still updating (the last request might have been lost).
+            -->
+            <span ng-switch-when="true">Refresh Achievements</span>
+            <span ng-switch-default ng-switch="$ctrl.updating">
+                <span ng-switch-when="true">Updating...</span>
+                <span ng-switch-default>Wait to refresh again...</span>
+            </span>
+        </md-button>
+        <md-button type="button" class="md-warn" ng-if="$ctrl.data.details.id" ng-click="$ctrl.remove()">Remove</md-button>
+    </md-card-actions>
+
+</md-card>

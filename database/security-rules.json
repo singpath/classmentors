@@ -700,15 +700,6 @@
         ".read": true,
         ".write": "auth !== null && root.child('classMentors/admins').child(auth.uid).val() === true"
       },
-      "servicesUserIds": {
-        "$serviceId": {
-          "$serviceUserId": {
-            ".validate": "root.child('auth/publicIds/' + newData.val()).val() === auth.uid",
-            ".write": "auth !== null && ( data.exists() === false || ( newData.exists() === true && root.child('auth/publicIds/' + data.val()).val() === auth.uid ))"
-          }
-        },
-        ".read": true
-      },
       "settings": {
         ".read": "true",
         "$settingId": {
@@ -821,12 +812,20 @@
               },
               "details": {
                 ".validate": "newData.hasChildren(['id', 'name', 'registeredBefore'])",
+                "id": {
+                  ".validate": "newData.isString() && newData.val().length >= 1"
+                },
                 "name": {
                   ".validate": "newData.isString() && newData.val().length >= 1"
                 },
-                "registeredBefore": {}
+                "registeredBefore": {
+                  ".validate": "newData.val() == data.val() || newData.val() == now"
+                }
               },
               "lastUpdate": {
+                ".validate": "newData.val() == data.val()"
+              },
+              "lastUpdateRequest": {
                 ".validate": "newData.val() === now",
                 ".write": "auth !== null && root.child('classMentors/admins').child(auth.uid).val() === true"
               }

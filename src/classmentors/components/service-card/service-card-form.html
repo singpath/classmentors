@@ -1,0 +1,27 @@
+<md-dialog aria-label="Link service profile" layout-padding style="min-width: 50%">
+
+    <md-dialog-content>
+        <form name="service-dialog-form" ng-submit="$ctrl.save($ctrl.name)">
+
+            <h3 class="md-title">Link your {{$ctrl.$card.service.name}} profile</h3>
+            <h4 class="md-subhead"><a ng-href="{{$ctrl.profileUrl}}">{{$ctrl.profileUrl}}</a></h4>
+
+            <div layout>
+                <md-input-container flex>
+                    <label>
+                        Your {{$ctrl.service.name}} username
+                    </label>
+                    <input name="userName" ng-model="$ctrl.name" required ng-change="$ctrl.onNameChanged()">
+                </md-input-container>
+            </div>
+
+        </form>
+
+    </md-dialog-content>
+
+    <md-dialog-actions>
+        <md-button ng-click="$ctrl.save($ctrl.name)" class="md-primary">Save</md-button>
+        <md-button ng-click="$ctrl.close()">Close</md-button>
+    </md-dialog-actions>
+
+</md-dialog>

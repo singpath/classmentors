@@ -241,13 +241,13 @@
     },
     "servicesUserIds": {
       "codeCombat": {
-        "codeCombat:alice": "alice"
+        "codeCombat:bob": "bob"
       },
       "freeCodeCamp": {
-        "freeCodeCamp:alice": "alice"
+        "freeCodeCamp:bob": "bob"
       },
       "pivotalExpert": {
-        "pivotalExpert:alice": "alice"
+        "pivotalExpert:bob": "bob"
       }
     },
     "userProfiles": {
@@ -295,23 +295,28 @@
             "details": {
               "id": "codeCombat:bob",
               "name": "codeCombat:bob",
-              "registeredBefore": 123000000000
+              "registeredBefore": 1470000000000
             },
-            "lastUpdate": 123000001000
+            "lastUpdate": 1470000001000,
+            "lastUpdateRequest": 1470000000001
           },
           "freeCodeCamp": {
             "details": {
               "id": "freeCodeCamp:bob",
               "name": "freeCodeCamp:bob",
-              "registeredBefore": 123000004000
-            }
+              "registeredBefore": 1470000001000
+            },
+            "lastUpdate": 1470000002000,
+            "lastUpdateRequest": 1470000001001
           },
           "pivotalExpert": {
             "details": {
               "id": "pivotalExpert:bob",
               "name": "pivotalExpert:bob",
-              "registeredBefore": 123000005000
-            }
+              "registeredBefore": 1470000002000
+            },
+            "lastUpdate": 1470000003000,
+            "lastUpdateRequest": 1470000002001
           }
         },
         "user": {
