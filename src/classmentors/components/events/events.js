@@ -2123,7 +2123,6 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
 
             this.checkEditor = function () {
                 return parent.loadingEditor;
-                console.log(parent.loadingEditor);
             };
 
             if (
@@ -2136,7 +2135,6 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             this.save = function () {
                 var editor = ace.edit(document.querySelector('#editor'));
                 var response = editor.getValue();
-                console.log("Function submitted for answer " + response);
                 clmDataStore.events.submitSolution(eventId, taskId, participant.$id, response).then(function () {
                     $mdDialog.hide();
                     spfAlert.success('Response is saved.');

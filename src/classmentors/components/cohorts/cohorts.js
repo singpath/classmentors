@@ -556,10 +556,6 @@ ViewCohortCtrl.$inject = [
 function editCohortCtrlInitialData($q, $route, spfAuthData, clmDataStore) {
     var data = baseEditCtrlInitialData($q, $route, spfAuthData, clmDataStore);
 
-    // data.tasks = data.event.then(function(event) {
-    //     return clmDataStore.events.getTasks(event.$id);
-    // });
-
     return $q.all(data);
 }
 editCohortCtrlInitialData.$inject = ['$q', '$route', 'spfAuthData', 'clmDataStore'];
@@ -586,6 +582,7 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
     this.querySearch = querySearch;
 
     function querySearch (query) {
+        console.log(self.mappedEvents);
         return query ? self.mappedEvents.filter( createFilterFor(query) ) : self.mappedEvents;
     }
 
@@ -601,6 +598,7 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
 
     function createFilterFor(query) {
         var lowercaseQuery = angular.lowercase(query);
+        // console.log(self.cohort.events);
         return function filterFn(event) {
             // to filter results based on query and ensure that user cannot select events already in the cohort
             return (event.value.indexOf(lowercaseQuery) >= 0 && self.cohort.events.indexOf(event.id) < 0);

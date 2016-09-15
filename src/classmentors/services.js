@@ -675,7 +675,7 @@ export function clmDataStoreFactory(
 
       listAllArr: function() {
         var ref = db.ref('classMentors/events');
-        var query = ref.orderByChild('createdAt').limitToLast(50);
+        var query = ref.orderByChild('createdAt');
 
         return loaded($firebaseArray(query));
       },
