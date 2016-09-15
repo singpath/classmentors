@@ -37,6 +37,7 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
     self.teamFormationMethod = null;
     self.teamFormationParameter = null;
 
+    
     self.submit = function(){
         self.task.activityType = self.activityType;
         self.task.newExistingTeams = self.newExistingTeams;
@@ -45,6 +46,8 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
         self.task.startIRAT = true;
         console.log(self.task);
         console.log(self.taskType);
+        console.log(self.teamFormationMethod);
+        self.event.teams = formTeams(self.teamFormationMethod, self.teamFormationParameter, self.participants.length);
         eventService.set({
             taskType: self.taskType,
             event: self.event,
@@ -54,6 +57,50 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
         $location.path(urlFor('viewMcq'));
     }
 
+
+    function formTeams(method, methodParameter, participants){
+        var teams = {};
+        var teamStructure = [];
+        console.log('Total participants :', participants );
+        if(method == 'noOfTeams'){
+          //initialze teamStructure with team size of 0 each
+          for(var i = 0; i < methodParameter; i++){
+            teamStructure.push(0);
+          }
+          console.log('Line reaches here');
+          console.log('teamStructure :', teamStructure);
+          //add 1 to each team until there are no more participants left
+          for(var i = 0; i < participants; i ++){
+            teamStructure[i % methodParameter] += 1;
+          }
+          console.log(teamStructure);
+        }else{//else by teamSize
+           while (participants > methodParameter) {
+             teamStructure.push(methodParameter);
+             participants -= methodParameter;
+           }
+           // split up remaining participants
+           for(var i = 0; i < participants; i ++){
+             teamStructure[i % teamStructure.length] += 1;
+           }
+        }
+        //Create 'teams'
+        for(var i = 0; i < teamStructure.length; i ++){
+          teams[i] = populateTeam(teamStructure[i]);
+        }
+        console.log('Teams is: ', teams);
+        return teams;
+    }
+
+    function populateTeam(members){
+        var team = {}
+        console.log(members);
+        for(var i = 0; i < members; i++){
+            team[i] = "TEST";
+        }
+        console.log(angular.toJson(team));
+        return team;
+    }
     // if number of teams, "Each team will have a maximum enrollment of # students"; #= roundup (totalParticipants / # of teams)
     // if max number of student, "You will have # teams"; #= round up (totalParticipants / # stud per team)
     self.calculateTeamMaximumStudent = function (noTeamsOrStudents){
