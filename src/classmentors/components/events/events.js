@@ -497,7 +497,6 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
             self.asstArr.push(self.assistants[asst].$id);
         }
     }
-    console.log(self.assistants);
 
     if (
         self.event &&
@@ -2112,7 +2111,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         var parent = this;
 
         function loadEditor() {
-            var editor = ace.edit($document.querySelector('#editor'));
+            var editor = ace.edit(document.querySelector('#editor'));
             editor.setTheme("ace/theme/monokai");
             editor.getSession().setMode("ace/mode/" + task.lang.toLowerCase());
             editor.getSession().setUseWrapMode(true);
@@ -2135,7 +2134,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             }
 
             this.save = function () {
-                var editor = ace.edit($document.querySelector('#editor'));
+                var editor = ace.edit(document.querySelector('#editor'));
                 var response = editor.getValue();
                 console.log("Function submitted for answer " + response);
                 clmDataStore.events.submitSolution(eventId, taskId, participant.$id, response).then(function () {
@@ -2175,7 +2174,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         var parent = this;
 
         function loadEditor() {
-            var editor = ace.edit($document.querySelector('#editor'));
+            var editor = ace.edit(document.querySelector('#editor'));
             editor.setTheme("ace/theme/monokai");
             editor.getSession().setMode("ace/mode/" + task.lang.toLowerCase());
             editor.getSession().setUseWrapMode(true);
@@ -3538,7 +3537,7 @@ function ClmEventResultsTableCtrl($scope, $q, $log, $mdDialog, $document,
         var parent = this;
 
         function loadEditor() {
-            var editor = ace.edit($document.querySelector('#editor'));
+            var editor = ace.edit(document.querySelector('#editor'));
             editor.setTheme("ace/theme/monokai");
             editor.getSession().setMode("ace/mode/" + task.lang.toLowerCase());
             editor.getSession().setUseWrapMode(true);
@@ -3567,7 +3566,7 @@ function ClmEventResultsTableCtrl($scope, $q, $log, $mdDialog, $document,
             }
 
             this.save = function () {
-                var editor = ace.edit($document.querySelector('#editor'));
+                var editor = ace.edit(document.querySelector('#editor'));
                 var response = editor.getValue();
                 console.log("Function submitted for answer " + response);
                 clmDataStore.events.submitSolution(eventId, taskId, participant.$id, response).then(function () {
