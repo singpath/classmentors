@@ -730,10 +730,8 @@ export function spfAuthDataFactory($q, $log, $firebaseObject, authFirebaseApp, s
     return new spfAuthData.UserFirebaseObject(ref);
   };
 
-  spfAuth.onAuth(function(auth) {
-    if (!auth) {
-      userDataPromise = undefined;
-    }
+  spfAuth.onAuth(function() {
+    userDataPromise = undefined;
   });
 
   spfAuthData = {
@@ -763,7 +761,6 @@ export function spfAuthDataFactory($q, $log, $firebaseObject, authFirebaseApp, s
 
       userDataPromise = spfAuth.$loaded().then(function() {
         if (!spfAuth.user || !spfAuth.user.uid) {
-          userDataPromise = undefined;
           return $q.reject(new Error('Your did not login or your session expired.'));
         }
 
