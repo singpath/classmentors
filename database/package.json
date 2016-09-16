@@ -17,7 +17,7 @@
     "eslint-config-singpath": "0.0.3",
     "istanbul": "^0.4.3",
     "istanbul-coveralls": "^1.0.3",
-    "lodash.merge": "^4.6.0",
+    "lodash.mergewith": "^4.6.0",
     "mocha": "2.4.5",
     "mocha-lcov-reporter": "^1.2.0",
     "mockfirebase": "latest",
@@ -28,7 +28,7 @@
   "scripts": {
     "lint": "eslint test/",
     "format": "eslint test/ --fix",
-    "test": "node ./node_modules/mocha/bin/mocha test/index.specs.js",
+    "test": "node ./node_modules/mocha/bin/mocha -b test/index.specs.js",
     "coverage": "node ./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha",
     "travis-ci": "node ./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha && ./node_modules/.bin/istanbul-coveralls;"
   }

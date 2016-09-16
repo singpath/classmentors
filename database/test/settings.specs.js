@@ -3,31 +3,12 @@
 const chai = require('chai');
 const expect = chai.expect;
 const utils = require('./utils.js');
+const auth = utils.auth;
 
 describe('settings', function() {
-  let init, bob;
 
   beforeEach(function() {
-    const isAdmin = true;
-    const isPremium = true;
-
-    bob = utils.bob({isAdmin, isPremium});
-    init = {
-      auth: bob.auth,
-      classMentors: {
-        userProfiles: bob.userProfiles,
-        admins: bob.admins,
-        premiumUsers: bob.premiumUsers,
-        settings: {
-          someId: {
-            value: false,
-            title: 'Some settings',
-            type: 'boolean'
-          }
-        }
-      }
-    };
-    utils.setFirebaseData(init);
+    utils.setFirebaseData();
   });
 
   it('should be readeable for all', function() {
@@ -35,7 +16,7 @@ describe('settings', function() {
   });
 
   it('should be writable for admin', function() {
-    expect(bob.firebaseAuth).can.write({
+    expect(auth.admin).can.write({
       value: true,
       title: 'Some settings',
       type: 'boolean'
@@ -43,10 +24,7 @@ describe('settings', function() {
   });
 
   it('should not be writeable by non-admin user', function() {
-    init.classMentors.admins[bob.uid] = false;
-    init.classMentors.userProfiles[bob.publicId].user.isAdmin = false;
-    utils.setFirebaseData(init);
-    expect(bob.firebaseAuth).cannot.write({
+    expect(auth.bob).cannot.write({
       value: true,
       title: 'Some settings',
       type: 'boolean'
