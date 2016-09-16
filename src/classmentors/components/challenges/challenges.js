@@ -189,19 +189,19 @@ export function challengeServiceFactory
         console.log(copy);
         // Create reccord in eventTeams
         // Add IRAT
-        var teamFormationTask = {};
-        teamFormationTask.activityType = task.activityType;
-        teamFormationTask.archived = task.archived;
-        teamFormationTask.closedAt = {'.sv': 'timestamp'};
-        teamFormationTask.openedAt = null;
-        teamFormationTask.description = 'Click below to join team';
-        teamFormationTask.title = task.title;
-        teamFormationTask.TaskFrom = taskId;
-        teamFormationTask.teamFormationMethod = task.teamFormationMethod;
-        teamFormationTask.teamFormationParameter = task.teamFormationParameter;
-        teamFormationTask.mcqQuestions = null;
-        teamFormationTask.showProgress = true;
-        teamFormationTask.formationPattern = true;
+        // var teamFormationTask = {};
+        // teamFormationTask.activityType = task.activityType;
+        // teamFormationTask.archived = task.archived;
+        // teamFormationTask.closedAt = {'.sv': 'timestamp'};
+        // teamFormationTask.openedAt = null;
+        // teamFormationTask.description = 'Click below to join team';
+        // teamFormationTask.title = task.title;
+        // teamFormationTask.TaskFrom = taskId;
+        // teamFormationTask.teamFormationMethod = task.teamFormationMethod;
+        // teamFormationTask.teamFormationParameter = task.teamFormationParameter;
+        // teamFormationTask.mcqQuestions = null;
+        // teamFormationTask.showProgress = true;
+        // teamFormationTask.formationPattern = true;
 
         clmDataStore.events.addTaskWithAns(event.$id, copy, isOpen,answers)
           .then(function(ref){
@@ -222,9 +222,17 @@ export function challengeServiceFactory
               var taskId = teamRef.key()
               console.log('taskId: ', taskId);
               console.log(event.teams);
-              spfFirebase.set(['classMentors/eventTeams', event.$id, taskId], event.teams)
+              spfFirebase.set(['classMentors/eventTeams', event.$id],taskId)
               .then(function(){
-                console.log('Its done.');
+                // For each team create a reccord in Firebase
+                for(var i = 0; i < event.teams.length; i ++){
+                    var team = event.teams[i];
+                    console.log('Team here is: ', team);
+                    spfFirebase.push(['classMentors/eventTeams/', event.$id,taskId],team)
+                    .then(function(ref){
+                        console.log('Team ', i , 'pushed with key: ', ref.key());
+                    });
+                }
               });
             })
         });

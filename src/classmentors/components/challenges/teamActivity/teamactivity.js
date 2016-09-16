@@ -59,7 +59,7 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
 
 
     function formTeams(method, methodParameter, participants){
-        var teams = {};
+        var teams = [];
         var teamStructure = [];
         console.log('Total participants :', participants );
         if(method == 'noOfTeams'){
@@ -85,7 +85,10 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
         }
         //Create 'teams'
         for(var i = 0; i < teamStructure.length; i ++){
-          teams[i] = populateTeam(teamStructure[i]);
+          // teams[i] = populateTeam(teamStructure[i]);
+          teams.push({
+            maxSize: teamStructure[i]
+          });
         }
         console.log('Teams is: ', teams);
         return teams;
