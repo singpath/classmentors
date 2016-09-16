@@ -25,7 +25,10 @@ import schEngageScaleTmpl from './events-view-schEngageScale-task-form.html!text
 import motiStratLearnTmpl from './events-view-motiStratLearn-task-form.html!text';
 import eduDisLearnTmpl from './events-view-eduDisLearn-task-form.html!text';
 
-import teamFormationTmpl from './events-view-teamFormation.html!text';
+//form team import
+import * as team from '../challenges/teamActivity/teamactivity.js';
+// import teamFormationTmpl from './teamactivity-view-teamFormation.html!text';
+
 const noop = () => undefined;
 
 export function configRoute($routeProvider, routes) {
@@ -1586,7 +1589,6 @@ EditEventTaskCtrl.$inject = [
  *
  */
 export function clmEventTableFactory() {
-    console.log("clmEvent table comes in here");
     return {
         template: eventTableParticipantsTmpl,
         restrict: 'E',
@@ -2015,7 +2017,6 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             };
         }
     };
-
     this.promptForLink = function (eventId, taskId, task, participant, userSolution) {
         $mdDialog.show({
             parent: $document.body,
@@ -2064,12 +2065,49 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
     this.promptForTeamFormation = function (eventId, taskId, task, participant, userSolution) {
         $mdDialog.show({
             parent: $document.body,
-            template: teamFormationTmpl,
+            template: team.teamFormationTmpl,
             controller: DialogController,
             controllerAs: 'ctrl'
+            // resolve:{
+            //     teamFormationInitialData
+            // }
         });
 
-        function DialogController() {
+        // function teamFormationInitialData(){
+        //     // var surveyPromise = spfFirebase.loadedArray(['classMentors/surveyTemplate']);
+        //     var teamEventPromise = spfFirebase.loadedArray(['classMentors/eventTeams/' + eventId + '/' + taskId]);
+        //
+        //     return $q.all({
+        //         teamFormation: teamEventPromise.then(function (value) {
+        //             return value;
+        //         })
+        //     });
+        // };
+
+        function DialogController(){
+
+            var teamEventPromise = spfFirebase.loadedArray(['classMentors/eventTeams/' + eventId + '/' + taskId]);
+            var resolvedPromise = teamEventPromise.then(function (result){
+                return result;
+            });
+
+            var value = resolvedPromise.value;
+
+
+
+
+
+
+
+            // console.log("testing all teamformation values:");
+            // console.log("eventId:", eventId);
+            // console.log("taskId:", taskId);
+            // console.log("task:", task);
+            // console.log("participant:", participant);
+            // console.log("userSolution:", userSolution);
+
+
+
             this.save = function () {
 
             };
@@ -2084,8 +2122,6 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
 
 
     this.promptForSurvey = function (eventId, taskId, task, participant, userSolution) {
-
-        console.log("prompt for survey task : ", task.survey);
 
         if (task.survey === "School engagement scale") {
 
@@ -3265,7 +3301,7 @@ function ClmEventResultsTableCtrl($scope, $q, $log, $mdDialog, $document,
         self.visibleTasks = self.tasks.filter(function (t) {
             return !t.hidden && !t.archived;
         });
-        
+
         taskCompletion();
     }
 

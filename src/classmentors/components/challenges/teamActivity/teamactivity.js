@@ -1,7 +1,7 @@
 import teamActivityCreateTmpl from './team-view-create.html!text';
 import teamIRATTmpl from './teamactivity-view-irat-start.html!text';
 import teamTRATTmpl from './teamactivity-view-trat-start.html!text';
-
+import teamFormationTmpl from './teamactivity-view-teamFormation.html!text';
 function createTeamActivityInitialData($q, eventService, clmDataStore) {
     var data = eventService.get();
     console.log("team data is:", data);
@@ -73,7 +73,6 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
           for(var i = 0; i < participants; i ++){
             teamStructure[i % methodParameter] += 1;
           }
-          console.log(teamStructure);
         }else{//else by teamSize
            while (participants > methodParameter) {
              teamStructure.push(methodParameter);
@@ -96,7 +95,7 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
         var team = {}
         console.log(members);
         for(var i = 0; i < members; i++){
-            team[i] = "TEST";
+            team[i] = "";
         }
         console.log(angular.toJson(team));
         return team;
@@ -128,25 +127,6 @@ createTeamActivityController.$inject = [
     'eventService'
     ];
 
-
-function startIRATController($q, initialData, clmDataStore, $location, urlFor) {
-    //todo: implement irat logic here
-
-
-    this.submitIrat = function(){
-        
-        $location.path(urlFor('oneEvent'));
-    };
-}
-
-startIRATController.$inject = [
-    '$q',
-    'initialData',
-    'clmDataStore',
-    '$location',
-    'urlFor'
-]
-
 function startTRATController($q, initialData, clmDataStore, $location, urlFor){
     this.submitTrat = function(){
         $location.path(urlFor('oneEvent'));
@@ -164,12 +144,13 @@ export {
     teamActivityCreateTmpl,
     createTeamActivityInitialData,
     createTeamActivityController,
-    startIRATController,
     teamIRATTmpl,
     startTRATController,
-    teamTRATTmpl
+    teamTRATTmpl,
+    teamFormationTmpl
 
 };
+// startIRATController,
 // export function teamActivityCreateView(){
 //   return teamActivityCreateTmpl;
 // }

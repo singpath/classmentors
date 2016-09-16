@@ -608,7 +608,10 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
             },
 
             addTeamFormation: function (eventId, task, priority) {
-                return spfFirebase.push(['classMentors/eventTasks', eventId], task);
+                return spfFirebase.push(['classMentors/eventTasks', eventId], task).then(function(ref){
+                    ref.setPriority(priority);
+                    return ref;
+                });
             },
 
             addTrat: function(eventId, task, priority){

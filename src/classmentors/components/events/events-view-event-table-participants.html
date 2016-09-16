@@ -101,7 +101,7 @@
                         </md-button>
                             </span>
                         <md-button class="md-raised md-primary" ng-if="task.formationPattern"
-                                   ng-click=""
+                                   ng-click="ctrl.promptForTeamFormation(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant, ctrl.currentUserSolutions)"
                                    target="_blank"
                                    ng-disabled="task.closedAt"
                                    aria-label="Start form team"

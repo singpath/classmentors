@@ -161,7 +161,7 @@ export function challengeServiceFactory
     save : function(event, taskId, task, taskType, isOpen) {
       var copy = spfFirebase.cleanObj(task);
       var answers = copy.answers;
-      console.log('COPY IS ... ', copy);
+      console.log('COPY IS!! ', copy);
       self.creatingTask = true;
       if (taskType === 'multipleChoice'){
         delete copy.singPathProblem;
@@ -209,13 +209,14 @@ export function challengeServiceFactory
             var previousTaskId = ref.key();
             console.log('IRAT key is :', previousTaskId);
             clmDataStore.events.addTeamFormation(event.$id, {
-              taskFrom: previousTaskId,
-              title: copy.title,
-              description: "Click Below To Join Team",
-              formationPattern: true,
-              closedAt : {'.sv': 'timestamp'},
-              showProgress: copy.showProgress,
-              archived: false,
+                taskFrom: previousTaskId,
+                title: copy.title,
+                description: "Click Below To Join Team",
+                formationPattern: true,
+                closedAt : {'.sv': 'timestamp'},
+                showProgress: copy.showProgress,
+                archived: false,
+                teamFormationMethod: copy.teamFormationMethod
             }, copy.priority).then(function(teamRef){
               //create teams here
               var taskId = teamRef.key()
@@ -256,7 +257,6 @@ export function challengeServiceFactory
     update: function(event, taskId, task, taskType, isOpen) {
       var copy = spfFirebase.cleanObj(task);
       var answers = copy.answers;
-      console.log('COPY IS ... ', copy);
       if (taskType === 'linkPattern') {
         delete copy.badge;
         delete copy.serviceId;
