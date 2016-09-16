@@ -97,18 +97,32 @@
           "questions": {
             "$questionId": {
               ".write": "auth != null && root.child('auth/users').child(auth.uid).child('publicId').exists() && root.child('classMentors/eventParticipants').child($eventId).child(root.child('auth/users').child(auth.uid).child('publicId').val()).exists()",
-              "title": {},
-              "body": {},
+              ".validate": "newData.hasChildren(['title', 'body', 'owner', 'createdAt'])",
+              "title": {
+                ".validate": "newData.isString() && newData.val().length >= 3"
+              },
+              "body": {
+                ".validate": "newData.isString() && newData.val().length >= 3"
+              },
               "owner": {
-                "displayName": {},
-                "gravatar": {},
-                "publicId": {}
+                ".validate": "newData.hasChildren(['displayName', 'gravatar', 'publicId'])",
+                "publicId": {
+                  ".validate": "(data.exists() == false || data.val() == newData.val()) && $publicId.length > 0 && root.child('auth/publicIds').child(newData.val()).val() == auth.uid"
+                },
+                "$key": {
+                  ".validate": "$key == 'displayName' || $key == 'gravatar' && newData.val() == root.child('auth/users').child(auth.uid).child($key).val()"
+                }
               },
               "upVotes": {
                 "$participantId": {}
               },
-              "createdAt": {},
-              "answeredBy": {}
+              "createdAt": {
+                ".validate": "data.exists() == false && newData.val() == now"
+              },
+              "answeredBy": {},
+              "$other": {
+                ".validate": false
+              }
             }
           },
           "answers": {
