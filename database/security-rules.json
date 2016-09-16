@@ -90,45 +90,47 @@
     },
     "classMentors": {
       "eventQuestions":{
-        ".read": "auth !== null && root.child('classMentors/admins').child(auth.uid).val() === true",
-        ".write": "auth !== null && root.child('classMentors/admins').child(auth.uid).val() === true",
         "$eventId":{
-          ".write": true,
-          ".read": "auth !== null && root.child('classMentors/events').child($eventId).child('owner/publicId').val() === root.child('auth/users').child(auth.uid).child('publicId').val()",
-          "questionOwners":{
-            "$ownerPublicId":{
-              "$questionId":{
-                 ".write":true
-              }
+          "questions":{
+            "$questionId": {
+              "title": {},
+              "body": {},
+              "owner": {
+                "displayName": {},
+                "gravatar": {},
+                "publicId": {}
+              },
+              "upVotes": {
+                "$participantId": {}
+              },
+              "createdAt": {},
+              "answeredBy": {}
             }
           },
-          "questions":{
-            ".read": true,
-            "$questionId":{
-              "upVotes": {
-                "$participantId":{
-                  ".write":true
-                }
-              },
-              "answers":{
-                "$publicId":{
-                  ".write":true,
-                  "upVotes": {
-                    "$participantId":{
-                        ".write":true
-                    }
-                  },
-                  "comments":{
-                    "$commentId":{
-                      ".write":true,
-                      "$commentorId":{
-                        ".write":true
-                      }
+          "answers": {
+            "$questionId": {
+              "$publicId": {
+                "body": {},
+                "upVotes": {
+                  "$participantId": {}
+                },
+                "createdAt": {},
+                "acceptedAt": {},
+                "comments": {
+                  "$commentId": {
+                    "body": {},
+                    "createdAt": {},
+                    "owner": {
+                      "displayName": {},
+                      "publicId": {}
                     }
                   }
                 }
               }
             }
+          },
+          "$other": {
+            ".validate": false
           }
         }
       },

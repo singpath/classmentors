@@ -159,6 +159,54 @@
         "title": "Test event"
       }
     },
+    "eventQuestions": {
+      "alice-event": {
+        "questions": {
+          "bob-question-1": {
+            "title": "Test",
+            "body": "Test question please ignore...",
+            "owner": {
+              "displayName": "Bob Smith",
+              "gravatar": "//www.gravatar.com/avatar/bob00000000000000000000000000000",
+              "publicId": "bob"
+            },
+            "upvote": {
+              "alice": true
+            },
+            "createdAt": 126000000000,
+            "answeredBy": "alice"
+          }
+        },
+        "answers": {
+          "bob-question-1": {
+            "alice": {
+              "body": "Ignored...",
+              "owner": {
+                "displayName": "Alice Smith",
+                "gravatar": "//www.gravatar.com/avatar/alice000000000000000000000000000",
+                "publicId": "alice"
+              },
+              "upVotes": {
+                "bob": true
+              },
+              "createdAt": 126000000000,
+              "acceptedAt": 127000000000,
+              "comments": {
+                "bob-comment-1": {
+                  "body": "Thanks!",
+                  "createdAt": 128000000000,
+                  "owner": {
+                    "displayName": "Bob Smith",
+                    "gravatar": "//www.gravatar.com/avatar/bob00000000000000000000000000000",
+                    "publicId": "bob"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "schools": {
       "Admiralty Secondary School": {
         "iconUrl": "/assets/crests/tempbadge.png",
