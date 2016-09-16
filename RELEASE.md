@@ -8,11 +8,14 @@ The release package are upload by Travis each time a tag is pushed to
 
 Bump the `package.json` version number, commit it, create a new tag and push
 the change and the new tag. You can use `npm version major|minor|patch` or
-`bin/release`:
-```
-./bin/release patch
+`./tools/bin/release.sh`.
 
-or 
+For example, to push patch change (if the current verion is 0.0.0, the new will
+be 0.0.1)
+```
+./tools/bin/release.sh patch
+
+# or
 
 export NEW_VERSION=$(npm version patch)
 git push origin master $NEW_VERSION
@@ -31,4 +34,3 @@ npm run travis-setup
 ```
 
 [singpath/classmentors]: https://github.com/singpath/classmentors
-
