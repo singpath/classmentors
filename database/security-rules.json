@@ -93,8 +93,10 @@
         ".read": "root.child('classMentors/admins').child(auth.uid).val() == true",
         "$eventId": {
           ".read": "auth != null && root.child('auth/users').child(auth.uid).child('publicId').exists() && (root.child('classMentors/events').child($eventId).child('owner/publicId').val() == root.child('auth/users').child(auth.uid).child('publicId').val() || root.child('classMentors/eventParticipants').child($eventId).child(root.child('auth/users').child(auth.uid).child('publicId').val()).exists())",
+          ".write": "auth != null && root.child('auth/users').child(auth.uid).child('publicId').exists() && root.child('classMentors/events').child($eventId).child('owner/publicId').val() == root.child('auth/users').child(auth.uid).child('publicId').val()",
           "questions": {
             "$questionId": {
+              ".write": "auth != null && root.child('auth/users').child(auth.uid).child('publicId').exists() && root.child('classMentors/eventParticipants').child($eventId).child(root.child('auth/users').child(auth.uid).child('publicId').val()).exists()",
               "title": {},
               "body": {},
               "owner": {

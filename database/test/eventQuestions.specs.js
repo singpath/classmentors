@@ -14,22 +14,69 @@ describe('eventQuestions', function() {
 
   describe('read rules', function() {
     const eventId = 'alice-event';
-    const questionPath = `classMentors/eventQuestions/${eventId}/questions`;
+    const questionsPath = `classMentors/eventQuestions/${eventId}/questions`;
 
     it('should allow the admin to read eventQuestions', function() {
       expect(auth.admin).can.read.path('classMentors/eventQuestions');
     });
 
     it('should allow the event owner to read eventQuestions', function() {
-      expect(auth.alice).can.read.path(questionPath);
+      expect(auth.alice).can.read.path(questionsPath);
     });
 
     it('should allow the event participants to read eventQuestions', function() {
-      expect(auth.bob).can.read.path(questionPath);
+      expect(auth.bob).can.read.path(questionsPath);
     });
 
     it('should disallow other user to read eventQuestions', function() {
-      expect(auth.emma).cannot.read.path(questionPath);
+      expect(auth.emma).cannot.read.path(questionsPath);
+    });
+
+  });
+
+  describe('write rules', function() {
+    const eventId = 'alice-event';
+    const questionsPath = `classMentors/eventQuestions/${eventId}/questions`;
+
+    function makeQuestion(firebaseAuth) {
+      const user = utils.fixtures(`auth/users/${firebaseAuth.uid}`);
+
+      return {
+        title: 'Test',
+        body: 'Test question please ignore...',
+        owner: {
+          displayName: user.displayName,
+          gravatar: user.gravatar,
+          publicId: user.publicId
+        },
+        createdAt: utils.timestamp()
+      };
+    }
+
+    function addQuestion(id, firebaseAuth, shouldFail) {
+      const path = `${questionsPath}/${id}`;
+      const question = makeQuestion(firebaseAuth);
+
+      if (shouldFail) {
+        expect(firebaseAuth).cannot.write(question).to.path(path);
+      } else {
+        expect(firebaseAuth).can.write(question).to.path(path);
+      }
+    }
+
+    it('should allow the event owner to add a question', function() {
+      addQuestion('alice-question-2', auth.alice);
+    });
+
+    it('should allow participants to add a question', function() {
+      addQuestion('bob-question-2', auth.bob);
+    });
+
+    it('should disallow other user to add a question', function() {
+      const shouldFail = true;
+
+      addQuestion('admin-question-1', auth.admin, shouldFail);
+      addQuestion('emma-question-1', auth.emma, shouldFail);
     });
 
     // it('should allow the event owner to read questionOwners', function() {

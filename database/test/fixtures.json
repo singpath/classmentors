@@ -170,11 +170,24 @@
               "gravatar": "//www.gravatar.com/avatar/bob00000000000000000000000000000",
               "publicId": "bob"
             },
-            "upvote": {
+            "upVotes": {
               "alice": true
             },
             "createdAt": 126000000000,
             "answeredBy": "alice"
+          },
+          "alice-question-1": {
+            "title": "Test",
+            "body": "Test question please ignore...",
+            "owner": {
+              "displayName": "Alice Smith",
+              "gravatar": "//www.gravatar.com/avatar/alice000000000000000000000000000",
+              "publicId": "alice"
+            },
+            "upVotes": {
+              "bob": true
+            },
+            "createdAt": 126000000000
           }
         },
         "answers": {
