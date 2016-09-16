@@ -10,7 +10,7 @@ if [[ -z $1 ]]; then
   exit 1
 fi
 
-git co master
+git checkout master
 git pull git@github.com:singpath/classmentors.git master
 
 NEW_VERSION=$(npm version "$1")
