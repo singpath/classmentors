@@ -2101,8 +2101,11 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             4. Team radio button should be disabled when team is full.
             */
             self.onClick = function(index){
-              //Check if selected index has changed, else do nothing.
-              if(self.selectedTeam & index != self.selectedTeam){
+              
+              // If user has not joined any team
+              if(self.selectedTeam == undefined){
+                joinTeam(index);
+              }else if(index != self.selectedTeam){ //Check if selected index has changed, else do nothing.
                 // Leave previous team.
                 leaveTeam(self.selectedTeam);
                 // Join new team.
