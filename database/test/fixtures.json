@@ -1,0 +1,276 @@
+{
+  "auth": {
+    "publicIds": {
+      "alice": "google:alice",
+      "bob": "google:bob",
+      "chris": "google:chris",
+      "emma": "google:emma"
+    },
+    "usedPublicIds": {
+      "alice": true,
+      "bob": true,
+      "chris": true,
+      "emma": true
+    },
+    "users": {
+      "google:alice": {
+        "displayName": "Alice Smith",
+        "email": "alice@example.com",
+        "fullName": "Alice Smith",
+        "gravatar": "//www.gravatar.com/avatar/alice000000000000000000000000000",
+        "id": "google:alice",
+        "publicId": "alice",
+        "yearOfBirth": 1992,
+        "createdAt": 123100000000
+      },
+      "google:chris": {
+        "country": {
+          "code": "SG",
+          "name": "Singapore"
+        },
+        "createdAt": 123000000000,
+        "displayName": "Chris Boesch",
+        "email": "chris@example.com",
+        "fullName": "Chris Boesch",
+        "gravatar": "//www.gravatar.com/avatar/chris000000000000000000000000000",
+        "id": "google:chris",
+        "publicId": "chris",
+        "yearOfBirth": 1990
+      },
+      "google:bob": {
+        "displayName": "Bob Smith",
+        "email": "bob@example.com",
+        "fullName": "Bob Smith",
+        "gravatar": "//www.gravatar.com/avatar/bob00000000000000000000000000000",
+        "id": "google:bob",
+        "publicId": "bob",
+        "yearOfBirth": 1991,
+        "createdAt": 123200000000
+      },
+      "google:emma": {
+        "displayName": "Emma Smith",
+        "email": "emma@example.com",
+        "fullName": "Emma Smith",
+        "gravatar": "//www.gravatar.com/avatar/emma0000000000000000000000000000",
+        "id": "google:emma",
+        "publicId": "emma",
+        "yearOfBirth": 1993,
+        "createdAt": 123300000000
+      }
+    }
+  },
+  "classMentors": {
+    "admins": {
+      "google:chris": true
+    },
+    "premiumUsers": {
+      "google:alice": true,
+      "google:chris": true
+    },
+    "settings": {
+      "someId": {
+        "value": false,
+        "title": "Some settings",
+        "type": "boolean"
+      }
+    },
+    "badges": {
+      "codeCombat": {
+        "arcane-ally": {
+          "iconUrl": "/assets/icons/taunt_15.png",
+          "id": "arcane-ally",
+          "name": "Arcane Ally",
+          "url": "http://codecombat.com/play/level/arcane-ally"
+        },
+        "back-to-back": {
+          "iconUrl": "/assets/icons/taunt_6.png",
+          "id": "back-to-back",
+          "name": "Back to Back",
+          "url": "http://codecombat.com/play/level/back-to-back"
+        },
+        "bonemender": {
+          "iconUrl": "/assets/icons/taunt_17.png",
+          "id": "bonemender",
+          "name": "Bonemender",
+          "url": "http://codecombat.com/play/level/bonemender"
+        }
+      },
+      "codeSchool": {
+        "anatomy-of-backbone-js-part-2-level-1-on-anatomy-of-backbone-js-part-2": {
+          "iconUrl": "https://d1ffx7ull4987f.cloudfront.net/images/achievements/large_badge/184/level-1-on-anatomy-of-backbone-js-part-2-8f767bef5eff75d1bd09aa5354d8108f.png",
+          "id": "anatomy-of-backbone-js-part-2-level-1-on-anatomy-of-backbone-js-part-2",
+          "name": "Level 1 on Anatomy of Backbone.JS Part 2",
+          "url": "https://www.codeschool.com/courses/anatomy-of-backbone-js-part-2"
+        },
+        "assembling-sass-part-2-level-1-on-assembling-sass-part-2": {
+          "iconUrl": "https://d1ffx7ull4987f.cloudfront.net/images/achievements/large_badge/178/level-1-on-assembling-sass-part-2-4e2c92173d4863bed99b94f3fc2aa218.png",
+          "id": "assembling-sass-part-2-level-1-on-assembling-sass-part-2",
+          "name": "Level 1 on Assembling Sass Part 2",
+          "url": "https://www.codeschool.com/courses/assembling-sass-part-2"
+        },
+        "blasting-off-with-bootstrap-blasting-off-with-bootstrap-level-1-badge": {
+          "iconUrl": "https://d1ffx7ull4987f.cloudfront.net/images/achievements/large_badge/476/level-1-complete-de745560878ebb460fba573e79046c16.png",
+          "id": "blasting-off-with-bootstrap-blasting-off-with-bootstrap-level-1-badge",
+          "name": "Blasting Off with Bootstrap Level 1 Badge",
+          "url": "https://www.codeschool.com/courses/blasting-off-with-bootstrap"
+        }
+      }
+    },
+    "eventApplications": {
+      "alice-event": {
+        "google:bob": "alice-password-hash-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      }
+    },
+    "eventParticipants": {
+      "alice-event": {
+        "bob": {
+          "user": {
+            "displayName": "Bob Smith",
+            "gravatar": "//www.gravatar.com/avatar/bob00000000000000000000000000000"
+          },
+          "joinedAt": 126000000000
+        }
+      }
+    },
+    "eventPasswords": {
+      "alice-event": {
+        "hash": "alice-password-hash-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "options": {
+          "hasher": "PBKDF2",
+          "iterations": 1012,
+          "keySize": 8,
+          "prf": "SHA256",
+          "salt": "alice-salt-xxxxxxxxxxxxxxxxxxxxx"
+        }
+      }
+    },
+    "eventProgress": {},
+    "eventRankings": {},
+    "eventSolutions": {},
+    "eventTasks": {},
+    "events": {
+      "alice-event": {
+        "createdAt": 125000000000,
+        "owner": {
+          "displayName": "Alice Smith",
+          "gravatar": "//www.gravatar.com/avatar/alice000000000000000000000000000",
+          "publicId": "alice"
+        },
+        "title": "Test event"
+      }
+    },
+    "schools": {
+      "Admiralty Secondary School": {
+        "iconUrl": "/assets/crests/tempbadge.png",
+        "id": "Admiralty Secondary School",
+        "name": "Admiralty Secondary School",
+        "type": "Secondary"
+      },
+      "Ahmad Ibrahim Secondary School": {
+        "iconUrl": "/assets/crests/tempbadge.png",
+        "id": "Ahmad Ibrahim Secondary School",
+        "name": "Ahmad Ibrahim Secondary School",
+        "type": "Secondary"
+      },
+      "Anderson Junior College": {
+        "iconUrl": "/assets/crests/Anderson_Junior_College_crest.jpg",
+        "id": "Anderson Junior College",
+        "name": "Anderson Junior College",
+        "type": "Junior College"
+      }
+    },
+    "servicesUserIds": {
+      "codeCombat": {
+        "codeCombat:alice": "alice"
+      },
+      "freeCodeCamp": {
+        "freeCodeCamp:alice": "alice"
+      },
+      "pivotalExpert": {
+        "pivotalExpert:alice": "alice"
+      }
+    },
+    "userProfiles": {
+      "alice": {
+        "createdEvents": {
+          "alice-event": {
+            "createdAt": 125000000000,
+            "featured": false,
+            "title": "Test event"
+          }
+        },
+        "user": {
+          "displayName": "Alice Smith",
+          "gravatar": "//www.gravatar.com/avatar/alice000000000000000000000000000",
+          "isPremium": true,
+          "yearOfBirth": 1992
+        }
+      },
+      "chris": {
+        "user": {
+          "country": {
+            "code": "SG",
+            "name": "Singapore"
+          },
+          "displayName": "Chris Boesch",
+          "gravatar": "//www.gravatar.com/avatar/somehashsomehashsomehashsomehash",
+          "isAdmin": true,
+          "isPremium": true,
+          "yearOfBirth": 1990
+        }
+      },
+      "bob": {
+        "joinedEvents": {
+          "alice-event": {
+            "createdAt": 125000000000,
+            "title": "Test event",
+            "owner": {
+              "displayName": "Alice Smith",
+              "gravatar": "//www.gravatar.com/avatar/alice000000000000000000000000000",
+              "publicId": "alice"
+            }
+          }
+        },
+        "services": {
+          "codeCombat": {
+            "details": {
+              "id": "codeCombat:bob",
+              "name": "codeCombat:bob",
+              "registeredBefore": 123000000000
+            },
+            "lastUpdate": 123000001000
+          },
+          "freeCodeCamp": {
+            "details": {
+              "id": "freeCodeCamp:bob",
+              "name": "freeCodeCamp:bob",
+              "registeredBefore": 123000004000
+            }
+          },
+          "pivotalExpert": {
+            "details": {
+              "id": "pivotalExpert:bob",
+              "name": "pivotalExpert:bob",
+              "registeredBefore": 123000005000
+            }
+          }
+        },
+        "user": {
+          "displayName": "Bob Smith",
+          "gravatar": "//www.gravatar.com/avatar/bob00000000000000000000000000000",
+          "yearOfBirth": 1991
+        }
+      },
+      "emma": {
+        "user": {
+          "displayName": "Emma Smith",
+          "gravatar": "//www.gravatar.com/avatar/emma0000000000000000000000000000",
+          "yearOfBirth": 1993
+        }
+      }
+    }
+  },
+  "meta": {
+    "version": 2
+  }
+}

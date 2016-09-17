@@ -3,6 +3,7 @@
 const chai = require('chai');
 const expect = chai.expect;
 const utils = require('./utils.js');
+const auth = utils.auth;
 
 describe('events', function() {
 
@@ -11,84 +12,57 @@ describe('events', function() {
   });
 
   describe('joining', function() {
-    const eventId = 'some-event-id';
-    const passwordHash = 'x'.repeat(64);
-    let event, admin, bob, init;
+    const passwordHash = utils.fixtures('classMentors/eventPasswords/alice-event/hash');
+    let user;
 
     beforeEach(function() {
-      bob = utils.bob();
-      admin = utils.admin();
-      event = {
-        createdAt: 1465362866984,
-        owner: admin.userWithId,
-        title: 'Test event'
-      };
-      init = {
-        auth: bob.auth,
-        classMentors: {
-          userProfiles: bob.userProfiles,
-          events: {[eventId]: event},
-          eventPasswords: {
-            [eventId]: {
-              hash: passwordHash,
-              options: {
-                hasher: 'PBKDF2',
-                iterations: 1012,
-                keySize: 8,
-                prf: 'SHA256',
-                salt: 'x'.repeat(32)
-              }
-            }
-          }
-        }
-      };
-      utils.setFirebaseData(init);
+      user = utils.fixtures('classMentors/eventParticipants/alice-event/bob/user');
     });
 
     it('should let a user join an event if has the password', function() {
-      expect(bob.firebaseAuth).can.write(passwordHash).path(`classMentors/eventApplications/${eventId}/${bob.uid}`);
+      utils.setFirebaseData({
+        classMentors: {
+          eventApplications: {'alice-event': {'google:bob': undefined}},
+          eventParticipants: {'alice-event': {bob: undefined}}
+        }
+      });
+      expect(auth.bob).can.write(passwordHash).path('classMentors/eventApplications/alice-event/google:bob');
 
-      init.classMentors.eventApplications = {[eventId]: {[bob.uid]: passwordHash}};
-      utils.setFirebaseData(init);
-      expect(bob.firebaseAuth).can.patch({
-        user: bob.user,
+      utils.setFirebaseData({classMentors: {eventParticipants: {'alice-event': {bob: undefined}}}});
+      expect(auth.bob).can.patch({
+        user: user,
         joinedAt: utils.timestamp()
-      }).path(`classMentors/eventParticipants/${eventId}/${bob.publicId}`);
+      }).path('classMentors/eventParticipants/alice-event/bob');
     });
 
     it('should not let a user join an event without a timestamp', function() {
-      init.classMentors.eventApplications = {[eventId]: {[bob.uid]: passwordHash}};
-      utils.setFirebaseData(init);
+      utils.setFirebaseData({classMentors: {eventParticipants: {'alice-event': {bob: undefined}}}});
 
-      expect(bob.firebaseAuth).cannot.patch({user: bob.user})
-        .path(`classMentors/eventParticipants/${eventId}/${bob.publicId}`);
+      expect(auth.bob).cannot.patch({user})
+        .path('classMentors/eventParticipants/alice-event/bob');
     });
 
-    it('should let a user edit details its details without a timestamp (old records)', function() {
-      init.classMentors.eventApplications = {[eventId]: {[bob.uid]: passwordHash}};
-      init.classMentors.eventParticipants = {[eventId]: {[bob.publicId]: {user: bob.user}}};
-      init.auth.users[bob.uid].displayName += ' 2';
-      utils.setFirebaseData(init);
+    it('should let a user edit details its details', function() {
+      utils.setFirebaseData({auth: {users: {'google:bob': {displayName: 'Just Bob'}}}});
 
-      expect(bob.firebaseAuth).can.write(
-        init.auth.users[bob.uid].displayName
-      ).path(`classMentors/eventParticipants/${eventId}/${bob.publicId}/user/displayName`);
+      expect(auth.bob).can.write(
+        'Just Bob'
+      ).path('classMentors/eventParticipants/alice-event/bob/user/displayName');
+    });
+
+    it.skip('should let a owner edit user details', function() {
+      utils.setFirebaseData({auth: {users: {'google:bob': {displayName: 'Just Bob'}}}});
+
+      expect(auth.alice).can.write(
+        'Just Bob'
+      ).path('classMentors/eventParticipants/alice-event/bob/user/displayName');
     });
 
     it('should let the owner remove participants', function() {
-      init.classMentors.eventApplications = {[eventId]: {[bob.uid]: passwordHash}};
-      init.classMentors.eventParticipants = {
-        [eventId]: {
-          [bob.publicId]: {
-            user: bob.user,
-            joinedAt: 1234567890
-          }
-        }
-      };
-      utils.setFirebaseData(init);
+      utils.setFirebaseData();
 
-      expect(admin.firebaseAuth).can.write(null)
-        .path(`classMentors/eventParticipants/${eventId}/${bob.publicId}`);
+      expect(auth.alice).can.write(null)
+        .path('classMentors/eventParticipants/alice-event/bob');
     });
 
   });

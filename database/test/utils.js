@@ -1,131 +1,115 @@
 'use strict';
 
-var exportData = require('./singpath-play-export.json');
-var rules = require('../security-rules.json');
-var targaryen = require('@dinoboff/targaryen');
-var merge = require('lodash.merge');
+const fixtures = require('./fixtures.json');
+const rules = require('../security-rules.json');
+const targaryen = require('@dinoboff/targaryen');
+const mergeWith = require('lodash.mergewith');
 
-const timestamp = () => ({'.sv': 'timestamp'});
+const baseData = mergeWith({}, fixtures);
 
 before(function() {
   targaryen.setDebug(true);
   targaryen.setFirebaseRules(rules);
 });
 
-exports.timestamp = timestamp;
+/**
+ * Return a Firebase timestamp server value.
+ *
+ * @return {{'.sv': string}}
+ */
+exports.timestamp = function() {
+  return {'.sv': 'timestamp'};
+};
 
 /**
- * Set targaryen's firebase data by complining singpath-play-export data
+ * Set targaryen's firebase data by merging fixtures.json data
  * with the patch.
  *
- * Note with will merge each data node. To remove a node, the patch needs set it
- * to "undefined":
+ * It makes sure fixtures.json doesn't change between tests.
+ *
+ * Note with will merge recursively each data node. To remove a node, the patch
+ * needs set it to "undefined":
  *
  * @example
  * // remove user from initial data
  * setFirebaseData({
  *   auth : {
- *     publicIds: {cboesch: undefined},
- *     usedPublicIds: {cboesch: undefined},
- *     users: {'google:123456': undefined}
+ *     publicIds: {chris: undefined},
+ *     usedPublicIds: {chris: undefined},
+ *     users: {'google:chris': undefined}
  *   }
  * });
  *
- * @param {Object} patch optional patch to singpath-play-export.json
+ * @param {Object} patch Optional patch to "fixtures.json".
  */
 exports.setFirebaseData = function(patch) {
-  var data = merge({}, exportData);
+  let data = mergeWith({}, baseData);
 
   if (patch) {
-    data = merge(data, patch);
+    data = mergeWith(data, patch, (value, newValue, key, obj) => {
+      if (newValue === undefined) {
+        delete obj[key];
+      }
+    });
   }
 
   targaryen.setFirebaseData(data);
 };
 
-exports.bob = function(opts) {
-  opts = Object.assign({
-    isAdmin: false,
-    isPremium: false
-  }, opts);
+/**
+ * Return a node in the fixture data.
+ *
+ * @param  {string} path Path the the node in the fixture data.
+ * @return {any}
+ */
+exports.fixtures = function(path) {
+  const parts = path.split('/').filter(p => p && p.length);
+  const data = mergeWith({}, baseData);
 
-  const uid = 'github:808';
-  const publicId = 'bob';
-  const firebaseAuth = {
-    uid,
-    id: 808,
-    provider: 'github'
-  };
-  const user = {
-    displayName: 'bob',
-    gravatar: '//www.gravatar.com/avatar/some-hash'
-  };
-  const userData = {
-    displayName: user.displayName,
-    email: 'bob@example.com',
-    fullName: 'Bob Smith',
-    gravatar: user.gravatar,
-    id: uid,
-    publicId: publicId,
-    yearOfBirth: 1990,
-    createdAt: timestamp()
-  };
-  const auth = {
-    publicIds: {[publicId]: uid},
-    usedPublicIds: {[publicId]: true},
-    users: {[uid]: userData}
-  };
-  const profile = {
-    user: {
-      displayName: user.displayName,
-      gravatar: user.gravatar,
-      isAdmin: opts.isAdmin,
-      isPremium: opts.isPremium,
-      yearOfBirth: userData.yearOfBirth
-    }
-  };
-  const userProfiles = {[publicId]: profile};
-  const premiumUsers = {[uid]: opts.isPremium};
-  const admins = {[uid]: opts.isAdmin};
-
-  return {
-    admins,
-    auth,
-    firebaseAuth,
-    premiumUsers,
-    profile,
-    publicId,
-    uid,
-    user,
-    userData,
-    userProfiles
-  };
+  return parts.reduce((node, key) => node[key] || {}, data);
 };
 
-exports.admin = function(opts) {
-  opts = Object.assign({
-    isAdmin: true,
-    isPremium: true
-  }, opts);
+/**
+ * List of read only firebase auth for targaryen's tests.
+ *
+ * @type {admin: object, alice: object, chris: object, bob: object}
+ */
+exports.auth = {
 
-  const uid = 'google:123456';
-  const publicId = 'cboesch';
-  const firebaseAuth = {
-    uid,
-    id: 123456,
-    provider: 'google'
-  };
-  const user = {
-    displayName: 'Chris Boesch',
-    gravatar: '//www.gravatar.com/avatar/somehashsomehashsomehashsomehash'
-  };
-  const userWithId = Object.assign({publicId}, user);
+  get admin() {
+    return {
+      uid: 'google:chris',
+      id: 'chris',
+      provider: 'google'
+    };
+  },
 
-  return {
-    firebaseAuth,
-    publicId,
-    uid,
-    user,
-    userWithId
-  };
+  get alice() {
+    return {
+      uid: 'google:alice',
+      id: 'alice',
+      provider: 'google'
+    };
+  },
+
+  get chris() {
+    return this.admin;
+  },
+
+  get bob() {
+    return {
+      uid: 'google:bob',
+      id: 'bob',
+      provider: 'google'
+    };
+  },
+
+  get emma() {
+    return {
+      uid: 'google:emma',
+      id: 'emma',
+      provider: 'google'
+    };
+  }
+
 };

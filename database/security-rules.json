@@ -132,17 +132,17 @@
           }
         }
       },
-      "userActions":{
-        "$userActions":{
-          ".write":"newData.hasChildren(['publicId','action','timestamp'])",
-          "publicId":{
-            ".validate":"newData.isString() && root.child('auth/publicIds').child(newData.val()).val() === auth.uid"
+      "userActions": {
+        "$userActions": {
+          ".write": "newData.hasChildren(['publicId','action','timestamp'])",
+          "publicId": {
+            ".validate": "newData.isString() && root.child('auth/publicIds').child(newData.val()).val() === auth.uid"
           }
         },
         ".write": "auth !== null",
         ".read": "auth !== null && root.child('classMentors/admins').child(auth.uid).val() === true"
       },
-      "surveyTemplate":{
+      "surveyTemplate": {
         ".read": true,
         ".write": true
       },
@@ -218,12 +218,12 @@
         ".read": true,
         ".write": "auth !== null && root.child('classMentors/admins').child(auth.uid).val() === true"
       },
-      "eventTeams":{
-        "$teamId":{
-            "$userId":{
-                ".write":true,
-                ".read":true
-            }
+      "eventTeams": {
+        "$teamId": {
+          "$userId": {
+            ".write": true,
+            ".read": true
+          }
         }
       },
       "eventApplications": {
@@ -262,8 +262,8 @@
           ".write": "auth !== null && root.child('classMentors/events').child($eventId).child('owner/publicId').val() === root.child('auth/users').child(auth.uid).child('publicId').val()"
         }
       },
-      "eventAnswers":{
-        "$eventId":{
+      "eventAnswers": {
+        "$eventId": {
           ".validate": "root.child('classMentors/eventTasks/' + $eventId).exists()",
           ".write": true,
           ".read": true
@@ -422,8 +422,8 @@
                 ".validate": "data.val() == newData.val() ||(\n  data.exists() === false\n  && newData.isString()\n  && (newData.val() === 'closed' || newData.val() === 'opened' )\n)"
               }
             },
-            "teams":{
-                ".validate":"newData.isString()"
+            "teams": {
+              ".validate": "newData.isString()"
             },
             "link": {
               ".validate": "newData.isString() && newData.val().matches(/^(https?:\\/\\/.+|#\\/).+$/)"

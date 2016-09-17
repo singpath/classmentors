@@ -3,215 +3,175 @@
 const chai = require('chai');
 const expect = chai.expect;
 const utils = require('./utils.js');
+const auth = utils.auth;
 
-describe('registration', function() {
-  const bobPublicId = 'bob';
-  let bob, alice, bobData;
+describe('auth', function() {
 
-  beforeEach(function() {
-    bob = {
-      uid: 'github:12345',
-      id: 12345,
-      provider: 'github'
-    };
-    alice = {
-      uid: 'github:12346',
-      id: 12346,
-      provider: 'github'
-    };
-    bobData = {
-      displayName: 'bob',
-      email: 'bob@example.com',
-      fullName: 'Bob Smith',
-      gravatar: '//www.gravatar.com/avatar/some-hash',
-      id: bob.uid,
-      yearOfBirth: 1990,
-      createdAt: {'.sv': 'timestamp'}
-    };
-    utils.setFirebaseData({auth: {users: {[bob.uid]: undefined}}});
-  });
+  describe('#registration', function() {
 
-  it('should allow authenticated user to register', function() {
-    expect(bob).can.write(bobData).path(`auth/users/${bob.uid}`);
-
-    utils.setFirebaseData({auth: {users: {[bob.uid]: bobData}}});
-    expect(bob).can.patch({
-      [`publicIds/${bobPublicId}`]: bob.uid,
-      [`usedPublicIds/${bobPublicId}`]: true,
-      [`users/${bob.uid}/publicId`]: bobPublicId
-    }).path('auth');
-  });
-
-  it('should fail is the publicId is already claimed', function() {
-    utils.setFirebaseData({
-      auth: {
-        publicIds: {[`${bobPublicId}`]: bob.uid},
-        usedPublicIds: {[`${bobPublicId}`]: true},
-        users: {
-          [bobData.uid]: bobData,
-          [alice.uid]: {
-            displayName: 'alice',
-            email: 'alice@example.com',
-            fullName: 'Alice Smith',
-            gravatar: '//www.gravatar.com/avatar/some-hash',
-            id: alice.uid,
-            yearOfBirth: 1990,
-            createdAt: {'.sv': 'timestamp'}
-          }
+    it('should allow authenticated user to save his data', function() {
+      utils.setFirebaseData({
+        auth: {
+          users: {'google:bob': undefined},
+          publicIds: {bob: undefined},
+          usedPublicIds: {bob: undefined}
         }
-      }
+      });
+
+      const bobData = utils.fixtures('auth/users/google:bob');
+
+      delete bobData.publicId;
+      bobData.createdAt = {'.sv': 'timestamp'};
+
+      expect(auth.bob).can.write(bobData).path('auth/users/google:bob');
     });
 
-    expect(bob).cannot.patch({
-      [`publicIds/${bobPublicId}`]: alice.uid,
-      [`usedPublicIds/${bobPublicId}`]: true,
-      [`users/${alice.uid}/publicId`]: bobPublicId
-    }).path('auth');
+    it('should let the user the claim a user name', function() {
+      utils.setFirebaseData({
+        auth: {
+          users: {'google:bob': {publicId: undefined}},
+          publicIds: {bob: undefined},
+          usedPublicIds: {bob: undefined}
+        }
+      });
+      expect(auth.bob).can.patch({
+        'publicIds/bob': 'google:bob',
+        'usedPublicIds/bob': true,
+        'users/google:bob/publicId': 'bob'
+      }).path('auth');
+
+    });
+
+    it('should fail is the publicId is already claimed', function() {
+      utils.setFirebaseData({
+        auth: {
+          users: {'google:bob': {publicId: undefined}},
+          publicIds: {bob: undefined},
+          usedPublicIds: {bob: undefined}
+        }
+      });
+
+      expect(auth.bob).cannot.patch({
+        'publicIds/alice': 'google:bob',
+        'usedPublicIds/alice': true,
+        'users/google:bob/publicId': 'alice'
+      }).path('auth');
+    });
+
   });
 
-  describe('auth', function() {
+  describe('publicIds', function() {
+    const path = 'auth/publicIds';
 
-    describe('publicIds', function() {
-      const path = 'auth/publicIds';
+    it('should not be searcheable', function() {
+      expect(auth.bob).cannot.read.path(path);
+    });
 
-      it('should not be searcheable', function() {
-        expect(bob).cannot.read.path(path);
+    describe('$publicId', function() {
+      const bobClaim = `${path}/bob`;
+
+      beforeEach(function() {
+        utils.setFirebaseData();
       });
 
-      describe('$publicId', function() {
-        const bobClaim = `${path}/${bobPublicId}`;
-        let patch;
+      it('should not be readeable', function() {
+        expect(null).cannot.read.path(bobClaim);
+      });
 
-        beforeEach(function() {
-          bobData.publicId = bobPublicId;
-          patch = {
-            auth: {
-              publicIds: {[`${bobPublicId}`]: bob.uid},
-              usedPublicIds: {[`${bobPublicId}`]: true},
-              users: {[bob.uid]: bobData}
-            }
-          };
-          utils.setFirebaseData(patch);
-        });
-
-        it('should not be readeable', function() {
-          expect(null).cannot.read.path(bobClaim);
-        });
-
-        it('should not be deleteable', function() {
-          expect(bob).cannot.write(null).path(bobClaim);
-        });
-
+      it('should not be deleteable', function() {
+        expect(auth.bob).cannot.write(null).path(bobClaim);
       });
 
     });
 
-    describe('usedPublicIds', function() {
-      const path = 'auth/usedPublicIds';
+  });
 
-      it('should be searcheable', function() {
-        expect(bob).can.read.path(path);
+  describe('usedPublicIds', function() {
+    const path = 'auth/usedPublicIds';
+
+    it('should be searcheable', function() {
+      expect(auth.bob).can.read.path(path);
+    });
+
+    describe('$publicId', function() {
+      const bobIsClaimed = `${path}/bob`;
+
+      beforeEach(function() {
+        utils.setFirebaseData();
       });
 
-      describe('$publicId', function() {
-        const bobIsClaimed = `${path}/${bobPublicId}`;
-        let patch;
-
-        beforeEach(function() {
-          bobData.publicId = bobPublicId;
-          patch = {
-            auth: {
-              publicIds: {[`${bobPublicId}`]: bob.uid},
-              usedPublicIds: {[`${bobPublicId}`]: true},
-              users: {[bob.uid]: bobData}
-            }
-          };
-          utils.setFirebaseData(patch);
-        });
-
-        it('should not be editable', function() {
-          expect(bob).cannot.write(false).path(bobIsClaimed);
-        });
-
+      it('should not be editable', function() {
+        expect(auth.bob).cannot.write(false).path(bobIsClaimed);
       });
 
     });
 
-    describe('users', function() {
-      const path = 'auth/users';
+  });
 
-      it('should not be searcheable', function() {
-        expect(bob).cannot.read.path(path);
+  describe('users', function() {
+    const path = 'auth/users';
+
+    it('should not be searcheable', function() {
+      expect(auth.bob).cannot.read.path(path);
+    });
+
+    describe('$userId', () => {
+      const userPath = `${path}/google:bob`;
+
+      beforeEach(function() {
+        utils.setFirebaseData();
       });
 
-      describe('$userId', () => {
-        let userPath, patch;
+      it('should be readeable by the user', function() {
+        expect(auth.bob).can.read.path(userPath);
+      });
 
-        beforeEach(function() {
-          userPath = `${path}/${bob.uid}`;
-          bobData.publicId = bobPublicId;
-          patch = {
-            auth: {
-              publicIds: {[`${bobPublicId}`]: bob.uid},
-              usedPublicIds: {[`${bobPublicId}`]: true},
-              users: {[bob.uid]: bobData}
-            }
-          };
-          utils.setFirebaseData(patch);
-        });
+      it('should not be readeable by other user', function() {
+        expect(auth.alice).cannot.read.path(userPath);
+      });
 
-        it('should be readeable by the user', function() {
-          expect(bob).can.read.path(userPath);
-        });
+      it('should only be writable by user', function() {
+        expect(auth.bob).can.write(1991).path(`${userPath}/yearOfBirth`);
+        expect(auth.alice).cannot.write(1991).path(`${userPath}/yearOfBirth`);
+      });
 
-        it('should not be readeable by other user', function() {
-          expect(alice).cannot.read.path(userPath);
-        });
+      it('can include a country', function() {
+        const country = {
+          name: 'Singapore',
+          code: 'SG'
+        };
 
-        it('should only be writable by user', function() {
-          expect(bob).can.write(1991).path(`${userPath}/yearOfBirth`);
-          expect(alice).cannot.write(1991).path(`${userPath}/yearOfBirth`);
-        });
+        expect(auth.bob).can.write(country).path(`${userPath}/country`);
+      });
 
-        it('can include a country', function() {
-          const country = {
-            name: 'Singapore',
-            code: 'SG'
-          };
+      it('can include school', function() {
+        const school = {
+          iconUrl: '/assets/crests/NUS_HS.jpeg',
+          id: 'NUS High School',
+          name: 'NUS High School',
+          type: 'Junior College'
+        };
 
-          expect(bob).can.write(country).path(`${userPath}/country`);
-        });
+        expect(auth.bob).can.write(school).path(`${userPath}/school`);
+      });
 
-        it('can include school', function() {
-          const school = {
-            iconUrl: '/assets/crests/NUS_HS.jpeg',
-            id: 'NUS High School',
-            name: 'NUS High School',
-            type: 'Junior College'
-          };
+      it('can include school with no icon', function() {
+        const school = {
+          id: 'NUS High School',
+          name: 'NUS High School',
+          type: 'Junior College'
+        };
 
-          expect(bob).can.write(school).path(`${userPath}/school`);
-        });
+        expect(auth.bob).can.write(school).path(`${userPath}/school`);
+      });
 
-        it('can include school with no icon', function() {
-          const school = {
-            id: 'NUS High School',
-            name: 'NUS High School',
-            type: 'Junior College'
-          };
+      it('can include a secret key', function() {
+        const keyPatch = {
+          secretKey: 's'.repeat(16),
+          secretKeyValidUntil: Date.now() + 3600
+        };
 
-          expect(bob).can.write(school).path(`${userPath}/school`);
-        });
-
-        it('can include a secret key', function() {
-          const keyPatch = {
-            secretKey: 's'.repeat(16),
-            secretKeyValidUntil: Date.now() + 3600
-          };
-
-          expect(bob).can.patch(keyPatch).path(userPath);
-        });
-
+        expect(auth.bob).can.patch(keyPatch).path(userPath);
       });
 
     });
