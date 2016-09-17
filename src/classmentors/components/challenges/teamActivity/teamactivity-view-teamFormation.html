@@ -10,12 +10,13 @@
                     <md-input-container md-no-float>
                        <md-radio-group ng-model="ctrl.value" ng-required='true'>
                            <md-radio-button ng-repeat='t in ctrl.teams' 
-                            ng-click="ctrl.onClick()"
+                            ng-click="ctrl.onClick($index)"
                             ng-value="$index">Team {{t.$id}}, max: {{t.maxSize}}</md-radio-button>
                        </md-radio-group>
                     </md-input-container>
                 </div>
                 {{ctrl.value}}
+                {{ctrl.teams}}
                 <div flex align='row'>
                 <md-button ng-disabled="true" type="submit" class="md-raised md-primary" style="width: 150px;">Join</md-button>
                 <md-button ng-click="ctrl.cancel()" class="md-raised md-primary" style="width: 150px;">Cancel

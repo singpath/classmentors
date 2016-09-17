@@ -2087,19 +2087,30 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         function DialogController(){
             var self = this;
             self.teams = {}
-            var teamEventPromise = spfFirebase.loadedArray(['classMentors/eventTeams/' + eventId + '/' + taskId]);
-            console.log(teamEventPromise.then);
+            var teamEventPromise = spfFirebase.loadedArray(['classMentors/eventTeams/',eventId,taskId]);
+            // console.log(teamEventPromise.then);
             var resolvedPromise = teamEventPromise.then(function(result,error){
                 self.teams = result;
             });
             
-            self.onClick = function(){
+            self.onClick = function(index){
               //participants is:
+              
               console.log(participant);
+              joinTeam(index);
             }
 
-            function join(){
+            function leaveTeam(index){
               
+            }
+            
+
+            function joinTeam(index){
+              console.log(index);
+              console.log(self.teams);
+              var team = self.teams[index];
+              console.log(team)
+              spfFirebase.set(['classMentors/eventTeams/',eventId,taskId,team.$id,participant.$id],participant.user);
             }
             //test data
             self.test_teams = [
