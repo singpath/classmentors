@@ -2067,64 +2067,83 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             parent: $document.body,
             template: team.teamFormationTmpl,
             controller: DialogController,
-            controllerAs: 'ctrl'
-            // resolve:{
-            //     teamFormationInitialData
-            // }
+            controllerAs: 'ctrl',
+            resolve:{
+                initialData: teamFormationInitialData
+            }
         });
 
-        // function teamFormationInitialData(){
-        //     // var surveyPromise = spfFirebase.loadedArray(['classMentors/surveyTemplate']);
-        //     var teamEventPromise = spfFirebase.loadedArray(['classMentors/eventTeams/' + eventId + '/' + taskId]);
-        //
-        //     return $q.all({
-        //         teamFormation: teamEventPromise.then(function (value) {
-        //             return value;
-        //         })
-        //     });
-        // };
-
-        function DialogController(){
-            var self = this;
-            self.selectedTeam = undefined; //Learning point here. undefined means not yet assigned a value. Whereas null is a special object.
-            self.teams = {}
-            var teamEventPromise = spfFirebase.loadedArray(['classMentors/eventTeams/',eventId,taskId]);
-            // console.log(teamEventPromise.then);
-            var resolvedPromise = teamEventPromise.then(function(result,error){
-                self.teams = result;
+        function teamFormationInitialData(){
+          console.log('InitialData loaded');
+          var teamEventPromise = spfFirebase.loadedArray(['classMentors/eventTeams/',eventId,taskId]);
+            return $q.all({
+                teams: teamEventPromise.then(function (result) {
+                    return result;
+                }),
+                selectedTeam: teamEventPromise.then(function (result){
+                  var teams = result;
+                  for(var i = 0; i < teams.length; i ++){
+                    var team = teams[i];
+                    // If participant's public Id can be found, return team index.
+                    console.log('Team: ', team);
+                    console.log('Participant id: ', participant.$id);
+                    if(team[participant.$id]){
+                      return i;
+                    }
+                  }
+                  return undefined;
+                })
             });
+        };
+
+        function DialogController(initialData){
+            console.log('initial data is: ',initialData);
+            var self = this;
+            // Learning point here. undefined means not yet assigned a value. Whereas null is a special object.
+            self.selectedTeam = initialData.selectedTeam; 
+            console.log(self.selectedTeam);
+            self.teams = {}
+            self.teams = initialData.teams;
+            var previousSelectedTeam = undefined
             
             /*TODO:
-            1. Remove user from previous teams when teams are switched.
-            2. When user exits dialog box, option should be saved.
-            3. User is able to see other teams and who is inside.
-            4. Team radio button should be disabled when team is full.
+            1. Remove user from previous teams when teams are switched. [X]
+            2. When user exits dialog box, option should be saved. [X]
+            3. User is able to see other teams and who is inside. 
+            4. Team radio button should be disabled when team is full. 
             */
-            self.onClick = function(index){
-              
-              // If user has not joined any team
-              if(self.selectedTeam == undefined){
+
+            self.onChange = function(index){
+              console.log('onChange fired');
+              console.log(index);
+
+              // If user has not joined any team before
+              if(previousSelectedTeam == undefined){
                 joinTeam(index);
-              }else if(index != self.selectedTeam){ //Check if selected index has changed, else do nothing.
+                previousSelectedTeam = index;
+              }else if(index != previousSelectedTeam){ //Check if selected index has changed, else do nothing.
                 // Leave previous team.
-                leaveTeam(self.selectedTeam);
+                leaveTeam(previousSelectedTeam);
                 // Join new team.
                 joinTeam(index);
+                previousSelectedTeam = index;
               }
             }
 
             function leaveTeam(index){
              var team = self.teams[index];
-             spfFirebase.remove(['classMentors/eventTeams/',eventId,taskId,team.$id,participant.$id]);
+             spfFirebase.remove(['classMentors/eventTeams/',eventId,taskId,team.$id,participant.$id])
+             .then(function(){
+               team.currentSize -= 1;
+             });
             }
             
-
             function joinTeam(index){
-              console.log(index);
-              console.log(self.teams);
               var team = self.teams[index];
-              console.log(team)
-              spfFirebase.set(['classMentors/eventTeams/',eventId,taskId,team.$id,participant.$id],participant.user);
+              spfFirebase.set(['classMentors/eventTeams/',eventId,taskId,team.$id,participant.$id],participant.user)
+              .then(function(){
+               team.currentSize += 1;
+             });
             }
             //test data
             self.test_teams = [
@@ -2148,6 +2167,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             };
 
         }
+        DialogController.$inject = ['initialData'];
 
     };
 

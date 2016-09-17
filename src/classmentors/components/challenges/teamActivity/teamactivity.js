@@ -87,7 +87,8 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
         for(var i = 0; i < teamStructure.length; i ++){
           // teams[i] = populateTeam(teamStructure[i]);
           teams.push({
-            maxSize: teamStructure[i]
+            maxSize: teamStructure[i],
+            currentSize: 0
           });
         }
         console.log('Teams is: ', teams);
