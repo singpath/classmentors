@@ -35,6 +35,7 @@ module.factory('challengeService', challenges.challengeServiceFactory);
 module.filter('cmTruncate', filters.cmTruncateFilterFactory);
 module.filter('cmTruncated', filters.cmTruncateFilterBooleanFactory);
 module.filter('showSchool', filters.showSchoolFilterFactory);
+module.filter('showTeamMembers', filters.showTeamMembersFilterFactory);
 
 module.directive('cmContains', directives.cmContainsFactory);
 
