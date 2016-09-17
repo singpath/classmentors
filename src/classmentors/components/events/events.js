@@ -2086,6 +2086,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
 
         function DialogController(){
             var self = this;
+            self.selectedTeam = undefined; //Learning point here. undefined means not yet assigned a value. Whereas null is a special object.
             self.teams = {}
             var teamEventPromise = spfFirebase.loadedArray(['classMentors/eventTeams/',eventId,taskId]);
             // console.log(teamEventPromise.then);
@@ -2093,15 +2094,25 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                 self.teams = result;
             });
             
+            /*TODO:
+            1. Remove user from previous teams when teams are switched.
+            2. When user exits dialog box, option should be saved.
+            3. User is able to see other teams and who is inside.
+            4. Team radio button should be disabled when team is full.
+            */
             self.onClick = function(index){
-              //participants is:
-              
-              console.log(participant);
-              joinTeam(index);
+              //Check if selected index has changed, else do nothing.
+              if(self.selectedTeam & index != self.selectedTeam){
+                // Leave previous team.
+                leaveTeam(self.selectedTeam);
+                // Join new team.
+                joinTeam(index);
+              }
             }
 
             function leaveTeam(index){
-              
+             var team = self.teams[index];
+             spfFirebase.remove(['classMentors/eventTeams/',eventId,taskId,team.$id,participant.$id]);
             }
             
 

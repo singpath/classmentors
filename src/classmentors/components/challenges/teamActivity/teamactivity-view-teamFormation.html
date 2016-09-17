@@ -8,14 +8,14 @@
                 </div>
                 <div>
                     <md-input-container md-no-float>
-                       <md-radio-group ng-model="ctrl.value" ng-required='true'>
+                       <md-radio-group ng-model="ctrl.selectedTeam" ng-required='true'>
                            <md-radio-button ng-repeat='t in ctrl.teams' 
                             ng-click="ctrl.onClick($index)"
                             ng-value="$index">Team {{t.$id}}, max: {{t.maxSize}}</md-radio-button>
                        </md-radio-group>
                     </md-input-container>
                 </div>
-                {{ctrl.value}}
+                {{ctrl.selectedTeam}}
                 {{ctrl.teams}}
                 <div flex align='row'>
                 <md-button ng-disabled="true" type="submit" class="md-raised md-primary" style="width: 150px;">Join</md-button>
