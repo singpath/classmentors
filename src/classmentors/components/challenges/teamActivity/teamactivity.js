@@ -44,9 +44,6 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
         self.task.teamFormationMethod = self.teamFormationMethod;
         self.task.teamFormationParameter = self.teamFormationParameter;
         self.task.startIRAT = true;
-        console.log(self.task);
-        console.log(self.taskType);
-        console.log(self.teamFormationMethod);
         self.event.teams = formTeams(self.teamFormationMethod, self.teamFormationParameter, self.participants.length);
         eventService.set({
             taskType: self.taskType,

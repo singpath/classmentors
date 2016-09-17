@@ -189,20 +189,6 @@ export function challengeServiceFactory
         console.log(copy);
         // Create reccord in eventTeams
         // Add IRAT
-        // var teamFormationTask = {};
-        // teamFormationTask.activityType = task.activityType;
-        // teamFormationTask.archived = task.archived;
-        // teamFormationTask.closedAt = {'.sv': 'timestamp'};
-        // teamFormationTask.openedAt = null;
-        // teamFormationTask.description = 'Click below to join team';
-        // teamFormationTask.title = task.title;
-        // teamFormationTask.TaskFrom = taskId;
-        // teamFormationTask.teamFormationMethod = task.teamFormationMethod;
-        // teamFormationTask.teamFormationParameter = task.teamFormationParameter;
-        // teamFormationTask.mcqQuestions = null;
-        // teamFormationTask.showProgress = true;
-        // teamFormationTask.formationPattern = true;
-
         clmDataStore.events.addTaskWithAns(event.$id, copy, isOpen,answers)
           .then(function(ref){
             //add Team formation task
