@@ -2104,8 +2104,14 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             console.log(self.selectedTeam);
             self.teams = {}
             self.teams = initialData.teams;
-            var previousSelectedTeam = undefined
-            
+            var previousSelectedTeam = undefined;
+            var index2 = undefined;
+            for(var i = 0; i < self.teams.length; i++){
+                if(self.teams[i][participant.$id]){
+                    index2 = i;
+                }
+            }
+            console.log("participant id isss:", participant.$id);
             /*TODO:
             1. Remove user from previous teams when teams are switched. [X]
             2. When user exits dialog box, option should be saved. [X]
@@ -2119,10 +2125,14 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
 
               // If user has not joined any team before
               if(previousSelectedTeam == undefined){
+                if(index2 != undefined){
+                    leaveTeam(index2);
+                }
                 joinTeam(index);
                 previousSelectedTeam = index;
               }else if(index != previousSelectedTeam){ //Check if selected index has changed, else do nothing.
                 // Leave previous team.
+
                 leaveTeam(previousSelectedTeam);
                 // Join new team.
                 joinTeam(index);
@@ -2143,6 +2153,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
               spfFirebase.set(['classMentors/eventTeams/',eventId,taskId,team.$id,participant.$id],participant.user)
               .then(function(){
                team.currentSize += 1;
+                  clmDataStore.events.submitSolution(eventId, taskId, participant.$id, "Completed");
              });
             }
             //test data

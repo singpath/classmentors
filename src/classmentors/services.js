@@ -1109,6 +1109,13 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                     solutions[task.$id]
                 );
             },
+            _hasFormTeam: function (task, solutions) {
+                return (
+                    task.formationPattern &&
+                    solutions &&
+                    solutions[task.$id]
+                );
+            },
 
             _solvedProblems: function (singPathProfile) {
                 var queueId = 'default';
@@ -1118,6 +1125,7 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
 
             _getProgress: function (tasks, data) {
                 // Transform array of badges to a collection of badges.
+                console.log("this dataaaa issss:", data);
                 var badges = Object.keys(data.badges).reduce(function (serviceBadges, serviceId) {
                     serviceBadges[serviceId] = data.badges[serviceId].reduce(function (results, badge) {
                         results[badge.id] = badge;
@@ -1127,6 +1135,7 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                 }, {});
 
                 return tasks.reduce(function (progress, task) {
+
                     // We never recheck archived task completeness
                     if (task.archived) {
                         if (data.progress && data.progress[task.$id]) {
@@ -1153,7 +1162,8 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                         clmDataStore.events._hasBadge(task, badges) ||
                         clmDataStore.events._hasSolvedSingpathProblem(task, data.singPath) ||
                         clmDataStore.events._hasDoneSurvey(task, data.solutions) ||
-                        clmDataStore.events._hasDoneMcq(task, data.solutions)
+                        clmDataStore.events._hasDoneMcq(task, data.solutions) ||
+                        clmDataStore.events._hasFormTeam(task, data.solutions)
                     );
 
                     if (solved) {
