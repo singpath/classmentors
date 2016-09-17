@@ -2109,6 +2109,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             for(var i = 0; i < self.teams.length; i++){
                 if(self.teams[i][participant.$id]){
                     index2 = i;
+                    break;
                 }
             }
             console.log("participant id isss:", participant.$id);
