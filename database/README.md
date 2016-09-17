@@ -1,13 +1,20 @@
 # Database
 
-Hold Class Mentors' database static data and rules tests
+Holds Class Mentors' database static data and rules tests.
 
+## Running tests
+
+```
+npm run test:rules
+```
 
 ## Tests Fixtures
 
-Most fixture data should be defined in "test/fixtures.json", with is used to set the default firebase data for a test.
+Most fixture data should be defined in "test/fixtures.json", with its data used
+to set the default firebase data for a test.
 
-Your tests should reset the firebase before running using `test/utils.js#setFirebaseData(somePatchToBaseData)`. e.g:
+Your tests should reset the firebase before running, using
+`test/utils.js#setFirebaseData(somePatchToBaseData)`. e.g:
 ```js
 const utils = require('./utils.js');
 
@@ -47,9 +54,11 @@ describe('auth', function() {
 });
 ```
 
-Return values cannot be corrupted by a previous test and will always reflect the data set in "tests/fixtures.json".
+Returned values cannot be corrupted by a previous test and will always reflect
+the data set in "tests/fixtures.json".
 
-You can use `test/utils.js#auth` to authenticate with one the fixture registered user:
+You can use `test/utils.js#auth` to authenticate with one of the fixture
+registered users:
 
 - `auth.admin` (admin);
 - `auth.chris` alias for `auth.admin`;
@@ -57,9 +66,9 @@ You can use `test/utils.js#auth` to authenticate with one the fixture registered
 - `auth.bob` (participant of "alice-event" event);
 - `auth.emma` (only registered - to test non-participant access to event).
 
-Those object can used with targaryen tests:
+They can used with targaryen tests:
 ```js
 expect(utils.auth.chris).can.read.path('classMentors/events');
 ```
 
-Those object cannot be corrupted by a previous test.
+Thoses object cannot be corrupted by previous tests.
