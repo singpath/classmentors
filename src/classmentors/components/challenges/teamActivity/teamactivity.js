@@ -2,6 +2,7 @@ import teamActivityCreateTmpl from './team-view-create.html!text';
 import teamIRATTmpl from './teamactivity-view-irat-start.html!text';
 import teamTRATTmpl from './teamactivity-view-trat-start.html!text';
 import teamFormationTmpl from './teamactivity-view-teamFormation.html!text';
+
 function createTeamActivityInitialData($q, eventService, clmDataStore) {
     var data = eventService.get();
     console.log("team data is:", data);

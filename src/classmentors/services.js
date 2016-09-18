@@ -617,7 +617,7 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
             addTrat: function(eventId, task, priority){
                 return spfFirebase.push(['classMentors/eventTasks', eventId], task).then(function (ref){
                     ref.setPriority(priority);
-                    var taskId3 = ref.key();
+                    var taskId = ref.key();
                     return ref;
                 });
             },

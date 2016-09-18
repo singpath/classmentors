@@ -213,13 +213,26 @@ export function challengeServiceFactory
                 // For each team create a reccord in Firebase
                 for(var i = 0; i < event.teams.length; i ++){
                     var team = event.teams[i];
-                    console.log('Team here is: ', team);
+                    // console.log('Team here is: ', team);
                     spfFirebase.push(['classMentors/eventTeams/', event.$id,taskId],team)
                     .then(function(ref){
                         console.log('Team ', i , 'pushed with key: ', ref.key());
                     });
                 }
               });
+                clmDataStore.events.addTrat(event.$id,{
+                    taskFrom: taskId,
+                    title: copy.title,
+                    description: "Click Below to Start TRAT",
+                    startTRAT: true,
+                    closedAt : {'.sv': 'timestamp'},
+                    showProgress: copy.showProgress,
+                    archived: false,
+                    teamFormationMethod: copy.teamFormationMethod,
+                    mcqQuestions: copy.mcqQuestions
+                },copy.priority).then(function(ref){
+                   var taskId = ref.key();
+                });
             })
         });
         //   .then(function(ref){

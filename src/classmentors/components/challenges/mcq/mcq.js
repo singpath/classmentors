@@ -202,9 +202,6 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
   //get user's Id
   var userId = initialData.currentUser.publicId;
 
-  console.log("the userid is", userId);
-
-
   var correctAnswers = angular.fromJson(initialData.correctAnswers.$value);
   //console.log(correctAnswers);
   self.task = data.task;
