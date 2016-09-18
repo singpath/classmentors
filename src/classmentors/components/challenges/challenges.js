@@ -71,12 +71,11 @@ export function configRoute($routeProvider, routes){
             controller: team.startTRATController,
             controllerAs:'ctrl',
             resolve:{
-                initialData: team.createTeamActivityInitialData
+                initialData: team.startTRATInitialData
             }
+        })
 
-        });
-
-}
+}4
 configRoute.$inject = ['$routeProvider', 'routes'];
 
 
@@ -110,7 +109,7 @@ function startMCQInitialData($q, spfAuthData, eventService, clmDataStore){
     console.log("my data is:", data);
     return $q.all ({
        currentUser: spfAuthData.user(),
-        answers: clmDataStore.events.getTaskAnswers(data.eventId, data.task.taskFromIrat),
+        answers: clmDataStore.events.getTaskAnswers(data.eventId, data.taskId),
         getProgress: clmDataStore.events.getProgress(data.eventId)
     }).then (function (result){
         console.log("result issss:", result);

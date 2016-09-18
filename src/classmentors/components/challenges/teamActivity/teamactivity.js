@@ -3,6 +3,16 @@ import teamIRATTmpl from './teamactivity-view-irat-start.html!text';
 import teamTRATTmpl from './teamactivity-view-trat-start.html!text';
 import teamFormationTmpl from './teamactivity-view-teamFormation.html!text';
 
+function startTRATInitialData($q, eventService, spfFirebase){
+    /*
+    TODO:
+    1. Load Teams
+    2. Load Team Log
+    3. Load Answers
+    */
+}
+startTRATInitialData.$inject = ['$q', 'eventService', 'spfFirebase']
+
 function createTeamActivityInitialData($q, eventService, clmDataStore) {
     var data = eventService.get();
     console.log("team data is:", data);
@@ -129,7 +139,9 @@ createTeamActivityController.$inject = [
     'eventService'
     ];
 
-function startTRATController($q, initialData, clmDataStore, $location, urlFor){
+function startTRATController($q, initialData, clmDataStore, $location, urlFor, spfFirebase){
+    //TODO:
+
     this.submitTrat = function(){
         $location.path(urlFor('oneEvent'));
     }
@@ -140,7 +152,8 @@ startTRATController.$inject = [
     'initialData',
     'clmDataStore',
     '$location',
-    'urlFor'
+    'urlFor',
+    'spfFirebase'
 ]
 export {
     teamActivityCreateTmpl,
@@ -149,7 +162,8 @@ export {
     teamIRATTmpl,
     startTRATController,
     teamTRATTmpl,
-    teamFormationTmpl
+    teamFormationTmpl,
+    startTRATInitialData
 
 };
 // startIRATController,

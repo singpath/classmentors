@@ -110,7 +110,7 @@
                             Form Team
                         </md-button>
                         <md-button class="md-raised md-primary" ng-if="task.startTRAT"
-                                   ng-click="ctrl.startMCQ(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant, ctrl.currentUserSolutions)"
+                                   ng-click="ctrl.startTRAT(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant)"
                                    target="_blank"
                                    ng-disabled="task.closedAt"
                                    aria-label="Start trat"

@@ -194,6 +194,7 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
   var self = this;
 
   var data = initialData.data;
+  console.log(data);
   var eventId = data.eventId;
   var taskId = data.taskId;
   var participant = data.participant;

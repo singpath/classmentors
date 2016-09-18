@@ -1893,6 +1893,20 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         $location.path('/challenges/mcq/start');
     }
 
+    this.startTRAT = function(eventId, taskId, task, participant){
+        var data = {
+          eventId: eventId,
+          taskId: taskId,
+          task: task,
+          participant: participant
+          
+        }
+        // Store data in eventService
+        eventService.set(data);
+        console.log('startTRAT triggered');
+        $location.path('/challenges/TRAT');
+    }
+
     this.mustRegister = function (task, profile) {
         return Boolean(
             task &&
