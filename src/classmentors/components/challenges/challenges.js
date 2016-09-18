@@ -107,15 +107,13 @@ function startMCQInitialData($q, spfAuthData, eventService, clmDataStore){
    // var currentUser = spfAuthData.user().catch(noop);
 
     var data =  eventService.get();
-
-    console.log("the data is here...,", data);
-    //console.log("current user now is.", currentUser);
-
+    console.log("my data is:", data);
     return $q.all ({
        currentUser: spfAuthData.user(),
-        answers: clmDataStore.events.getTaskAnswers(data.eventId, data.taskId),
+        answers: clmDataStore.events.getTaskAnswers(data.eventId, data.task.taskFromIrat),
         getProgress: clmDataStore.events.getProgress(data.eventId)
     }).then (function (result){
+        console.log("result issss:", result);
         return {
             data: data,
             correctAnswers: result.answers,
@@ -222,6 +220,7 @@ export function challengeServiceFactory
               });
                 clmDataStore.events.addTrat(event.$id,{
                     taskFrom: taskId,
+                    taskFromIrat: previousTaskId,
                     title: copy.title,
                     description: "Click Below to Start TRAT",
                     startTRAT: true,
