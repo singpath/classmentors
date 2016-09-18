@@ -896,6 +896,8 @@ function ClmCohortRankPageCtrl($q, $scope, $log, firebaseApp, $firebaseObject, $
 
     getAllEventData();
     this.cohortTotalParticipants = 0;
+    this.showFilteredRanking = false;
+
     function getAllEventData() {
         var iter = 0;
         loopDBEvents();
@@ -905,7 +907,7 @@ function ClmCohortRankPageCtrl($q, $scope, $log, firebaseApp, $firebaseObject, $
 
             if(iter < self.cohort.events.length) {
                 var participantsRef = db.ref(`classMentors/eventParticipants/${eventId}`);
-                var participantsQuery = participantsRef.limitToLast(100);
+                var participantsQuery = participantsRef;
                 var participantsArray = $firebaseArray(participantsQuery);
 
                 participantsArray.$loaded().then(
@@ -923,31 +925,113 @@ function ClmCohortRankPageCtrl($q, $scope, $log, firebaseApp, $firebaseObject, $
                         oneEventData.title = result.title;
                         self.cohortTotalParticipants += oneEventData.participants.length;
                         oneEventData.id = result.$id;
-                        self.cohortEventData.push(oneEventData);
-                        iter++;
-                        loopDBEvents();
+                        oneEventData.userRanks = [];
+                        var userIndex = 0;
+                        loadUserAchievements();
+                        function loadUserAchievements() {
+                            if(userIndex < oneEventData.participants.length) {
+                                var participantRankingRef = db.ref(`classMentors/userProfiles/${oneEventData.participants[userIndex].$id}`);
+                                var participantRankingObj = $firebaseObject(participantRankingRef);
+                                participantRankingObj.$loaded().then(function () {
+                                    var rankingResult = participantRankingObj;
+                                    console.log(rankingResult);
+                                    if(rankingResult.services && rankingResult.services.freeCodeCamp) {
+                                        oneEventData.userRanks.push({"user": rankingResult.user, "total": parseInt(rankingResult.services.freeCodeCamp.totalAchievements)});
+                                    } else {
+                                        oneEventData.userRanks.push({"user": rankingResult.user, "total": 0});
+                                    }
+                                    userIndex++;
+                                    loadUserAchievements();
+                                });
+                            } else {
+                                self.cohortEventData.push(oneEventData);
+                                iter++;
+                                loopDBEvents();
+                            }
+                        }
                     });
                 });
             } else {
                 self.cohortEventData.sort(function(a,b) {
                     return b.participants.length - a.participants.length;
                 });
-                var rank = 1;
-                for(var i = 0; i < self.cohortEventData.length-1; i++) {
-                    if(self.cohortEventData[i].participants.length > self.cohortEventData[i+1].participants.length) {
-                        self.cohortEventData[i].rank = rank;
-                        rank ++;
-                    } else {
-                        self.cohortEventData[i].rank = rank;
+                // var rank = 1;
+                // for(var i = 0; i < self.cohortEventData.length-1; i++) {
+                //     if(self.cohortEventData[i].participants.length > self.cohortEventData[i+1].participants.length) {
+                //         self.cohortEventData[i].rank = rank;
+                //         rank ++;
+                //     } else {
+                //         self.cohortEventData[i].rank = rank;
+                //     }
+                // }
+                // if(self.cohortEventData[self.cohortEventData.length-1].participants.length <= self.cohortEventData[self.cohortEventData.length-2].participants.length) {
+                //     self.cohortEventData[self.cohortEventData.length-1].rank = rank;
+                // } else {
+                //     rank--;
+                //     self.cohortEventData[self.cohortEventData.length-1].rank = rank;
+                // }
+            }
+        }
+    }
+
+    this.fourEntryThreshold = 2;
+    this.twoEntryThreshold = 12;
+
+    this.filterRanking = function() {
+        if(self.showFilteredRanking) {
+            for(let eventId in self.cohortEventData) {
+                let event = self.cohortEventData[eventId];
+                let totalEventScore = 0;
+                for(let user in event.userRanks) {
+                    let rankObj = event.userRanks[user];
+                    if(rankObj.total) {
+                        totalEventScore += rankObj.total;
                     }
                 }
-                if(self.cohortEventData[self.cohortEventData.length-1].participants.length <= self.cohortEventData[self.cohortEventData.length-2].participants.length) {
-                    self.cohortEventData[self.cohortEventData.length-1].rank = rank;
-                } else {
-                    rank--;
-                    self.cohortEventData[self.cohortEventData.length-1].rank = rank;
+                self.cohortEventData[eventId].totalScore = totalEventScore;
+            }
+            self.cohortEventData.sort(function(a,b) {
+                return b.totalScore - a.totalScore;
+            });
+            for(let placing = 0; placing < self.fourEntryThreshold; placing++) {
+                let event = self.cohortEventData[placing];
+                if(event) {
+                    event.userRanks.sort(function (a,b) {
+                        return b.total - a.total;
+                    });
+                    if(event.userRanks[0]) {
+                        self.cohortEventData[placing].first = {"name": event.userRanks[0].user.displayName, "total": event.userRanks[0].total};
+                    }
+                    if(event.userRanks[1]) {
+                        self.cohortEventData[placing].second = {"name": event.userRanks[1].user.displayName, "total": event.userRanks[1].total};
+                    }
+                    if(event.userRanks[2]) {
+                        self.cohortEventData[placing].third = {"name": event.userRanks[2].user.displayName, "total": event.userRanks[2].total};
+                    }
+                    if(event.userRanks[3]) {
+                        self.cohortEventData[placing].fourth = {"name": event.userRanks[3].user.displayName, "total": event.userRanks[3].total};
+                    }
                 }
             }
+            for(let placing = self.fourEntryThreshold; placing < self.twoEntryThreshold; placing ++) {
+                let event = self.cohortEventData[placing];
+                if(event) {
+                    console.log(event);
+                    event.userRanks.sort(function (a,b) {
+                        return b.total - a.total;
+                    });
+                    if(event.userRanks[0]) {
+                        self.cohortEventData[placing].first = {"name": event.userRanks[0].user.displayName, "total": event.userRanks[0].total};
+                    }
+                    if(event.userRanks[1]) {
+                        self.cohortEventData[placing].second = {"name": event.userRanks[1].user.displayName, "total": event.userRanks[1].total};
+                    }
+                }
+            }
+        } else {
+            self.cohortEventData.sort(function(a,b) {
+                return b.participants.length - a.participants.length;
+            });
         }
     }
 }
