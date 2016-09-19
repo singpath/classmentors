@@ -759,7 +759,7 @@ export function clmDataStoreFactory(
         var passwordRef = db.ref(`classMentors/eventPasswords/${eventId}`);
 
         var ownerId = event.owner.publicId;
-        var profileRef = db.ref(`'classMentors/userProfiles/${ownerId}/createdEvents/${eventId}`);
+        var profileRef = db.ref(`classMentors/userProfiles/${ownerId}/createdEvents/${eventId}`);
 
         return eventRef.then(function() {
           var hash = spfCrypto.password.newHash(password);
