@@ -194,6 +194,7 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
   var self = this;
 
   var data = initialData.data;
+  console.log(data);
   var eventId = data.eventId;
   var taskId = data.taskId;
   var participant = data.participant;
@@ -201,9 +202,6 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
   //console.log(initialData);
   //get user's Id
   var userId = initialData.currentUser.publicId;
-
-  console.log("the userid is", userId);
-
 
   var correctAnswers = angular.fromJson(initialData.correctAnswers.$value);
   //console.log(correctAnswers);
@@ -342,6 +340,7 @@ export function newMcqController(initialData, challengeService, $filter,$mdDialo
   // Checks if all questions have at least one answer
   self.isMcqValid = false;
   self.task = initialData.task;
+  
   self.questions = [{
     text:"",
     answers:[],
@@ -383,8 +382,7 @@ export function newMcqController(initialData, challengeService, $filter,$mdDialo
     var isOpen = initialData.isOpen;
     task.mcqQuestions = answersJsonText;
     task.answers = angular.toJson(setAnswers);
-    console.log(task);
-    console.log(taskType);
+
     challengeService.save(event, taskId, task,taskType, isOpen);
   }
 

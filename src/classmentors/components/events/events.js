@@ -52,7 +52,10 @@ import schEngageScaleTmpl from './events-view-schEngageScale-task-form.html!text
 import motiStratLearnTmpl from './events-view-motiStratLearn-task-form.html!text';
 import eduDisLearnTmpl from './events-view-eduDisLearn-task-form.html!text';
 
-import teamFormationTmpl from './events-view-teamFormation.html!text';
+//form team import
+import * as team from '../challenges/teamActivity/teamactivity.js';
+// import teamFormationTmpl from './teamactivity-view-teamFormation.html!text';
+
 const noop = () => undefined;
 const TIMESTAMP = {'.sv': 'timestamp'};
 
@@ -1544,7 +1547,6 @@ EditEventTaskCtrl.$inject = [
  *
  */
 export function clmEventTableFactory() {
-    console.log("clmEvent table comes in here");
     return {
         template: eventTableParticipantsTmpl,
         restrict: 'E',
@@ -1645,7 +1647,6 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         var participantCount, participantsIds;
 
         if (!self.participants || !self.progress) {
-            console.log("there is no self participants!");
             return 0;
         }
         participantCount = self.participants.length;
@@ -1851,6 +1852,20 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         $location.path('/challenges/mcq/start');
     }
 
+    this.startTRAT = function(eventId, taskId, task, participant){
+        var data = {
+          eventId: eventId,
+          taskId: taskId,
+          task: task,
+          participant: participant
+          
+        }
+        // Store data in eventService
+        eventService.set(data);
+        console.log('startTRAT triggered');
+        $location.path('/challenges/TRAT');
+    }
+
     this.mustRegister = function (task, profile) {
         return Boolean(
             task &&
@@ -1965,7 +1980,6 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             };
         }
     };
-
     this.promptForLink = function (eventId, taskId, task, participant, userSolution) {
         $mdDialog.show({
             parent: $document.body,
@@ -2014,12 +2028,111 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
     this.promptForTeamFormation = function (eventId, taskId, task, participant, userSolution) {
         $mdDialog.show({
             parent: $document.body,
-            template: teamFormationTmpl,
+            template: team.teamFormationTmpl,
             controller: DialogController,
-            controllerAs: 'ctrl'
+            controllerAs: 'ctrl',
+            resolve:{
+                initialData: teamFormationInitialData
+            }
         });
 
-        function DialogController() {
+        function teamFormationInitialData(){
+          console.log('InitialData loaded');
+          var teamEventPromise = spfFirebase.loadedArray(['classMentors/eventTeams/',eventId,taskId]);
+            return $q.all({
+                teams: teamEventPromise.then(function (result) {
+                    return result;
+                }),
+                selectedTeam: teamEventPromise.then(function (result){
+                  var teams = result;
+                  for(var i = 0; i < teams.length; i ++){
+                    var team = teams[i];
+                    // If participant's public Id can be found, return team index.
+                    console.log('Team: ', team);
+                    console.log('Participant id: ', participant.$id);
+                    if(team[participant.$id]){
+                      return i;
+                    }
+                  }
+                  return undefined;
+                })
+            });
+        };
+
+        function DialogController(initialData){
+            console.log('initial data is: ',initialData);
+            var self = this;
+            // Learning point here. undefined means not yet assigned a value. Whereas null is a special object.
+            self.selectedTeam = initialData.selectedTeam; 
+            console.log(self.selectedTeam);
+            self.teams = {}
+            self.teams = initialData.teams;
+            var previousSelectedTeam = undefined;
+            var index2 = undefined;
+            for(var i = 0; i < self.teams.length; i++){
+                if(self.teams[i][participant.$id]){
+                    index2 = i;
+                    break;
+                }
+            }
+            console.log("participant id isss:", participant.$id);
+            /*TODO:
+            1. Remove user from previous teams when teams are switched. [X]
+            2. When user exits dialog box, option should be saved. [X]
+            3. User is able to see other teams and who is inside. 
+            4. Team radio button should be disabled when team is full. 
+            */
+
+            self.onChange = function(index){
+              console.log('onChange fired');
+              console.log(index);
+
+              // If user has not joined any team before
+              if(previousSelectedTeam == undefined){
+                if(index2 != undefined){
+                    leaveTeam(index2);
+                }
+                joinTeam(index);
+                previousSelectedTeam = index;
+              }else if(index != previousSelectedTeam){ //Check if selected index has changed, else do nothing.
+                // Leave previous team.
+
+                leaveTeam(previousSelectedTeam);
+                // Join new team.
+                joinTeam(index);
+                previousSelectedTeam = index;
+              }
+            }
+
+            function leaveTeam(index){
+             var team = self.teams[index];
+             spfFirebase.remove(['classMentors/eventTeams/',eventId,taskId,team.$id,participant.$id])
+             .then(function(){
+               team.currentSize -= 1;
+             });
+            }
+            
+            function joinTeam(index){
+              var team = self.teams[index];
+              spfFirebase.set(['classMentors/eventTeams/',eventId,taskId,team.$id,participant.$id],participant.user)
+              .then(function(){
+               team.currentSize += 1;
+                  clmDataStore.events.submitSolution(eventId, taskId, participant.$id, "Completed");
+             });
+            }
+            //test data
+            self.test_teams = [
+                {
+                    id: 1,
+                    maxSize: 2
+                },
+                {
+                    id:2,
+                    maxSize:3
+                }
+            ]
+            
+
             this.save = function () {
 
             };
@@ -2029,13 +2142,12 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             };
 
         }
+        DialogController.$inject = ['initialData'];
 
     };
 
 
     this.promptForSurvey = function (eventId, taskId, task, participant, userSolution) {
-
-        console.log("prompt for survey task : ", task.survey);
 
         if (task.survey === "School engagement scale") {
 

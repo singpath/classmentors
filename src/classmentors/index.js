@@ -69,6 +69,7 @@ module.factory('eventService', components.events.eventServiceFactory);
 module.filter('cmTruncate', filters.cmTruncateFilterFactory);
 module.filter('cmTruncated', filters.cmTruncateFilterBooleanFactory);
 module.filter('showSchool', filters.showSchoolFilterFactory);
+module.filter('showTeamMembers', filters.showTeamMembersFilterFactory);
 
 // TODO: convert those view controller/template to component and move them above
 module.config(components.cohorts.configRoute);
