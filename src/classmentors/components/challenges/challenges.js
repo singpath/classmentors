@@ -7,6 +7,7 @@
 import * as mcq from './mcq/mcq.js';
 import * as survey from './survey/survey.js';
 import * as team from './teamActivity/teamactivity.js';
+import {cleanObj} from 'singpath-core/services/firebase.js';
 
 const noop = () => undefined;
 
@@ -153,11 +154,13 @@ createMCQInitialData.$inject = [
 
 //TODO: Generic save function
 export function challengeServiceFactory
-  ($q, $route, spfAuthData, clmDataStore, spfFirebase, $log, spfAlert, $location, urlFor){
+  ($q, $route, spfAuthData, clmDataStore, $log, spfAlert, $location, urlFor){
   return {
     save : function(event, taskId, task, taskType, isOpen) {
-      var copy = spfFirebase.cleanObj(task);
+      var copy = cleanObj(task);
       var answers = copy.answers;
+      console.log('COPY IS ... ', copy);
+
       console.log('COPY IS!! ', copy);
       self.creatingTask = true;
       if (taskType === 'multipleChoice'){
@@ -253,14 +256,14 @@ export function challengeServiceFactory
         //     spfAlert.error('Failed to created new task');
         // }).finally(function() {
         //     self.creatingTask = false;
-        // }); 
+        // });
       }
 
-      
+
 
     },
     update: function(event, taskId, task, taskType, isOpen) {
-      var copy = spfFirebase.cleanObj(task);
+      var copy = cleanObj(task);
       var answers = copy.answers;
       if (taskType === 'linkPattern') {
         delete copy.badge;
@@ -269,9 +272,9 @@ export function challengeServiceFactory
       } else if (copy.serviceId === 'singPath') {
         delete copy.badge;
         if (copy.singPathProblem) {
-          copy.singPathProblem.path = spfFirebase.cleanObj(task.singPathProblem.path);
-          copy.singPathProblem.level = spfFirebase.cleanObj(task.singPathProblem.level);
-          copy.singPathProblem.problem = spfFirebase.cleanObj(task.singPathProblem.problem);
+          copy.singPathProblem.path = cleanObj(task.singPathProblem.path);
+          copy.singPathProblem.level = cleanObj(task.singPathProblem.level);
+          copy.singPathProblem.problem = cleanObj(task.singPathProblem.problem);
         }
       }else if (taskType === 'multipleChoice'){
         delete copy.singPathProblem;
@@ -279,7 +282,7 @@ export function challengeServiceFactory
         delete copy.answers;
       } else {
         delete copy.singPathProblem;
-        copy.badge = spfFirebase.cleanObj(task.badge);
+        copy.badge = cleanObj(task.badge);
       }
 
       if (!copy.link) {
@@ -312,13 +315,13 @@ export function challengeServiceFactory
   }
 }
 challengeServiceFactory.$inject =
-    ['$q', '$route', 'spfAuthData', 'clmDataStore', 'spfFirebase', '$log', 'spfAlert', '$location', 'urlFor'];
+    ['$q', '$route', 'spfAuthData', 'clmDataStore', '$log', 'spfAlert', '$location', 'urlFor'];
 
 // export const component = {
 //
 // }
 
-function surveyFormEvent($scope, clmSurvey, spfFirebase, clmDataStore, $log, spfAlert, $location, urlFor) {
+function surveyFormEvent($scope, clmSurvey, clmDataStore, $log, spfAlert, $location, urlFor) {
 
     this.surveys = [
         {id: 1, name: 'Education vs Dissatisfaction with learning'},
@@ -333,7 +336,7 @@ function surveyFormEvent($scope, clmSurvey, spfFirebase, clmDataStore, $log, spf
     var self = this;
 
     this.saveSurveyTask = function (surveyType) {
-        var copy = spfFirebase.cleanObj(getTask);
+        var copy = cleanObj(getTask);
         console.log('my copy is ', copy);
         if (sharedData.taskType === 'linkPattern') {
             delete copy.badge;
@@ -342,13 +345,13 @@ function surveyFormEvent($scope, clmSurvey, spfFirebase, clmDataStore, $log, spf
         } else if (copy.serviceId === 'singPath') {
             delete copy.badge;
             if (copy.singPathProblem) {
-                copy.singPathProblem.path = spfFirebase.cleanObj(getTask.singPathProblem.path);
-                copy.singPathProblem.level = spfFirebase.cleanObj(getTask.singPathProblem.level);
-                copy.singPathProblem.problem = spfFirebase.cleanObj(getTask.singPathProblem.problem);
+                copy.singPathProblem.path = cleanObj(getTask.singPathProblem.path);
+                copy.singPathProblem.level = cleanObj(getTask.singPathProblem.level);
+                copy.singPathProblem.problem = cleanObj(getTask.singPathProblem.problem);
             }
         } else {
             delete copy.singPathProblem;
-            copy.badge = spfFirebase.cleanObj(getTask.badge);
+            copy.badge = cleanObj(getTask.badge);
         }
 
         if (!copy.link) {
@@ -374,7 +377,6 @@ function surveyFormEvent($scope, clmSurvey, spfFirebase, clmDataStore, $log, spf
 surveyFormEvent.$inject = [
     '$scope',
     'clmSurvey',
-    'spfFirebase',
     'clmDataStore',
     '$log',
     'spfAlert',
@@ -383,7 +385,7 @@ surveyFormEvent.$inject = [
 ];
 
 
-function getTaskSurveyValues(clmSurvey, $q, $route, spfAuthData, clmDataStore, spfAuth) {
+function getTaskSurveyValues(clmSurvey, $q, $route, spfAuthData, clmDataStore) {
     var sharedData = clmSurvey.get();
 
     var data = baseEditCtrlInitialData(sharedData, $q, $route, spfAuthData, clmDataStore, clmSurvey);
@@ -401,7 +403,7 @@ function getTaskSurveyValues(clmSurvey, $q, $route, spfAuthData, clmDataStore, s
 
     return $q.all(data);
 }
-getTaskSurveyValues.$inject = ['clmSurvey', '$q', '$route', 'spfAuthData', 'clmDataStore', 'spfAuth'];
+getTaskSurveyValues.$inject = ['clmSurvey', '$q', '$route', 'spfAuthData', 'clmDataStore'];
 
 
 function baseEditCtrlInitialData(sharedData, $q, $route, spfAuthData, clmDataStore, clmSurvey) {
