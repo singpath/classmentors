@@ -934,7 +934,6 @@ function ClmCohortRankPageCtrl($q, $scope, $log, firebaseApp, $firebaseObject, $
                                 var participantRankingObj = $firebaseObject(participantRankingRef);
                                 participantRankingObj.$loaded().then(function () {
                                     var rankingResult = participantRankingObj;
-                                    console.log(rankingResult);
                                     if(rankingResult.services && rankingResult.services.freeCodeCamp) {
                                         oneEventData.userRanks.push({"user": rankingResult.user, "total": parseInt(rankingResult.services.freeCodeCamp.totalAchievements)});
                                     } else {
