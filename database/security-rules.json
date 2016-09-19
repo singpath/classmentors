@@ -107,7 +107,7 @@
               "owner": {
                 ".validate": "newData.hasChildren(['displayName', 'gravatar', 'publicId'])",
                 "publicId": {
-                  ".validate": "(data.exists() == false || data.val() == newData.val()) && $publicId.length > 0 && root.child('auth/publicIds').child(newData.val()).val() == auth.uid"
+                  ".validate": "(data.exists() == false || data.val() == newData.val()) && newData.val().length > 0 && root.child('auth/publicIds').child(newData.val()).val() == auth.uid"
                 },
                 "$key": {
                   ".validate": "$key == 'displayName' || $key == 'gravatar' && newData.val() == root.child('auth/users').child(auth.uid).child($key).val()"
@@ -507,8 +507,8 @@
       },
       "events": {
         "$eventId": {
-          ".validate": "newData.hasChildren(['createdAt', 'owner', 'title']) && (\n  data.exists()\n  || root.child('classMentors/premiumUsers').child(auth.uid).val() === true\n)",
-          ".write": "auth !== null && (\n  data.exists() === false\n  || root.child('classMentors/admins').child(auth.uid).val() === true\n  || (\n    root.child('auth/publicIds').child(data.child('owner/publicId').val()).val() === auth.uid\n    && (\n      newData.hasChildren(['featured']) === false\n      || newData.child('featured').val() === false\n      || data.child('featured').val() === true\n    )\n  )\n)",
+          ".validate": "newData.hasChildren(['createdAt', 'owner', 'title']) && (\n data.exists()\n || root.child('classMentors/admins').child(auth.uid).val() === true\n || root.child('classMentors/premiumUsers').child(auth.uid).val() === true\n )",
+          ".write": "auth !== null && (\n data.exists() === false\n || root.child('classMentors/admins').child(auth.uid).val() === true\n || (\n root.child('auth/publicIds').child(data.child('owner/publicId').val()).val() === auth.uid\n && (\n newData.hasChildren(['featured']) === false\n || newData.child('featured').val() === false\n || data.child('featured').val() === true\n )\n )\n )",
           "createdAt": {
             ".validate": "(data.exists() && data.val() === newData.val()) || (!data.exists() && newData.val() === now)"
           },
