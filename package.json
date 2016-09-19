@@ -11,7 +11,7 @@
     "tmp": "0.0.28"
   },
   "devDependencies": {
-    "@dinoboff/targaryen": "^2.2.2",
+    "@dinoboff/targaryen": "^2.2.3",
     "@singpath/tools": "0.0.8",
     "babel-eslint": "^6.0.4",
     "chai": "^3.5.0",
