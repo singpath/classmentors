@@ -89,46 +89,66 @@
       }
     },
     "classMentors": {
-      "eventQuestions":{
-        ".read": "auth !== null && root.child('classMentors/admins').child(auth.uid).val() === true",
-        ".write": "auth !== null && root.child('classMentors/admins').child(auth.uid).val() === true",
-        "$eventId":{
-          ".write": true,
-          ".read": "auth !== null && root.child('classMentors/events').child($eventId).child('owner/publicId').val() === root.child('auth/users').child(auth.uid).child('publicId').val()",
-          "questionOwners":{
-            "$ownerPublicId":{
-              "$questionId":{
-                 ".write":true
+      "eventQuestions": {
+        ".read": "root.child('classMentors/admins').child(auth.uid).val() == true",
+        "$eventId": {
+          ".read": "auth != null && root.child('auth/users').child(auth.uid).child('publicId').exists() && (root.child('classMentors/events').child($eventId).child('owner/publicId').val() == root.child('auth/users').child(auth.uid).child('publicId').val() || root.child('classMentors/eventParticipants').child($eventId).child(root.child('auth/users').child(auth.uid).child('publicId').val()).exists())",
+          ".write": "auth != null && root.child('auth/users').child(auth.uid).child('publicId').exists() && root.child('classMentors/events').child($eventId).child('owner/publicId').val() == root.child('auth/users').child(auth.uid).child('publicId').val()",
+          "questions": {
+            "$questionId": {
+              ".write": "auth != null && root.child('auth/users').child(auth.uid).child('publicId').exists() && root.child('classMentors/eventParticipants').child($eventId).child(root.child('auth/users').child(auth.uid).child('publicId').val()).exists()",
+              ".validate": "newData.hasChildren(['title', 'body', 'owner', 'createdAt'])",
+              "title": {
+                ".validate": "newData.isString() && newData.val().length >= 3"
+              },
+              "body": {
+                ".validate": "newData.isString() && newData.val().length >= 3"
+              },
+              "owner": {
+                ".validate": "newData.hasChildren(['displayName', 'gravatar', 'publicId'])",
+                "publicId": {
+                  ".validate": "(data.exists() == false || data.val() == newData.val()) && $publicId.length > 0 && root.child('auth/publicIds').child(newData.val()).val() == auth.uid"
+                },
+                "$key": {
+                  ".validate": "$key == 'displayName' || $key == 'gravatar' && newData.val() == root.child('auth/users').child(auth.uid).child($key).val()"
+                }
+              },
+              "upVotes": {
+                "$participantId": {}
+              },
+              "createdAt": {
+                ".validate": "data.exists() == false && newData.val() == now"
+              },
+              "answeredBy": {},
+              "$other": {
+                ".validate": false
               }
             }
           },
-          "questions":{
-            ".read": true,
-            "$questionId":{
-              "upVotes": {
-                "$participantId":{
-                  ".write":true
-                }
-              },
-              "answers":{
-                "$publicId":{
-                  ".write":true,
-                  "upVotes": {
-                    "$participantId":{
-                        ".write":true
-                    }
-                  },
-                  "comments":{
-                    "$commentId":{
-                      ".write":true,
-                      "$commentorId":{
-                        ".write":true
-                      }
+          "answers": {
+            "$questionId": {
+              "$publicId": {
+                "body": {},
+                "upVotes": {
+                  "$participantId": {}
+                },
+                "createdAt": {},
+                "acceptedAt": {},
+                "comments": {
+                  "$commentId": {
+                    "body": {},
+                    "createdAt": {},
+                    "owner": {
+                      "displayName": {},
+                      "publicId": {}
                     }
                   }
                 }
               }
             }
+          },
+          "$other": {
+            ".validate": false
           }
         }
       },

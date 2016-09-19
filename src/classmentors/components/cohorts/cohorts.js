@@ -214,8 +214,6 @@ function NewCohortCtrl(
                 featured: featured
             }, newCohort);
 
-            console.log(data);
-
             return clmDataStore.cohorts.create(data);
         }).then(function() {
             spfAlert.success('New cohort created.');

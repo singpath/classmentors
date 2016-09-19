@@ -759,7 +759,7 @@ export function clmDataStoreFactory(
         var passwordRef = db.ref(`classMentors/eventPasswords/${eventId}`);
 
         var ownerId = event.owner.publicId;
-        var profileRef = db.ref(`'classMentors/userProfiles/${ownerId}/createdEvents/${eventId}`);
+        var profileRef = db.ref(`classMentors/userProfiles/${ownerId}/createdEvents/${eventId}`);
 
         return eventRef.then(function() {
           var hash = spfCrypto.password.newHash(password);
@@ -1617,6 +1617,90 @@ export function clmDataStoreFactory(
         var ref = db.ref(`classMentors/events/${eventId}/assistants/${assistantId}`);
 
         return ref.remove();
+      },
+
+      questions: {
+
+        /**
+         * Return query to all event questions sorted by upvote.
+         *
+         * @param  {string}   eventId The event id to query question for.
+         * @return {firebase.database.Reference}
+         */
+        allRef() {},
+
+        /**
+         * Create a question on behave of the current user.
+         *
+         * @param  {string}   eventId The event id to submit the question for.
+         * @param  {{title: string, body: string}} details Question details
+         * @return {Promise<firebase.database.Reference,Error>}
+         */
+        create() {},
+
+        /**
+         * Upvote a question.
+         *
+         * @param  {string}   eventId    The event id of the question.
+         * @param  {string}   questionId The question id to upvote.
+         * @return {Promise<void,Error>}
+         */
+        upVote() {},
+
+        answers: {
+
+          /**
+           * Return query to all the answer of a question sorted by upvote.
+           *
+           * @param  {string}   eventId    The event id of the question.
+           * @param  {string}   questionId The question id to query comments for.
+           * @return {firebase.database.Reference}
+           */
+          allRef() {},
+
+          /**
+           * Create an answer on behave of the current user.
+           *
+           * @param  {string} eventId    The event id to submit the answer for.
+           * @param  {string} questionId The question id to submit the answer for.
+           * @param  {string} body       The answer body.
+           * @return {Promise<firebase.database.Reference,Error>}
+           */
+          create() {},
+
+          /**
+           * Mark an answer as the accepted answer to the question.
+           *
+           * @param  {string} eventId    The event id to mark the answer for.
+           * @param  {string} questionId The question id to mark the answer for.
+           * @param  {string} answerId   The answer id to mark as accepted.
+           * @return {Promise<void,Error>}
+           */
+          accept() {},
+
+          /**
+           * Upvote a comment.
+           *
+           * @param  {string}   eventId    The event id of the question.
+           * @param  {string}   questionId The question id of the answer.
+           * @param  {string}   answerId   The answer id to upvote.
+           * @return {Promise<void,Error>}
+           */
+          upVote() {},
+
+          /**
+           * Add a comment to a question.
+           *
+           * @param  {string} eventId    The event id to add comment for.
+           * @param  {string} questionId The question id to add comment for.
+           * @param  {string} answerId   The answer id to add comment for.
+           * @param  {string} body       The comment body.
+           * @return {Promise<void,Error>}
+           */
+          comment() {}
+
+        }
+
       }
     },
 
