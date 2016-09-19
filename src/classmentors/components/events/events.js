@@ -1566,7 +1566,8 @@ export function clmEventTableFactory() {
 
 function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                            urlFor, spfAlert, clmServicesUrl, clmDataStore, clmPagerOption,
-                           eventService, $location, routes, $route, spfAuthData, authFirebaseApp) {
+                           eventService, $location, routes, $route, spfAuthData, authFirebaseApp,
+                           firebaseApp, $firebaseArray, $firebaseObject) {
     var authDb = authFirebaseApp.database();
     var self = this;
     var unwatchers = [];
@@ -2026,6 +2027,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
 
 
     this.promptForTeamFormation = function (eventId, taskId, task, participant, userSolution) {
+        var db = firebaseApp.database();
         $mdDialog.show({
             parent: $document.body,
             template: team.teamFormationTmpl,
@@ -2038,12 +2040,16 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
 
         function teamFormationInitialData(){
           console.log('InitialData loaded');
-          var teamEventPromise = spfFirebase.loadedArray(['classMentors/eventTeams/',eventId,taskId]);
+        //   var teamEventPromise = spfFirebase.loadedArray(['classMentors/eventTeams/',eventId,taskId]);
+            var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}`);
+            var teamEventPromise = $firebaseArray(ref);
             return $q.all({
-                teams: teamEventPromise.then(function (result) {
+                teams: teamEventPromise.$loaded().then(function (result) {
+                    console.log(result);
                     return result;
                 }),
-                selectedTeam: teamEventPromise.then(function (result){
+                selectedTeam: teamEventPromise.$loaded().then(function (result){
+                  console.log(result);
                   var teams = result;
                   for(var i = 0; i < teams.length; i ++){
                     var team = teams[i];
@@ -2067,6 +2073,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             console.log(self.selectedTeam);
             self.teams = {}
             self.teams = initialData.teams;
+            console.log(self.teams);
             var previousSelectedTeam = undefined;
             var index2 = undefined;
             for(var i = 0; i < self.teams.length; i++){
@@ -2076,13 +2083,6 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                 }
             }
             console.log("participant id isss:", participant.$id);
-            /*TODO:
-            1. Remove user from previous teams when teams are switched. [X]
-            2. When user exits dialog box, option should be saved. [X]
-            3. User is able to see other teams and who is inside. 
-            4. Team radio button should be disabled when team is full. 
-            */
-
             self.onChange = function(index){
               console.log('onChange fired');
               console.log(index);
@@ -2106,31 +2106,25 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
 
             function leaveTeam(index){
              var team = self.teams[index];
-             spfFirebase.remove(['classMentors/eventTeams/',eventId,taskId,team.$id,participant.$id])
-             .then(function(){
+             var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${team.$id}/${participant.$id}`);
+             console.log(ref);
+            //  spfFirebase.remove(['classMentors/eventTeams/',eventId,taskId,team.$id,participant.$id])
+             ref.remove().then(function(){
                team.currentSize -= 1;
              });
             }
             
             function joinTeam(index){
               var team = self.teams[index];
-              spfFirebase.set(['classMentors/eventTeams/',eventId,taskId,team.$id,participant.$id],participant.user)
-              .then(function(){
+              var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${team.$id}/${participant.$id}`);
+              // spfFirebase.set(['classMentors/eventTeams/',eventId,taskId,team.$id,participant.$id],participant.user)
+              console.log(participant.user);
+              ref.set(participant.user).then(function(){
                team.currentSize += 1;
-                  clmDataStore.events.submitSolution(eventId, taskId, participant.$id, "Completed");
+                clmDataStore.events.submitSolution(eventId, taskId, participant.$id, "Completed");
              });
             }
-            //test data
-            self.test_teams = [
-                {
-                    id: 1,
-                    maxSize: 2
-                },
-                {
-                    id:2,
-                    maxSize:3
-                }
-            ]
+
             
 
             this.save = function () {
@@ -2419,7 +2413,10 @@ ClmEventTableCtrl.$inject = [
     'routes',
     '$route',
     'spfAuthData',
-    'authFirebaseApp'
+    'authFirebaseApp',
+    'firebaseApp', 
+    '$firebaseArray', 
+    '$firebaseObject'
 ];
 
 //TODO: include the event to load initial data into surveyformfillctrl
