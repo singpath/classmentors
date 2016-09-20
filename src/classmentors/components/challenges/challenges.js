@@ -280,7 +280,8 @@ export function challengeServiceFactory
         }).then(function(){
           console.log('TeamFormationTask set.');
           var tratTask = {
-            taskFrom: teamFormationTaskRef.key,
+            taskFrom: ref.key,
+            teamFormationRef: teamFormationTaskRef.key,
             title: copy.title,
             description: "Click Below to Start TRAT",
             startTRAT: true,

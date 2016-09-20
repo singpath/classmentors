@@ -164,8 +164,11 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor, q
     self.index = 0;
     self.question = quizFactory.getQuestion(self.index);
     self.options = self.question.options;
-    var db = firebaseApp.db();
-    // var eventSolRef =
+    var userPublicId = initialData.currentUser.publicId;
+    console.log(initialData.currentUser);
+    var teamId = getTeamId(userPublicId);
+    var db = firebaseApp.database();
+    
     console.log("length of data:", initialData.data);
     // var questions = angular.fromJson(initialData.data.task.mcqQuestions);
     // self.question = questions[self.index];
@@ -179,8 +182,9 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor, q
     2. Load log
     3. Insert things into log
     */
+    // Initialize team Log.
     this.teamLog = (function(){
-
+        var teamLogRef = db.ref(`classMentors\eventTeamLog`);
     })();
 
     this.submitTrat = function(){
@@ -192,6 +196,10 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor, q
         self.question = quizFactory.getQuestion(self.index);
         self.options = self.question.options;
 
+    }
+
+    function getTeamId(userPublicId){
+        var teamsRef = db.ref(`classMentors\${eventId}`);
     }
 }
 
