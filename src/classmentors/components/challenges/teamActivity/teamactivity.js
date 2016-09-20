@@ -160,14 +160,19 @@ createTeamActivityController.$inject = [
 function startTRATController($q, initialData, clmDataStore, $location, urlFor, quizFactory,
         firebaseApp, $firebaseObject, $firebaseArray){
     //TODO: propagate all questions to the html page
+    var db = firebaseApp.database();
     var self = this;
     self.index = 0;
     self.question = quizFactory.getQuestion(self.index);
     self.options = self.question.options;
     var userPublicId = initialData.currentUser.publicId;
     console.log(initialData.currentUser);
-    var teamId = getTeamId(userPublicId);
-    var db = firebaseApp.database();
+    self.eventId = initialData.data.eventId;
+    self.teamFormationRef = initialData.data.task.teamFormationRef;
+     var teamId = getTeamId(userPublicId);
+    
+    
+    
     
     console.log("length of data:", initialData.data);
     // var questions = angular.fromJson(initialData.data.task.mcqQuestions);
@@ -199,7 +204,11 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor, q
     }
 
     function getTeamId(userPublicId){
-        var teamsRef = db.ref(`classMentors\${eventId}`);
+        var eventId = self.eventId;
+        var teamFormationRef = self.teamFormationRef;
+        var teamsRef = db.ref(`classMentors/eventTeams/${eventId}/${teamFormationRef}`);
+        var teams = $firebaseArray(teamsRef);
+        console.log(teams);
     }
 }
 
