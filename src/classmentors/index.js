@@ -70,12 +70,15 @@ module.filter('cmTruncate', filters.cmTruncateFilterFactory);
 module.filter('cmTruncated', filters.cmTruncateFilterBooleanFactory);
 module.filter('showSchool', filters.showSchoolFilterFactory);
 module.filter('showTeamMembers', filters.showTeamMembersFilterFactory);
+//for page controls in trat
+module.factory('quizFactory', components.challenges.tratQuestionFactory);
 
 // TODO: convert those view controller/template to component and move them above
 module.config(components.cohorts.configRoute);
 module.config(components.events.configRoute);
 module.config(components.profiles.configRoute);
 module.config(components.challenges.configRoute);
+// module.config(components.challenges.teamActivity.configRoute);
 
 // added new survey factory for tryout purpose
 module.factory('clmSurvey', components.events.clmSurveyTaskFactory);

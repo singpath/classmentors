@@ -11,6 +11,32 @@ import {cleanObj} from 'singpath-core/services/firebase.js';
 
 const noop = () => undefined;
 
+export function tratQuestionFactory($q, spfAuthData, eventService, clmDataStore){
+    var data =  eventService.get();
+    console.log("my data is:", data);
+    // var question = $q.all ({
+    //     questions: angular.fromJson(data.task.mcqQuestions)
+    // }).then (function (result){
+    //     console.log("testing questions:", result);
+    //     return result;
+    //
+    // });
+
+    return {
+        getQuestion: function(id){
+            var question = angular.fromJson(data.task.mcqQuestions);
+            if(id < question.length){
+                return question[id];
+            }else{
+                return false;
+            }
+        }
+    }
+
+}
+tratQuestionFactory.$inject = ['$q','spfAuthData', 'eventService','clmDataStore'];
+
+
 //TODO: Add config for routing to various challenges
 export function configRoute($routeProvider, routes){
     $routeProvider

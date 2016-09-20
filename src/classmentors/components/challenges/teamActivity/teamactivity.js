@@ -4,29 +4,32 @@ import teamTRATTmpl from './teamactivity-view-trat-start.html!text';
 import teamFormationTmpl from './teamactivity-view-teamFormation.html!text';
 import './teamActivity.css!';
 
-function startTRATInitialData($q, spfAuthData, eventService, clmDataStore){
+
+function startTRATInitialData($q, spfAuthData, eventService, clmDataStore, quizFactory){
     /*
     TODO:
     1. Load Teams
     2. Load Team Log
-    3. Load Answers
+    3. Load Answers [done]
     */
     var data =  eventService.get();
     console.log("my data is:", data);
-    // return $q.all ({
-    //     currentUser: spfAuthData.user(),
-    //     answers: clmDataStore.events.getTaskAnswers(data.eventId, data.taskId),
-    //     getProgress: clmDataStore.events.getProgress(data.eventId)
-    // }).then (function (result){
-    //     return {
-    //         data: data,
-    //         correctAnswers: result.answers,
-    //         currentUser: result.currentUser,
-    //         progress: result.getProgress
-    //     }
-    // });
+    return $q.all ({
+        currentUser: spfAuthData.user(),
+        answers: clmDataStore.events.getTaskAnswers(data.eventId, data.task.taskFrom),
+        getProgress: clmDataStore.events.getProgress(data.eventId)
+    }).then (function (result){
+        return {
+            data: data,
+            correctAnswers: result.answers,
+            currentUser: result.currentUser,
+            progress: result.getProgress
+        }
+    });
+
+
 }
-startTRATInitialData.$inject = ['$q','spfAuthData', 'eventService','clmDataStore']
+startTRATInitialData.$inject = ['$q','spfAuthData', 'eventService','clmDataStore', 'quizFactory']
 
 function createTeamActivityInitialData($q, eventService, clmDataStore) {
     var data = eventService.get();
@@ -154,11 +157,31 @@ createTeamActivityController.$inject = [
     'eventService'
     ];
 
-function startTRATController($q, initialData, clmDataStore, $location, urlFor){
-    //TODO:
+function startTRATController($q, initialData, clmDataStore, $location, urlFor, quizFactory){
+    //TODO: propagate all questions to the html page
+    var self = this;
+    self.index = 0;
+    self.question = quizFactory.getQuestion(self.index);
+    self.options = self.question.options;
+
+    console.log("length of data:", initialData.data);
+    // var questions = angular.fromJson(initialData.data.task.mcqQuestions);
+    // self.question = questions[self.index];
+    // self.options =  self.question.options;
+
+
+    //self.options = angular.fromJson(initialData.data.task.)
+    // console.log("initial Data for trat:", questions[0].options);
 
     this.submitTrat = function(){
         $location.path(urlFor('oneEvent'));
+    }
+    this.nextQuestion = function(){
+        console.log("next question has been clicked");
+        self.index = self.index + 1;
+        self.question = quizFactory.getQuestion(self.index);
+        self.options = self.question.options;
+
     }
 }
 
@@ -167,7 +190,8 @@ startTRATController.$inject = [
     'initialData',
     'clmDataStore',
     '$location',
-    'urlFor'
+    'urlFor',
+    'quizFactory'
 ]
 export {
     teamActivityCreateTmpl,
