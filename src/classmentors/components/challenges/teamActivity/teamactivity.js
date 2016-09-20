@@ -164,7 +164,7 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor, q
     self.question = quizFactory.getQuestion(self.index);
     self.options = self.question.options;
 
-    console.log("length of data:", initialData.data);
+    console.log("length of data:", initialData.data.task.mcqQuestions);
     // var questions = angular.fromJson(initialData.data.task.mcqQuestions);
     // self.question = questions[self.index];
     // self.options =  self.question.options;
