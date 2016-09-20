@@ -113,7 +113,6 @@ function startMCQInitialData($q, spfAuthData, eventService, clmDataStore){
         answers: clmDataStore.events.getTaskAnswers(data.eventId, data.taskId),
         getProgress: clmDataStore.events.getProgress(data.eventId)
     }).then (function (result){
-        console.log("result issss:", result);
         return {
             data: data,
             correctAnswers: result.answers,
@@ -202,7 +201,7 @@ export function challengeServiceFactory
         var taskAnsRef = db.ref(`classMentors/eventAnswers/${event.$id}/${ref.key}`);
         var teamFormationTaskRef = db.ref(`classMentors/eventTasks/${event.$id}`).push();
         var tratTaskRef = db.ref(`classMentors/eventTasks/${event.$id}`).push();
-        console.log('Team Formation key: ', teamFormationTaskRef.key)
+        console.log('Team Formation key: ', taskAnsRef.key)
         var eventTeamsRef = db.ref(`classMentors/eventTeams/${event.$id}/${teamFormationTaskRef.key}`);
         console.log(event.$id);
         // Check If key
@@ -255,7 +254,7 @@ export function challengeServiceFactory
         }).then(function(){
           console.log('TeamFormationTask set.');
           var tratTask = {
-            taskFrom: teamFormationTaskRef.key,
+            taskFrom: taskAnsRef.key,
             teamsRefKey: eventTeamsRef.key,
             title: copy.title,
             description: "Click Below to Start TRAT",

@@ -25,6 +25,7 @@
 */
 
 import {cleanObj} from 'singpath-core/services/firebase.js';
+import firebase from 'firebase';
 import editTmpl from './events-view-event-edit.html!text';
 import eventTableParticipantsTmpl from './events-view-event-table-participants.html!text';
 import eventTableRankTmpl from './events-view-event-table-rank.html!text';
@@ -2425,8 +2426,8 @@ function addSurveyEventTaskCtrlInitialData($q, $route, firebaseApp, $firebaseArr
     // var eventId = $route.current.params.eventId
     // var eventPromise = clmDataStore.events.get(eventId);
     var db = firebaseApp.database();
-
-    var errNoEvent = new Error('Event not found-1');
+    console.log("this firebaseapp database is", db);
+    var errNoEvent = new Error('Event not found');
     var eventId = $route.current.params.eventId;
 
     var profilePromise = clmDataStore.currentUserProfile().catch(noop);
@@ -2492,7 +2493,7 @@ addSurveyEventTaskCtrlInitialData.$inject = [
 ];
 
 //TODO: include controller for the survey
-function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $routeParams, clmDataStore, clmPagerOption, spfAlert, $log) {
+function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $routeParams, clmDataStore, clmPagerOption, spfAlert, $scope, firebase) {
 
     this.pagerOpts = clmPagerOption();
 
@@ -2754,17 +2755,18 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
                 publicId: userId,
                 eventId: eventId,
                 taskId: taskId,
-                timestamp: Firebase.ServerValue.TIMESTAMP
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+
             });
 
 
             spfAlert.success('Survey responses have been submitted.');
             clmDataStore.events.saveSurveyResponseOnSubmit(taskId, eventId, userId, surveyType, schEngageResp);
             clmDataStore.events.submitSolution(eventId, taskId, userId, "Completed");
-            clmDataStore.events.setProgress(eventId, taskId, userId, initialData.progress);
+            // clmDataStore.events.setProgress(eventId, taskId, userId, initialData.progress);
 
-            //clmDataStore.events.updateProgress(initialData.event, initialData.tasks, initialData.solutions, userId, initialData.progress);
-            //console.log(eventId, taskId, userId);
+
+
 
             $location.path(urlFor('oneEvent', {eventId: self.event.$id}));
 
@@ -2799,10 +2801,20 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             initialData.progress[userId] = {taskId};
             initialData.progress[userId][taskId] = {completed: completed};
 
+            clmDataStore.logging.inputLog({
+                action: "submitMotiStratResponse",
+                publicId: userId,
+                eventId: eventId,
+                taskId: taskId,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+
+            });
+
+
             spfAlert.success('Survey response has been submitted.');
             clmDataStore.events.saveSurveyResponseOnSubmit(taskId, eventId, userId, surveyType, motiResp);
             clmDataStore.events.submitSolution(eventId, taskId, userId, "Completed");
-            clmDataStore.events.setProgress(eventId, taskId, userId, initialData.progress);
+
 
             $location.path(urlFor('oneEvent', {eventId: self.event.$id}));
 
@@ -2852,12 +2864,20 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             initialData.progress[userId] = {taskId};
             initialData.progress[userId][taskId] = {completed: completed};
 
+            clmDataStore.logging.inputLog({
+                action: "submitEduDissResponse",
+                publicId: userId,
+                eventId: eventId,
+                taskId: taskId,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+
+            });
+
 
             spfAlert.success('Survey response has been submitted.');
             //add into firebase
             clmDataStore.events.saveSurveyResponseOnSubmit(taskId, eventId, userId, surveyType, eduDissResp);
             clmDataStore.events.submitSolution(eventId, taskId, userId, "Completed");
-            clmDataStore.events.setProgress(eventId, taskId, userId, initialData.progress);
 
             $location.path(urlFor('oneEvent', {eventId: self.event.$id}));
         }
@@ -2878,8 +2898,8 @@ SurveyFormFillCtrl.$inject = [
     'clmDataStore',
     'clmPagerOption',
     'spfAlert',
-    '$scope'
-
+    '$scope',
+    'firebase'
 ];
 
 export function clmEventRankTableFactory() {

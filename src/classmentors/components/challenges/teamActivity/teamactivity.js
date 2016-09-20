@@ -4,15 +4,29 @@ import teamTRATTmpl from './teamactivity-view-trat-start.html!text';
 import teamFormationTmpl from './teamactivity-view-teamFormation.html!text';
 import './teamActivity.css!';
 
-function startTRATInitialData($q, eventService, spfFirebase){
+function startTRATInitialData($q, spfAuthData, eventService, clmDataStore){
     /*
     TODO:
     1. Load Teams
     2. Load Team Log
     3. Load Answers
     */
+    var data =  eventService.get();
+    console.log("my data is:", data);
+    // return $q.all ({
+    //     currentUser: spfAuthData.user(),
+    //     answers: clmDataStore.events.getTaskAnswers(data.eventId, data.taskId),
+    //     getProgress: clmDataStore.events.getProgress(data.eventId)
+    // }).then (function (result){
+    //     return {
+    //         data: data,
+    //         correctAnswers: result.answers,
+    //         currentUser: result.currentUser,
+    //         progress: result.getProgress
+    //     }
+    // });
 }
-startTRATInitialData.$inject = ['$q', 'eventService', 'spfFirebase']
+startTRATInitialData.$inject = ['$q','spfAuthData', 'eventService','clmDataStore']
 
 function createTeamActivityInitialData($q, eventService, clmDataStore) {
     var data = eventService.get();
@@ -140,7 +154,7 @@ createTeamActivityController.$inject = [
     'eventService'
     ];
 
-function startTRATController($q, initialData, clmDataStore, $location, urlFor, spfFirebase){
+function startTRATController($q, initialData, clmDataStore, $location, urlFor){
     //TODO:
 
     this.submitTrat = function(){
@@ -153,8 +167,7 @@ startTRATController.$inject = [
     'initialData',
     'clmDataStore',
     '$location',
-    'urlFor',
-    'spfFirebase'
+    'urlFor'
 ]
 export {
     teamActivityCreateTmpl,
