@@ -157,14 +157,16 @@ createTeamActivityController.$inject = [
     'eventService'
     ];
 
-function startTRATController($q, initialData, clmDataStore, $location, urlFor, quizFactory){
+function startTRATController($q, initialData, clmDataStore, $location, urlFor, quizFactory,
+        firebaseApp, $firebaseObject, $firebaseArray){
     //TODO: propagate all questions to the html page
     var self = this;
     self.index = 0;
     self.question = quizFactory.getQuestion(self.index);
     self.options = self.question.options;
-
-    console.log("length of data:", initialData.data.task.mcqQuestions);
+    var db = firebaseApp.db();
+    // var eventSolRef =
+    console.log("length of data:", initialData.data);
     // var questions = angular.fromJson(initialData.data.task.mcqQuestions);
     // self.question = questions[self.index];
     // self.options =  self.question.options;
@@ -172,6 +174,14 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor, q
 
     //self.options = angular.fromJson(initialData.data.task.)
     // console.log("initial Data for trat:", questions[0].options);
+    /*TODO:
+    1. Decide who answers the questions
+    2. Load log
+    3. Insert things into log
+    */
+    this.teamLog = (function(){
+
+    })();
 
     this.submitTrat = function(){
         $location.path(urlFor('oneEvent'));
@@ -191,7 +201,10 @@ startTRATController.$inject = [
     'clmDataStore',
     '$location',
     'urlFor',
-    'quizFactory'
+    'quizFactory',
+    'firebaseApp',
+    '$firebaseObject',
+    '$firebaseArray'
 ]
 export {
     teamActivityCreateTmpl,
