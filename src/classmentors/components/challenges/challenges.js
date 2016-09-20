@@ -21,7 +21,7 @@ export function tratQuestionFactory($q, spfAuthData, eventService, clmDataStore)
     //     return result;
     //
     // });
-
+    
     return {
         getQuestion: function(id){
             var question = angular.fromJson(data.task.mcqQuestions);
@@ -270,7 +270,7 @@ export function challengeServiceFactory
               var teamLog = {
                 init: {'.sv': 'timestamp'}
               }
-              var eventTeamsLogRef = db.ref(`classMentors/eventTeamsLog/${event.$id}/${thenableRef.key}`);
+              var eventTeamsLogRef = db.ref(`classMentors/eventTeamsLog/${teamFormationTaskRef.key}/${thenableRef.key}`);
               eventTeamsLogRef.set(teamLog);
             });
           }
@@ -280,8 +280,7 @@ export function challengeServiceFactory
         }).then(function(){
           console.log('TeamFormationTask set.');
           var tratTask = {
-            taskFrom: taskAnsRef.key,
-            teamsRefKey: eventTeamsRef.key,
+            taskFrom: teamFormationTaskRef.key,
             title: copy.title,
             description: "Click Below to Start TRAT",
             startTRAT: true,
