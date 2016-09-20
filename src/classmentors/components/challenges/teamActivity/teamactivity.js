@@ -164,8 +164,8 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor, q
     self.index = 0;
     self.question = quizFactory.getQuestion(self.index);
     self.options = self.question.options;
-    var db = 
-    var eventSolRef = 
+    var db = firebaseApp.db();
+    // var eventSolRef = 
     console.log("length of data:", initialData.data);
     // var questions = angular.fromJson(initialData.data.task.mcqQuestions);
     // self.question = questions[self.index];
