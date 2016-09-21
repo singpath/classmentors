@@ -2223,7 +2223,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         var parent = this;
 
         function loadEditor() {
-            var editor = ace.edit(document.querySelector('#editor'));
+            var editor = ace.edit($document[0].querySelector('#editor'));
             editor.setTheme("ace/theme/monokai");
             editor.getSession().setMode("ace/mode/" + task.lang.toLowerCase());
             editor.getSession().setUseWrapMode(true);
@@ -2245,7 +2245,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             }
 
             this.save = function () {
-                var editor = ace.edit(document.querySelector('#editor'));
+                var editor = ace.edit($document[0].querySelector('#editor'));
                 var response = editor.getValue();
                 clmDataStore.events.submitSolution(eventId, taskId, participant.$id, response).then(function () {
                     $mdDialog.hide();
@@ -2284,7 +2284,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         var parent = this;
 
         function loadEditor() {
-            var editor = ace.edit(document.querySelector('#editor'));
+            var editor = ace.edit($document[0].querySelector('#editor'));
             editor.setTheme("ace/theme/monokai");
             editor.getSession().setMode("ace/mode/" + task.lang.toLowerCase());
             editor.getSession().setUseWrapMode(true);
@@ -3647,7 +3647,7 @@ function ClmEventResultsTableCtrl($scope, $q, $log, $mdDialog, $document,
         var parent = this;
 
         function loadEditor() {
-            var editor = ace.edit(document.querySelector('#editor'));
+            var editor = ace.edit($document[0].querySelector('#editor'));
             editor.setTheme("ace/theme/monokai");
             editor.getSession().setMode("ace/mode/" + task.lang.toLowerCase());
             editor.getSession().setUseWrapMode(true);
