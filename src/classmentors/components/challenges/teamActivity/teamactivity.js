@@ -175,7 +175,7 @@ function startTRATInitialData($q, spfAuthData, eventService, clmDataStore, fireb
         progress: clmDataStore.events.getProgress(data.eventId).then(function(data){return data}),
         questions: angular.fromJson(data.task.mcqQuestions),
         tratId: tratId,
-        teamId: $firebaseArray(eventTeamRef).$loaded()
+        teamAndteamId: $firebaseArray(eventTeamRef).$loaded()
         .then(function(teams){
             // Sanity check that teams are retrieved
             console.log(teams);
@@ -184,8 +184,15 @@ function startTRATInitialData($q, spfAuthData, eventService, clmDataStore, fireb
                 if(team[userPublicId]){
                     return team.$id;
                 }
-            }}),
-        eventId: eventId
+            }}).then(function(teamId){
+                var teamRef = db.ref(`classMentors/eventTeams/${eventId}/${teamFormationRefKey}/${teamId}`);
+                return {
+                    team: $firebaseArray(teamRef).$loaded().then(function(team){return team;}),
+                    teamId:teamId
+                }
+            }),
+        eventId: eventId,
+        teamFormId: teamFormationRefKey
     });
 
     // return $q.all ({
@@ -210,7 +217,7 @@ function startTRATInitialData($q, spfAuthData, eventService, clmDataStore, fireb
 }
 startTRATInitialData.$inject = ['$q','spfAuthData', 'eventService','clmDataStore', 'firebaseApp', '$firebaseObject', '$firebaseArray'];
 
-function startTRATController($q, initialData, clmDataStore, $location, urlFor, quizFactory,
+function startTRATController($q, initialData, clmDataStore, $location, urlFor,
         firebaseApp, $firebaseObject, $firebaseArray){
     
     // Sanity check
@@ -218,17 +225,25 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor, q
     var self = this;
     var db = firebaseApp.database();
     self.index = 0;
-    // self.questions = angular.fromJson(initialData.data.task.mcqQuestions); //quizFactory.getQuestion(self.index);
     
     // Inititalize Question and Question's option(s)
     self.question = initialData.questions[self.index];
     self.options = self.question.options;
-
-    // Get current user's publicId
     var userPublicId = initialData.currentUser.publicId;
     console.log(initialData.currentUser);
     self.eventId = initialData.eventId;
-    self.teamId = initialData.teamId;
+    var teamAndteamId = initialData.teamAndteamId;
+    self.teamId = teamAndteamId.teamId;
+    self.team = teamAndteamId.team;
+    self.tratId = initialData.tratId;
+    // self.teamFormId = initialData.teamFormId;
+    var answers = [];
+    
+    // Will this overwrite the reference when called by other clients?
+    var teamAnsRef = db.ref(`classMentors/eventSolutions/${self.eventId}`)
+        .push(self.teamId)
+        .push(self.tratId);
+    
 
     // Initialize team Log.
     self.teamLog = (function(){
@@ -239,27 +254,24 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor, q
         });
     })();
 
-    // var questions = angular.fromJson(initialData.data.task.mcqQuestions);
-    // self.question = questions[self.index];
-    // self.options =  self.question.options;
+    // test this later
+    self.updateLog = function(string){
+        var timestamp = db.ServerValue.TIMESTAMP;
+        self.teamLog.transaction(function(){
+            return {timestamp: string};
+        });
+    }
 
-
-    //self.options = angular.fromJson(initialData.data.task.)
-    // console.log("initial Data for trat:", questions[0].options);
-    /*TODO:
-    1. Decide who answers the questions
-    2. Load log
-    3. Insert things into log
-    */
-
-
-
-
-    this.submitTrat = function(){
+    self.submitTrat = function(){
         $location.path(urlFor('oneEvent'));
     }
-    this.nextQuestion = function(){
+
+    
+    self.nextQuestion = function(){
         console.log("next question has been clicked");
+        // Check if all members have submit
+        // Check if user's answers is the answer that will be saved under team record.
+        // 
         self.index = self.index + 1;
         self.question =  //quizFactory.getQuestion(self.index);
         self.options = self.question.options;
@@ -274,7 +286,6 @@ startTRATController.$inject = [
     'clmDataStore',
     '$location',
     'urlFor',
-    'quizFactory',
     'firebaseApp',
     '$firebaseObject',
     '$firebaseArray'
