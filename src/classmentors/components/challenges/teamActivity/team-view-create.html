@@ -80,7 +80,7 @@
             <label ng-show="ctrl.teams">Assign teams from previous team challenges</label>
             <label ng-hide="ctrl.teams || ctrl.teams.length == 0">No team challenges available</label>
             <md-select ng-model="ctrl.selectedTeam" ng-disabled="!ctrl.teams || ctrl.teams.length == 0">
-              <md-option ng-$at="team in ctrl.teams" ng-value="team.name"></md-option>
+              <md-option ng-repeat="team in ctrl.teams" ng-value="team.name"></md-option>
             </md-select>
           </md-input-container>
         </div>

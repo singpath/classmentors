@@ -4,15 +4,32 @@ import teamTRATTmpl from './teamactivity-view-trat-start.html!text';
 import teamFormationTmpl from './teamactivity-view-teamFormation.html!text';
 import './teamActivity.css!';
 
-function startTRATInitialData($q, eventService, spfFirebase){
+
+function startTRATInitialData($q, spfAuthData, eventService, clmDataStore, quizFactory){
     /*
     TODO:
     1. Load Teams
     2. Load Team Log
-    3. Load Answers
+    3. Load Answers [done]
     */
+    var data =  eventService.get();
+    console.log("my data is:", data);
+    return $q.all ({
+        currentUser: spfAuthData.user(),
+        answers: clmDataStore.events.getTaskAnswers(data.eventId, data.task.taskFrom),
+        getProgress: clmDataStore.events.getProgress(data.eventId)
+    }).then (function (result){
+        return {
+            data: data,
+            correctAnswers: result.answers,
+            currentUser: result.currentUser,
+            progress: result.getProgress
+        }
+    });
+
+
 }
-startTRATInitialData.$inject = ['$q', 'eventService', 'spfFirebase']
+startTRATInitialData.$inject = ['$q','spfAuthData', 'eventService','clmDataStore', 'quizFactory']
 
 function createTeamActivityInitialData($q, eventService, clmDataStore) {
     var data = eventService.get();
@@ -140,11 +157,67 @@ createTeamActivityController.$inject = [
     'eventService'
     ];
 
-function startTRATController($q, initialData, clmDataStore, $location, urlFor, spfFirebase){
-    //TODO:
+function startTRATController($q, initialData, clmDataStore, $location, urlFor, quizFactory,
+        firebaseApp, $firebaseObject, $firebaseArray){
+    //TODO: propagate all questions to the html page
+    var db = firebaseApp.database();
+    var self = this;
+    self.index = 0;
+    self.question = quizFactory.getQuestion(self.index);
+    self.options = self.question.options;
+    var userPublicId = initialData.currentUser.publicId;
+    console.log(initialData.currentUser);
+    self.eventId = initialData.data.eventId;
+    self.teamFormationRef = initialData.data.task.teamFormationRef;
+    var teamId = getTeamId(userPublicId);
+
+
+    // var questions = angular.fromJson(initialData.data.task.mcqQuestions);
+    // self.question = questions[self.index];
+    // self.options =  self.question.options;
+
+
+    //self.options = angular.fromJson(initialData.data.task.)
+    // console.log("initial Data for trat:", questions[0].options);
+    /*TODO:
+    1. Decide who answers the questions
+    2. Load log
+    3. Insert things into log
+    */
+    // Initialize team Log.
+    this.teamLog = (function(){
+        var teamLogRef = db.ref(`classMentors\eventTeamLog`);
+    })();
 
     this.submitTrat = function(){
         $location.path(urlFor('oneEvent'));
+    }
+    this.nextQuestion = function(){
+        console.log("next question has been clicked");
+        self.index = self.index + 1;
+        self.question = quizFactory.getQuestion(self.index);
+        self.options = self.question.options;
+
+    }
+
+    function getTeamId(userPublicId){
+        var eventId = self.eventId;
+        var teamFormationRef = self.teamFormationRef;
+        var teamsRef = db.ref(`classMentors/eventTeams/${eventId}/${teamFormationRef}`);
+        var teamsArrayPromise = $firebaseArray(teamsRef);
+        teamsArrayPromise.$loaded().then(function(teams){
+            angular.forEach(teams, function(team){
+                console.log(team);
+            })
+        });
+        // for(var i = 0; i < teams.length; i ++){
+        //     var team = teams[i];
+        //     console.log(team);
+        //     if(team.userPublicId){
+        //         console.log('User found : ', userPublicId);
+        //         return team.$id;
+        //     }
+        // }
     }
 }
 
@@ -154,7 +227,10 @@ startTRATController.$inject = [
     'clmDataStore',
     '$location',
     'urlFor',
-    'spfFirebase'
+    'quizFactory',
+    'firebaseApp',
+    '$firebaseObject',
+    '$firebaseArray'
 ]
 export {
     teamActivityCreateTmpl,
