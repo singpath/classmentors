@@ -64,8 +64,7 @@
       "google:chris": true
     },
     "premiumUsers": {
-      "google:alice": true,
-      "google:chris": true
+      "google:alice": true
     },
     "settings": {
       "someId": {
@@ -276,7 +275,6 @@
           "displayName": "Chris Boesch",
           "gravatar": "//www.gravatar.com/avatar/somehashsomehashsomehashsomehash",
           "isAdmin": true,
-          "isPremium": true,
           "yearOfBirth": 1990
         }
       },

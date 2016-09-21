@@ -791,7 +791,7 @@ export function clmDataStoreFactory(
         }
 
         passwordRef = db.ref(`classMentors/eventPasswords/${eventId}`);
-        profileRef = db.ref(`'classMentors/userProfiles/${ownerId}/createdEvents/${eventId}`);
+        profileRef = db.ref(`classMentors/userProfiles/${ownerId}/createdEvents/${eventId}`);
 
         return event.$save().then(function() {
           var hash, opts;
