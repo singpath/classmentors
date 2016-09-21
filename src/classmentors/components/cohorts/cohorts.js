@@ -580,7 +580,6 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
     this.querySearch = querySearch;
 
     function querySearch (query) {
-        console.log(self.mappedEvents);
         return query ? self.mappedEvents.filter( createFilterFor(query) ) : self.mappedEvents;
     }
 
@@ -596,7 +595,6 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
 
     function createFilterFor(query) {
         var lowercaseQuery = angular.lowercase(query);
-        // console.log(self.cohort.events);
         return function filterFn(event) {
             // to filter results based on query and ensure that user cannot select events already in the cohort
             return (event.value.indexOf(lowercaseQuery) >= 0 && self.cohort.events.indexOf(event.id) < 0);
@@ -624,8 +622,6 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
     };
 
     this.saveAddedEvent = function () {
-        console.log(self.selectedEvent.id + "  " + self.cohort.$id);
-
         clmDataStore.cohorts.addEvent(self.cohort.$id, self.selectedEvent.id, self.cohort.events.length).then(function() {
             spfAlert.success(self.selectedEvent.title + ' has been added to the cohort!');
             self.selectedEvent = null;
@@ -1013,7 +1009,6 @@ function ClmCohortRankPageCtrl($q, $scope, $log, firebaseApp, $firebaseObject, $
             for(let placing = self.fourEntryThreshold; placing < self.twoEntryThreshold; placing ++) {
                 let event = self.cohortEventData[placing];
                 if(event) {
-                    console.log(event);
                     event.userRanks.sort(function (a,b) {
                         return b.total - a.total;
                     });
