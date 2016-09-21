@@ -204,8 +204,20 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor, q
         var eventId = self.eventId;
         var teamFormationRef = self.teamFormationRef;
         var teamsRef = db.ref(`classMentors/eventTeams/${eventId}/${teamFormationRef}`);
-        var teams = $firebaseArray(teamsRef);
-        console.log("teams are:",teams);
+        var teamsArrayPromise = $firebaseArray(teamsRef);
+        teamsArrayPromise.$loaded().then(function(teams){
+            angular.forEach(teams, function(team){
+                console.log(team);
+            })
+        });
+        // for(var i = 0; i < teams.length; i ++){
+        //     var team = teams[i];
+        //     console.log(team);
+        //     if(team.userPublicId){
+        //         console.log('User found : ', userPublicId);
+        //         return team.$id;
+        //     }
+        // }
     }
 }
 
