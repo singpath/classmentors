@@ -34,34 +34,30 @@ export function clmServiceFactory($q, $log, firebaseApp, $firebaseObject, $fireb
       availableBadges: function() {
         var ref, badges;
 
-                if (availableBadgesPromise[serviceId]) {
-                    return availableBadgesPromise[serviceId];
-                }
-
         ref = db.ref(`classMentors/badges/${serviceId}`);
         badges = $firebaseObject(ref);
         availableBadgesPromise[serviceId] = loaded(badges);
 
-                return availableBadgesPromise[serviceId];
-            },
+        return availableBadgesPromise[serviceId];
+      },
 
             /**
              * Return the list of saved badges for the service and user.
              *
              * @return {object}
              */
-            badges: function (profile) {
-                if (
+      badges: function(profile) {
+        if (
                     profile &&
                     profile.services &&
                     profile.services[serviceId] &&
                     profile.services[serviceId].badges
                 ) {
-                    return profile.services[serviceId].badges;
-                }
+          return profile.services[serviceId].badges;
+        }
 
-                return {};
-            },
+        return {};
+      },
 
       /**
        * Return the details of of the user for that service.
@@ -102,11 +98,11 @@ export function clmServiceFactory($q, $log, firebaseApp, $firebaseObject, $fireb
           return $q.reject(new Error('The Classmentors profile should have an id.'));
         }
 
-                if (!details || !details.id) {
-                    return $q.reject(new Error(
+        if (!details || !details.id) {
+          return $q.reject(new Error(
                         `The user details for ${serviceId} should include an id.`
                     ));
-                }
+        }
 
         ref = firebaseApp.ref(`classMentors/servicesUserIds/${serviceId}/${details.id}`);
 
@@ -157,9 +153,9 @@ export function clmServiceFactory($q, $log, firebaseApp, $firebaseObject, $fireb
           return $q.reject(new Error('The Classmentors profile should have an id.'));
         }
 
-                if (!userId) {
-                    return $q.reject(new Error('The profile should have an id for that service.'));
-                }
+        if (!userId) {
+          return $q.reject(new Error('The profile should have an id for that service.'));
+        }
 
         profileRef = db.ref(`classMentors/userProfiles/${publicId}/services/${serviceId}`);
 
@@ -177,11 +173,11 @@ export function clmServiceFactory($q, $log, firebaseApp, $firebaseObject, $fireb
              * @return {Promise}        resolve to the a boolean. True if taken, false
              *                          otherwise.
              */
-            userIdTaken: function (userId) {
-                return service.userIdOwner(userId).then(function (sync) {
-                    return sync.$value !== null;
-                });
-            },
+      userIdTaken: function(userId) {
+        return service.userIdOwner(userId).then(function(sync) {
+          return sync.$value !== null;
+        });
+      },
 
       /**
        * Return a promise resolving to a loaded AngularFire object for the service
@@ -203,16 +199,16 @@ export function clmServiceFactory($q, $log, firebaseApp, $firebaseObject, $fireb
              * resolved to false if it doesn't exist.
              *
              */
-            userIdExist: function (userId) {
-                if (!userId) {
-                    return $q.when(false);
-                }
-                return service.fetchProfile(userId).then(function () {
-                    return true;
-                }).catch(function () {
-                    return false;
-                });
-            },
+      userIdExist: function(userId) {
+        if (!userId) {
+          return $q.when(false);
+        }
+        return service.fetchProfile(userId).then(function() {
+          return true;
+        }).catch(function() {
+          return false;
+        });
+      },
 
             /**
              * Fetch user's badges from 3rd party service and update user
@@ -224,8 +220,8 @@ export function clmServiceFactory($q, $log, firebaseApp, $firebaseObject, $fireb
              * @return {Promise}             return promise resolving to a map of
              *                               of newly earned badges.
              */
-            updateProfile: function (profile) {
-                var knownBadges = service.badges(profile);
+      updateProfile: function(profile) {
+        var knownBadges = service.badges(profile);
 
         return service.fetchBadges(profile).then(function(badges) {
           return badges.filter(function(badge) {
@@ -284,13 +280,13 @@ export function clmServiceFactory($q, $log, firebaseApp, $firebaseObject, $fireb
              * @return {Promise} Promise resolving to the user details
              *                   (an object holding the user id and name).
              */
-            auth: function () {
-                return $q.reject(service.errNotImplemented);
-            }
-        };
-
-        return Object.assign(service, mixin || {});
+      auth: function() {
+        return $q.reject(service.errNotImplemented);
+      }
     };
+
+    return Object.assign(service, mixin || {});
+  };
 }
 clmServiceFactory.$inject = ['$q', '$log', 'firebaseApp', '$firebaseObject', '$firebaseArray'];
 
@@ -388,33 +384,33 @@ export function clmDataStoreFactory(
         return clmDataStore.profile(currentUser.publicId);
       });
 
-            return $q.all({
-                currentUser: currentUserPromise,
-                profile: profilePromise
-            }).then(function (resp) {
-                var userData = resp.profile && resp.profile.user;
+      return $q.all({
+        currentUser: currentUserPromise,
+        profile: profilePromise
+      }).then(function(resp) {
+        var userData = resp.profile && resp.profile.user;
 
-                if (!userData) {
-                    return resp.profile;
-                }
+        if (!userData) {
+          return resp.profile;
+        }
 
-                var userSchool = userData.school && userData.school.name;
-                var profileSchool = resp.currentUser.school && resp.currentUser.school.name;
-                var userCountry = userData.country && userData.country.code;
-                var profileCountry = resp.currentUser.country && resp.currentUser.country.code;
+        var userSchool = userData.school && userData.school.name;
+        var profileSchool = resp.currentUser.school && resp.currentUser.school.name;
+        var userCountry = userData.country && userData.country.code;
+        var profileCountry = resp.currentUser.country && resp.currentUser.country.code;
 
-                if (
+        if (
                     userData.displayName === resp.currentUser.displayName &&
                     userData.gravatar === resp.currentUser.gravatar &&
                     userCountry === profileCountry &&
                     userData.yearOfBirth === resp.currentUser.yearOfBirth
                 ) {
-                    return resp.profile;
-                }
+          return resp.profile;
+        }
 
-                return clmDataStore.updateProfile(resp.currentUser);
-            });
-        },
+        return clmDataStore.updateProfile(resp.currentUser);
+      });
+    },
 
     logging: {
       inputLog: function(actionObj) {
@@ -456,15 +452,15 @@ export function clmDataStoreFactory(
       return spfSchools();
     },
 
-        initProfile: function () {
-            return spfAuthData.user().then(function (currentUser) {
-                if (!currentUser || !currentUser.publicId) {
-                    return $q.reject(new Error('The user has not set a user public id.'));
-                }
+    initProfile: function() {
+      return spfAuthData.user().then(function(currentUser) {
+        if (!currentUser || !currentUser.publicId) {
+          return $q.reject(new Error('The user has not set a user public id.'));
+        }
 
-                return clmDataStore.updateProfile(currentUser);
-            });
-        },
+        return clmDataStore.updateProfile(currentUser);
+      });
+    },
 
     cohorts: {
       errNoPublicId: new Error('You should have a public id to join a cohort'),
@@ -605,7 +601,7 @@ export function clmDataStoreFactory(
         return ref.set(false);
       }
 
-        },
+    },
 
     events: {
       addTaskWithAns: function(eventId, task, isOpen, answers) {
@@ -641,20 +637,21 @@ export function clmDataStoreFactory(
         return loaded($firebaseObject(ref));
       },
 
-    addTeamFormation: function (eventId, task, priority) {
-        return spfFirebase.push(['classMentors/eventTasks', eventId], task).then(function(ref){
-            ref.setPriority(priority);
-            return ref;
+      addTeamFormation: function(eventId, task, priority) {
+        return spfFirebase.push(['classMentors/eventTasks', eventId], task).then(function(ref) {
+          ref.setPriority(priority);
+          return ref;
         });
-    },
+      },
 
-    addTrat: function(eventId, task, priority){
-        return spfFirebase.push(['classMentors/eventTasks', eventId], task).then(function (ref){
-            ref.setPriority(priority);
-            var taskId = ref.key();
-            return ref;
+      addTrat: function(eventId, task, priority) {
+        return spfFirebase.push(['classMentors/eventTasks', eventId], task).then(function(ref) {
+          ref.setPriority(priority);
+          var taskId = ref.key();
+
+          return ref;
         });
-    },
+      },
 
       updateTaskWithAns: function(eventId, taskId, task, answers) {
         var ref = db.ref(`classMentors/eventTasks/${eventId}/${taskId}`);
@@ -794,7 +791,7 @@ export function clmDataStoreFactory(
         }
 
         passwordRef = db.ref(`classMentors/eventPasswords/${eventId}`);
-        profileRef = db.ref(`'classMentors/userProfiles/${ownerId}/createdEvents/${eventId}`);
+        profileRef = db.ref(`classMentors/userProfiles/${ownerId}/createdEvents/${eventId}`);
 
         return event.$save().then(function() {
           var hash, opts;
@@ -846,21 +843,21 @@ export function clmDataStoreFactory(
               var participant = ranking[publicId];
               var schoolId;
 
-                            if (
-                                participant.user.school == null || !participant.user.school.name || !participant.user.school.type
-                            ) {
-                                return all;
-                            }
+              if (
+                  participant.user.school == null || !participant.user.school.name || !participant.user.school.type
+              ) {
+                return all;
+              }
 
-                            schoolId = `${participant.user.school.type}/${participant.user.school.name}`;
-                            if (!all[schoolId]) {
-                                all[schoolId] = [];
-                            }
+              schoolId = `${participant.user.school.type}/${participant.user.school.name}`;
+              if (!all[schoolId]) {
+                all[schoolId] = [];
+              }
 
-                            all[schoolId].push(participant);
+              all[schoolId].push(participant);
 
-                            return all;
-                        }, {});
+              return all;
+            }, {});
 
             Object.keys(schoolRankings).map(function(schoolId) {
 
@@ -872,9 +869,9 @@ export function clmDataStoreFactory(
                   return b.total - a.total;
                 }
 
-                                if (!a.user || a.user.displayName) {
-                                    return -1;
-                                }
+                if (!a.user || a.user.displayName) {
+                  return -1;
+                }
 
                 if (!b.user || b.user.displayName) {
                   return 1;
@@ -1032,11 +1029,11 @@ export function clmDataStoreFactory(
       join: function(event, pw) {
         var refs, authData, eventId;
 
-                if (!event || !event.$id) {
-                    return $q.reject('Event was not provided');
-                }
+        if (!event || !event.$id) {
+          return $q.reject('Event was not provided');
+        }
 
-                eventId = event.$id;
+        eventId = event.$id;
 
         return spfAuthData.user().then(function(_authData) {
           var uid = spfAuth.user && spfAuth.user.uid;
@@ -1082,11 +1079,11 @@ export function clmDataStoreFactory(
         });
       },
 
-            leave: function (eventId) {
-                return spfAuthData.user().then(function (authData) {
-                    return clmDataStore.events.removeParticpants(eventId, authData.publicId);
-                });
-            },
+      leave: function(eventId) {
+        return spfAuthData.user().then(function(authData) {
+          return clmDataStore.events.removeParticpants(eventId, authData.publicId);
+        });
+      },
 
       removeParticpants: function(eventId, publicId) {
         var profileRef = db.ref(`classMentors/userProfiles/${publicId}/joinedEvents/${eventId}`);
@@ -1106,107 +1103,113 @@ export function clmDataStoreFactory(
       },
 
             // to be true the task only need registration.
-            _hasRegistered: function (task, clmProfile, spfProfile) {
-                var serviceId = task.serviceId;
+      _hasRegistered: function(task, clmProfile, spfProfile) {
+        var serviceId = task.serviceId;
 
-                if (!task.serviceId || task.badge || task.singPathProblem) {
-                    return false;
-                }
+        if (!task.serviceId || task.badge || task.singPathProblem) {
+          return false;
+        }
 
-                if (serviceId === 'singPath') {
-                    return Boolean(spfProfile);
-                }
+        if (serviceId === 'singPath') {
+          return Boolean(spfProfile);
+        }
 
-                return (
+        return (
                     clmProfile.services &&
                     clmProfile.services[serviceId] &&
                     clmProfile.services[serviceId].details &&
                     clmProfile.services[serviceId].details.id
                 );
-            },
+      },
 
-            _hasBadge: function (task, badges) {
-                if (
+      _hasBadge: function(task, badges) {
+        if (
                     !task.badge || !task.badge.id
                 ) {
-                    return false;
-                }
+          return false;
+        }
 
-                var serviceId = task.serviceId;
+        var serviceId = task.serviceId;
 
-                return (
+        return (
                     task.badge &&
                     task.badge.id &&
                     badges[serviceId] &&
                     badges[serviceId][task.badge.id]
                 );
-            },
+      },
 
-            _hasSolvedSingpathProblem: function (task, profile) {
+      _hasSolvedSingpathProblem: function(task, profile) {
 
-                if (
-                    !task.singPathProblem || !task.singPathProblem.path || !task.singPathProblem.path.id || !task.singPathProblem.level || !task.singPathProblem.level.id || !task.singPathProblem.problem || !task.singPathProblem.problem.id
-                ) {
-                    return false;
-                }
+        if (!task.singPathProblem || !task.singPathProblem.path || !task.singPathProblem.path.id) {
+          return false;
+        }
 
-                var queueId = 'default';
+        if (!task.singPathProblem.level || !task.singPathProblem.level.id) {
+          return false;
+        }
 
-                return clmDataStore.singPath.hasSolved(
+        if (!task.singPathProblem.problem || !task.singPathProblem.problem.id) {
+          return false;
+        }
+
+        var queueId = 'default';
+
+        return clmDataStore.singPath.hasSolved(
                     profile,
                     task.singPathProblem.path.id,
                     task.singPathProblem.level.id,
                     task.singPathProblem.problem.id,
                     queueId
                 );
-            },
+      },
 
-            _isSolutionLinkValid: function (task, solutions) {
-                return (
+      _isSolutionLinkValid: function(task, solutions) {
+        return (
                     task.linkPattern &&
                     solutions &&
                     solutions[task.$id] &&
                     solutions[task.$id].match &&
                     solutions[task.$id].match(task.linkPattern)
                 );
-            },
+      },
 
-            _isResponseValid: function (task, solutions) {
-                return (
+      _isResponseValid: function(task, solutions) {
+        return (
                     task.textResponse &&
                     solutions &&
                     solutions[task.$id]
                 );
-            },
+      },
 
-            _hasDoneSurvey: function (task, solutions) {
-                return (
+      _hasDoneSurvey: function(task, solutions) {
+        return (
                     task.survey &&
                     solutions &&
                     solutions[task.$id]
                 );
-            },
+      },
 
-            _hasDoneMcq: function (task, solutions) {
-                return (
+      _hasDoneMcq: function(task, solutions) {
+        return (
                     task.mcqQuestions &&
                     solutions &&
                     solutions[task.$id]
                 );
-            },
-            _hasFormTeam: function (task, solutions) {
-                return (
+      },
+      _hasFormTeam: function(task, solutions) {
+        return (
                     task.formationPattern &&
                     solutions &&
                     solutions[task.$id]
                 );
-            },
+      },
 
-            _solvedProblems: function (singPathProfile) {
-                var queueId = 'default';
+      _solvedProblems: function(singPathProfile) {
+        var queueId = 'default';
 
-                return clmDataStore.singPath.countSolvedSolution(singPathProfile, queueId);
-            },
+        return clmDataStore.singPath.countSolvedSolution(singPathProfile, queueId);
+      },
 
       _getProgress: function(tasks, data) {
 
@@ -1230,17 +1233,17 @@ export function clmDataStoreFactory(
           }
 
                     // We recheck solved closed tasks in case requirements changed.
-                    if (
+          if (
                         task.closedAt && !(
                             data.progress &&
                             data.progress[task.$id] &&
                             data.progress[task.$id].completed
                         )
                     ) {
-                        return progress;
-                    }
+            return progress;
+          }
 
-                    var solved = (
+          var solved = (
                         clmDataStore.events._isSolutionLinkValid(task, data.solutions) ||
                         clmDataStore.events._isResponseValid(task, data.solutions) ||
                         clmDataStore.events._hasRegistered(task, data.classMentors, data.singPath) ||
@@ -1251,29 +1254,29 @@ export function clmDataStoreFactory(
                         clmDataStore.events._hasFormTeam(task, data.solutions)
                     );
 
-                    if (solved) {
-                        progress[task.$id] = {completed: true};
-                    }
+          if (solved) {
+            progress[task.$id] = {completed: true};
+          }
 
-                    return progress;
-                }, {});
-            },
+          return progress;
+        }, {});
+      },
 
-            _getRanking: function (data) {
-                var ranking = {
-                    singPath: clmDataStore.events._solvedProblems(data.singPath),
-                    codeCombat: data.badges.codeCombat.length,
-                    codeSchool: data.badges.codeSchool.length
-                };
+      _getRanking: function(data) {
+        var ranking = {
+          singPath: clmDataStore.events._solvedProblems(data.singPath),
+          codeCombat: data.badges.codeCombat.length,
+          codeSchool: data.badges.codeSchool.length
+        };
 
-                ranking.total = Object.keys(ranking).reduce(function (sum, key) {
-                    return sum + ranking[key];
-                }, 0);
+        ranking.total = Object.keys(ranking).reduce(function(sum, key) {
+          return sum + ranking[key];
+        }, 0);
 
-                ranking.user = data.classMentors.user;
+        ranking.user = data.classMentors.user;
 
-                return ranking;
-            },
+        return ranking;
+      },
 
       monitorEvent: function(event, tasks, participants, solutions, progress) {
         var tid;
@@ -1288,42 +1291,42 @@ export function clmDataStoreFactory(
             );
           });
 
-                }
+        }
 
-                function debouncedUpdate() {
-                    if (tid) {
-                        $timeout.cancel(tid);
-                    }
+        function debouncedUpdate() {
+          if (tid) {
+            $timeout.cancel(tid);
+          }
 
-                    tid = $timeout(update, delay, false);
-                }
+          tid = $timeout(update, delay, false);
+        }
 
-                debouncedUpdate();
-                return {
-                    update: debouncedUpdate,
-                    unwatch: function stopMonitorEvent() {
-                        unWatchParticipants();
-                        unWatchSolution();
-                    }
-                };
-            },
+        debouncedUpdate();
+        return {
+          update: debouncedUpdate,
+          unwatch: function stopMonitorEvent() {
+            unWatchParticipants();
+            unWatchSolution();
+          }
+        };
+      },
 
-            updateProgress: function (event, tasks, solutions, publicId, userProgress) {
-                if (!publicId) {
-                    return $q.reject('User public id is missing missing.');
-                }
+      updateProgress: function(event, tasks, solutions, publicId, userProgress) {
+        if (!publicId) {
+          return $q.reject('User public id is missing missing.');
+        }
 
-                if (!solutions || !solutions.$id || solutions.$id !== event.$id) {
-                    return $q.reject('User solutions are missing');
-                }
+        if (!solutions || !solutions.$id || solutions.$id !== event.$id) {
+          return $q.reject('User solutions are missing');
+        }
 
-                var cmProfilePromise = clmDataStore.profile(publicId);
-                var badgesPromise = cmProfilePromise.then(function (profile) {
-                    return $q.all({
-                        codeCombat: clmDataStore.services.codeCombat.fetchBadges(profile),
-                        codeSchool: clmDataStore.services.codeSchool.fetchBadges(profile)
-                    });
-                });
+        var cmProfilePromise = clmDataStore.profile(publicId);
+        var badgesPromise = cmProfilePromise.then(function(profile) {
+          return $q.all({
+            codeCombat: clmDataStore.services.codeCombat.fetchBadges(profile),
+            codeSchool: clmDataStore.services.codeSchool.fetchBadges(profile)
+          });
+        });
 
         // 1. load profile, badges and current progress
         return $q.all({
@@ -1340,6 +1343,7 @@ export function clmDataStoreFactory(
           // 4. save data
 
           return $q.all([
+
             // 2. check completness and update progress if needed.
             $q.when(clmDataStore.events._getProgress(tasks, data)).then(function(progress) {
               var ref = db.ref(`classMentors/eventProgress/${event.$id}/${data.classMentors.$id}`);
@@ -1347,8 +1351,8 @@ export function clmDataStoreFactory(
                 var wasCompleted = data.progress && data.progress[taskId] && data.progress[taskId].completed;
                 var isCompleted = progress && progress[taskId] && progress[taskId].completed;
 
-                                return isCompleted !== wasCompleted;
-                            });
+                return isCompleted !== wasCompleted;
+              });
 
               if (updated) {
                 return ref.set(progress);
@@ -1380,14 +1384,14 @@ export function clmDataStoreFactory(
              * Only admin and event onwer can save the progress and ranking.
              *
              */
-            updateCurrentUserProfile: function (event, tasks, userSolutions, profile) {
-                if (!event || !event.$id || !userSolutions || !userSolutions.$id || !profile || !profile.$id) {
-                    return $q.reject(new Error('Event, userSolutions or profile are not valid firebase object'));
-                }
+      updateCurrentUserProfile: function(event, tasks, userSolutions, profile) {
+        if (!event || !event.$id || !userSolutions || !userSolutions.$id || !profile || !profile.$id) {
+          return $q.reject(new Error('Event, userSolutions or profile are not valid firebase object'));
+        }
 
-                function solvedTask(task, solutions) {
-                    return Boolean(solutions[task.$id]);
-                }
+        function solvedTask(task, solutions) {
+          return Boolean(solutions[task.$id]);
+        }
 
         return $q.all({
 
@@ -1409,19 +1413,19 @@ export function clmDataStoreFactory(
               return false;
             }
 
-                        return (
+            return (
                             clmDataStore.events._hasRegistered(task, profile, data.singPath) ||
                             clmDataStore.events._hasSolvedSingpathProblem(task, data.singPath) ||
                             clmDataStore.events._hasBadge(task, data.badges)
                         );
-                    }).map(function (task) {
-                        userSolutions[task.$id] = true;
-                        return task;
-                    });
+          }).map(function(task) {
+            userSolutions[task.$id] = true;
+            return task;
+          });
 
-                    if (updatedTasks.length > 0) {
-                        userSolutions.$save();
-                    }
+          if (updatedTasks.length > 0) {
+            userSolutions.$save();
+          }
 
           return updatedTasks;
         }).catch(function(err) {
@@ -1497,25 +1501,25 @@ export function clmDataStoreFactory(
         var ref;
 
         if (!responses) {
-            return $q.reject(new Error('No responses provided'));
+          return $q.reject(new Error('No responses provided'));
         }
         if (!questionNumber) {
-            return $q.reject(new Error('Invalid survey question'));
+          return $q.reject(new Error('Invalid survey question'));
         }
         if (!taskId) {
-            return $q.reject(new Error('No task id provided'));
+          return $q.reject(new Error('No task id provided'));
         }
         if (!eventId) {
-            return $q.reject(new Error('No event id provided'));
+          return $q.reject(new Error('No event id provided'));
         }
         if (!userId) {
-            return $q.reject(new Error('No user id provided'));
+          return $q.reject(new Error('No user id provided'));
         }
-        if(!surveyTask){
-            return $q.reject(new Error('No survey task provided'));
+        if (!surveyTask) {
+          return $q.reject(new Error('No survey task provided'));
         }
-        if(!qnTitle){
-            return $q.reject(new Error('No question title provided'));
+        if (!qnTitle) {
+          return $q.reject(new Error('No question title provided'));
         }
 
         ref = db.ref(
@@ -1532,13 +1536,13 @@ export function clmDataStoreFactory(
           return $q.reject(new Error('No event id provided'));
         }
 
-                if (!taskId) {
-                    return $q.reject(new Error('No task id provided'));
-                }
+        if (!taskId) {
+          return $q.reject(new Error('No task id provided'));
+        }
 
-                if (!publicId) {
-                    return $q.reject(new Error('No public id provided'));
-                }
+        if (!publicId) {
+          return $q.reject(new Error('No public id provided'));
+        }
 
         ref = db.ref(`classMentors/eventSolutions/${eventId}/${publicId}/${taskId}`);
 
@@ -1704,31 +1708,31 @@ export function clmDataStoreFactory(
       }
     },
 
-        services: {
+    services: {
 
-            codeCombat: clmService('codeCombat', {
-                errServerError: new Error('Failed to get logged in user info from Code Combat.'),
-                errLoggedOff: new Error('The user is not logged in to Code Combat.'),
-                errNoUserId: new Error('Your code combat user id is missing.'),
-                errNoName: new Error('The user hasn\'t set a name.'),
+      codeCombat: clmService('codeCombat', {
+        errServerError: new Error('Failed to get logged in user info from Code Combat.'),
+        errLoggedOff: new Error('The user is not logged in to Code Combat.'),
+        errNoUserId: new Error('Your code combat user id is missing.'),
+        errNoName: new Error('The user hasn\'t set a name.'),
 
                 /**
                  * Return the the user's levels.
                  *
                  */
-                fetchProfile: function (userId) {
-                    if (!userId) {
-                        return $q.reject(clmDataStore.services.codeCombat.errNoUserId);
-                    }
+        fetchProfile: function(userId) {
+          if (!userId) {
+            return $q.reject(clmDataStore.services.codeCombat.errNoUserId);
+          }
 
-                    return $http.get([
-                        clmServicesUrl.backend,
-                        'proxy/codecombat.com/db/user', userId,
-                        'level.sessions?project=state.complete,levelID,levelName'
-                    ].join('/')).then(function (resp) {
-                        return resp.data;
-                    });
-                },
+          return $http.get([
+            clmServicesUrl.backend,
+            'proxy/codecombat.com/db/user', userId,
+            'level.sessions?project=state.complete,levelID,levelName'
+          ].join('/')).then(function(resp) {
+            return resp.data;
+          });
+        },
 
         /**
          * Query the user's level and return a promise resolving to a
