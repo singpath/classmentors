@@ -169,12 +169,9 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor, q
     console.log(initialData.currentUser);
     self.eventId = initialData.data.eventId;
     self.teamFormationRef = initialData.data.task.teamFormationRef;
-     var teamId = getTeamId(userPublicId);
-    
-    
-    
-    
-    console.log("length of data:", initialData.data);
+    var teamId = getTeamId(userPublicId);
+
+
     // var questions = angular.fromJson(initialData.data.task.mcqQuestions);
     // self.question = questions[self.index];
     // self.options =  self.question.options;
@@ -208,7 +205,7 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor, q
         var teamFormationRef = self.teamFormationRef;
         var teamsRef = db.ref(`classMentors/eventTeams/${eventId}/${teamFormationRef}`);
         var teams = $firebaseArray(teamsRef);
-        console.log(teams);
+        console.log("teams are:",teams);
     }
 }
 
