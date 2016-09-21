@@ -4,33 +4,6 @@ import teamTRATTmpl from './teamactivity-view-trat-start.html!text';
 import teamFormationTmpl from './teamactivity-view-teamFormation.html!text';
 import './teamActivity.css!';
 
-
-function startTRATInitialData($q, spfAuthData, eventService, clmDataStore, quizFactory){
-    /*
-    TODO:
-    1. Load Teams
-    2. Load Team Log
-    3. Load Answers [done]
-    */
-    var data =  eventService.get();
-    console.log("my data is:", data);
-    return $q.all ({
-        currentUser: spfAuthData.user(),
-        answers: clmDataStore.events.getTaskAnswers(data.eventId, data.task.taskFrom),
-        getProgress: clmDataStore.events.getProgress(data.eventId)
-    }).then (function (result){
-        return {
-            data: data,
-            correctAnswers: result.answers,
-            currentUser: result.currentUser,
-            progress: result.getProgress
-        }
-    });
-
-
-}
-startTRATInitialData.$inject = ['$q','spfAuthData', 'eventService','clmDataStore', 'quizFactory']
-
 function createTeamActivityInitialData($q, eventService, clmDataStore) {
     var data = eventService.get();
     console.log("team data is:", data);
@@ -157,20 +130,114 @@ createTeamActivityController.$inject = [
     'eventService'
     ];
 
+function startTRATInitialData($q, spfAuthData, eventService, clmDataStore, firebaseApp, $firebaseObject, $firebaseArray){
+    /*
+    TODO:
+    1. Load Teams
+    2. Load Team Log
+    3. Load Answers [done]
+    */
+    var data =  eventService.get();
+    var db = firebaseApp.database();
+    
+    console.log("my data is:", data);
+    var eventId = data.eventId;
+    var taskId = data.taskId;
+    // var teamLogPromise = null;
+    var tratId = taskId;
+    var userTeamId = null;
+    var userPublicId = data.participant.$id;
+    var teamFormationRefKey = data.task.teamFormationRef;
+    var eventTeamRef = db.ref(`classMentors/eventTeams/${eventId}/${teamFormationRefKey}`);
+
+    // Get user's teamId
+    // $firebaseArray(eventTeamRef).$loaded()
+    //     .then(function(teams){
+    //         // Sanity check that teams are retrieved
+    //         console.log(teams);
+    //         for(var i = 0; i < teams.length; i ++){
+    //             var team = teams[i];
+    //             if(team[userPublicId]){
+    //                 userTeamId = team.$id
+    //             }
+    //         }})
+    //     .then(getTeamLog(userTeamId));
+    // function getTeamLog(teamId){
+    //     var eventTeamsLogRef = db.ref(`classMentors/eventTeamsLog/${eventId}/${teamId}`);
+    //     teamLogPromise = $firebaseObject(eventTeamsLogRef).$loaded();
+    // }
+
+
+    return $q.all({
+        currentUser: spfAuthData.user(),
+        correctAnswers: clmDataStore.events.getTaskAnswers(data.eventId, data.task.taskFrom)
+            .then(function(data){return data.$value}),
+        progress: clmDataStore.events.getProgress(data.eventId).then(function(data){return data}),
+        questions: angular.fromJson(data.task.mcqQuestions),
+        tratId: tratId,
+        teamId: $firebaseArray(eventTeamRef).$loaded()
+        .then(function(teams){
+            // Sanity check that teams are retrieved
+            console.log(teams);
+            for(var i = 0; i < teams.length; i ++){
+                var team = teams[i];
+                if(team[userPublicId]){
+                    return team.$id;
+                }
+            }}),
+        eventId: eventId
+    });
+
+    // return $q.all ({
+    //     currentUser: spfAuthData.user(),
+    //     correctAnswers: clmDataStore.events.getTaskAnswers(data.eventId, data.task.taskFrom),
+    //     progress: clmDataStore.events.getProgress(data.eventId),
+    //     questions: null,
+    //     teamLog: null,
+    //     tratId: null,
+    //     teamId: null,
+
+    // }).then (function (result){
+    //     return {
+    //         data: data,
+    //         correctAnswers: result.answers,
+    //         currentUser: result.currentUser,
+    //         progress: result.getProgress
+    //     }
+    // });
+    
+
+}
+startTRATInitialData.$inject = ['$q','spfAuthData', 'eventService','clmDataStore', 'firebaseApp', '$firebaseObject', '$firebaseArray'];
+
 function startTRATController($q, initialData, clmDataStore, $location, urlFor, quizFactory,
         firebaseApp, $firebaseObject, $firebaseArray){
-    //TODO: propagate all questions to the html page
-    var db = firebaseApp.database();
+    
+    // Sanity check
+    console.log('Initial data contains: ', initialData);
     var self = this;
+    var db = firebaseApp.database();
     self.index = 0;
-    self.question = quizFactory.getQuestion(self.index);
+    // self.questions = angular.fromJson(initialData.data.task.mcqQuestions); //quizFactory.getQuestion(self.index);
+    
+    // Inititalize Question and Question's option(s)
+    self.question = initialData.questions[self.index];
     self.options = self.question.options;
+
+    // Get current user's publicId
     var userPublicId = initialData.currentUser.publicId;
     console.log(initialData.currentUser);
-    self.eventId = initialData.data.eventId;
-    self.teamFormationRef = initialData.data.task.teamFormationRef;
-    var teamId = getTeamId(userPublicId);
+    self.eventId = initialData.eventId;
+    self.teamId = initialData.teamId;
 
+    // Initialize team Log.
+    self.teamLog = (function(){
+        var teamLogRef = db.ref(`classMentors/eventTeamsLog/${self.eventId}/${self.teamId}`);
+        return $firebaseObject(teamLogRef).$loaded().then(function(data){
+            console.log(data);
+            return data;
+        });
+    })();
 
     // var questions = angular.fromJson(initialData.data.task.mcqQuestions);
     // self.question = questions[self.index];
@@ -184,10 +251,9 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor, q
     2. Load log
     3. Insert things into log
     */
-    // Initialize team Log.
-    this.teamLog = (function(){
-        var teamLogRef = db.ref(`classMentors\eventTeamLog`);
-    })();
+
+
+
 
     this.submitTrat = function(){
         $location.path(urlFor('oneEvent'));
@@ -195,30 +261,11 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor, q
     this.nextQuestion = function(){
         console.log("next question has been clicked");
         self.index = self.index + 1;
-        self.question = quizFactory.getQuestion(self.index);
+        self.question =  //quizFactory.getQuestion(self.index);
         self.options = self.question.options;
 
     }
 
-    function getTeamId(userPublicId){
-        var eventId = self.eventId;
-        var teamFormationRef = self.teamFormationRef;
-        var teamsRef = db.ref(`classMentors/eventTeams/${eventId}/${teamFormationRef}`);
-        var teamsArrayPromise = $firebaseArray(teamsRef);
-        teamsArrayPromise.$loaded().then(function(teams){
-            angular.forEach(teams, function(team){
-                console.log(team);
-            })
-        });
-        // for(var i = 0; i < teams.length; i ++){
-        //     var team = teams[i];
-        //     console.log(team);
-        //     if(team.userPublicId){
-        //         console.log('User found : ', userPublicId);
-        //         return team.$id;
-        //     }
-        // }
-    }
 }
 
 startTRATController.$inject = [
@@ -232,6 +279,9 @@ startTRATController.$inject = [
     '$firebaseObject',
     '$firebaseArray'
 ]
+
+
+// Export
 export {
     teamActivityCreateTmpl,
     createTeamActivityInitialData,
