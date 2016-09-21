@@ -52,7 +52,10 @@ import schEngageScaleTmpl from './events-view-schEngageScale-task-form.html!text
 import motiStratLearnTmpl from './events-view-motiStratLearn-task-form.html!text';
 import eduDisLearnTmpl from './events-view-eduDisLearn-task-form.html!text';
 
-import teamFormationTmpl from './events-view-teamFormation.html!text';
+//form team import
+import * as team from '../challenges/teamActivity/teamactivity.js';
+// import teamFormationTmpl from './teamactivity-view-teamFormation.html!text';
+
 const noop = () => undefined;
 const TIMESTAMP = {'.sv': 'timestamp'};
 
@@ -497,7 +500,6 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
             self.asstArr.push(self.assistants[asst].$id);
         }
     }
-    console.log(self.assistants);
 
     if (
         self.event &&
@@ -1415,7 +1417,7 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
         } else if (this.tasktype === 'profileEdit') {
             return 'Save';
 
-        }else {
+        } else {
             return 'Save';
         }
     };
@@ -1545,7 +1547,6 @@ EditEventTaskCtrl.$inject = [
  *
  */
 export function clmEventTableFactory() {
-    console.log("clmEvent table comes in here");
     return {
         template: eventTableParticipantsTmpl,
         restrict: 'E',
@@ -1646,7 +1647,6 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         var participantCount, participantsIds;
 
         if (!self.participants || !self.progress) {
-            console.log("there is no self participants!");
             return 0;
         }
         participantCount = self.participants.length;
@@ -1852,6 +1852,20 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         $location.path('/challenges/mcq/start');
     }
 
+    this.startTRAT = function(eventId, taskId, task, participant){
+        var data = {
+          eventId: eventId,
+          taskId: taskId,
+          task: task,
+          participant: participant
+          
+        }
+        // Store data in eventService
+        eventService.set(data);
+        console.log('startTRAT triggered');
+        $location.path('/challenges/TRAT');
+    }
+
     this.mustRegister = function (task, profile) {
         return Boolean(
             task &&
@@ -1966,7 +1980,6 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             };
         }
     };
-
     this.promptForLink = function (eventId, taskId, task, participant, userSolution) {
         $mdDialog.show({
             parent: $document.body,
@@ -2015,13 +2028,112 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
     this.promptForTeamFormation = function (eventId, taskId, task, participant, userSolution) {
         $mdDialog.show({
             parent: $document.body,
-            template: teamFormationTmpl,
+            template: team.teamFormationTmpl,
             controller: DialogController,
-            controllerAs: 'ctrl'
+            controllerAs: 'ctrl',
+            resolve:{
+                initialData: teamFormationInitialData
+            }
         });
 
-        function DialogController() {
-            this.save = function(){
+        function teamFormationInitialData(){
+          console.log('InitialData loaded');
+          var teamEventPromise = spfFirebase.loadedArray(['classMentors/eventTeams/',eventId,taskId]);
+            return $q.all({
+                teams: teamEventPromise.then(function (result) {
+                    return result;
+                }),
+                selectedTeam: teamEventPromise.then(function (result){
+                  var teams = result;
+                  for(var i = 0; i < teams.length; i ++){
+                    var team = teams[i];
+                    // If participant's public Id can be found, return team index.
+                    console.log('Team: ', team);
+                    console.log('Participant id: ', participant.$id);
+                    if(team[participant.$id]){
+                      return i;
+                    }
+                  }
+                  return undefined;
+                })
+            });
+        };
+
+        function DialogController(initialData){
+            console.log('initial data is: ',initialData);
+            var self = this;
+            // Learning point here. undefined means not yet assigned a value. Whereas null is a special object.
+            self.selectedTeam = initialData.selectedTeam; 
+            console.log(self.selectedTeam);
+            self.teams = {}
+            self.teams = initialData.teams;
+            var previousSelectedTeam = undefined;
+            var index2 = undefined;
+            for(var i = 0; i < self.teams.length; i++){
+                if(self.teams[i][participant.$id]){
+                    index2 = i;
+                    break;
+                }
+            }
+            console.log("participant id isss:", participant.$id);
+            /*TODO:
+            1. Remove user from previous teams when teams are switched. [X]
+            2. When user exits dialog box, option should be saved. [X]
+            3. User is able to see other teams and who is inside. 
+            4. Team radio button should be disabled when team is full. 
+            */
+
+            self.onChange = function(index){
+              console.log('onChange fired');
+              console.log(index);
+
+              // If user has not joined any team before
+              if(previousSelectedTeam == undefined){
+                if(index2 != undefined){
+                    leaveTeam(index2);
+                }
+                joinTeam(index);
+                previousSelectedTeam = index;
+              }else if(index != previousSelectedTeam){ //Check if selected index has changed, else do nothing.
+                // Leave previous team.
+
+                leaveTeam(previousSelectedTeam);
+                // Join new team.
+                joinTeam(index);
+                previousSelectedTeam = index;
+              }
+            }
+
+            function leaveTeam(index){
+             var team = self.teams[index];
+             spfFirebase.remove(['classMentors/eventTeams/',eventId,taskId,team.$id,participant.$id])
+             .then(function(){
+               team.currentSize -= 1;
+             });
+            }
+            
+            function joinTeam(index){
+              var team = self.teams[index];
+              spfFirebase.set(['classMentors/eventTeams/',eventId,taskId,team.$id,participant.$id],participant.user)
+              .then(function(){
+               team.currentSize += 1;
+                  clmDataStore.events.submitSolution(eventId, taskId, participant.$id, "Completed");
+             });
+            }
+            //test data
+            self.test_teams = [
+                {
+                    id: 1,
+                    maxSize: 2
+                },
+                {
+                    id:2,
+                    maxSize:3
+                }
+            ]
+            
+
+            this.save = function () {
 
             };
 
@@ -2030,13 +2142,12 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             };
 
         }
+        DialogController.$inject = ['initialData'];
 
     };
 
 
     this.promptForSurvey = function (eventId, taskId, task, participant, userSolution) {
-
-        console.log("prompt for survey task : ", task.survey);
 
         if (task.survey === "School engagement scale") {
 
@@ -2112,7 +2223,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         var parent = this;
 
         function loadEditor() {
-            var editor = ace.edit($document.querySelector('#editor'));
+            var editor = ace.edit($document[0].querySelector('#editor'));
             editor.setTheme("ace/theme/monokai");
             editor.getSession().setMode("ace/mode/" + task.lang.toLowerCase());
             editor.getSession().setUseWrapMode(true);
@@ -2124,7 +2235,6 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
 
             this.checkEditor = function () {
                 return parent.loadingEditor;
-                console.log(parent.loadingEditor);
             };
 
             if (
@@ -2135,9 +2245,8 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             }
 
             this.save = function () {
-                var editor = ace.edit($document.querySelector('#editor'));
+                var editor = ace.edit($document[0].querySelector('#editor'));
                 var response = editor.getValue();
-                console.log("Function submitted for answer " + response);
                 clmDataStore.events.submitSolution(eventId, taskId, participant.$id, response).then(function () {
                     $mdDialog.hide();
                     spfAlert.success('Response is saved.');
@@ -2175,7 +2284,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         var parent = this;
 
         function loadEditor() {
-            var editor = ace.edit($document.querySelector('#editor'));
+            var editor = ace.edit($document[0].querySelector('#editor'));
             editor.setTheme("ace/theme/monokai");
             editor.getSession().setMode("ace/mode/" + task.lang.toLowerCase());
             editor.getSession().setUseWrapMode(true);
@@ -2394,7 +2503,6 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
 
 
     this.questions = initialData.survey2;
-    console.log("testing for questions:: ", initialData.survey2);
     this.ratingOptions = [
         {id: 1},
         {id: 2},
@@ -2407,6 +2515,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
 
 
     if ($routeParams.surveyTask === 'School engagement scale') {
+
 
         self.responseRating = [
             {option: 'Never'},
@@ -2498,6 +2607,20 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
 
     }
 
+    //$routechangestart will be executed before users route to another page
+    var schEngageInvalid = true;
+    var motiStratInvalid = true;
+    var eduDissInvalid = true;
+    $scope.$on("$routeChangeStart", function (event, next, current) {
+        if (schEngageInvalid && motiStratInvalid && eduDissInvalid) {
+            if (!confirm("You have not finished this survey. Are you sure you want to continue? All data will be lost")) {
+                event.preventDefault();
+            }
+        }
+
+
+    });
+
     this.event = initialData.event;
     spfNavBarService.update(
         'Survey', [{
@@ -2560,8 +2683,6 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
 
     }
     this.saveEduDisResponse = function (response, age, item, task, siblingNum, selectedMonth, country, language, qnTitle, bestResp) {
-        //console.log("qn title is", qnTitle);
-        //console.log("qn Number is", item.currentTarget.getAttribute("data-id"));
 
         var surveyResp = response;
         var questionNumber = item.currentTarget.getAttribute("data-id");
@@ -2581,7 +2702,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             clmDataStore.events.saveSurveyEduDisResponse(surveyResp, questionNumber, taskId, eventId, userId, surveyType, qnTitle);
         }
         else if (ageResp != undefined) {
-            //console.log("THE VALUES ARE: " + ageResp + ", " + questionNumber + ", " + taskId + ", " + eventId + ", " + userId + ", " + surveyType + ", " + qnTitle)
+
             clmDataStore.events.saveSurveyEduDisResponse(ageResp, questionNumber, taskId, eventId, userId, surveyType, qnTitle);
         }
 
@@ -2605,7 +2726,11 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
 
     }
     this.submitSchEngageResponse = function (schEngageResp) {
-        console.log("sch engage length:", Object.keys(schEngageResp).length);
+
+        //to set warning
+        schEngageInvalid = false;
+        motiStratInvalid = true;
+        eduDissInvalid = true;
 
         var allResponses = true;
         for (var i = 1; i < schEngageResp.length; i++) {
@@ -2652,6 +2777,11 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
     };
     this.submitMotiStratResponse = function (motiResp) {
 
+        //to set warning
+        motiStratInvalid = false;
+        eduDissInvalid = true;
+        schEngageInvalid = true;
+
         var allResponses = true;
         console.log("trying ", motiResp);
         for (var i = 1; i < motiResp.length; i++) {
@@ -2683,6 +2813,11 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
     }
 
     this.submitEduDissResponse = function (eduDissResp, selectedFamily, selectedRaceEthnicity) {
+
+        //to set warning
+        eduDissInvalid = true;
+        motiStratInvalid = false;
+        schEngageInvalid = false;
 
         //add checkbox values into json
         var allResponses = true;
@@ -2746,7 +2881,8 @@ SurveyFormFillCtrl.$inject = [
     'clmDataStore',
     'clmPagerOption',
     'spfAlert',
-    '$log'
+    '$scope'
+
 ];
 
 export function clmEventRankTableFactory() {
@@ -3396,6 +3532,7 @@ function ClmEventResultsTableCtrl($scope, $q, $log, $mdDialog, $document,
         function DialogController() {
             this.task = task;
             this.review = true;
+            this.participant = participant;
             if (
                 userSolution &&
                 userSolution[taskId]
@@ -3510,7 +3647,7 @@ function ClmEventResultsTableCtrl($scope, $q, $log, $mdDialog, $document,
         var parent = this;
 
         function loadEditor() {
-            var editor = ace.edit($document.querySelector('#editor'));
+            var editor = ace.edit($document[0].querySelector('#editor'));
             editor.setTheme("ace/theme/monokai");
             editor.getSession().setMode("ace/mode/" + task.lang.toLowerCase());
             editor.getSession().setUseWrapMode(true);
@@ -3539,7 +3676,7 @@ function ClmEventResultsTableCtrl($scope, $q, $log, $mdDialog, $document,
             }
 
             this.save = function () {
-                var editor = ace.edit($document.querySelector('#editor'));
+                var editor = ace.edit(document.querySelector('#editor'));
                 var response = editor.getValue();
                 console.log("Function submitted for answer " + response);
                 clmDataStore.events.submitSolution(eventId, taskId, participant.$id, response).then(function () {

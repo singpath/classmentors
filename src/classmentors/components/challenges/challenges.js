@@ -72,12 +72,11 @@ export function configRoute($routeProvider, routes){
             controller: team.startTRATController,
             controllerAs:'ctrl',
             resolve:{
-                initialData: team.createTeamActivityInitialData
+                initialData: team.startTRATInitialData
             }
+        })
 
-        });
-
-}
+}4
 configRoute.$inject = ['$routeProvider', 'routes'];
 
 
@@ -108,15 +107,13 @@ function startMCQInitialData($q, spfAuthData, eventService, clmDataStore){
    // var currentUser = spfAuthData.user().catch(noop);
 
     var data =  eventService.get();
-
-    console.log("the data is here...,", data);
-    //console.log("current user now is.", currentUser);
-
+    console.log("my data is:", data);
     return $q.all ({
        currentUser: spfAuthData.user(),
         answers: clmDataStore.events.getTaskAnswers(data.eventId, data.taskId),
         getProgress: clmDataStore.events.getProgress(data.eventId)
     }).then (function (result){
+        console.log("result issss:", result);
         return {
             data: data,
             correctAnswers: result.answers,
@@ -164,6 +161,7 @@ export function challengeServiceFactory
       var answers = copy.answers;
       console.log('COPY IS ... ', copy);
 
+      console.log('COPY IS!! ', copy);
       self.creatingTask = true;
       if (taskType === 'multipleChoice'){
         delete copy.singPathProblem;
@@ -185,20 +183,80 @@ export function challengeServiceFactory
         delete copy.singPathProblem;
         delete copy.badge;
         delete copy.answers;
+        if(copy.link == ""){
+          delete copy.link;
+        }
         console.log(copy);
         // Create reccord in eventTeams
-
-        // Create reccord in answers and tasks
-        var ref = clmDataStore.events.addTaskWithAns(event.$id, copy, isOpen,answers);
-        ref.then(function() {
-            spfAlert.success('Task created');
-            $location.path(urlFor('editEvent', {eventId: event.$id}));
-        }).catch(function(err) {
-            $log.error(err);
-            spfAlert.error('Failed to created new task');
-        }).finally(function() {
-            self.creatingTask = false;
+        // Add IRAT
+        clmDataStore.events.addTaskWithAns(event.$id, copy, isOpen,answers)
+          .then(function(ref){
+            //add Team formation task
+            var previousTaskId = ref.key();
+            console.log('IRAT key is :', previousTaskId);
+            clmDataStore.events.addTeamFormation(event.$id, {
+                taskFrom: previousTaskId,
+                title: copy.title,
+                description: "Click Below To Join Team",
+                formationPattern: true,
+                closedAt : {'.sv': 'timestamp'},
+                showProgress: copy.showProgress,
+                archived: false,
+                teamFormationMethod: copy.teamFormationMethod
+            }, copy.priority).then(function(teamRef){
+              //create teams here
+              var taskId = teamRef.key()
+              console.log('taskId: ', taskId);
+              console.log(event.teams);
+              spfFirebase.set(['classMentors/eventTeams', event.$id],taskId)
+              .then(function(){
+                // For each team create a reccord in Firebase
+                for(var i = 0; i < event.teams.length; i ++){
+                    var team = event.teams[i];
+                    // console.log('Team here is: ', team);
+                    spfFirebase.push(['classMentors/eventTeams/', event.$id,taskId],team)
+                    .then(function(ref){
+                        console.log('Team ', i , 'pushed with key: ', ref.key());
+                    });
+                }
+              });
+                clmDataStore.events.addTrat(event.$id,{
+                    taskFrom: taskId,
+                    taskFromIrat: previousTaskId,
+                    title: copy.title,
+                    description: "Click Below to Start TRAT",
+                    startTRAT: true,
+                    closedAt : {'.sv': 'timestamp'},
+                    showProgress: copy.showProgress,
+                    archived: false,
+                    teamFormationMethod: copy.teamFormationMethod,
+                    mcqQuestions: copy.mcqQuestions
+                },copy.priority).then(function(ref){
+                   var taskId = ref.key();
+                });
+            })
         });
+        //   .then(function(ref){
+        //     //add TRAT
+        //     var previousTaskId = ref.key();
+        //     console.log('TRAT ')
+        //     clmDataStore.events.addTrat()
+        // })
+        //   .then(function(){
+        //     //add teams
+        // })
+        //   .then(function(){
+
+        // });
+        // ref.then(function() {
+        //     spfAlert.success('Task created');
+        //     $location.path(urlFor('editEvent', {eventId: event.$id}));
+        // }).catch(function(err) {
+        //     $log.error(err);
+        //     spfAlert.error('Failed to created new task');
+        // }).finally(function() {
+        //     self.creatingTask = false;
+        // });
       }
 
 
@@ -207,7 +265,6 @@ export function challengeServiceFactory
     update: function(event, taskId, task, taskType, isOpen) {
       var copy = cleanObj(task);
       var answers = copy.answers;
-      console.log('COPY IS ... ', copy);
       if (taskType === 'linkPattern') {
         delete copy.badge;
         delete copy.serviceId;

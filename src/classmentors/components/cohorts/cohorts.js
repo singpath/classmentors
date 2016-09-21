@@ -214,8 +214,6 @@ function NewCohortCtrl(
                 featured: featured
             }, newCohort);
 
-            console.log(data);
-
             return clmDataStore.cohorts.create(data);
         }).then(function() {
             spfAlert.success('New cohort created.');
@@ -318,7 +316,8 @@ function viewCohortCtrlInitialData($q, $route, spfAuth, spfAuthData, clmDataStor
         canView: canviewPromise,
         announcements: clmDataStore.cohorts.getAnnouncements(cohortId),
         events: clmDataStore.events.listAll(),
-        joinedEvents: clmDataStore.events.listJoinedEventsObj()
+        joinedEvents: clmDataStore.events.listJoinedEventsObj(),
+        createdEvents: clmDataStore.events.listCreatedEvents()
     });
 }
 viewCohortCtrlInitialData.$inject = [
@@ -345,9 +344,11 @@ function ViewCohortCtrl(
     this.events = initialData.events;
     this.isOwner = false;
     this.joinedEvents = initialData.joinedEvents;
+    this.createdEvents = initialData.createdEvents;
 
     this.selectedEvent = null;
     this.eventChallenges = null;
+    this.selectedAction = null;
 
     if (
         self.cohort &&
@@ -553,10 +554,6 @@ ViewCohortCtrl.$inject = [
 function editCohortCtrlInitialData($q, $route, spfAuthData, clmDataStore) {
     var data = baseEditCtrlInitialData($q, $route, spfAuthData, clmDataStore);
 
-    // data.tasks = data.event.then(function(event) {
-    //     return clmDataStore.events.getTasks(event.$id);
-    // });
-
     return $q.all(data);
 }
 editCohortCtrlInitialData.$inject = ['$q', '$route', 'spfAuthData', 'clmDataStore'];
@@ -625,8 +622,6 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
     };
 
     this.saveAddedEvent = function () {
-        console.log(self.selectedEvent.id + "  " + self.cohort.$id);
-
         clmDataStore.cohorts.addEvent(self.cohort.$id, self.selectedEvent.id, self.cohort.events.length).then(function() {
             spfAlert.success(self.selectedEvent.title + ' has been added to the cohort!');
             self.selectedEvent = null;
@@ -800,23 +795,11 @@ function ClmCohortStatsPageCtrl(
             if(self.selectedStatistic == 'Submission time series') {
                 // How formatted data should look like
                 var dataObj = {};
-                // dataObj = {"setosa_x": [3.5, 3.0, 3.2, 3.1, 3.6, 3.9, 3.4, 3.4, 2.9, 3.1, 3.7, 3.4, 3.0, 3.0, 4.0, 4.4, 3.9, 3.5, 3.8, 3.8, 3.4, 3.7, 3.6, 3.3, 3.4, 3.0, 3.4, 3.5, 3.4, 3.2, 3.1, 3.4, 4.1, 4.2, 3.1, 3.2, 3.5, 3.6, 3.0, 3.4, 3.5, 2.3, 3.2, 3.5, 3.8, 3.0, 3.8, 3.2, 3.7, 3.3],
-                //     "versicolor_x": [3.2, 3.2, 3.1, 2.3, 2.8, 2.8, 3.3, 2.4, 2.9, 2.7, 2.0, 3.0, 2.2, 2.9, 2.9, 3.1, 3.0, 2.7, 2.2, 2.5, 3.2, 2.8, 2.5, 2.8, 2.9, 3.0, 2.8, 3.0, 2.9, 2.6, 2.4, 2.4, 2.7, 2.7, 3.0, 3.4, 3.1, 2.3, 3.0, 2.5, 2.6, 3.0, 2.6, 2.3, 2.7, 3.0, 2.9, 2.9, 2.5, 2.8],
-                //     "setosa": [0.2, 0.2, 0.2, 0.2, 0.2, 0.4, 0.3, 0.2, 0.2, 0.1, 0.2, 0.2, 0.1, 0.1, 0.2, 0.4, 0.4, 0.3, 0.3, 0.3, 0.2, 0.4, 0.2, 0.5, 0.2, 0.2, 0.4, 0.2, 0.2, 0.2, 0.2, 0.4, 0.1, 0.2, 0.2, 0.2, 0.2, 0.1, 0.2, 0.2, 0.3, 0.3, 0.2, 0.6, 0.4, 0.3, 0.2, 0.2, 0.2, 0.2],
-                //     "versicolor": [1.4, 1.5, 1.5, 1.3, 1.5, 1.3, 1.6, 1.0, 1.3, 1.4, 1.0, 1.5, 1.0, 1.4, 1.3, 1.4, 1.5, 1.0, 1.5, 1.1, 1.8, 1.3, 1.5, 1.2, 1.3, 1.4, 1.4, 1.7, 1.5, 1.0, 1.1, 1.0, 1.2, 1.6, 1.5, 1.6, 1.5, 1.3, 1.3, 1.3, 1.2, 1.4, 1.2, 1.0, 1.3, 1.2, 1.3, 1.3, 1.1, 1.3]};
 
                 var dataArr = [];
-                // dataArr = [["setosa_x", 3.5, 3.0, 3.2, 3.1, 3.6, 3.9, 3.4, 3.4, 2.9, 3.1, 3.7, 3.4, 3.0, 3.0, 4.0, 4.4, 3.9, 3.5, 3.8, 3.8, 3.4, 3.7, 3.6, 3.3, 3.4, 3.0, 3.4, 3.5, 3.4, 3.2, 3.1, 3.4, 4.1, 4.2, 3.1, 3.2, 3.5, 3.6, 3.0, 3.4, 3.5, 2.3, 3.2, 3.5, 3.8, 3.0, 3.8, 3.2, 3.7, 3.3],
-                //     ["versicolor_x", 3.2, 3.2, 3.1, 2.3, 2.8, 2.8, 3.3, 2.4, 2.9, 2.7, 2.0, 3.0, 2.2, 2.9, 2.9, 3.1, 3.0, 2.7, 2.2, 2.5, 3.2, 2.8, 2.5, 2.8, 2.9, 3.0, 2.8, 3.0, 2.9, 2.6, 2.4, 2.4, 2.7, 2.7, 3.0, 3.4, 3.1, 2.3, 3.0, 2.5, 2.6, 3.0, 2.6, 2.3, 2.7, 3.0, 2.9, 2.9, 2.5, 2.8],
-                //     ["setosa", 0.2, 0.2, 0.2, 0.2, 0.2, 0.4, 0.3, 0.2, 0.2, 0.1, 0.2, 0.2, 0.1, 0.1, 0.2, 0.4, 0.4, 0.3, 0.3, 0.3, 0.2, 0.4, 0.2, 0.5, 0.2, 0.2, 0.4, 0.2, 0.2, 0.2, 0.2, 0.4, 0.1, 0.2, 0.2, 0.2, 0.2, 0.1, 0.2, 0.2, 0.3, 0.3, 0.2, 0.6, 0.4, 0.3, 0.2, 0.2, 0.2, 0.2],
-                //     ["versicolor", 1.4, 1.5, 1.5, 1.3, 1.5, 1.3, 1.6, 1.0, 1.3, 1.4, 1.0, 1.5, 1.0, 1.4, 1.3, 1.4, 1.5, 1.0, 1.5, 1.1, 1.8, 1.3, 1.5, 1.2, 1.3, 1.4, 1.4, 1.7, 1.5, 1.0, 1.1, 1.0, 1.2, 1.6, 1.5, 1.6, 1.5, 1.3, 1.3, 1.3, 1.2, 1.4, 1.2, 1.0, 1.3, 1.2, 1.3, 1.3, 1.1, 1.3]];
 
                 //Axis data object
                 var axisParam = {};
-                // axisParam = {
-                //     setosa: 'setosa_x',
-                //     versicolor: 'versicolor_x'
-                // };
 
                 //Initialise dataObj
                 for(var e = 0; e < self.cohort.events.length; e++) {
@@ -824,8 +807,6 @@ function ClmCohortStatsPageCtrl(
                     dataObj[self.cohort.events[e]] = [];
                     axisParam[self.cohort.events[e]] = self.cohort.events[e] + "_x";
                 }
-
-                console.log(dataObj);
 
                 var actionsRef = db.ref('classMentors/userActions');
                 var actionObj = $firebaseArray(actionsRef);
@@ -838,113 +819,13 @@ function ClmCohortStatsPageCtrl(
                         if(self.cohort.events.indexOf(logHolder.eventId) >= 0) {
                             dataObj[logHolder.eventId + "_x"].push(logHolder.timestamp);
                             dataObj[logHolder.eventId].push(new Date(logHolder.timestamp).getMinutes());
-                            // console.log(new Date(logHolder.timestamp).getDate());
                         }
-                        // if(self.allLogs[actionIndex].action == 'submitLinkResponse') {
-                        //     dataObj.Link.push(action.)
-                        // }
-                        // console.log(new Date(self.submissionLogs[actionIndex].timestamp));
                     }
                 }).then(function () {
-                    // var canvas = d3.select('#canvas').node(),
-                    //     context = canvas.getContext("2d");
-                    //
-                    // var margin = {top: 20, right: 20, bottom: 30, left: 40},
-                    //     width = canvas.width - margin.left - margin.right,
-                    //     height = canvas.height - margin.top - margin.bottom;
-                    //
-                    // var svg = d3.select("svg").append("g")
-                    //     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-                    //
-                    // var x = d3.scaleLinear()
-                    //     .rangeRound([0, width - 2]);
-                    //
-                    // var y = d3.scaleLinear()
-                    //     .rangeRound([height - 2, 0]);
-                    //
-                    // context.translate(margin.left, margin.top);
-                    // context.globalCompositeOperation = "multiply";
-                    // context.fillStyle = "rgba(60,180,240,0.6)";
-                    //
-                    // d3.tsv("diamonds.tsv", type, function(error, diamonds) {
-                    //     if (error) throw error;
-                    //
-                    //     x.domain(d3.extent(diamonds, function(d) { return d.carat; }));
-                    //     y.domain(d3.extent(diamonds, function(d) { return d.price; }));
-                    //
-                    //     svg.append("g")
-                    //         .attr("class", "grid grid--x")
-                    //         .call(d3.axisLeft(y)
-                    //             .tickSize(-width)
-                    //             .tickFormat(""));
-                    //
-                    //     svg.append("g")
-                    //         .attr("class", "grid grid--y")
-                    //         .attr("transform", "translate(0," + height + ")")
-                    //         .call(d3.axisBottom(x)
-                    //             .tickSize(-height)
-                    //             .tickFormat(""));
-                    //
-                    //     svg.append("g")
-                    //         .attr("class", "axis axis--y")
-                    //         .call(d3.axisLeft(y)
-                    //             .ticks(10, "s"))
-                    //         .append("text")
-                    //         .attr("x", 10)
-                    //         .attr("y", 10)
-                    //         .attr("dy", ".71em")
-                    //         .attr("fill", "#000")
-                    //         .attr("font-weight", "bold")
-                    //         .attr("text-anchor", "start")
-                    //         .text("Price (US$)");
-                    //
-                    //     svg.append("g")
-                    //         .attr("class", "axis axis--x")
-                    //         .attr("transform", "translate(0," + height + ")")
-                    //         .call(d3.axisBottom(x))
-                    //         .append("text")
-                    //         .attr("x", width - 10)
-                    //         .attr("y", -10)
-                    //         .attr("dy", "-.35em")
-                    //         .attr("fill", "#000")
-                    //         .attr("font-weight", "bold")
-                    //         .attr("text-anchor", "end")
-                    //         .text("Mass (carats)");
-                    //
-                    //     d3.shuffle(diamonds);
-                    //     var t = d3.timer(function() {
-                    //         for (var i = 0, n = 500, d; i < n; ++i) {
-                    //             if (!(d = diamonds.pop())) return t.stop();
-                    //             context.fillRect(x(d.carat), y(d.price), Math.max(2, x(d.carat + 0.01) - x(d.carat)), 2);
-                    //         }
-                    //     });
-                    // });
-                    //
-                    // function type(d) {
-                    //     d.carat = +d.carat;
-                    //     d.price = +d.price;
-                    //     return d;
-                    // }
-                    // var chart = c3.generate({
-                    //     bindto: "#chart",
-                    //     data: {
-                    //         //Test data
-                    //         // columns: [
-                    //         // 	['data1', 50, 70, 30, 20, 10],
-                    //         // 	['data2', 14, 56, 88, 34, 100]
-                    //         // ],
-                    //         json: dataObj,
-                    //         type: "spline"
-                    //     }
-                    // });
                     for(var obj in dataObj) {
                         var newArr = [obj];
                         dataArr.push(newArr.concat(dataObj[obj]));
-                        console.log(newArr.concat(dataObj[obj]));
                     }
-                    console.log(dataArr);
-                    console.log(axisParam);
-                    console.log(dataObj);
                     var chart = c3.generate({
                         bindto: "#chart",
                         data: {
@@ -1009,6 +890,8 @@ function ClmCohortRankPageCtrl($q, $scope, $log, firebaseApp, $firebaseObject, $
 
     getAllEventData();
     this.cohortTotalParticipants = 0;
+    this.showFilteredRanking = false;
+
     function getAllEventData() {
         var iter = 0;
         loopDBEvents();
@@ -1018,7 +901,7 @@ function ClmCohortRankPageCtrl($q, $scope, $log, firebaseApp, $firebaseObject, $
 
             if(iter < self.cohort.events.length) {
                 var participantsRef = db.ref(`classMentors/eventParticipants/${eventId}`);
-                var participantsQuery = participantsRef.limitToLast(100);
+                var participantsQuery = participantsRef;
                 var participantsArray = $firebaseArray(participantsQuery);
 
                 participantsArray.$loaded().then(
@@ -1036,31 +919,111 @@ function ClmCohortRankPageCtrl($q, $scope, $log, firebaseApp, $firebaseObject, $
                         oneEventData.title = result.title;
                         self.cohortTotalParticipants += oneEventData.participants.length;
                         oneEventData.id = result.$id;
-                        self.cohortEventData.push(oneEventData);
-                        iter++;
-                        loopDBEvents();
+                        oneEventData.userRanks = [];
+                        var userIndex = 0;
+                        loadUserAchievements();
+                        function loadUserAchievements() {
+                            if(userIndex < oneEventData.participants.length) {
+                                var participantRankingRef = db.ref(`classMentors/userProfiles/${oneEventData.participants[userIndex].$id}`);
+                                var participantRankingObj = $firebaseObject(participantRankingRef);
+                                participantRankingObj.$loaded().then(function () {
+                                    var rankingResult = participantRankingObj;
+                                    if(rankingResult.services && rankingResult.services.freeCodeCamp) {
+                                        oneEventData.userRanks.push({"user": rankingResult.user, "total": parseInt(rankingResult.services.freeCodeCamp.totalAchievements)});
+                                    } else {
+                                        oneEventData.userRanks.push({"user": rankingResult.user, "total": 0});
+                                    }
+                                    userIndex++;
+                                    loadUserAchievements();
+                                });
+                            } else {
+                                self.cohortEventData.push(oneEventData);
+                                iter++;
+                                loopDBEvents();
+                            }
+                        }
                     });
                 });
             } else {
                 self.cohortEventData.sort(function(a,b) {
                     return b.participants.length - a.participants.length;
                 });
-                var rank = 1;
-                for(var i = 0; i < self.cohortEventData.length-1; i++) {
-                    if(self.cohortEventData[i].participants.length > self.cohortEventData[i+1].participants.length) {
-                        self.cohortEventData[i].rank = rank;
-                        rank ++;
-                    } else {
-                        self.cohortEventData[i].rank = rank;
+                // var rank = 1;
+                // for(var i = 0; i < self.cohortEventData.length-1; i++) {
+                //     if(self.cohortEventData[i].participants.length > self.cohortEventData[i+1].participants.length) {
+                //         self.cohortEventData[i].rank = rank;
+                //         rank ++;
+                //     } else {
+                //         self.cohortEventData[i].rank = rank;
+                //     }
+                // }
+                // if(self.cohortEventData[self.cohortEventData.length-1].participants.length <= self.cohortEventData[self.cohortEventData.length-2].participants.length) {
+                //     self.cohortEventData[self.cohortEventData.length-1].rank = rank;
+                // } else {
+                //     rank--;
+                //     self.cohortEventData[self.cohortEventData.length-1].rank = rank;
+                // }
+            }
+        }
+    }
+
+    this.fourEntryThreshold = 2;
+    this.twoEntryThreshold = 12;
+
+    this.filterRanking = function() {
+        if(self.showFilteredRanking) {
+            for(let eventId in self.cohortEventData) {
+                let event = self.cohortEventData[eventId];
+                let totalEventScore = 0;
+                for(let user in event.userRanks) {
+                    let rankObj = event.userRanks[user];
+                    if(rankObj.total) {
+                        totalEventScore += rankObj.total;
                     }
                 }
-                if(self.cohortEventData[self.cohortEventData.length-1].participants.length <= self.cohortEventData[self.cohortEventData.length-2].participants.length) {
-                    self.cohortEventData[self.cohortEventData.length-1].rank = rank;
-                } else {
-                    rank--;
-                    self.cohortEventData[self.cohortEventData.length-1].rank = rank;
+                self.cohortEventData[eventId].totalScore = totalEventScore;
+            }
+            self.cohortEventData.sort(function(a,b) {
+                return b.totalScore - a.totalScore;
+            });
+            for(let placing = 0; placing < self.fourEntryThreshold; placing++) {
+                let event = self.cohortEventData[placing];
+                if(event) {
+                    event.userRanks.sort(function (a,b) {
+                        return b.total - a.total;
+                    });
+                    if(event.userRanks[0]) {
+                        self.cohortEventData[placing].first = {"name": event.userRanks[0].user.displayName, "total": event.userRanks[0].total};
+                    }
+                    if(event.userRanks[1]) {
+                        self.cohortEventData[placing].second = {"name": event.userRanks[1].user.displayName, "total": event.userRanks[1].total};
+                    }
+                    if(event.userRanks[2]) {
+                        self.cohortEventData[placing].third = {"name": event.userRanks[2].user.displayName, "total": event.userRanks[2].total};
+                    }
+                    if(event.userRanks[3]) {
+                        self.cohortEventData[placing].fourth = {"name": event.userRanks[3].user.displayName, "total": event.userRanks[3].total};
+                    }
                 }
             }
+            for(let placing = self.fourEntryThreshold; placing < self.twoEntryThreshold; placing ++) {
+                let event = self.cohortEventData[placing];
+                if(event) {
+                    event.userRanks.sort(function (a,b) {
+                        return b.total - a.total;
+                    });
+                    if(event.userRanks[0]) {
+                        self.cohortEventData[placing].first = {"name": event.userRanks[0].user.displayName, "total": event.userRanks[0].total};
+                    }
+                    if(event.userRanks[1]) {
+                        self.cohortEventData[placing].second = {"name": event.userRanks[1].user.displayName, "total": event.userRanks[1].total};
+                    }
+                }
+            }
+        } else {
+            self.cohortEventData.sort(function(a,b) {
+                return b.participants.length - a.participants.length;
+            });
         }
     }
 }

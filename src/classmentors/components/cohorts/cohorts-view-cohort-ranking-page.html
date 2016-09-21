@@ -1,20 +1,39 @@
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
 <div ng-if="ctrl.loading" layout="row" layout-align="space-around" class="md-padding">
     <md-progress-circular md-mode="indeterminate"></md-progress-circular>
 </div>
 <div ng-if="!ctrl.loading">
     <md-content class="md-padding">
-        <!--<button ng-show="ctrl.cohort.owner.publicId==ctrl.profile.$id" type="submit" ng-click="ctrl.updateAllParticipantUserProfiles()">Update All User Achievements</button>-->
+        <md-switch ng-model="ctrl.showFilteredRanking" aria-label="showFilter?" ng-change="ctrl.filterRanking()">
+            Show Filtered Rankings: {{ ctrl.showFilteredRanking }}
+        </md-switch>
         <table class="events ranking">
             <thead>
             <tr ng-class="{'reversed': ctrl.orderOpts[0].reversed, secondaryReversed: ctrl.orderOpts[1].reversed}">
                 <th ng-class="{orderer: ctrl.orderOpts[0].key == 'name', secondaryOrderer: ctrl.orderOpts[1].key == 'name'}">
                     <md-button ng-click="ctrl.orderBy('name')">Rank</md-button>
                 </th>
-                <th ng-class="{orderer: ctrl.orderOpts[0].key == 'name', secondaryOrderer: ctrl.orderOpts[1].key == 'name'}">
+                <th ng-class="{orderer: ctrl.orderOpts[0].key == 'name', secondaryOrderer: ctrl.orderOpts[1].key == 'name'}" ng-if="!ctrl.showFilteredRanking">
                     <md-button ng-click="ctrl.orderBy('name')">Registered Students ({{ctrl.cohortTotalParticipants}})</md-button>
+                </th>
+                <th ng-class="{orderer: ctrl.orderOpts[0].key == 'name', secondaryOrderer: ctrl.orderOpts[1].key == 'name'}" ng-if="ctrl.showFilteredRanking">
+                    <md-button ng-click="ctrl.orderBy('name')">Total Score </md-button>
                 </th>
                 <th ng-class="{orderer: ctrl.orderOpts[0].key == 'schoolName', secondaryOrderer: ctrl.orderOpts[1].key == 'schoolName'}">
                     <md-button ng-click="ctrl.orderBy('schoolName')">Event</md-button>
+                </th>
+                <th ng-if="ctrl.showFilteredRanking">
+                    <md-button ng-disabled="true">1st</md-button>
+                </th>
+                <th ng-if="ctrl.showFilteredRanking">
+                    <md-button ng-disabled="true">2nd</md-button>
+                </th>
+                <th ng-if="ctrl.showFilteredRanking">
+                    <md-button ng-disabled="true">3rd</md-button>
+                </th>
+                <th ng-if="ctrl.showFilteredRanking">
+                    <md-button ng-disabled="true">4th</md-button>
                 </th>
             </tr>
             </thead>
@@ -23,8 +42,13 @@
                     <th>
                      {{$index+1}}
                     </th>
-                    <td>{{ event.participants.length }}</td>
+                    <td ng-if="!ctrl.showFilteredRanking">{{ event.participants.length }}</td>
+                    <td ng-if="ctrl.showFilteredRanking">{{ event.totalScore }}</td>
                     <td><a href="#{{ 'oneEvent' | urlFor: {eventId: event.id} }}">{{ event.title }}</a></td>
+                    <td ng-if="ctrl.showFilteredRanking" ng-show="event.first">{{ event.first.name }} ({{event.first.total}})</td>
+                    <td ng-if="ctrl.showFilteredRanking" ng-show="event.second">{{ event.second.name }} ({{event.second.total}})</td>
+                    <td ng-if="ctrl.showFilteredRanking" ng-show="event.third">{{ event.third.name }} ({{event.third.total}})</td>
+                    <td ng-if="ctrl.showFilteredRanking" ng-show="event.fourth">{{ event.fourth.name }} ({{event.fourth.total}})</td>
                 </tr>
             </tbody>
         </table>

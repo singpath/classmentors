@@ -1,6 +1,18 @@
 import teamActivityCreateTmpl from './team-view-create.html!text';
 import teamIRATTmpl from './teamactivity-view-irat-start.html!text';
 import teamTRATTmpl from './teamactivity-view-trat-start.html!text';
+import teamFormationTmpl from './teamactivity-view-teamFormation.html!text';
+import './teamActivity.css!';
+
+function startTRATInitialData($q, eventService, spfFirebase){
+    /*
+    TODO:
+    1. Load Teams
+    2. Load Team Log
+    3. Load Answers
+    */
+}
+startTRATInitialData.$inject = ['$q', 'eventService', 'spfFirebase']
 
 function createTeamActivityInitialData($q, eventService, clmDataStore) {
     var data = eventService.get();
@@ -28,7 +40,7 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
     self.task = initialData.data.task;
 
     self.taskType = initialData.data.taskType;
-    
+
     self.participants = initialData.participants;
     self.teamsMaximumStudents = 0;
     self.taskType = initialData.data.taskType;
@@ -37,15 +49,14 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
     self.teamFormationMethod = null;
     self.teamFormationParameter = null;
 
+    
     self.submit = function(){
-        console.log('form its submitted');
         self.task.activityType = self.activityType;
         self.task.newExistingTeams = self.newExistingTeams;
         self.task.teamFormationMethod = self.teamFormationMethod;
         self.task.teamFormationParameter = self.teamFormationParameter;
-        console.log(self.task);
-        // todo: Validation for form data, saving of form data, direct to MCQ page.
-        console.log(self.taskType);
+        self.task.startIRAT = true;
+        self.event.teams = formTeams(self.teamFormationMethod, self.teamFormationParameter, self.participants.length);
         eventService.set({
             taskType: self.taskType,
             event: self.event,
@@ -55,6 +66,53 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
         $location.path(urlFor('viewMcq'));
     }
 
+
+    function formTeams(method, methodParameter, participants){
+        var teams = [];
+        var teamStructure = [];
+        console.log('Total participants :', participants );
+        if(method == 'noOfTeams'){
+          //initialze teamStructure with team size of 0 each
+          for(var i = 0; i < methodParameter; i++){
+            teamStructure.push(0);
+          }
+          console.log('Line reaches here');
+          console.log('teamStructure :', teamStructure);
+          //add 1 to each team until there are no more participants left
+          for(var i = 0; i < participants; i ++){
+            teamStructure[i % methodParameter] += 1;
+          }
+        }else{//else by teamSize
+           while (participants > methodParameter) {
+             teamStructure.push(methodParameter);
+             participants -= methodParameter;
+           }
+           // split up remaining participants
+           for(var i = 0; i < participants; i ++){
+             teamStructure[i % teamStructure.length] += 1;
+           }
+        }
+        //Create 'teams'
+        for(var i = 0; i < teamStructure.length; i ++){
+          // teams[i] = populateTeam(teamStructure[i]);
+          teams.push({
+            maxSize: teamStructure[i],
+            currentSize: 0
+          });
+        }
+        console.log('Teams is: ', teams);
+        return teams;
+    }
+
+    function populateTeam(members){
+        var team = {}
+        console.log(members);
+        for(var i = 0; i < members; i++){
+            team[i] = "";
+        }
+        console.log(angular.toJson(team));
+        return team;
+    }
     // if number of teams, "Each team will have a maximum enrollment of # students"; #= roundup (totalParticipants / # of teams)
     // if max number of student, "You will have # teams"; #= round up (totalParticipants / # stud per team)
     self.calculateTeamMaximumStudent = function (noTeamsOrStudents){
@@ -68,8 +126,7 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
     }
 
     self.calculationResult = function (){
-        console.log("t", self.teamsMaximumStudents);
-
+        
         return self.teamsMaximumStudents;
     }
 
@@ -83,26 +140,9 @@ createTeamActivityController.$inject = [
     'eventService'
     ];
 
+function startTRATController($q, initialData, clmDataStore, $location, urlFor, spfFirebase){
+    //TODO:
 
-function startIRATController($q, initialData, clmDataStore, $location, urlFor) {
-    //todo: implement irat logic here
-
-
-    this.submitIrat = function(){
-        console.log("i come in here");
-        $location.path(urlFor('oneEvent'));
-    };
-}
-
-startIRATController.$inject = [
-    '$q',
-    'initialData',
-    'clmDataStore',
-    '$location',
-    'urlFor'
-]
-
-function startTRATController($q, initialData, clmDataStore, $location, urlFor){
     this.submitTrat = function(){
         $location.path(urlFor('oneEvent'));
     }
@@ -113,18 +153,21 @@ startTRATController.$inject = [
     'initialData',
     'clmDataStore',
     '$location',
-    'urlFor'
+    'urlFor',
+    'spfFirebase'
 ]
 export {
     teamActivityCreateTmpl,
     createTeamActivityInitialData,
     createTeamActivityController,
-    startIRATController,
     teamIRATTmpl,
     startTRATController,
-    teamTRATTmpl
+    teamTRATTmpl,
+    teamFormationTmpl,
+    startTRATInitialData
 
 };
+// startIRATController,
 // export function teamActivityCreateView(){
 //   return teamActivityCreateTmpl;
 // }
