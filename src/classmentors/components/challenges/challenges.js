@@ -12,8 +12,9 @@ import {cleanObj} from 'singpath-core/services/firebase.js';
 const noop = () => undefined;
 
 export function tratQuestionFactory($q, spfAuthData, eventService, clmDataStore){
-    var data =  eventService.get();
-    console.log("my data is:", data);
+    var self = this;
+    self.data =  eventService.get();
+    console.log("my data is:", self.data);
     // var question = $q.all ({
     //     questions: angular.fromJson(data.task.mcqQuestions)
     // }).then (function (result){
@@ -21,10 +22,20 @@ export function tratQuestionFactory($q, spfAuthData, eventService, clmDataStore)
     //     return result;
     //
     // });
-    
+    // return $q.all({
+    //     getQuestion: function(id){
+    //         var question = angular.fromJson(self.data.task.mcqQuestions);
+    //         if(id < question.length){
+    //             return question[id];
+    //         }else{
+    //             return false;
+    //         }
+    //     } 
+    // });
+    // Weird bugs often happen here. Could be bcoz of promise objects not resolved.
     return {
         getQuestion: function(id){
-            var question = angular.fromJson(data.task.mcqQuestions);
+            var question = angular.fromJson(self.data.task.mcqQuestions);
             if(id < question.length){
                 return question[id];
             }else{
