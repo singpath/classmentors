@@ -5,23 +5,24 @@
 </div>
 <div ng-if="!ctrl.loading">
     <md-content class="md-padding">
+        <timer interval="1000">{{hhours}} hour{{hhoursS}}, {{mminutes}} minute{{minutesS}}, {{sseconds}} second{{secondsS}}.</timer>
         <md-switch ng-model="ctrl.showFilteredRanking" aria-label="showFilter?" ng-change="ctrl.filterRanking()">
             Show Filtered Rankings: {{ ctrl.showFilteredRanking }}
         </md-switch>
         <table class="events ranking">
             <thead>
-            <tr ng-class="{'reversed': ctrl.orderOpts[0].reversed, secondaryReversed: ctrl.orderOpts[1].reversed}">
-                <th ng-class="{orderer: ctrl.orderOpts[0].key == 'name', secondaryOrderer: ctrl.orderOpts[1].key == 'name'}">
-                    <md-button ng-click="ctrl.orderBy('name')">Rank</md-button>
+            <tr>
+                <th>
+                    <md-button>Rank</md-button>
                 </th>
-                <th ng-class="{orderer: ctrl.orderOpts[0].key == 'name', secondaryOrderer: ctrl.orderOpts[1].key == 'name'}" ng-if="!ctrl.showFilteredRanking">
-                    <md-button ng-click="ctrl.orderBy('name')">Registered Students ({{ctrl.cohortTotalParticipants}})</md-button>
+                <th ng-if="!ctrl.showFilteredRanking">
+                    <md-button>Registered ({{ctrl.cohortTotalParticipants}})</md-button>
                 </th>
-                <th ng-class="{orderer: ctrl.orderOpts[0].key == 'name', secondaryOrderer: ctrl.orderOpts[1].key == 'name'}" ng-if="ctrl.showFilteredRanking">
-                    <md-button ng-click="ctrl.orderBy('name')">Total Score </md-button>
+                <th ng-if="ctrl.showFilteredRanking">
+                    <md-button>Qualified</md-button>
                 </th>
-                <th ng-class="{orderer: ctrl.orderOpts[0].key == 'schoolName', secondaryOrderer: ctrl.orderOpts[1].key == 'schoolName'}">
-                    <md-button ng-click="ctrl.orderBy('schoolName')">Event</md-button>
+                <th>
+                    <md-button>Event</md-button>
                 </th>
                 <th ng-if="ctrl.showFilteredRanking">
                     <md-button ng-disabled="true">1st</md-button>
