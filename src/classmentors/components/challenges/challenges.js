@@ -308,6 +308,8 @@ export function challengeServiceFactory
         }).then(function(){
           console.log('TRAT set.');
           console.log('Events Created');
+            spfAlert.success('Task saved');
+            $location.path(urlFor('editEvent', {eventId: event.$id}));
         });
       }
     },

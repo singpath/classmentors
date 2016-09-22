@@ -188,7 +188,17 @@ function startTRATInitialData($q, spfAuthData, eventService, clmDataStore, fireb
                 var teamRef = db.ref(`classMentors/eventTeams/${eventId}/${teamFormationRefKey}/${teamId}`);
                 
                 return {
-                    team: $firebaseArray(teamRef).$loaded().then(function(team){return team;}),
+                    team: $firebaseArray(teamRef).$loaded()
+                        .then(function(team){
+                            var outputTeam = []
+                            for(var i = 0; i < team.length; i++){
+                                var idAtIdx = team[i].$id;
+                                if(idAtIdx != 'currentSize' && idAtIdx != 'maxSize'){
+                                    outputTeam.push(team[i]);
+                                }
+                            }
+                            return outputTeam;
+                        }),
                     teamId:teamId
                 }
             }),
@@ -219,7 +229,7 @@ function startTRATInitialData($q, spfAuthData, eventService, clmDataStore, fireb
 startTRATInitialData.$inject = ['$q','spfAuthData', 'eventService','clmDataStore', 'firebaseApp', '$firebaseObject', '$firebaseArray'];
 
 function startTRATController($q, initialData, clmDataStore, $location, urlFor,
-        firebaseApp, $firebaseObject, $firebaseArray){
+        firebaseApp, $firebaseObject, $firebaseArray, spfAlert){
     
     // Sanity check
     console.log('Initial data contains: ', initialData);
@@ -236,11 +246,12 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
     self.eventId = initialData.eventId;
     var teamAndteamId = initialData.teamAndteamId;
     self.teamId = teamAndteamId.teamId;
-    self.team = teamAndteamId.team;
+    self.team = null;
+    teamAndteamId.team.then(function(result){self.team = result}); 
     self.tratId = initialData.tratId;
     self.teamFormId = initialData.teamFormId;
     var answers = [];
-    var multiAns = [];
+    self.multiAns = [];
     self.correctAnswers = angular.fromJson(initialData.correctAnswers);
     var teamLogRef = db.ref(`classMentors/eventTeamsLog/${self.teamFormId}/${self.teamId}`);
     self.multipleAns = (function(){
@@ -255,12 +266,14 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
         }
         console.log('Sanity check: ', multipleAnsArray);
         return multipleAnsArray;
-    })();  
+    })();
+    console.log(self.multipleAns);  
 
     // Will this overwrite the reference when called by other clients?
     var teamAnsRef = db.ref(`classMentors/eventSolutions/${self.eventId}/${self.teamId}/${self.tratId}`);
-    teamAnsRef.set('init');
+    // teamAnsRef.set('init');
     
+    //Init team log
     self.teamLog = null;
     function refreshLog(){
         $firebaseArray(teamLogRef.orderByKey()).$loaded(function(data){
@@ -288,40 +301,96 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
     self.onChange = function(){
         var msg = {
             user: userPublicId,
-            text: 'Selected: ' + self.options[self.selected],
+            text: 'Selected: ' + self.options[self.selected].text,
             selected: self.selected
         }
         updateLog(msg);
     }
     
-
+    function teamAns(answer){
+        // Check which user`s answer is used for submission.
+        var userIdx = self.index % self.team.length;
+        console.log(userIdx);
+        console.log(self.team);
+        var selectedUserPubId = self.team[userIdx].$id
+        // Check if current user is selected.
+        if(selectedUserPubId == userPublicId){
+            var submission = {
+                submitBy: userPublicId,
+                answer: angular.toJson(answer)
+            }
+            teamAnsRef.push(submission);
+        }
+        
+        // Submit answer
+        // Optional: Add to log; The next user who`s answer will be submited next.
+    }
 
     self.nextQuestion = function(){
         console.log("next question has been clicked");
         // Check if all members have submit
         // Check if user's answers is the answer that will be saved under team record.
         // 
-        // Add selected answer to answers.
-        // Single ans questions
         if(self.selected != null){
             var tempArray = []
             tempArray.push(self.selected);
-            answers.push(tempArray)
-            console.log(answers);
+            answers.push(tempArray);
+            teamAns(tempArray);
         }else{// Multi-ans questions
             answers.push(multiAns);
+            teamAns(multiAns);
             multiAns = [];
+            
         }
-        console.log(self.questions)
         if(self.index + 1 < self.questions.length){
             self.index += 1;
             self.question = self.questions[self.index];
             self.options = self.question.options;
         }else{
-            // submit answers 
             console.log('Submitted Ans for last question.. ending TRAT');
-            //self.submitTrat();
+            console.log(answers);
+            // Mark indiv
+            // Mark team
+            spfAlert.success('TRAT Submitted');
+            var indivScore = markQuestions(answers);
+            console.log(indivScore);
+            // $location.path(urlFor('oneEvent', {eventId: event.$id}));
+
         }
+
+    }
+    function arraysEqual(arr1, arr2) {
+        if(arr1.length !== arr2.length)
+        return 0;
+        for(var i = arr1.length; i--;) {
+        if(arr1[i] !== arr2[i])
+            return 0;
+        }
+        return 1;
+    }
+
+    self.toggle = function(list, item){
+        console.log(list);
+        var idx = list.indexOf(item);
+        if (idx > -1) {
+            list.splice(idx, 1);
+        }else {
+            list.push(item);
+        }
+    }
+
+    function markQuestions(submittedAnswers){
+        console.log('Correct Answers...', self.correctAnswers);
+        console.log('Submitted Answers...', submittedAnswers);
+        var score = 0;
+        for(var i = 0; i < submittedAnswers.length; i ++){
+            score += arraysEqual(submittedAnswers[i], self.correctAnswers[i]);
+        }
+        return score;
+    }
+
+    function markTeam(){
+            //   saveScore: function(eventId, publicId, taskId, score) {
 
     }
 
@@ -335,7 +404,8 @@ startTRATController.$inject = [
     'urlFor',
     'firebaseApp',
     '$firebaseObject',
-    '$firebaseArray'
+    '$firebaseArray',
+    'spfAlert'
 ]
 
 
