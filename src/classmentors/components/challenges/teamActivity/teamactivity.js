@@ -167,7 +167,7 @@ function startTRATInitialData($q, spfAuthData, eventService, clmDataStore, fireb
     //     teamLogPromise = $firebaseObject(eventTeamsLogRef).$loaded();
     // }
 
-
+    
     return $q.all({
         currentUser: spfAuthData.user(),
         correctAnswers: clmDataStore.events.getTaskAnswers(data.eventId, data.task.taskFrom)
@@ -186,6 +186,7 @@ function startTRATInitialData($q, spfAuthData, eventService, clmDataStore, fireb
                 }
             }}).then(function(teamId){
                 var teamRef = db.ref(`classMentors/eventTeams/${eventId}/${teamFormationRefKey}/${teamId}`);
+                
                 return {
                     team: $firebaseArray(teamRef).$loaded().then(function(team){return team;}),
                     teamId:teamId
@@ -239,6 +240,7 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
     self.tratId = initialData.tratId;
     self.teamFormId = initialData.teamFormId;
     var answers = [];
+    var multiAns = [];
     self.correctAnswers = angular.fromJson(initialData.correctAnswers);
     var teamLogRef = db.ref(`classMentors/eventTeamsLog/${self.teamFormId}/${self.teamId}`);
     self.multipleAns = (function(){
@@ -254,10 +256,10 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
         console.log('Sanity check: ', multipleAnsArray);
         return multipleAnsArray;
     })();  
+
     // Will this overwrite the reference when called by other clients?
-    var teamAnsRef = db.ref(`classMentors/eventSolutions/${self.eventId}`)
-        .push(self.teamId)
-        .push(self.tratId);
+    var teamAnsRef = db.ref(`classMentors/eventSolutions/${self.eventId}/${self.teamId}/${self.tratId}`);
+    teamAnsRef.set('init');
     
     self.teamLog = null;
     function refreshLog(){
@@ -286,22 +288,35 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
     self.onChange = function(){
         var msg = {
             user: userPublicId,
-            text: 'Selected: ' + self.selected
+            text: 'Selected: ' + self.options[self.selected],
+            selected: self.selected
         }
         updateLog(msg);
     }
     
+
+
     self.nextQuestion = function(){
         console.log("next question has been clicked");
         // Check if all members have submit
         // Check if user's answers is the answer that will be saved under team record.
         // 
-        self.index = self.index + 1;
+        // Add selected answer to answers.
+        // Single ans questions
+        if(self.selected != null){
+            var tempArray = []
+            tempArray.push(self.selected);
+            answers.push(tempArray)
+            console.log(answers);
+        }else{// Multi-ans questions
+            answers.push(multiAns);
+            multiAns = [];
+        }
         console.log(self.questions)
-        if(self.index < self.questions.length){
+        if(self.index + 1 < self.questions.length){
+            self.index += 1;
             self.question = self.questions[self.index];
             self.options = self.question.options;
-            
         }else{
             // submit answers 
             console.log('Submitted Ans for last question.. ending TRAT');
