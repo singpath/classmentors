@@ -1,5 +1,5 @@
 <md-content flex class="md-padding">
-    <form name="tratForm" ng-submit="ctrl.submitTrat()">
+    <form name="tratForm">
         <!--Remember to correct the the logic when done-->
         <div ng-show="ctrl.question" flex layout='row' layout-align='start stretch'>
             <div flex-offset='2' flex='66' name='question_box'>
@@ -79,7 +79,10 @@
             </div>
         </div>
         <div layout="row" layout-align="center center">
-            <md-button class="md-raised md-primary" ng-disabled="ctrl.multiAns.length == 0 || ctrl.selected == null" ng-click="ctrl.nextQuestion()">Next</md-button>
+            <md-button class="md-raised md-primary" 
+                ng-disabled="(ctrl.multiAns.length == 0 && ctrl.multipleAns[ctrl.index]) || 
+                    (ctrl.selected == null && !ctrl.multipleAns[ctrl.index])" 
+                ng-click="ctrl.nextQuestion()">Next</md-button>
         </div>
     </form>
 </md-content>

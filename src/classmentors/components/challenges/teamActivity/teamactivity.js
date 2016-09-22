@@ -337,9 +337,9 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
             answers.push(tempArray);
             teamAns(tempArray);
         }else{// Multi-ans questions
-            answers.push(multiAns);
-            teamAns(multiAns);
-            multiAns = [];
+            answers.push(self.multiAns);
+            teamAns(self.multiAns);
+            self.multiAns = [];
             
         }
         if(self.index + 1 < self.questions.length){
@@ -352,8 +352,10 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
             // Mark indiv
             // Mark team
             spfAlert.success('TRAT Submitted');
-            var indivScore = markQuestions(answers);
-            console.log(indivScore);
+            // var indivScore = markQuestions(answers);
+            markTeamQuestions();
+            
+            
             // $location.path(urlFor('oneEvent', {eventId: event.$id}));
 
         }
@@ -361,10 +363,18 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
     }
     function arraysEqual(arr1, arr2) {
         if(arr1.length !== arr2.length)
-        return 0;
-        for(var i = arr1.length; i--;) {
-        if(arr1[i] !== arr2[i])
             return 0;
+        
+        if(arr1.length > 1 && arr2.length > 1 && arr1.length == arr2.length){
+            for(var i = arr1.length; i--;){
+                if(arr2.indexOf(arr1[i]) < 0)
+                    return 0
+            }
+        }else{
+            for(var i = arr1.length; i--;) {
+                if(arr1[i] !== arr2[i])
+                    return 0;
+            }
         }
         return 1;
     }
@@ -394,13 +404,38 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
         console.log('Correct Answers...', self.correctAnswers);
         console.log('Submitted Answers...', submittedAnswers);
         var score = 0;
-        for(var i = 0; i < submittedAnswers.length; i ++){
+        for(var i = 0; i < self.correctAnswers.length; i ++){
             score += arraysEqual(submittedAnswers[i], self.correctAnswers[i]);
         }
         return score;
     }
 
-    function markTeam(){
+    function isLastQuestion(){
+
+    }
+
+    function markTeamQuestions(){
+        /* Retrieve eventSolution for last user Assumption here: When the last user assigned
+        to submit the answer for the TRAT as submitted his answer, clm will write scores to all
+        users in the team */
+        
+
+        return $firebaseArray(teamAnsRef).$loaded(function(teamAnswers){
+            var answers = [];
+            var score = null;
+            console.log('Answers loaded ', teamAnswers);
+            for(var i = 0; i < teamAnswers.length; i ++){
+                var teamAnswer = teamAnswers[i];
+                console.log(teamAnswer);
+                if(teamAnswer.answer){
+                    answers.push(angular.fromJson(teamAnswer.answer))
+                }
+            }
+            console.log(answers);
+            return markQuestions(answers);
+        });
+
+        // Loop through each 
             //   saveScore: function(eventId, publicId, taskId, score) {
 
     }
