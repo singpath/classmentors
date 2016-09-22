@@ -377,6 +377,17 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
         }else {
             list.push(item);
         }
+        var selected = [];
+        for(var i = 0; i < list.length; i++){
+            var text = self.options[list[i]].text;
+            selected.push(text);
+        }
+        var msg = {
+            user: userPublicId,
+            text: 'Selected: ' + selected,
+            selected: list
+        }
+        updateLog(msg);
     }
 
     function markQuestions(submittedAnswers){
