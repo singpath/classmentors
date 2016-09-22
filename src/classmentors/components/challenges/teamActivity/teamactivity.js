@@ -258,24 +258,23 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
         .push(self.teamId)
         .push(self.tratId);
     
+    self.teamLog = null;
     function refreshLog(){
-        return $firebaseArray(teamLogRef).$loaded().then(function(data){
-            var deferred = $q.defer();
-            deferred.resolve(data);
-            return deferred.promise;
+        $firebaseArray(teamLogRef).$loaded(function(data){
+            self.teamLog = data;
         });
     }
-    // Initialize team Log.
-    self.teamLog = refreshLog().then(function(promise){
-        console.log(promise);
-        return promise;
-    });
+    refreshLog();
+    // $firebaseArray(teamLogRef)
+    //     .$loaded(function(data){
+    //         console.log(data);
+    //     });
 
     // test this later
     var updateLog = function(msg){
         teamLogRef.push().set(msg).then(function(){
             console.log('Msg has been pushed');
-            self.teamLog = refreshLog();
+            refreshLog();
         });
     }
 

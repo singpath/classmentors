@@ -60,12 +60,11 @@
                     <!--{{ctrl.teamLog}}-->
                     <!--<md-subheader class='md-no-sticky'>Last activity at: {{time}}</md-subheader>-->
                     <md-list class='md-dense' flex>
-                        {{ctrl.teamLog[0]}}
-                        <md-list-item ng-model='ctrl.teamLog' ng-repeat="msg in ctrl.teamLog"> 
-                        <div class="md-list-item-text" layout="column">
-                            <h3>{{ msg.user }}</h3>
-                            <h4>{{ msg.text }}</h4>
-                        </div>
+                        <md-list-item class='md-3-line' ng-model='ctrl.teamLog' ng-repeat="msg in ctrl.teamLog"> 
+                            <div class="md-list-item-text" layout="column">
+                                <h3>{{ msg.user }}</h3>
+                                <h4>{{ msg.text }}</h4>
+                            </div>
                         </md-list-item>
                     </md-list>
                 </md-content>
