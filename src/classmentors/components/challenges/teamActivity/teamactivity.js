@@ -353,7 +353,28 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
             // Mark team
             spfAlert.success('TRAT Submitted');
             // var indivScore = markQuestions(answers);
-            markTeamQuestions();
+            $firebaseArray(teamAnsRef).$loaded(function(teamAnswers){
+                var answers = [];
+                var score = null;
+                console.log('Answers loaded ', teamAnswers);
+                for(var i = 0; i < teamAnswers.length; i ++){
+                    var teamAnswer = teamAnswers[i];
+                    console.log(teamAnswer);
+                    if(teamAnswer.answer){
+                        answers.push(angular.fromJson(teamAnswer.answer))
+                    }
+                }
+                console.log(answers);
+                return markQuestions(answers);
+            }).then(function(score){
+                //   saveScore: function(eventId, publicId, taskId, score)
+                for(var i = 0; i < self.team.length; i ++){
+                    var publicId = self.team[i].$id;
+                    clmDataStore.events.saveScore(self.eventId, publicId, self.tratId, score);
+                }
+            }).then(function(){
+                console.log('Sucess!');
+            });
             
             
             // $location.path(urlFor('oneEvent', {eventId: event.$id}));
@@ -408,36 +429,6 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
             score += arraysEqual(submittedAnswers[i], self.correctAnswers[i]);
         }
         return score;
-    }
-
-    function isLastQuestion(){
-
-    }
-
-    function markTeamQuestions(){
-        /* Retrieve eventSolution for last user Assumption here: When the last user assigned
-        to submit the answer for the TRAT as submitted his answer, clm will write scores to all
-        users in the team */
-        
-
-        return $firebaseArray(teamAnsRef).$loaded(function(teamAnswers){
-            var answers = [];
-            var score = null;
-            console.log('Answers loaded ', teamAnswers);
-            for(var i = 0; i < teamAnswers.length; i ++){
-                var teamAnswer = teamAnswers[i];
-                console.log(teamAnswer);
-                if(teamAnswer.answer){
-                    answers.push(angular.fromJson(teamAnswer.answer))
-                }
-            }
-            console.log(answers);
-            return markQuestions(answers);
-        });
-
-        // Loop through each 
-            //   saveScore: function(eventId, publicId, taskId, score) {
-
     }
 
 }
