@@ -14,7 +14,25 @@
 
 
                 <!------------------starting of questions--------------------------------------------->
-                <div ng-show="!ctrl.multipleAns[$index]">
+                <div ng-show="!ctrl.multipleAns[self.index]">
+                       <md-radio-group ng-required="true" ng-model="ctrl.selected" ng-required='true' 
+                        ng-change='ctrl.onChange()'>
+                            <div layout="column" ng-repeat="option in ctrl.options">
+                                <div layout="row">
+                                    <div flex="80">
+                                        <label>{{$index + 1}}) {{option.text}}</label>
+                                    </div>
+                                    <div flex="20">
+                                        <md-radio-button aria-label="{{option.text}}" value={{$index}}>
+                                        </md-radio-button>
+                                    </div>
+                                </div>
+                                <md-divider layout-padding ng-if="!$last"></md-divider>
+                            </div>
+                        </md-radio-group>                    
+                </div>
+
+                <div ng-show="ctrl.multipleAns[self.index]">
                     <md-radio-group ng-required="true" ng-model="question.answers">
                         <div layout="column" ng-repeat="option in ctrl.options">
                             <div layout="row">
@@ -39,10 +57,15 @@
                     </div>
                 </md-tool-bar>
                 <md-content>
-                    <md-subheader class='md-no-sticky'>Last activity at: {{time}}</md-subheader>
+                    <!--{{ctrl.teamLog}}-->
+                    <!--<md-subheader class='md-no-sticky'>Last activity at: {{time}}</md-subheader>-->
                     <md-list class='md-dense' flex>
-                        <md-list-item>
-
+                        {{ctrl.teamLog[0]}}
+                        <md-list-item ng-model='ctrl.teamLog' ng-repeat="msg in ctrl.teamLog"> 
+                        <div class="md-list-item-text" layout="column">
+                            <h3>{{ msg.user }}</h3>
+                            <h4>{{ msg.text }}</h4>
+                        </div>
                         </md-list-item>
                     </md-list>
                 </md-content>

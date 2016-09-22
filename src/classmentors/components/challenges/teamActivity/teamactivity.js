@@ -236,29 +236,46 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
     self.teamId = teamAndteamId.teamId;
     self.team = teamAndteamId.team;
     self.tratId = initialData.tratId;
-    // self.teamFormId = initialData.teamFormId;
+    self.teamFormId = initialData.teamFormId;
     var answers = [];
-    
+    self.correctAnswers = angular.fromJson(initialData.correctAnswers);
+    var teamLogRef = db.ref(`classMentors/eventTeamsLog/${self.teamFormId}/${self.teamId}`);
+    self.multipleAns = (function(){
+        var multipleAnsArray = [];
+        for(var i = 0; i < self.correctAnswers.length; i ++){
+            var ans = self.correctAnswers[i];
+            if(ans.length > 1){
+                multipleAnsArray.push(true);
+            }else{
+                multipleAnsArray.push(false);
+            }
+        }
+        console.log('Sanity check: ', multipleAnsArray);
+        return multipleAnsArray;
+    })();  
     // Will this overwrite the reference when called by other clients?
     var teamAnsRef = db.ref(`classMentors/eventSolutions/${self.eventId}`)
         .push(self.teamId)
         .push(self.tratId);
     
-
-    // Initialize team Log.
-    self.teamLog = (function(){
-        var teamLogRef = db.ref(`classMentors/eventTeamsLog/${self.eventId}/${self.teamId}`);
-        return $firebaseObject(teamLogRef).$loaded().then(function(data){
-            console.log(data);
-            return data;
+    function refreshLog(){
+        return $firebaseArray(teamLogRef).$loaded().then(function(data){
+            var deferred = $q.defer();
+            deferred.resolve(data);
+            return deferred.promise;
         });
-    })();
+    }
+    // Initialize team Log.
+    self.teamLog = refreshLog().then(function(promise){
+        console.log(promise);
+        return promise;
+    });
 
     // test this later
-    self.updateLog = function(string){
-        var timestamp = db.ServerValue.TIMESTAMP;
-        self.teamLog.transaction(function(){
-            return {timestamp: string};
+    var updateLog = function(msg){
+        teamLogRef.push().set(msg).then(function(){
+            console.log('Msg has been pushed');
+            self.teamLog = refreshLog();
         });
     }
 
@@ -266,6 +283,13 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
         $location.path(urlFor('oneEvent'));
     }
 
+    self.onChange = function(){
+        var msg = {
+            user: userPublicId,
+            text: 'Selected: ' + self.selected
+        }
+        updateLog(msg);
+    }
     
     self.nextQuestion = function(){
         console.log("next question has been clicked");
@@ -273,8 +297,15 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
         // Check if user's answers is the answer that will be saved under team record.
         // 
         self.index = self.index + 1;
-        self.question =  //quizFactory.getQuestion(self.index);
-        self.options = self.question.options;
+        if(self.index < questions.length){
+            self.question = questions.length(self.index);
+            self.options = question.options;
+            
+        }else{
+            // submit answers 
+            console.log('Submitted Ans for last question.. ending TRAT');
+            //self.submitTrat();
+        }
 
     }
 
