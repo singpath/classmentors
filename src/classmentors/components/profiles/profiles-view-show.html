@@ -7,12 +7,12 @@
             </h2>
             <h3 ng-if="ctrl.profile.user.school" layout="row" layout-align="center center">
                 <span flex="33"><img ng-src="{{ctrl.profile.user.school.iconUrl}}" alt="user school crest"></span>
-                <span flex="67">{{ctrl.profile.user.school.name}}</span>
+                <span flex="66">{{ctrl.profile.user.school.name}}</span>
             </h3>
         </div>
     </div>
-    
-    <div flex="67">
+
+    <div flex="66">
         <!--
         <div clm-spf-profile="ctrl.profile.$id"></div>
 
@@ -21,7 +21,7 @@
         <div clm-profile="ctrl.profile" clm-service-id="treeHouse" clm-current-user="ctrl.currentUserProfile"></div>
         -->
         <button type="submit" ng-click="ctrl.refreshAchievements(ctrl.profile.$id)">Refresh Achievements for {{ctrl.profile.$id}} </button>
-         
+
         <div id="register-freecodecamp" class="register-service md-whiteframe-z1" ng-if="ctrl.settings.enableFreeCodeCamp.value">
                 <h2>FreeCodeCamp</h2>
                 <div ng-hide="ctrl.profile.services.freeCodeCamp.details.id">
@@ -32,7 +32,7 @@
                   Registered as <a href="https://www.freecodecamp.com/{{ctrl.profile.services.freeCodeCamp.details.id}}">{{ctrl.profile.services.freeCodeCamp.details.id}}</a> on Free Code Camp.
                 </div>
             </div>
-            
+
      <div id="register-pivotalexpert" class="register-service md-whiteframe-z1" ng-if="ctrl.settings.enablePivotalexpert.value">
                 <h2>Pivotal Expert</h2>
                 <div ng-hide="ctrl.profile.services.pivotalExpert.details.id">
@@ -43,13 +43,13 @@
                   Registered as <a href="https://pivotal-expert.firebaseapp.com/#/profile/{{ctrl.profile.services.pivotalExpert.details.id}}">{{ctrl.profile.services.pivotalExpert.details.id}}</a> on Pivotal Expert.
                 </div>
             </div>
-           
+
             <div id="register-codecombat" class="register-service md-whiteframe-z1" ng-if="ctrl.settings.enableCodeCombat.value">
                 <h2>Code Combat</h2>
 
-                <div ng-hide="ctrl.profile.services.codeCombat.details.id">  
+                <div ng-hide="ctrl.profile.services.codeCombat.details.id">
                      Not registered.
-                </div>   
+                </div>
                 <div ng-show="ctrl.profile.services.codeCombat.details.id">
                    {{ctrl.profile.services.codeCombat.totalAchievements}}  achievements<br>
                    Registered as <a href="https://codecombat.com/user/{{ctrl.profile.services.codeCombat.details.id}}">{{ctrl.profile.services.codeCombat.details.id}}</a> on Code Combat.
