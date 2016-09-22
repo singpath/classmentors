@@ -7,6 +7,7 @@ import 'angular-material';
 import 'angular-messages';
 import 'angular-route';
 import 'angularfire';
+import 'angular-timer';
 
 // polyfills
 import 'core-js/fn/array/every.js';
@@ -31,6 +32,7 @@ const module = angular.module('clm', [
   'ngAnimate',
   'ngMessages',
   'ngRoute',
+  'timer',
   spfShared.name
 ]);
 
