@@ -59,14 +59,22 @@
                 <md-content>
                     <!--{{ctrl.teamLog}}-->
                     <!--<md-subheader class='md-no-sticky'>Last activity at: {{time}}</md-subheader>-->
-                    <md-list class='md-dense' flex>
+                    <md-virtual-repeat-container id="vertical-container">
+                        <md-list-item class='md-3-line' ng-model='ctrl.teamLog' md-virtual-repeat="msg in ctrl.teamLog"> 
+                            <div class="md-list-item-text" layout="column">
+                                <h3>{{ msg.user }}</h3>
+                                <h4>{{ msg.text }}</h4>
+                            </div>
+                        </md-list-item>
+                    </md-virtual-repeat-container>
+                    <!--<md-list class='md-dense' flex>
                         <md-list-item class='md-3-line' ng-model='ctrl.teamLog' ng-repeat="msg in ctrl.teamLog"> 
                             <div class="md-list-item-text" layout="column">
                                 <h3>{{ msg.user }}</h3>
                                 <h4>{{ msg.text }}</h4>
                             </div>
                         </md-list-item>
-                    </md-list>
+                    </md-list>-->
                 </md-content>
 
             </div>

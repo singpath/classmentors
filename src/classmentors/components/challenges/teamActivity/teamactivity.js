@@ -227,7 +227,8 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
     self.index = 0;
     
     // Inititalize Question and Question's option(s)
-    self.question = initialData.questions[self.index];
+    self.questions = initialData.questions; 
+    self.question = self.questions[self.index];
     self.options = self.question.options;
     var userPublicId = initialData.currentUser.publicId;
     console.log(initialData.currentUser);
@@ -260,7 +261,7 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
     
     self.teamLog = null;
     function refreshLog(){
-        $firebaseArray(teamLogRef).$loaded(function(data){
+        $firebaseArray(teamLogRef.orderByKey()).$loaded(function(data){
             self.teamLog = data;
         });
     }
@@ -296,9 +297,10 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
         // Check if user's answers is the answer that will be saved under team record.
         // 
         self.index = self.index + 1;
-        if(self.index < questions.length){
-            self.question = questions.length(self.index);
-            self.options = question.options;
+        console.log(self.questions)
+        if(self.index < self.questions.length){
+            self.question = self.questions[self.index];
+            self.options = self.question.options;
             
         }else{
             // submit answers 

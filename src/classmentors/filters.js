@@ -62,3 +62,9 @@ export function showTeamMembersFilterFactory() {
       return output.filter(filterUserID);
     }
 }
+
+// export function reverseArray (){
+//   return function(items) {
+//     return items.slice().reverse();
+//   };
+// };

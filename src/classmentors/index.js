@@ -70,6 +70,7 @@ module.filter('cmTruncate', filters.cmTruncateFilterFactory);
 module.filter('cmTruncated', filters.cmTruncateFilterBooleanFactory);
 module.filter('showSchool', filters.showSchoolFilterFactory);
 module.filter('showTeamMembers', filters.showTeamMembersFilterFactory);
+// module.filter('reverseArray', filters.reverseArray);
 //for page controls in trat
 module.factory('quizFactory', components.challenges.tratQuestionFactory);
 
