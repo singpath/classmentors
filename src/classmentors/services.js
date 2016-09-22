@@ -789,7 +789,7 @@ export function clmDataStoreFactory(
         var ownerId = event && event.owner && event.owner.publicId;
         var passwordRef, profileRef;
 
-        if (eventId || !ownerId) {
+        if (!eventId || !ownerId) {
           return $q.reject(new Error('Event is not a firebase object'));
         }
 
