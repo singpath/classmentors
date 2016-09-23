@@ -61,6 +61,9 @@ module.directive('clmProfile', components.profiles.clmProfileFactory);
 module.directive('clmServiceUserIdExists', components.profiles.clmServiceUserIdExistsFactory);
 module.directive('clmSpfProfile', components.profiles.clmSpfProfileFactory);
 module.directive('cmContains', directives.cmContainsFactory);
+//add directive for page scroll
+module.directive('scrollBottom', components.challenges.scrollBottom);
+//
 module.factory('aceStats', components.ace.factory);
 module.factory('challengeService', components.challenges.challengeServiceFactory);
 module.factory('clmDataStore', services.clmDataStoreFactory);

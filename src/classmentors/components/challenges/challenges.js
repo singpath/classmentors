@@ -189,6 +189,22 @@ createMCQInitialData.$inject = [
   'eventService'
 ]
 
+export function scrollBottom(){
+    return {
+        scope: {
+            schrollBottom: "="
+        },
+        link: function (scope, element) {
+            scope.$watchCollection('schrollBottom', function (newValue) {
+                if (newValue)
+                {
+                    $(element).scrollTop($(element)[0].scrollHeight);
+                }
+            });
+        }
+    }
+}
+
 //TODO: Generic save function
 export function challengeServiceFactory
   ($q, $route, spfAuthData, clmDataStore, $log, spfAlert, $location, urlFor, firebaseApp,
