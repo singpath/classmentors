@@ -39,7 +39,7 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
     self.teamFormationMethod = null;
     self.teamFormationParameter = null;
 
-
+    
     self.submit = function(){
         self.task.activityType = self.activityType;
         self.task.newExistingTeams = self.newExistingTeams;
@@ -116,14 +116,14 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
     }
 
     self.calculationResult = function (){
-
+        
         return self.teamsMaximumStudents;
     }
 
 }
 createTeamActivityController.$inject = [
-    '$q',
-    'initialData',
+    '$q', 
+    'initialData', 
     'clmDataStore',
     '$location',
     'urlFor',
@@ -139,7 +139,7 @@ function startTRATInitialData($q, spfAuthData, eventService, clmDataStore, fireb
     */
     var data =  eventService.get();
     var db = firebaseApp.database();
-
+    
     console.log("my data is:", data);
     var eventId = data.eventId;
     var taskId = data.taskId;
@@ -167,7 +167,7 @@ function startTRATInitialData($q, spfAuthData, eventService, clmDataStore, fireb
     //     teamLogPromise = $firebaseObject(eventTeamsLogRef).$loaded();
     // }
 
-
+    
     return $q.all({
         currentUser: spfAuthData.user(),
         correctAnswers: clmDataStore.events.getTaskAnswers(data.eventId, data.task.taskFrom)
@@ -186,7 +186,7 @@ function startTRATInitialData($q, spfAuthData, eventService, clmDataStore, fireb
                 }
             }}).then(function(teamId){
                 var teamRef = db.ref(`classMentors/eventTeams/${eventId}/${teamFormationRefKey}/${teamId}`);
-
+                
                 return {
                     team: $firebaseArray(teamRef).$loaded()
                         .then(function(team){
@@ -223,23 +223,22 @@ function startTRATInitialData($q, spfAuthData, eventService, clmDataStore, fireb
     //         progress: result.getProgress
     //     }
     // });
-
+    
 
 }
 startTRATInitialData.$inject = ['$q','spfAuthData', 'eventService','clmDataStore', 'firebaseApp', '$firebaseObject', '$firebaseArray'];
 
 function startTRATController($q, initialData, clmDataStore, $location, urlFor,
         firebaseApp, $firebaseObject, $firebaseArray, spfAlert){
-
-
+    
     // Sanity check
     console.log('Initial data contains: ', initialData);
     var self = this;
     var db = firebaseApp.database();
     self.index = 0;
-
+    
     // Inititalize Question and Question's option(s)
-    self.questions = initialData.questions;
+    self.questions = initialData.questions; 
     self.question = self.questions[self.index];
     self.options = self.question.options;
     var userPublicId = initialData.currentUser.publicId;
@@ -248,10 +247,10 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
     var teamAndteamId = initialData.teamAndteamId;
     self.teamId = teamAndteamId.teamId;
     self.team = null;
-    teamAndteamId.team.then(function(result){self.team = result});
+    teamAndteamId.team.then(function(result){self.team = result}); 
     self.tratId = initialData.tratId;
     self.teamFormId = initialData.teamFormId;
-    var answers = [];
+    var userAnswers = [];
     self.multiAns = [];
     self.correctAnswers = angular.fromJson(initialData.correctAnswers);
     var teamLogRef = db.ref(`classMentors/eventTeamsLog/${self.teamFormId}/${self.teamId}`);
@@ -268,12 +267,12 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
         console.log('Sanity check: ', multipleAnsArray);
         return multipleAnsArray;
     })();
-    console.log(self.multipleAns);
+    console.log(self.multipleAns);  
 
     // Will this overwrite the reference when called by other clients?
     var teamAnsRef = db.ref(`classMentors/eventSolutions/${self.eventId}/${self.teamId}/${self.tratId}`);
     // teamAnsRef.set('init');
-
+    
     //Init team log
     self.teamLog = null;
     function refreshLog(){
@@ -309,9 +308,7 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
         }
         updateLog(msg);
     }
-
-
-
+    
     function teamAns(answer){
         // Check which user`s answer is used for submission.
         var userIdx = self.index % self.team.length;
@@ -326,7 +323,7 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
             }
             teamAnsRef.push(submission);
         }
-
+        
         // Submit answer
         // Optional: Add to log; The next user who`s answer will be submited next.
     }
@@ -335,17 +332,18 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
         console.log("next question has been clicked");
         // Check if all members have submit
         // Check if user's answers is the answer that will be saved under team record.
-        //
+        // 
         if(self.selected != null){
             var tempArray = []
             tempArray.push(self.selected);
-            answers.push(tempArray);
+            userAnswers.push(tempArray);
             teamAns(tempArray);
+            self.selected = null;
         }else{// Multi-ans questions
-            answers.push(self.multiAns);
+            userAnswers.push(self.multiAns);
             teamAns(self.multiAns);
             self.multiAns = [];
-
+            
         }
         if(self.index + 1 < self.questions.length){
             self.index += 1;
@@ -353,35 +351,55 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
             self.options = self.question.options;
         }else{
             console.log('Submitted Ans for last question.. ending TRAT');
-            console.log(answers);
+            console.log(userAnswers);
             // Mark indiv
             // Mark team
-            spfAlert.success('TRAT Submitted');
+
+            // If current user is the last user to submit
             // var indivScore = markQuestions(answers);
-            $firebaseArray(teamAnsRef).$loaded(function(teamAnswers){
-                var answers = [];
-                var score = null;
-                console.log('Answers loaded ', teamAnswers);
-                for(var i = 0; i < teamAnswers.length; i ++){
-                    var teamAnswer = teamAnswers[i];
-                    console.log(teamAnswer);
-                    if(teamAnswer.answer){
-                        answers.push(angular.fromJson(teamAnswer.answer))
+
+            var userIdx = self.index % self.team.length;
+            console.log(userIdx);
+            console.log(self.team);
+            var selectedUserPubId = self.team[userIdx].$id
+
+            if(selectedUserPubId == userPublicId){
+                $firebaseArray(teamAnsRef).$loaded(function(teamAnswers){
+                    var answers = [];
+                    var score = null;
+                    console.log('Answers loaded ', teamAnswers);
+                    for(var i = 0; i < teamAnswers.length; i ++){
+                        var teamAnswer = teamAnswers[i];
+                        console.log(teamAnswer);
+                        if(teamAnswer.answer){
+                            answers.push(angular.fromJson(teamAnswer.answer))
+                        }
                     }
-                }
-                console.log(answers);
-                return markQuestions(answers);
-            }).then(function(score){
-                //   saveScore: function(eventId, publicId, taskId, score)
-                for(var i = 0; i < self.team.length; i ++){
-                    var publicId = self.team[i].$id;
-                    clmDataStore.events.saveScore(self.eventId, publicId, self.tratId, score);
-                }
-            }).then(function(){
-                console.log('Sucess!');
-            });
+                    console.log(answers);
+                    return markQuestions(answers);
+                }).then(function(score){
+                    //   saveScore: function(eventId, publicId, taskId, score)
+                    for(var i = 0; i < self.team.length; i ++){
+                        var publicId = self.team[i].$id;
+                        clmDataStore.events.saveScore(self.eventId, publicId, self.tratId, score);
+                    }
+                }).then(function(){
+                    console.log('Sucess!');
+                    var indivSolutionRef = db.ref(`classMentors/eventSolutions/${self.eventId}/${userPublicId}/${self.tratId}`);
+                    return indivSolutionRef.set(angular.toJson(userAnswers));
+                }).finally(function(){
+                    spfAlert.success('TRAT Submitted');
+                    $location.path(urlFor('oneEvent', {eventId: event.$id}));
+                });
+            }else{
+                var indivSolutionRef = db.ref(`classMentors/eventSolutions/${self.eventId}/${userPublicId}/${self.tratId}`);
+                indivSolutionRef.set(angular.toJson(userAnswers)).then(function(){
+                    spfAlert.success('TRAT Submitted');
+                    $location.path(urlFor('oneEvent', {eventId: event.$id}));
+                });
+            }
 
-
+            
             // $location.path(urlFor('oneEvent', {eventId: event.$id}));
 
         }
@@ -390,7 +408,7 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
     function arraysEqual(arr1, arr2) {
         if(arr1.length !== arr2.length)
             return 0;
-
+        
         if(arr1.length > 1 && arr2.length > 1 && arr1.length == arr2.length){
             for(var i = arr1.length; i--;){
                 if(arr2.indexOf(arr1[i]) < 0)
