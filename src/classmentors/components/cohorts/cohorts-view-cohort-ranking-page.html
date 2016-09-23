@@ -44,7 +44,7 @@
                      {{$index+1}}
                     </th>
                     <td ng-if="!ctrl.showFilteredRanking">{{ event.participants.length }}</td>
-                    <td ng-if="ctrl.showFilteredRanking">{{ event.totalScore }}</td>
+                    <td ng-if="ctrl.showFilteredRanking">{{ event.qualifiedParticipants.length }}</td>
                     <td><a href="#{{ 'oneEvent' | urlFor: {eventId: event.id} }}">{{ event.title }}</a></td>
                     <td ng-if="ctrl.showFilteredRanking" ng-show="event.first">{{ event.first.name }} ({{event.first.total}})</td>
                     <td ng-if="ctrl.showFilteredRanking" ng-show="event.second">{{ event.second.name }} ({{event.second.total}})</td>
