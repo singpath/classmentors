@@ -6,14 +6,10 @@
                 <h1 class='md-title'>Question {{ctrl.index + 1}} </h1>
                 <md-divider></md-divider>
                 <!------------------starting of questions--------------------------------------------->
-
                 <div align="start" layout="column">
-                    <!--<md-divider></md-divider>-->
                     <label><h4>{{ctrl.question.text}}</h4></label>
                 </div>
 
-                {{ctrl.multipleAns}}
-                {{ctrl.multiAns}}
                 <!------------------starting of questions--------------------------------------------->
                 <div ng-show="!ctrl.multipleAns[ctrl.index]">
                     <md-radio-group ng-required="true" ng-model="ctrl.selected" ng-required='true'
@@ -32,7 +28,6 @@
                         </div>
                     </md-radio-group>
                 </div>
-
                 <div ng-show="ctrl.multipleAns[ctrl.index]">
                     <div layout="column" ng-repeat="option in ctrl.options">
                         <div layout="row">
@@ -41,7 +36,7 @@
                             </div>
                             <div flex="20">
                                 <md-checkbox ng-model="option.checked" ng-required="true"
-                                             ng-click="ctrl.toggle(ctrl.multiAns, $index)"></md-checkbox>
+                                    ng-click="ctrl.toggle(ctrl.multiAns, $index)"></md-checkbox>
                             </div>
                         </div>
                         <md-divider layout-padding ng-if="!$last"></md-divider>

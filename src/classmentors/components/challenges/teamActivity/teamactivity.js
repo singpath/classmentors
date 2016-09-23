@@ -387,15 +387,15 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
                     console.log('Sucess!');
                     var indivSolutionRef = db.ref(`classMentors/eventSolutions/${self.eventId}/${userPublicId}/${self.tratId}`);
                     return indivSolutionRef.set(angular.toJson(userAnswers));
-                }).finally(function(){
+                }).then(function(){
                     spfAlert.success('TRAT Submitted');
-                    $location.path(urlFor('oneEvent', {eventId: event.$id}));
+                    $location.path(urlFor('oneEvent', {eventId: self.eventId}));
                 });
             }else{
                 var indivSolutionRef = db.ref(`classMentors/eventSolutions/${self.eventId}/${userPublicId}/${self.tratId}`);
                 indivSolutionRef.set(angular.toJson(userAnswers)).then(function(){
                     spfAlert.success('TRAT Submitted');
-                    $location.path(urlFor('oneEvent', {eventId: event.$id}));
+                    $location.path(urlFor('oneEvent', {eventId: self.eventId}));
                 });
             }
 
