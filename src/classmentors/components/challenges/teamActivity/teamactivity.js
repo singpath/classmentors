@@ -4,6 +4,7 @@ import teamTRATTmpl from './teamactivity-view-trat-start.html!text';
 import teamFormationTmpl from './teamactivity-view-teamFormation.html!text';
 import './teamActivity.css!';
 
+const TIMESTAMP = {'.sv': 'timestamp'};
 function createTeamActivityInitialData($q, eventService, clmDataStore) {
     var data = eventService.get();
     console.log("team data is:", data);
@@ -275,13 +276,16 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
     
     //Init team log
     self.teamLog = null;
+
     function refreshLog(){
         $firebaseArray(teamLogRef.orderByKey()).$loaded(function(data){
             console.log("refresh log data iss:", data);
-            data.reverse();
             self.teamLog = data;
         });
     }
+
+
+
     refreshLog();
     // $firebaseArray(teamLogRef)
     //     .$loaded(function(data){
@@ -303,8 +307,10 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
     self.onChange = function(){
         var msg = {
             user: userPublicId,
-            text: 'Selected: ' + self.options[self.selected].text,
-            selected: self.selected
+            text: self.options[self.selected].text,
+            selected: self.selected,
+            timestamp: TIMESTAMP
+
         }
         updateLog(msg);
     }
@@ -438,8 +444,9 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
         }
         var msg = {
             user: userPublicId,
-            text: 'Selected: ' + selected,
-            selected: list
+            text: selected,
+            selected: list,
+            timestamp: TIMESTAMP
         }
         updateLog(msg);
     }
