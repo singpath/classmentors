@@ -1,56 +1,112 @@
 <md-content flex class="md-padding">
-    <form name="tratForm" ng-submit="ctrl.submitTrat()">
+    <form name="tratForm">
         <!--Remember to correct the the logic when done-->
         <div ng-show="ctrl.question" flex layout='row' layout-align='start stretch'>
             <div flex-offset='2' flex='66' name='question_box'>
                 <h1 class='md-title'>Question {{ctrl.index + 1}} </h1>
                 <md-divider></md-divider>
                 <!------------------starting of questions--------------------------------------------->
-
                 <div align="start" layout="column">
-                    <!--<md-divider></md-divider>-->
                     <label><h4>{{ctrl.question.text}}</h4></label>
                 </div>
 
-
                 <!------------------starting of questions--------------------------------------------->
-                <div ng-show="!ctrl.multipleAns[$index]">
-                    <md-radio-group ng-required="true" ng-model="question.answers">
+                <div ng-show="!ctrl.multipleAns[ctrl.index]">
+                    <md-radio-group ng-required="true" ng-model="ctrl.selected" ng-required='true'
+                                    ng-change='ctrl.onChange()'>
                         <div layout="column" ng-repeat="option in ctrl.options">
                             <div layout="row">
                                 <div flex="80">
                                     <label>{{$index + 1}}) {{option.text}}</label>
                                 </div>
                                 <div flex="20">
-                                    <md-radio-button aria-label="{{option.text}}" value={{$index}}></md-radio-button>
+                                    <md-radio-button aria-label="{{option.text}}" value={{$index}}>
+                                    </md-radio-button>
                                 </div>
                             </div>
                             <md-divider layout-padding ng-if="!$last"></md-divider>
                         </div>
                     </md-radio-group>
                 </div>
+                <div ng-show="ctrl.multipleAns[ctrl.index]">
+                    <div layout="column" ng-repeat="option in ctrl.options">
+                        <div layout="row">
+                            <div flex="80">
+                                <label>{{$index + 1}}) {{option.text}}</label>
+                            </div>
+                            <div flex="20">
+                                <md-checkbox ng-model="option.checked" ng-required="true"
+                                             ng-click="ctrl.toggle(ctrl.multiAns, $index)"></md-checkbox>
+                            </div>
+                        </div>
+                        <md-divider layout-padding ng-if="!$last"></md-divider>
+                    </div>
+                </div>
 
             </div>
             <!------------------log box--------------------------------------------->
-            <div flex='33' name='team_log' layout='column' class="md-whiteframe-3dp">
+            <div style="width:300px" name='team_log' layout='column' class="md-whiteframe-3dp">
                 <md-tool-bar layout='row' class="md-hue-1">
                     <div class='md-toolbar-tools'>
                         <span>Team Log</span>
                     </div>
                 </md-tool-bar>
                 <md-content>
-                    <md-subheader class='md-no-sticky'>Last activity at: {{time}}</md-subheader>
-                    <md-list class='md-dense' flex>
-                        <md-list-item>
-
+                    <!--{{ctrl.teamLog}}-->
+                    <!--<md-subheader class='md-no-sticky'>Last activity at: {{time}}</md-subheader>-->
+                    <md-virtual-repeat-container id="vertical-container" style="width:400px">
+                        <table md-virtual-repeat="msg in ctrl.teamLog | orderBy: '-'" width="100%">
+                            <tr>
+                                <td>
+                                    <md-list-item class='md-3-line' ng-model='ctrl.teamLog'>
+                                        <table class="md-list-item-text">
+                                            <tr>
+                                                <td>
+                                                    <h3><b>{{ msg.user }}</b></h3>
+                                                </td>
+                                                <td>
+                                                    <div ng-style="{'font-size': '10px', 'color': '#A9A9A9'}"> at
+                                                        {{msg.timestamp | date: 'hh:mm:ss'}}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    Selected:
+                                                </td>
+                                                <td>
+                                                    <h3 ng-style="{'color': '#A9241C'}"><b>{{ msg.text }}</b></h3>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </md-list-item>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="100%">
+                                    <md-divider></md-divider>
+                                </td>
+                            </tr>
+                        </table>
+                    </md-virtual-repeat-container>
+                    <!--<md-list class='md-dense' flex>
+                        <md-list-item class='md-3-line' ng-model='ctrl.teamLog' ng-repeat="msg in ctrl.teamLog">
+                            <div class="md-list-item-text" layout="column">
+                                <h3>{{ msg.user }}</h3>
+                                <h4>{{ msg.text }}</h4>
+                            </div>
                         </md-list-item>
-                    </md-list>
+                    </md-list>-->
                 </md-content>
 
             </div>
         </div>
         <div layout="row" layout-align="center center">
-            <md-button class="md-raised md-primary" ng-click="ctrl.nextQuestion()">Next</md-button>
+            <md-button class="md-raised md-primary"
+                       ng-disabled="(ctrl.multiAns.length == 0 && ctrl.multipleAns[ctrl.index]) ||
+                    (ctrl.selected == null && !ctrl.multipleAns[ctrl.index])"
+                       ng-click="ctrl.nextQuestion()">Next
+            </md-button>
         </div>
     </form>
 </md-content>

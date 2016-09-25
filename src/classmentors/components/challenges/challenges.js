@@ -11,6 +11,7 @@ import {cleanObj} from 'singpath-core/services/firebase.js';
 
 const noop = () => undefined;
 
+// TODO: Put out of use.
 export function tratQuestionFactory($q, spfAuthData, eventService, clmDataStore){
     var self = this;
     self.data =  eventService.get();
@@ -104,7 +105,7 @@ export function configRoute($routeProvider, routes){
                 initialData: team.createTeamActivityInitialData
             }
         })
-        .when(routes.viewTRAT,{
+        .when(routes.viewTRAT,{ // Start TRAT.
             template: team.teamTRATTmpl,
             controller: team.startTRATController,
             controllerAs:'ctrl',
@@ -187,6 +188,22 @@ createMCQInitialData.$inject = [
   '$q',
   'eventService'
 ]
+
+export function scrollBottom(){
+    return {
+        scope: {
+            schrollBottom: "="
+        },
+        link: function (scope, element) {
+            scope.$watchCollection('schrollBottom', function (newValue) {
+                if (newValue)
+                {
+                    $(element).scrollTop($(element)[0].scrollHeight);
+                }
+            });
+        }
+    }
+}
 
 //TODO: Generic save function
 export function challengeServiceFactory
@@ -307,59 +324,9 @@ export function challengeServiceFactory
         }).then(function(){
           console.log('TRAT set.');
           console.log('Events Created');
+            spfAlert.success('Task saved');
+            $location.path(urlFor('editEvent', {eventId: event.$id}));
         });
-
-        // var a = clmDataStore.events.addTaskWithAns(event.$id, copy, isOpen,answers);
-        // console.log(a);
-        //   a.then(function(ref){
-        //     //add Team formation task
-        //     console.log(ref);
-        //     var previousTaskId = ref.key;
-        //     console.log('IRAT key is :', previousTaskId);
-        //     clmDataStore.events.addTeamFormation(event.$id, {
-        //         taskFrom: previousTaskId,
-        //         title: copy.title,
-        //         description: "Click Below To Join Team",
-        //         formationPattern: true,
-        //         closedAt : {'.sv': 'timestamp'},
-        //         showProgress: copy.showProgress,
-        //         archived: false,
-        //         teamFormationMethod: copy.teamFormationMethod
-        //     }, copy.priority)
-        //     .then(function(teamRef){
-        //       //Create teams here
-        //       var taskId = teamRef.key()
-        //       console.log('taskId: ', taskId);
-        //       console.log(event.teams);
-        //       spfFirebase.set(['classMentors/eventTeams', event.$id],taskId)
-        //         .then(function(){
-        //           // For each team create a reccord in Firebase
-        //           for(var i = 0; i < event.teams.length; i ++){
-        //             var team = event.teams[i];
-        //             // console.log('Team here is: ', team);
-        //             spfFirebase.push(['classMentors/eventTeams/', event.$id,taskId],team)
-        //               .then(function(ref){
-        //                 console.log('Team ', i , 'pushed with key: ', ref.key());
-        //               });
-        //             }
-        //           });
-        //       clmDataStore.events.addTrat(event.$id,{
-        //         taskFrom: taskId,
-        //         taskFromIrat: previousTaskId,
-        //         title: copy.title,
-        //         description: "Click Below to Start TRAT",
-        //         startTRAT: true,
-        //         closedAt : {'.sv': 'timestamp'},
-        //         showProgress: copy.showProgress,
-        //         archived: false,
-        //         teamFormationMethod: copy.teamFormationMethod,
-        //         mcqQuestions: copy.mcqQuestions
-        //         },copy.priority)
-        //         .then(function(ref){
-        //            var taskId = ref.key();
-        //         });
-        //     })
-        // });
       }
     },
     update: function(event, taskId, task, taskType, isOpen) {
