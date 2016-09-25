@@ -1,4 +1,5 @@
-import {expect, sinon} from 'singpath-core/tools/chai.js';
+import {expect} from 'chai';
+import * as sinon from 'sinon';
 
 import * as icons from './icons.js';
 import setTmpl from './svgdefs.svg!text';

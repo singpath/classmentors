@@ -18,19 +18,4 @@ tools.clean(coverage, {message: 'Removing coverage data'});
 sh.echo(`Setting up "${coverage}/"...`);
 sh.mkdir('-p', coverage);
 
-tools.instanbul(src, {
-  coverage,
-  config(loader) {
-    loader.config({
-      map: {
-        css: loader.map.text,
-        'ace/mode-html.js': '@empty',
-        'ace/mode-java.js': '@empty',
-        'ace/mode-javascript.js': '@empty',
-        'ace/mode-python.js': '@empty',
-        'ace/theme-twilight.js': '@empty',
-        ace: '@empty'
-      }
-    });
-  }
-});
+tools.instanbul(src, {coverage});

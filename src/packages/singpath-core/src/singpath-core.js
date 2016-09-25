@@ -24,14 +24,9 @@ export const spfShared = angular.module('spf.shared', [
 //
 // Register directives, services and filters.
 //
-// spfShared.factory('spfFirebase', services.firebase.spfFirebaseFactory);
-// spfShared.provider('spfFirebaseRef', services.firebase.SpfFirebaseRefProvider);
 spfShared.config(config.loadingBar);
 spfShared.config(config.mdTheme);
 spfShared.config(services.icons.config);
-spfShared.constant('authFirebaseApp', null);
-spfShared.constant('authProvider', null);
-spfShared.constant('firebaseApp', null);
 spfShared.constant('routes', services.routes.defaults);
 spfShared.constant('SPF_COUNTRIES', services.countries);
 spfShared.constant('spfCryptoHashKeySize', services.crypto.keySize);
@@ -45,6 +40,7 @@ spfShared.directive('spfUniqPublicId', components.sign.spfUniqPublicIdFactory);
 spfShared.factory('spfAlert', components.alert.spfAlertFactory);
 spfShared.factory('spfAuth', services.datastore.spfAuthFactory);
 spfShared.factory('spfAuthData', services.datastore.spfAuthDataFactory);
+spfShared.factory('spfFirebase', services.firebase.spfFirebaseFactory);
 spfShared.factory('spfNavBarService', components.navbar.spfNavBarServiceFactory);
 spfShared.factory('spfSchools', services.datastore.spfSchoolsFactory);
 spfShared.factory('urlFor', services.routes.urlForFactory);
@@ -52,9 +48,9 @@ spfShared.filter('spfEmpty', filters.spfEmptyFilterFactory);
 spfShared.filter('spfLength', filters.spfLengthFilterFactory);
 spfShared.filter('spfToArray', filters.spfToArrayFilterFactory);
 spfShared.filter('urlFor', services.routes.urlForFilterFactory);
+spfShared.provider('spfFirebaseRef', services.firebase.SpfFirebaseRefProvider);
 spfShared.run(components.navbar.initNavBar);
 spfShared.run(services.datastore.run);
-spfShared.run(services.firebase.run);
 spfShared.run(services.icons.run);
 spfShared.run(services.routes.run);
 spfShared.service('spfCrypto', services.crypto.Service);

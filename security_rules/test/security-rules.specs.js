@@ -21,7 +21,7 @@ describe('With current security rules', function() {
   });
 
   describe('Unauthorized users', function() {
-    var chris = {uid: 'google:chris'};
+    var chris = {uid: 'google:110893970871115341770'};
 
     it.skip('can not write bad data to classMentors/userActions/$userActions', function() {
       expect(chris)
@@ -29,7 +29,7 @@ describe('With current security rules', function() {
     });
 
     var goodAction = {
-      publicId: 'chris',
+      publicId: 'cboesch',
       action: 'button',
       misc: 'misc',
       timestamp: {'.sv': 'timestamp'}

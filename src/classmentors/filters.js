@@ -49,16 +49,3 @@ export function showSchoolFilterFactory() {
     };
 }
 showSchoolFilterFactory.$inject = [];
-
-export function showTeamMembersFilterFactory() {
-    return function(team){
-      var output = Object.keys(team);
-      
-      function filterUserID(id){
-        if(id != "currentSize" && id != "maxSize" && id != "$id" && id != "$priority" && id != "$$hashKey"){
-          return id;
-        }
-      }
-      return output.filter(filterUserID);
-    }
-}
