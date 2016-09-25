@@ -51,7 +51,8 @@
       "angularfire": "github:firebase/angularfire@^2.0.2",
       "c3": "npm:c3@^0.4.11",
       "d3": "npm:d3@^4.2.2",
-      "get-parameter-names": "npm:get-parameter-names@^0.3.0"
+      "get-parameter-names": "npm:get-parameter-names@^0.3.0",
+      "lodash.camelcase": "npm:lodash.camelcase@^4.3.0"
     },
     "devDependencies": {
       "plugin-babel": "npm:systemjs-plugin-babel@^0.0.13"
@@ -62,7 +63,7 @@
       "angular-animate": "github:angular/bower-angular-animate@^1.5.8",
       "angular-aria": "github:angular/bower-angular-aria@^1.5.8",
       "angular-loading-bar": "github:chieffancypants/angular-loading-bar@^0.8.0",
-      "angular-material": "github:angular/bower-material@~1.0.9",
+      "angular-material": "github:angular/bower-material@1.1.1",
       "angular-messages": "github:angular/bower-angular-messages@^1.5.8",
       "angular-route": "github:angular/bower-angular-route@^1.5.8",
       "assert": "github:jspm/nodelibs-assert@^0.2.0-alpha",
@@ -184,7 +185,7 @@
           }
         }
       },
-      "github:angular/bower-material@1.0.9": {
+      "github:angular/bower-material@1.1.1": {
         "main": "angular-material",
         "registry": "jspm",
         "dependencies": {
