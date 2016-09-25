@@ -248,7 +248,15 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
     var teamAndteamId = initialData.teamAndteamId;
     self.teamId = teamAndteamId.teamId;
     self.team = null;
-    teamAndteamId.team.then(function(result){self.team = result}); 
+
+    var teamMembers = null;
+    teamAndteamId.team.then(function(result){self.team=result});
+    // self.team = teamAndteamId.team.then(function(result){
+    //     return result
+    // }).then(function(data){
+    //     return data;
+    // });
+    // console.log("self team is:", self.team);
     self.tratId = initialData.tratId;
     self.teamFormId = initialData.teamFormId;
     var userAnswers = [];
@@ -273,7 +281,7 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
     // Will this overwrite the reference when called by other clients?
     var teamAnsRef = db.ref(`classMentors/eventSolutions/${self.eventId}/${self.teamId}/${self.tratId}`);
     // teamAnsRef.set('init');
-    
+
     //Init team log
     self.teamLog = null;
 
@@ -291,6 +299,7 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
     //     .$loaded(function(data){
     //         console.log(data);
     //     });
+
 
     // test this later
     var updateLog = function(msg){
@@ -318,8 +327,8 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
     function teamAns(answer){
         // Check which user`s answer is used for submission.
         var userIdx = self.index % self.team.length;
-        console.log(userIdx);
-        console.log(self.team);
+        console.log("userIdx iss:",userIdx);
+        console.log("team length is:",self.team.length);
         var selectedUserPubId = self.team[userIdx].$id
         // Check if current user is selected.
         if(selectedUserPubId == userPublicId){
