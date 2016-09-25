@@ -7,46 +7,8 @@
 import * as mcq from './mcq/mcq.js';
 import * as survey from './survey/survey.js';
 import * as team from './teamActivity/teamactivity.js';
-import {cleanObj} from 'singpath-core/services/firebase.js';
 
 const noop = () => undefined;
-
-export function tratQuestionFactory($q, spfAuthData, eventService, clmDataStore){
-    var self = this;
-    self.data =  eventService.get();
-    console.log("my data is:", self.data);
-    // var question = $q.all ({
-    //     questions: angular.fromJson(data.task.mcqQuestions)
-    // }).then (function (result){
-    //     console.log("testing questions:", result);
-    //     return result;
-    //
-    // });
-    // return $q.all({
-    //     getQuestion: function(id){
-    //         var question = angular.fromJson(self.data.task.mcqQuestions);
-    //         if(id < question.length){
-    //             return question[id];
-    //         }else{
-    //             return false;
-    //         }
-    //     } 
-    // });
-    // Weird bugs often happen here. Could be bcoz of promise objects not resolved.
-    return {
-        getQuestion: function(id){
-            var question = angular.fromJson(self.data.task.mcqQuestions);
-            if(id < question.length){
-                return question[id];
-            }else{
-                return false;
-            }
-        }
-    }
-
-}
-tratQuestionFactory.$inject = ['$q','spfAuthData', 'eventService','clmDataStore'];
-
 
 //TODO: Add config for routing to various challenges
 export function configRoute($routeProvider, routes){
@@ -109,11 +71,12 @@ export function configRoute($routeProvider, routes){
             controller: team.startTRATController,
             controllerAs:'ctrl',
             resolve:{
-                initialData: team.startTRATInitialData
+                initialData: team.createTeamActivityInitialData
             }
-        })
 
-}4
+        });
+
+}
 configRoute.$inject = ['$routeProvider', 'routes'];
 
 
@@ -144,7 +107,10 @@ function startMCQInitialData($q, spfAuthData, eventService, clmDataStore){
    // var currentUser = spfAuthData.user().catch(noop);
 
     var data =  eventService.get();
-    console.log("my data is:", data);
+
+    console.log("the data is here...,", data);
+    //console.log("current user now is.", currentUser);
+
     return $q.all ({
        currentUser: spfAuthData.user(),
         answers: clmDataStore.events.getTaskAnswers(data.eventId, data.taskId),
@@ -190,181 +156,12 @@ createMCQInitialData.$inject = [
 
 //TODO: Generic save function
 export function challengeServiceFactory
-  ($q, $route, spfAuthData, clmDataStore, $log, spfAlert, $location, urlFor, firebaseApp,
-    $firebaseArray, $firebaseObject){
+  ($q, $route, spfAuthData, clmDataStore, spfFirebase, $log, spfAlert, $location, urlFor){
   return {
     save : function(event, taskId, task, taskType, isOpen) {
-      // Get firebase database object.
-      var db = firebaseApp.database();
-      var copy = cleanObj(task);
+      var copy = spfFirebase.cleanObj(task);
       var answers = copy.answers;
       console.log('COPY IS ... ', copy);
-
-      console.log('COPY IS!! ', copy);
-      self.creatingTask = true;
-      if (taskType === 'multipleChoice'){
-        delete copy.singPathProblem;
-        delete copy.badge;
-        delete copy.answers;
-
-        var ref = clmDataStore.events.addTaskWithAns(event.$id, copy, isOpen,answers);
-        ref.then(function() {
-            spfAlert.success('Task created');
-            $location.path(urlFor('editEvent', {eventId: event.$id}));
-        }).catch(function(err) {
-            $log.error(err);
-            spfAlert.error('Failed to created new task');
-        }).finally(function() {
-            self.creatingTask = false;
-        });
-
-      } else if(taskType === 'teamActivity'){
-        delete copy.singPathProblem;
-        delete copy.badge;
-        delete copy.answers;
-        if(copy.link == ""){
-          delete copy.link;
-        }
-        console.log(copy);
-        /*TODO:
-        1. Modify 'addTaskWithAns' to return firebase reference too? hmm.
-        2. Refactor once (1) is agreed upon.
-        */
-        
-        // Get firebase task reference.
-        var taskRef = db.ref(`classMentors/eventTasks/${event.$id}`);
-        // Get root reference; Returns thenable reference
-        var ref = taskRef.push();
-        var taskAnsRef = db.ref(`classMentors/eventAnswers/${event.$id}/${ref.key}`);
-        var teamFormationTaskRef = db.ref(`classMentors/eventTasks/${event.$id}`).push();
-        var tratTaskRef = db.ref(`classMentors/eventTasks/${event.$id}`).push();
-        console.log('Team Formation key: ', taskAnsRef.key)
-        var eventTeamsRef = db.ref(`classMentors/eventTeams/${event.$id}/${teamFormationTaskRef.key}`);
-        console.log(event.$id);
-        // Check If key
-        console.log(teamFormationTaskRef.key);
-        var priority = copy.priority;
-        // Set openedAt, closedAt timestamp.
-        if (isOpen) {
-          copy.openedAt = {'.sv': 'timestamp'};
-          copy.closedAt = null;
-        } else {
-          copy.closedAt = {'.sv': 'timestamp'};
-          copy.openedAt = null;
-        }
-        // Save IRAT.
-        var promise = priority ? ref.setWithPriority(copy, priority) : ref.set(copy);
-        promise.then(function(){
-          // Save answers.
-          console.log('Task answers set.');
-          console.log(taskAnsRef);
-          return taskAnsRef.set(answers);
-        }).then(function(){
-          // Define 'teamFormationTask'.
-          var teamFormationTask = {
-            taskFrom: ref.key,
-            title: copy.title,
-            description: "Click Below To Join Team",
-            formationPattern: true,
-            closedAt : {'.sv': 'timestamp'},
-            showProgress: copy.showProgress,
-            archived: false,
-            teamFormationMethod: copy.teamFormationMethod
-          };
-          // Create 'teams' in 'eventTeams'.
-          for(var i = 0; i < event.teams.length; i ++){
-            var team = event.teams[i];
-            // console.log('Team here is: ', team);
-            console.log('Team is: ', team);
-            eventTeamsRef.push(team).then(function(thenableRef){
-              console.log('Team reccorded at: ', thenableRef.key);
-              var teamLog = {
-                init: {'.sv': 'timestamp'}
-              }
-              var eventTeamsLogRef = db.ref(`classMentors/eventTeamsLog/${teamFormationTaskRef.key}/${thenableRef.key}`);
-              eventTeamsLogRef.set(teamLog);
-            });
-          }
-          console.log('Team answers set.');          
-          return priority ? teamFormationTaskRef.setWithPriority(teamFormationTask, priority) 
-            : teamFormationTaskRef.set(teamFormationTask);
-        }).then(function(){
-          console.log('TeamFormationTask set.');
-          var tratTask = {
-            taskFrom: ref.key,
-            teamFormationRef: teamFormationTaskRef.key,
-            title: copy.title,
-            description: "Click Below to Start TRAT",
-            startTRAT: true,
-            closedAt : {'.sv': 'timestamp'},
-            showProgress: copy.showProgress,
-            archived: false,
-            teamFormationMethod: copy.teamFormationMethod,
-            mcqQuestions: copy.mcqQuestions
-          }
-          return priority ? tratTaskRef.setWithPriority(tratTask, priority) 
-            : tratTaskRef.set(tratTask);
-        }).then(function(){
-          console.log('TRAT set.');
-          console.log('Events Created');
-        });
-
-        // var a = clmDataStore.events.addTaskWithAns(event.$id, copy, isOpen,answers);
-        // console.log(a);
-        //   a.then(function(ref){
-        //     //add Team formation task
-        //     console.log(ref);
-        //     var previousTaskId = ref.key;
-        //     console.log('IRAT key is :', previousTaskId);
-        //     clmDataStore.events.addTeamFormation(event.$id, {
-        //         taskFrom: previousTaskId,
-        //         title: copy.title,
-        //         description: "Click Below To Join Team",
-        //         formationPattern: true,
-        //         closedAt : {'.sv': 'timestamp'},
-        //         showProgress: copy.showProgress,
-        //         archived: false,
-        //         teamFormationMethod: copy.teamFormationMethod
-        //     }, copy.priority)
-        //     .then(function(teamRef){
-        //       //Create teams here
-        //       var taskId = teamRef.key()
-        //       console.log('taskId: ', taskId);
-        //       console.log(event.teams);
-        //       spfFirebase.set(['classMentors/eventTeams', event.$id],taskId)
-        //         .then(function(){
-        //           // For each team create a reccord in Firebase
-        //           for(var i = 0; i < event.teams.length; i ++){
-        //             var team = event.teams[i];
-        //             // console.log('Team here is: ', team);
-        //             spfFirebase.push(['classMentors/eventTeams/', event.$id,taskId],team)
-        //               .then(function(ref){
-        //                 console.log('Team ', i , 'pushed with key: ', ref.key());
-        //               });
-        //             }
-        //           });
-        //       clmDataStore.events.addTrat(event.$id,{
-        //         taskFrom: taskId,
-        //         taskFromIrat: previousTaskId,
-        //         title: copy.title,
-        //         description: "Click Below to Start TRAT",
-        //         startTRAT: true,
-        //         closedAt : {'.sv': 'timestamp'},
-        //         showProgress: copy.showProgress,
-        //         archived: false,
-        //         teamFormationMethod: copy.teamFormationMethod,
-        //         mcqQuestions: copy.mcqQuestions
-        //         },copy.priority)
-        //         .then(function(ref){
-        //            var taskId = ref.key();
-        //         });
-        //     })
-        // });
-      }
-    },
-    update: function(event, taskId, task, taskType, isOpen) {
-      var copy = cleanObj(task);
-      var answers = copy.answers;
       if (taskType === 'linkPattern') {
         delete copy.badge;
         delete copy.serviceId;
@@ -372,9 +169,9 @@ export function challengeServiceFactory
       } else if (copy.serviceId === 'singPath') {
         delete copy.badge;
         if (copy.singPathProblem) {
-          copy.singPathProblem.path = cleanObj(task.singPathProblem.path);
-          copy.singPathProblem.level = cleanObj(task.singPathProblem.level);
-          copy.singPathProblem.problem = cleanObj(task.singPathProblem.problem);
+          copy.singPathProblem.path = spfFirebase.cleanObj(task.singPathProblem.path);
+          copy.singPathProblem.level = spfFirebase.cleanObj(task.singPathProblem.level);
+          copy.singPathProblem.problem = spfFirebase.cleanObj(task.singPathProblem.problem);
         }
       }else if (taskType === 'multipleChoice'){
         delete copy.singPathProblem;
@@ -382,7 +179,48 @@ export function challengeServiceFactory
         delete copy.answers;
       } else {
         delete copy.singPathProblem;
-        copy.badge = cleanObj(task.badge);
+        copy.badge = spfFirebase.cleanObj(task.badge);
+      }
+
+      if (!copy.link) {
+        // delete empty link. Can't be empty string
+        delete copy.link;
+      }
+
+      self.creatingTask = true;
+      var ref = clmDataStore.events.addTaskWithAns(event.$id, copy, isOpen,answers);
+      ref.then(function() {
+          spfAlert.success('Task created');
+          $location.path(urlFor('editEvent', {eventId: event.$id}));
+        }).catch(function(err) {
+            $log.error(err);
+            spfAlert.error('Failed to created new task');
+        }).finally(function() {
+            self.creatingTask = false;
+        });
+    },
+    update: function(event, taskId, task, taskType, isOpen) {
+      var copy = spfFirebase.cleanObj(task);
+      var answers = copy.answers;
+      console.log('COPY IS ... ', copy);
+      if (taskType === 'linkPattern') {
+        delete copy.badge;
+        delete copy.serviceId;
+        delete copy.singPathProblem;
+      } else if (copy.serviceId === 'singPath') {
+        delete copy.badge;
+        if (copy.singPathProblem) {
+          copy.singPathProblem.path = spfFirebase.cleanObj(task.singPathProblem.path);
+          copy.singPathProblem.level = spfFirebase.cleanObj(task.singPathProblem.level);
+          copy.singPathProblem.problem = spfFirebase.cleanObj(task.singPathProblem.problem);
+        }
+      }else if (taskType === 'multipleChoice'){
+        delete copy.singPathProblem;
+        delete copy.badge;
+        delete copy.answers;
+      } else {
+        delete copy.singPathProblem;
+        copy.badge = spfFirebase.cleanObj(task.badge);
       }
 
       if (!copy.link) {
@@ -415,14 +253,13 @@ export function challengeServiceFactory
   }
 }
 challengeServiceFactory.$inject =
-    ['$q', '$route', 'spfAuthData', 'clmDataStore', '$log', 'spfAlert', '$location', 'urlFor',
-        'firebaseApp', '$firebaseArray', '$firebaseObject'];
+    ['$q', '$route', 'spfAuthData', 'clmDataStore', 'spfFirebase', '$log', 'spfAlert', '$location', 'urlFor'];
 
 // export const component = {
 //
 // }
 
-function surveyFormEvent($scope, clmSurvey, clmDataStore, $log, spfAlert, $location, urlFor) {
+function surveyFormEvent($scope, clmSurvey, spfFirebase, clmDataStore, $log, spfAlert, $location, urlFor) {
 
     this.surveys = [
         {id: 1, name: 'Education vs Dissatisfaction with learning'},
@@ -437,7 +274,7 @@ function surveyFormEvent($scope, clmSurvey, clmDataStore, $log, spfAlert, $locat
     var self = this;
 
     this.saveSurveyTask = function (surveyType) {
-        var copy = cleanObj(getTask);
+        var copy = spfFirebase.cleanObj(getTask);
         console.log('my copy is ', copy);
         if (sharedData.taskType === 'linkPattern') {
             delete copy.badge;
@@ -446,13 +283,13 @@ function surveyFormEvent($scope, clmSurvey, clmDataStore, $log, spfAlert, $locat
         } else if (copy.serviceId === 'singPath') {
             delete copy.badge;
             if (copy.singPathProblem) {
-                copy.singPathProblem.path = cleanObj(getTask.singPathProblem.path);
-                copy.singPathProblem.level = cleanObj(getTask.singPathProblem.level);
-                copy.singPathProblem.problem = cleanObj(getTask.singPathProblem.problem);
+                copy.singPathProblem.path = spfFirebase.cleanObj(getTask.singPathProblem.path);
+                copy.singPathProblem.level = spfFirebase.cleanObj(getTask.singPathProblem.level);
+                copy.singPathProblem.problem = spfFirebase.cleanObj(getTask.singPathProblem.problem);
             }
         } else {
             delete copy.singPathProblem;
-            copy.badge = cleanObj(getTask.badge);
+            copy.badge = spfFirebase.cleanObj(getTask.badge);
         }
 
         if (!copy.link) {
@@ -478,6 +315,7 @@ function surveyFormEvent($scope, clmSurvey, clmDataStore, $log, spfAlert, $locat
 surveyFormEvent.$inject = [
     '$scope',
     'clmSurvey',
+    'spfFirebase',
     'clmDataStore',
     '$log',
     'spfAlert',
@@ -486,7 +324,7 @@ surveyFormEvent.$inject = [
 ];
 
 
-function getTaskSurveyValues(clmSurvey, $q, $route, spfAuthData, clmDataStore) {
+function getTaskSurveyValues(clmSurvey, $q, $route, spfAuthData, clmDataStore, spfAuth) {
     var sharedData = clmSurvey.get();
 
     var data = baseEditCtrlInitialData(sharedData, $q, $route, spfAuthData, clmDataStore, clmSurvey);
@@ -504,7 +342,7 @@ function getTaskSurveyValues(clmSurvey, $q, $route, spfAuthData, clmDataStore) {
 
     return $q.all(data);
 }
-getTaskSurveyValues.$inject = ['clmSurvey', '$q', '$route', 'spfAuthData', 'clmDataStore'];
+getTaskSurveyValues.$inject = ['clmSurvey', '$q', '$route', 'spfAuthData', 'clmDataStore', 'spfAuth'];
 
 
 function baseEditCtrlInitialData(sharedData, $q, $route, spfAuthData, clmDataStore, clmSurvey) {

@@ -1,10 +1,10 @@
-import {expect, testInjectMatch} from 'singpath-core/tools/chai.js';
+import {expect} from 'chai';
+
+// import * as sinon from 'sinon';
 
 import * as crypto from './crypto.js';
 
 describe('crypto service', function() {
-
-  testInjectMatch(crypto.Service);
 
   describe('md5', function() {
 
@@ -85,14 +85,6 @@ describe('crypto service', function() {
         const service = new crypto.Service(16, 8, 2);
         const original = service.password.newHash('password');
         const copy = service.password.fromSalt('password', original.options.salt, original.options);
-
-        expect(copy).to.equal(original.value);
-      });
-
-      it('should attempt to create the same hash with default options', function() {
-        const service = new crypto.Service(16, 8, 2);
-        const original = service.password.newHash('password');
-        const copy = service.password.fromSalt('password', original.options.salt, {});
 
         expect(copy).to.equal(original.value);
       });

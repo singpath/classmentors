@@ -3,7 +3,7 @@ import * as icons from 'singpath-core/services/icons/icons.js';
 import * as crypto from 'singpath-core/services/crypto.js';
 import * as routeServices from 'singpath-core/services/routes.js';
 import * as datastore from 'singpath-core/services/datastore.js';
-import {run as firebaseRun} from 'singpath-core/services/firebase.js';
+import * as firebase from 'singpath-core/services/firebase.js';
 
 const services = {
   countries,
@@ -11,7 +11,7 @@ const services = {
   crypto,
   routes: routeServices,
   datastore,
-  firebase: {run: firebaseRun}
+  firebase
 };
 
 export default services;
