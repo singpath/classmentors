@@ -4,6 +4,7 @@ import teamTRATTmpl from './teamactivity-view-trat-start.html!text';
 import teamFormationTmpl from './teamactivity-view-teamFormation.html!text';
 import './teamActivity.css!';
 
+const TIMESTAMP = {'.sv': 'timestamp'};
 function createTeamActivityInitialData($q, eventService, clmDataStore) {
     var data = eventService.get();
     console.log("team data is:", data);
@@ -247,7 +248,15 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
     var teamAndteamId = initialData.teamAndteamId;
     self.teamId = teamAndteamId.teamId;
     self.team = null;
-    teamAndteamId.team.then(function(result){self.team = result}); 
+
+    var teamMembers = null;
+    teamAndteamId.team.then(function(result){self.team=result});
+    // self.team = teamAndteamId.team.then(function(result){
+    //     return result
+    // }).then(function(data){
+    //     return data;
+    // });
+    // console.log("self team is:", self.team);
     self.tratId = initialData.tratId;
     self.teamFormId = initialData.teamFormId;
     var userAnswers = [];
@@ -272,21 +281,25 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
     // Will this overwrite the reference when called by other clients?
     var teamAnsRef = db.ref(`classMentors/eventSolutions/${self.eventId}/${self.teamId}/${self.tratId}`);
     // teamAnsRef.set('init');
-    
+
     //Init team log
     self.teamLog = null;
+
     function refreshLog(){
         $firebaseArray(teamLogRef.orderByKey()).$loaded(function(data){
             console.log("refresh log data iss:", data);
-            data.reverse();
             self.teamLog = data;
         });
     }
+
+
+
     refreshLog();
     // $firebaseArray(teamLogRef)
     //     .$loaded(function(data){
     //         console.log(data);
     //     });
+
 
     // test this later
     var updateLog = function(msg){
@@ -303,8 +316,10 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
     self.onChange = function(){
         var msg = {
             user: userPublicId,
-            text: 'Selected: ' + self.options[self.selected].text,
-            selected: self.selected
+            text: self.options[self.selected].text,
+            selected: self.selected,
+            timestamp: TIMESTAMP
+
         }
         updateLog(msg);
     }
@@ -312,8 +327,8 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
     function teamAns(answer){
         // Check which user`s answer is used for submission.
         var userIdx = self.index % self.team.length;
-        console.log(userIdx);
-        console.log(self.team);
+        console.log("userIdx iss:",userIdx);
+        console.log("team length is:",self.team.length);
         var selectedUserPubId = self.team[userIdx].$id
         // Check if current user is selected.
         if(selectedUserPubId == userPublicId){
@@ -438,8 +453,9 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
         }
         var msg = {
             user: userPublicId,
-            text: 'Selected: ' + selected,
-            selected: list
+            text: selected,
+            selected: list,
+            timestamp: TIMESTAMP
         }
         updateLog(msg);
     }
