@@ -5,7 +5,7 @@
 </div>
 <div ng-if="!ctrl.loading">
     <md-content class="md-padding">
-        <timer interval="1000">{{hhours}} hour{{hhoursS}}, {{mminutes}} minute{{minutesS}}, {{sseconds}} second{{secondsS}}.</timer>
+        <!--<timer interval="1000">{{hhours}} hour{{hhoursS}}, {{mminutes}} minute{{minutesS}}, {{sseconds}} second{{secondsS}}.</timer>-->
         <md-switch ng-model="ctrl.showFilteredRanking" aria-label="showFilter?" ng-change="ctrl.filterRanking()">
             Show Filtered Rankings: {{ ctrl.showFilteredRanking }}
         </md-switch>
@@ -44,7 +44,7 @@
                      {{$index+1}}
                     </th>
                     <td ng-if="!ctrl.showFilteredRanking">{{ event.participants.length }}</td>
-                    <td ng-if="ctrl.showFilteredRanking">{{ event.totalScore }}</td>
+                    <td ng-if="ctrl.showFilteredRanking">{{ event.qualifiedParticipants.length }}</td>
                     <td><a href="#{{ 'oneEvent' | urlFor: {eventId: event.id} }}">{{ event.title }}</a></td>
                     <td ng-if="ctrl.showFilteredRanking" ng-show="event.first">{{ event.first.name }} ({{event.first.total}})</td>
                     <td ng-if="ctrl.showFilteredRanking" ng-show="event.second">{{ event.second.name }} ({{event.second.total}})</td>
