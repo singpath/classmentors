@@ -1543,7 +1543,6 @@ export function clmDataStoreFactory(
         if (!publicId) {
           return $q.reject(new Error('No public id provided'));
         }
-
         ref = db.ref(`classMentors/eventSolutions/${eventId}/${publicId}/${taskId}`);
 
         return ref.set(link);

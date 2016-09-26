@@ -193,21 +193,17 @@ editMcqController.$inject = [
 export function startMcqController(initialData, challengeService, clmDataStore, $location, $mdDialog,urlFor, spfAlert ){
   var self = this;
 
-  var data = initialData.data;
-  console.log(data);
+  var data = initialData;
   var eventId = data.eventId;
   var taskId = data.taskId;
-  var participant = data.participant;
+  var participant = data.currentUser;
+  var userId = data.currentUser.publicId;
 
-  //console.log(initialData);
-  //get user's Id
-  var userId = initialData.currentUser.publicId;
-
-  var correctAnswers = angular.fromJson(initialData.correctAnswers.$value);
-  //console.log(correctAnswers);
+  var correctAnswers = angular.fromJson(data.correctAnswers.$value);
+  console.log('correctans:',correctAnswers);
   self.task = data.task;
   var quesFromJson = angular.fromJson(self.task.mcqQuestions);
-  self.questions = quesFromJson
+  self.questions = quesFromJson;
   self.multipleAns = initMultipleAns(correctAnswers);
 
   self.isMcqValid = false;
@@ -254,13 +250,12 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
     console.log('Submitted Answers...', submittedAnswers);
     var score = 0;
     for(var i = 0; i < submittedAnswers.length; i ++){
+      console.log("loopin thru correctanswers:", correctAnswers[i]);
       score += arraysEqual(submittedAnswers[i], correctAnswers[i]);
     }
+    console.log("score is:", score);
     return score;
   }
-
-
-
 
   self.submit = function(){
     var submission = {};
@@ -276,19 +271,17 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
 
     var score = markQuestions(userAnswers);
     var answerString = angular.toJson(submission);
-    // console.log(submission.score);
-    // console.log(answerString);
 
-    clmDataStore.events.submitSolution(eventId, taskId, participant.$id, answerString)
+    clmDataStore.events.submitSolution(eventId, taskId, participant.publicId, answerString)
       .then(
-        clmDataStore.events.saveScore(eventId, participant.$id, taskId, score),
+        clmDataStore.events.saveScore(eventId, participant.publicId, taskId, score),
         spfAlert.success('Your Mcq responses are saved.'),
 
         //todo:set progress to true, and save the progress into firebase
 
         initialData.progress[userId] = {taskId},
         initialData.progress[userId][taskId] = {completed: true},
-        clmDataStore.events.setProgress(eventId, taskId, userId, initialData.progress),
+        // clmDataStore.events.setProgress(eventId, taskId, userId, initialData.progress),
 
         $location.path(urlFor('oneEvent',{eventId: eventId}))
       ). catch (function (err){
