@@ -37,6 +37,10 @@ html p, body p {
   width: 18px;
 }
 
+.md-accent md-icon g {
+  fill: rgba(0,0,0,0.87);
+}
+
 md-sidenav md-list .md-button {
   color: inherit;
   font-weight: 500;

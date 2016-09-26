@@ -10,3 +10,4 @@ import 'classmentors/directives.js';
 import 'classmentors/components/index.js';
 
 import 'classmentors/components/index.specs.js';
+import 'classmentors/services.specs.js';

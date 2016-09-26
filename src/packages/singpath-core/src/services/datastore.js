@@ -539,6 +539,7 @@ SpfCurrentUserService.$inject = [
 export function spfAuthFactory($q, $route, $log, $firebaseAuth, authFirebaseApp, authProvider) {
   var auth = $firebaseAuth(authFirebaseApp.auth());
   var cbs = [];
+  var loaded = false;
   var spfAuth = {
 
     // The current user auth data (null is not authenticated).
@@ -654,6 +655,10 @@ export function spfAuthFactory($q, $route, $log, $firebaseAuth, authFirebaseApp,
 
       cbs.push(handler);
 
+      if (loaded) {
+        handler.fn.call(handler.ctx, spfAuth.user);
+      }
+
       return () => {
         const index = cbs.indexOf(handler);
 
@@ -665,6 +670,7 @@ export function spfAuthFactory($q, $route, $log, $firebaseAuth, authFirebaseApp,
   };
 
   auth.$onAuthStateChanged(function(currentAuth) {
+    loaded = true;
     $log.debug('reloading');
     $route.reload();
 
@@ -672,7 +678,7 @@ export function spfAuthFactory($q, $route, $log, $firebaseAuth, authFirebaseApp,
 
     cbs.forEach(handler => {
       try {
-        handler.fn.call(handler.ctx, currentAuth);
+        handler.fn.call(handler.ctx, spfAuth.user);
       } catch (e) {
         $log.error(e);
       }
