@@ -922,8 +922,18 @@ function ClmCohortRankPageCtrl($q, $scope, $log, firebaseApp, $firebaseObject, $
         participantsArray.$loaded().then(
             () => (self.cohortEventData.find(e => e.id == eventId).participants = participantsArray)
         ).then(function () {
-            
-        })
+            for(let participantIndex = 0; participantIndex < participantsArray.length; participantIndex++) {
+                // console.log("User " + participantsArray[participantIndex].$id + " from event " + eventId);
+                $firebaseObject(db.ref(`classMentors/userProfiles/${participantsArray[participantIndex].$id}/services`)).$loaded().then(function (result) {
+                    if(result.freeCodeCamp && result.freeCodeCamp.totalAchievements >= 1) {
+                        self.cohortEventData.find(e => e.id == eventId).qualifiedParticipants.push({displayName: participantsArray[participantIndex].user.displayName, userId: participantsArray[participantIndex].$id, score: result.freeCodeCamp.totalAchievements});
+                        self.cohortEventData.find(e => e.id == eventId).qualifiedParticipants.sort(function(a,b) {
+                            return b.score - a.score;
+                        });
+                    }
+                })
+            }
+        });
     }
     // *************************** END ***************************
 
