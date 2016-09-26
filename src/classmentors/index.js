@@ -7,6 +7,7 @@ import 'angular-material';
 import 'angular-messages';
 import 'angular-route';
 import 'angularfire';
+import 'angular-timer';
 
 // polyfills
 import 'core-js/fn/array/every.js';
@@ -31,6 +32,7 @@ const module = angular.module('clm', [
   'ngAnimate',
   'ngMessages',
   'ngRoute',
+  'timer',
   spfShared.name
 ]);
 
@@ -58,6 +60,9 @@ module.directive('clmEventResultsTable', components.events.clmEventResultsTableF
 module.directive('clmEventTable', components.events.clmEventTableFactory);
 module.directive('clmPager', components.events.clmPagerFactory);
 module.directive('cmContains', directives.cmContainsFactory);
+//add directive for page scroll
+module.directive('scrollBottom', components.challenges.scrollBottom);
+//
 module.factory('aceStats', components.ace.factory);
 module.factory('challengeService', components.challenges.challengeServiceFactory);
 module.factory('clmDataStore', services.clmDataStoreFactory);
@@ -69,13 +74,17 @@ module.filter('cmTruncate', filters.cmTruncateFilterFactory);
 module.filter('cmTruncated', filters.cmTruncateFilterBooleanFactory);
 module.filter('showSchool', filters.showSchoolFilterFactory);
 module.filter('showTeamMembers', filters.showTeamMembersFilterFactory);
+// module.filter('reverseArray', filters.reverseArray);
+//for page controls in trat
 module.run(components.profiles.configServices);
+module.factory('quizFactory', components.challenges.tratQuestionFactory);
 
 // TODO: convert those view controller/template to component and move them above
 module.config(components.cohorts.configRoute);
 module.config(components.events.configRoute);
 module.config(components.profiles.configRoute);
 module.config(components.challenges.configRoute);
+// module.config(components.challenges.teamActivity.configRoute);
 
 // added new survey factory for tryout purpose
 module.factory('clmSurvey', components.events.clmSurveyTaskFactory);

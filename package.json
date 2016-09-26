@@ -48,11 +48,13 @@
       "lib": "src/classmentors"
     },
     "dependencies": {
+      "angular-timer": "github:siddii/angular-timer@^1.3.4",
       "angularfire": "github:firebase/angularfire@^2.0.2",
       "c3": "npm:c3@^0.4.11",
       "d3": "npm:d3@^4.2.2",
       "get-parameter-names": "npm:get-parameter-names@^0.3.0",
-      "lodash.camelcase": "npm:lodash.camelcase@^4.3.0"
+      "lodash.camelcase": "npm:lodash.camelcase@^4.3.0",
+      "moment": "npm:moment@^2.15.1"
     },
     "devDependencies": {
       "plugin-babel": "npm:systemjs-plugin-babel@^0.0.13"
@@ -94,6 +96,10 @@
       "vm": "github:jspm/nodelibs-vm@^0.2.0-alpha"
     },
     "overrides": {
+      "github:EvanHahn/HumanizeDuration.js@3.9.1": {
+        "main": "humanize-duration",
+        "format": "global"
+      },
       "github:ajaxorg/ace-builds@1.2.5": {
         "main": "ace",
         "format": "global",
@@ -247,6 +253,26 @@
           "firebase.js": {
             "format": "global",
             "exports": "firebase"
+          }
+        }
+      },
+      "github:siddii/angular-timer@1.3.4": {
+        "main": "dist/angular-timer",
+        "registry": "jspm",
+        "format": "global",
+        "dependencies": {
+          "angular": "^1.4.1",
+          "moment": "^2.10.3",
+          "humanize-duration": "^3.0.0"
+        },
+        "meta": {
+          "dist/angular-timer.js": {
+            "deps": [
+              "angular",
+              "humanize-duration",
+              "moment"
+            ],
+            "format": "global"
           }
         }
       },
@@ -539,6 +565,14 @@
         "ignore": [
           "test.js"
         ]
+      },
+      "npm:moment@2.15.1": {
+        "jspmNodeConversion": false,
+        "meta": {
+          "moment.js": {
+            "exports": "moment"
+          }
+        }
       }
     }
   },

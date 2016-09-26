@@ -25,6 +25,7 @@
 */
 
 import {cleanObj} from 'singpath-core/services/firebase.js';
+import firebase from 'firebase';
 import editTmpl from './events-view-event-edit.html!text';
 import eventTableParticipantsTmpl from './events-view-event-table-participants.html!text';
 import eventTableRankTmpl from './events-view-event-table-rank.html!text';
@@ -1566,7 +1567,8 @@ export function clmEventTableFactory() {
 
 function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                            urlFor, spfAlert, clmServicesUrl, clmDataStore, clmPagerOption,
-                           eventService, $location, routes, $route, spfAuthData, authFirebaseApp) {
+                           eventService, $location, routes, $route, spfAuthData, authFirebaseApp,
+                           firebaseApp, $firebaseArray, $firebaseObject) {
     var authDb = authFirebaseApp.database();
     var self = this;
     var unwatchers = [];
@@ -2026,6 +2028,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
 
 
     this.promptForTeamFormation = function (eventId, taskId, task, participant, userSolution) {
+        var db = firebaseApp.database();
         $mdDialog.show({
             parent: $document.body,
             template: team.teamFormationTmpl,
@@ -2038,12 +2041,16 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
 
         function teamFormationInitialData(){
           console.log('InitialData loaded');
-          var teamEventPromise = spfFirebase.loadedArray(['classMentors/eventTeams/',eventId,taskId]);
+        //   var teamEventPromise = spfFirebase.loadedArray(['classMentors/eventTeams/',eventId,taskId]);
+            var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}`);
+            var teamEventPromise = $firebaseArray(ref);
             return $q.all({
-                teams: teamEventPromise.then(function (result) {
+                teams: teamEventPromise.$loaded().then(function (result) {
+                    console.log(result);
                     return result;
                 }),
-                selectedTeam: teamEventPromise.then(function (result){
+                selectedTeam: teamEventPromise.$loaded().then(function (result){
+                  console.log(result);
                   var teams = result;
                   for(var i = 0; i < teams.length; i ++){
                     var team = teams[i];
@@ -2067,6 +2074,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             console.log(self.selectedTeam);
             self.teams = {}
             self.teams = initialData.teams;
+            console.log(self.teams);
             var previousSelectedTeam = undefined;
             var index2 = undefined;
             for(var i = 0; i < self.teams.length; i++){
@@ -2076,13 +2084,6 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                 }
             }
             console.log("participant id isss:", participant.$id);
-            /*TODO:
-            1. Remove user from previous teams when teams are switched. [X]
-            2. When user exits dialog box, option should be saved. [X]
-            3. User is able to see other teams and who is inside. 
-            4. Team radio button should be disabled when team is full. 
-            */
-
             self.onChange = function(index){
               console.log('onChange fired');
               console.log(index);
@@ -2106,31 +2107,25 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
 
             function leaveTeam(index){
              var team = self.teams[index];
-             spfFirebase.remove(['classMentors/eventTeams/',eventId,taskId,team.$id,participant.$id])
-             .then(function(){
+             var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${team.$id}/${participant.$id}`);
+             console.log(ref);
+            //  spfFirebase.remove(['classMentors/eventTeams/',eventId,taskId,team.$id,participant.$id])
+             ref.remove().then(function(){
                team.currentSize -= 1;
              });
             }
             
             function joinTeam(index){
               var team = self.teams[index];
-              spfFirebase.set(['classMentors/eventTeams/',eventId,taskId,team.$id,participant.$id],participant.user)
-              .then(function(){
+              var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${team.$id}/${participant.$id}`);
+              // spfFirebase.set(['classMentors/eventTeams/',eventId,taskId,team.$id,participant.$id],participant.user)
+              console.log(participant.user);
+              ref.set(participant.user).then(function(){
                team.currentSize += 1;
-                  clmDataStore.events.submitSolution(eventId, taskId, participant.$id, "Completed");
+                clmDataStore.events.submitSolution(eventId, taskId, participant.$id, "Completed");
              });
             }
-            //test data
-            self.test_teams = [
-                {
-                    id: 1,
-                    maxSize: 2
-                },
-                {
-                    id:2,
-                    maxSize:3
-                }
-            ]
+
             
 
             this.save = function () {
@@ -2419,7 +2414,10 @@ ClmEventTableCtrl.$inject = [
     'routes',
     '$route',
     'spfAuthData',
-    'authFirebaseApp'
+    'authFirebaseApp',
+    'firebaseApp', 
+    '$firebaseArray', 
+    '$firebaseObject'
 ];
 
 //TODO: include the event to load initial data into surveyformfillctrl
@@ -2428,8 +2426,8 @@ function addSurveyEventTaskCtrlInitialData($q, $route, firebaseApp, $firebaseArr
     // var eventId = $route.current.params.eventId
     // var eventPromise = clmDataStore.events.get(eventId);
     var db = firebaseApp.database();
-
-    var errNoEvent = new Error('Event not found-1');
+    console.log("this firebaseapp database is", db);
+    var errNoEvent = new Error('Event not found');
     var eventId = $route.current.params.eventId;
 
     var profilePromise = clmDataStore.currentUserProfile().catch(noop);
@@ -2495,7 +2493,7 @@ addSurveyEventTaskCtrlInitialData.$inject = [
 ];
 
 //TODO: include controller for the survey
-function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $routeParams, clmDataStore, clmPagerOption, spfAlert, $log) {
+function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $routeParams, clmDataStore, clmPagerOption, spfAlert, $scope, firebase) {
 
     this.pagerOpts = clmPagerOption();
 
@@ -2757,17 +2755,18 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
                 publicId: userId,
                 eventId: eventId,
                 taskId: taskId,
-                timestamp: Firebase.ServerValue.TIMESTAMP
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+
             });
 
 
             spfAlert.success('Survey responses have been submitted.');
             clmDataStore.events.saveSurveyResponseOnSubmit(taskId, eventId, userId, surveyType, schEngageResp);
             clmDataStore.events.submitSolution(eventId, taskId, userId, "Completed");
-            clmDataStore.events.setProgress(eventId, taskId, userId, initialData.progress);
+            // clmDataStore.events.setProgress(eventId, taskId, userId, initialData.progress);
 
-            //clmDataStore.events.updateProgress(initialData.event, initialData.tasks, initialData.solutions, userId, initialData.progress);
-            //console.log(eventId, taskId, userId);
+
+
 
             $location.path(urlFor('oneEvent', {eventId: self.event.$id}));
 
@@ -2802,10 +2801,20 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             initialData.progress[userId] = {taskId};
             initialData.progress[userId][taskId] = {completed: completed};
 
+            clmDataStore.logging.inputLog({
+                action: "submitMotiStratResponse",
+                publicId: userId,
+                eventId: eventId,
+                taskId: taskId,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+
+            });
+
+
             spfAlert.success('Survey response has been submitted.');
             clmDataStore.events.saveSurveyResponseOnSubmit(taskId, eventId, userId, surveyType, motiResp);
             clmDataStore.events.submitSolution(eventId, taskId, userId, "Completed");
-            clmDataStore.events.setProgress(eventId, taskId, userId, initialData.progress);
+
 
             $location.path(urlFor('oneEvent', {eventId: self.event.$id}));
 
@@ -2855,12 +2864,20 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             initialData.progress[userId] = {taskId};
             initialData.progress[userId][taskId] = {completed: completed};
 
+            clmDataStore.logging.inputLog({
+                action: "submitEduDissResponse",
+                publicId: userId,
+                eventId: eventId,
+                taskId: taskId,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+
+            });
+
 
             spfAlert.success('Survey response has been submitted.');
             //add into firebase
             clmDataStore.events.saveSurveyResponseOnSubmit(taskId, eventId, userId, surveyType, eduDissResp);
             clmDataStore.events.submitSolution(eventId, taskId, userId, "Completed");
-            clmDataStore.events.setProgress(eventId, taskId, userId, initialData.progress);
 
             $location.path(urlFor('oneEvent', {eventId: self.event.$id}));
         }
@@ -2881,8 +2898,8 @@ SurveyFormFillCtrl.$inject = [
     'clmDataStore',
     'clmPagerOption',
     'spfAlert',
-    '$scope'
-
+    '$scope',
+    'firebase'
 ];
 
 export function clmEventRankTableFactory() {
