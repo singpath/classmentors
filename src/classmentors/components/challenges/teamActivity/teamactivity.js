@@ -179,6 +179,7 @@ function startTRATInitialData($q, spfAuthData, eventService, clmDataStore, fireb
         progress: clmDataStore.events.getProgress(data.eventId).then(function (data) {
             return data
         }),
+        teamRefId: teamFormationRefKey,
         questions: angular.fromJson(data.task.mcqQuestions),
         tratId: tratId,
         teamAndteamId: $firebaseArray(eventTeamRef).$loaded()
@@ -252,14 +253,12 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
     self.eventId = initialData.eventId;
     var teamAndteamId = initialData.teamAndteamId;
     self.teamId = teamAndteamId.teamId;
-
     self.team = null;
     teamAndteamId.team.then(function(result){
         self.team = result;
     });
 
-    var teamMembers = null;
-
+    self.teamMember = clmDataStore.events.getTeam(self.eventId, initialData.teamRefId, self.teamId);
     self.tratId = initialData.tratId;
     self.teamFormId = initialData.teamFormId;
     var userAnswers = [];
@@ -403,12 +402,14 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
                     var indivSolutionRef = db.ref(`classMentors/eventSolutions/${self.eventId}/${userPublicId}/${self.tratId}`);
                     return indivSolutionRef.set(angular.toJson(userAnswers));
                 }).then(function () {
+                    clmDataStore.events.submitSolution(self.eventId, self.tratId, initialData.currentUser.publicId, "Completed");
                     spfAlert.success('TRAT Submitted');
                     $location.path(urlFor('oneEvent', {eventId: self.eventId}));
                 });
             } else {
                 var indivSolutionRef = db.ref(`classMentors/eventSolutions/${self.eventId}/${userPublicId}/${self.tratId}`);
                 indivSolutionRef.set(angular.toJson(userAnswers)).then(function () {
+                    clmDataStore.events.submitSolution(self.eventId, self.tratId, initialData.currentUser.publicId, "Completed");
                     spfAlert.success('TRAT Submitted');
                     $location.path(urlFor('oneEvent', {eventId: self.eventId}));
                 });
