@@ -2,6 +2,10 @@ import {expect, sinon, testInjectMatch} from 'classmentors/tools/chai.js';
 
 import * as card from './service-card.js';
 
+function wait(delay) {
+  return new Promise(resolve => setTimeout(resolve, delay || 10));
+}
+
 describe('clm-service-card component:', function() {
 
   describe('ServiceCardCtrl', function() {
@@ -11,14 +15,25 @@ describe('clm-service-card component:', function() {
 
     let ctrl, service, serviceRef, $data, $unwatchUser, $unwatchData,
       $profileUrlTemplate, canRefresh,
-      $attrs, $document, $firebaseObject, $interpolate, $log, $mdDialog,
-      clmServices, spfAlert, spfCurrentUser;
+      $attrs, $document, $firebaseObject, $interpolate, $log, $mdDialog, $q, $timeout,
+      clmServices, spfAlert, spfCurrentUser, clmRefreshTimout;
 
     beforeEach(function() {
+      $q = {all: ps => Promise.all(ps)};
+
+      $timeout = sinon.stub();
+      $timeout.cancel = sinon.spy();
+
+      clmRefreshTimout = 60000;
+
       $attrs = {profileTemplate: 'http://example.com/profile/{{name}}'};
+
       $document = [{querySelector: sinon.stub()}];
+
       $log = {error: sinon.spy(), debug: sinon.spy()};
+
       $mdDialog = {show: sinon.spy()};
+
       spfAlert = {error: sinon.spy(), success: sinon.spy()};
 
       $unwatchData = sinon.spy();
@@ -26,10 +41,7 @@ describe('clm-service-card component:', function() {
       $data.$watch.withArgs(sinon.match.func).returns($unwatchData);
 
       serviceRef = {};
-      service = {
-        dataRef: sinon.stub(),
-        canRequestUpdate: sinon.stub()
-      };
+      service = {dataRef: sinon.stub()};
       service.dataRef.withArgs(publicId).returns(serviceRef);
       clmServices = {[serviceId]: service};
 
@@ -51,8 +63,8 @@ describe('clm-service-card component:', function() {
       spfCurrentUser.$watch.returns($unwatchUser);
 
       ctrl = new card.ServiceCardCtrl(
-        $attrs, $document, $firebaseObject, $interpolate, $log, $mdDialog,
-        clmServices, spfAlert, spfCurrentUser
+        $attrs, $document, $firebaseObject, $interpolate, $log, $mdDialog, $q, $timeout,
+        clmServices, spfAlert, spfCurrentUser, clmRefreshTimout
       );
 
     });
@@ -81,60 +93,37 @@ describe('clm-service-card component:', function() {
       expect(ctrl.$unwatchUser()).to.be.undefined();
     });
 
-    it('should set $cancelRefreshTimer', function() {
-      expect(ctrl.$cancelRefreshTimer()).to.be.undefined();
-    });
-
     describe('#$onChanges', function() {
+      let changes;
 
       beforeEach(function() {
         ctrl.publicId = publicId;
         ctrl.serviceId = serviceId;
         sinon.stub(ctrl, 'watchData');
+
+        changes = {publicId: {}, serviceId: {}, disableRefresh: {}};
       });
 
-      it('should be called when the currentUser changes', function() {
-        const handler = spfCurrentUser.$watch.lastCall.args[0];
+      it('should watch the user data if the publicId or the serviceId changes', function() {
+        ctrl.$onChanges({disableRefresh: {}});
+        expect(ctrl.watchData).to.not.have.been.called();
 
-        sinon.stub(ctrl, '$onChanges');
-        handler();
-
-        expect(ctrl.$onChanges).to.have.been.calledOnce();
-      });
-
-      it('should set "loading" to true', function() {
-        ctrl.$onChanges();
-        expect(ctrl.loading).to.be.true();
-        expect(ctrl.updating).to.be.false();
-        expect(ctrl.canRefresh).to.be.false();
-      });
-
-      it('should set "canEdit" to true when the current user is the owner', function() {
-        ctrl.currentUser.publicId = publicId;
-        ctrl.$onChanges();
-        expect(ctrl.canEdit).to.be.true();
-      });
-
-      it('should set "canEdit" to false when the current user is not the owner', function() {
-        ctrl.currentUser.publicId = `not-${publicId}`;
-        ctrl.$onChanges();
-        expect(ctrl.canEdit).to.be.false();
-      });
-
-      it('should set "canEdit" to false when the current user is not registered', function() {
-        ctrl.currentUser.publicId = null;
-        ctrl.$onChanges();
-        expect(ctrl.canEdit).to.be.false();
-      });
-
-      it('should set "service"', function() {
-        ctrl.$onChanges();
-        expect(ctrl.service).to.equal(service);
-      });
-
-      it('should watch the user data', function() {
-        ctrl.$onChanges();
+        ctrl.$onChanges(changes);
         expect(ctrl.watchData).to.have.been.calledOnce();
+      });
+
+      it('should update canRefresh when the disableRefresh is updated', function() {
+        ctrl.canRefresh = false;
+        ctrl.$onChanges({publicId: {}});
+        expect(ctrl.canRefresh).to.be.false();
+
+        ctrl.canRefresh = true;
+        ctrl.$onChanges({publicId: {}});
+        expect(ctrl.canRefresh).to.be.true();
+
+        ctrl.disableRefresh = Promise.resolve();
+        ctrl.$onChanges(changes);
+        expect(ctrl.canRefresh).to.be.false();
       });
 
     });
@@ -143,18 +132,31 @@ describe('clm-service-card component:', function() {
 
       it('should deregister all listereners', function() {
         sinon.spy(ctrl, '$unwatchData');
-        sinon.spy(ctrl, '$cancelRefreshTimer');
 
         ctrl.$onDestroy();
         expect(ctrl.$unwatchData).to.have.been.calledOnce();
         expect(ctrl.$unwatchUser).to.have.been.calledOnce();
-        expect(ctrl.$cancelRefreshTimer).to.have.been.calledOnce();
       });
 
       it('should release the service data synchronized object', function() {
         ctrl.data = {$destroy: sinon.spy()};
         ctrl.$onDestroy();
         expect(ctrl.data.$destroy).to.have.been.calledOnce();
+      });
+
+      it('should cancel the refresh timer', function() {
+        const to = {};
+
+        ctrl.$disableRefresh = to;
+        ctrl.$onDestroy();
+        expect($timeout.cancel).to.have.been.calledOnce();
+        expect($timeout.cancel).to.have.been.calledWith(to);
+        expect(ctrl.$disableRefresh).to.be.undefined();
+
+        $timeout.cancel.reset();
+        ctrl.$onDestroy();
+        expect($timeout.cancel).to.not.have.been.called();
+
       });
 
     });
@@ -165,6 +167,26 @@ describe('clm-service-card component:', function() {
         ctrl.publicId = publicId;
         ctrl.serviceId = serviceId;
         ctrl.service = service;
+      });
+
+      it('should be called when user data changes', function() {
+        sinon.stub(ctrl, 'watchData');
+        spfCurrentUser.$watch.lastCall.args[0]();
+        expect(ctrl.watchData).to.have.been.calledOnce();
+      });
+
+      it('should reset flags', function() {
+        ctrl.canEdit = true;
+        ctrl.loading = false;
+        ctrl.updating = true;
+        ctrl.profileUrl = 'http://example.com/profile/someservice:bob';
+
+        ctrl.watchData();
+
+        expect(ctrl.canEdit).to.be.true();
+        expect(ctrl.loading).to.be.true();
+        expect(ctrl.updating).to.be.false();
+        expect(ctrl.profileUrl).to.be.undefined();
       });
 
       it('should watch the user\'s service data', function() {
@@ -204,9 +226,6 @@ describe('clm-service-card component:', function() {
             id: userId,
             name: userId
           };
-
-          canRefresh = {value: true, timeout: Promise.resolve(), cancel: sinon.spy()};
-          service.canRequestUpdate.withArgs($data).returns(canRefresh);
         });
 
         it('should update profileUrl', function() {
@@ -219,43 +238,9 @@ describe('clm-service-card component:', function() {
           expect(ctrl.profileUrl).to.equal(`http://example.com/profile/${userId}`);
         });
 
-        it('should update canRefresh', function() {
-          handler();
-          expect(service.canRequestUpdate).to.have.been.calledOnce();
-          expect(ctrl.canRefresh).to.be.true();
-          expect(ctrl.$cancelRefreshTimer).to.be.a('function');
-          expect(ctrl.$cancelRefreshTimer).to.not.equal(canRefresh.cancel);
-        });
-
-        it('should wait for refresh timer complete to set canRefresh to true', function() {
-          canRefresh.value = false;
-
-          const promise = handler();
-
-          expect(service.canRequestUpdate).to.have.been.calledOnce();
-          expect(ctrl.canRefresh).to.be.false();
-          expect(ctrl.$cancelRefreshTimer).to.equal(canRefresh.cancel);
-
-          return promise.then(() => expect(ctrl.canRefresh).to.be.true());
-        });
-
-        it('should log refresh timer getting cancelled', function() {
-          canRefresh.value = false;
-          canRefresh.timeout = Promise.reject();
-
-          return handler().then(() => expect($log.debug).to.have.been.calledOnce());
-        });
-
-        it('should not update canRefresh if service cannot be edited', function() {
-          ctrl.canEdit = false;
-          handler();
-          expect(service.canRequestUpdate).to.not.have.been.called();
-        });
-
         it('should reset data states if there is no data for that service', function() {
           ctrl.canEdit = true;
           ctrl.loading = false;
-          ctrl.canRefresh = true;
           ctrl.updating = true;
           ctrl.profileUrl = 'http://example.com/profile/someservice:bob';
 
@@ -264,7 +249,6 @@ describe('clm-service-card component:', function() {
 
           expect(ctrl.canEdit).to.be.true();
           expect(ctrl.loading).to.be.false();
-          expect(ctrl.canRefresh).to.be.false();
           expect(ctrl.updating).to.be.false();
           expect(ctrl.profileUrl).to.be.undefined();
         });
@@ -315,6 +299,7 @@ describe('clm-service-card component:', function() {
 
       beforeEach(function() {
         ctrl.publicId = publicId;
+        ctrl.canRefresh = true;
         ctrl.service = {requestUpdate: sinon.stub()};
         ctrl.service.requestUpdate.withArgs(publicId).returns(Promise.resolve());
       });
@@ -322,6 +307,26 @@ describe('clm-service-card component:', function() {
       it('should request an update', function() {
         ctrl.refresh();
         expect(ctrl.service.requestUpdate).to.have.been.calledOnce();
+      });
+
+      it('should fail if the cannot refresh yet', function() {
+        ctrl.canRefresh = false;
+        ctrl.refresh();
+        expect(ctrl.service.requestUpdate).to.not.have.been.called();
+      });
+
+      it('should update can refresh', function() {
+        let defer;
+
+        $timeout.returns(new Promise(resolve => (defer = resolve)));
+
+        return ctrl.refresh().then(() => {
+          expect(ctrl.canRefresh).to.be.false();
+          defer();
+          return wait();
+        }).then(
+          () => expect(ctrl.canRefresh).to.be.true()
+        );
       });
 
       it('should report error', function() {
