@@ -309,9 +309,9 @@ export function challengeServiceFactory
                         console.log('Team is: ', team);
                         eventTeamsRef.push(team).then(function (thenableRef) {
                             console.log('Team reccorded at: ', thenableRef.key);
-                            var teamLog = {
-                                init: {'.sv': 'timestamp'}
-                            }
+                            // var teamLog = {
+                            //     init: {'.sv': 'timestamp'}
+                            // }
                             var eventTeamsLogRef = db.ref(`classMentors/eventTeamsLog/${teamFormationTaskRef.key}/${thenableRef.key}`);
                             eventTeamsLogRef.set(teamLog);
                         });

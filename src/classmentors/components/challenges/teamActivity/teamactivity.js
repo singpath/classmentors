@@ -364,7 +364,6 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
             self.question = self.questions[self.index];
             self.options = self.question.options;
         } else {
-            console.log('Submitted Ans for last question.. ending TRAT');
             console.log(userAnswers);
             // Mark indiv
             // Mark team
