@@ -47,6 +47,8 @@ module.value('clmServicesUrl', {
 module.component('ace', components.ace.component);
 module.component('classmentors', components.classmentors.component);
 module.component('clmAdmin', components.admin.component);
+module.component('clmServiceCard', components.serviceCard.component);
+module.component('clmServiceForm', components.serviceCard.serviceForm.component);
 module.config(components.ace.configRoute);
 module.config(components.admin.configRoute);
 module.constant('aceStatsUrl', components.ace.ACE_STATS_URL);
@@ -57,9 +59,6 @@ module.directive('clmEventRankTable', components.events.clmEventRankTableFactory
 module.directive('clmEventResultsTable', components.events.clmEventResultsTableFactory);
 module.directive('clmEventTable', components.events.clmEventTableFactory);
 module.directive('clmPager', components.events.clmPagerFactory);
-module.directive('clmProfile', components.profiles.clmProfileFactory);
-module.directive('clmServiceUserIdExists', components.profiles.clmServiceUserIdExistsFactory);
-module.directive('clmSpfProfile', components.profiles.clmSpfProfileFactory);
 module.directive('cmContains', directives.cmContainsFactory);
 //add directive for page scroll
 module.directive('scrollBottom', components.challenges.scrollBottom);
@@ -69,7 +68,7 @@ module.factory('challengeService', components.challenges.challengeServiceFactory
 module.factory('clmDataStore', services.clmDataStoreFactory);
 module.factory('clmPagerOption', components.events.clmPagerOptionFactory);
 module.factory('clmRowPerPage', components.events.clmRowPerPageFactory);
-module.factory('clmService', services.clmServiceFactory);
+module.factory('clmServices', services.clmServicesFactory);
 module.factory('eventService', components.events.eventServiceFactory);
 module.filter('cmTruncate', filters.cmTruncateFilterFactory);
 module.filter('cmTruncated', filters.cmTruncateFilterBooleanFactory);
@@ -77,6 +76,7 @@ module.filter('showSchool', filters.showSchoolFilterFactory);
 module.filter('showTeamMembers', filters.showTeamMembersFilterFactory);
 // module.filter('reverseArray', filters.reverseArray);
 //for page controls in trat
+module.run(components.profiles.configServices);
 module.factory('quizFactory', components.challenges.tratQuestionFactory);
 
 // TODO: convert those view controller/template to component and move them above
@@ -110,7 +110,6 @@ module.constant('routes', {
   addEventTask: '/events/:eventId/new-task',
   profile: '/profile/:publicId',
   editProfile: '/profile/',
-  setProfileCodeCombatId: '/profile/codeCombat',
   cohorts: '/cohorts',
   newCohort: '/new-cohort',
   viewCohort: '/cohorts/:cohortId',

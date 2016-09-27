@@ -16,7 +16,7 @@
                     <md-button>Rank</md-button>
                 </th>
                 <th ng-if="!ctrl.showFilteredRanking">
-                    <md-button>Registered ({{ctrl.cohortTotalParticipants}})</md-button>
+                    <md-button>Registered ({{ctrl.cohortTotalParticipants.length}})</md-button>
                 </th>
                 <th ng-if="ctrl.showFilteredRanking">
                     <md-button>Qualified</md-button>
@@ -39,17 +39,23 @@
             </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="event in ctrl.cohortEventData" ng-class="'index-' + $index + ' ' + ($odd ? 'odd' : 'even')">
+                <tr ng-if="!ctrl.showFilteredRanking" ng-repeat="event in ctrl.cohortEventData | orderBy:'-participants'" ng-class="'index-' + $index + ' ' + ($odd ? 'odd' : 'even')">
                     <th>
                      {{$index+1}}
                     </th>
-                    <td ng-if="!ctrl.showFilteredRanking">{{ event.participants.length }}</td>
-                    <td ng-if="ctrl.showFilteredRanking">{{ event.qualifiedParticipants.length }}</td>
+                    <td>{{ event.participants.length }}</td>
                     <td><a href="#{{ 'oneEvent' | urlFor: {eventId: event.id} }}">{{ event.title }}</a></td>
-                    <td ng-if="ctrl.showFilteredRanking" ng-show="event.first">{{ event.first.name }} ({{event.first.total}})</td>
-                    <td ng-if="ctrl.showFilteredRanking" ng-show="event.second">{{ event.second.name }} ({{event.second.total}})</td>
-                    <td ng-if="ctrl.showFilteredRanking" ng-show="event.third">{{ event.third.name }} ({{event.third.total}})</td>
-                    <td ng-if="ctrl.showFilteredRanking" ng-show="event.fourth">{{ event.fourth.name }} ({{event.fourth.total}})</td>
+                </tr>
+                <tr ng-if="ctrl.showFilteredRanking" ng-repeat="event in ctrl.cohortEventData | orderBy:'-qualifiedParticipants'" ng-class="'index-' + $index + ' ' + ($odd ? 'odd' : 'even')">
+                    <th>
+                        {{$index+1}}
+                    </th>
+                    <td>{{ event.qualifiedParticipants.length }}</td>
+                    <td><a href="#{{ 'oneEvent' | urlFor: {eventId: event.id} }}">{{ event.title }}</a></td>
+                    <td ng-if="ctrl.showFilteredRanking && $index<12">{{event.qualifiedParticipants[0].displayName }} ({{event.qualifiedParticipants[0].score}})</td>
+                    <td ng-if="ctrl.showFilteredRanking && $index<12">{{event.qualifiedParticipants[1].displayName }} ({{event.qualifiedParticipants[1].score}})</td>
+                    <td ng-if="ctrl.showFilteredRanking && $index<2">{{event.qualifiedParticipants[2].displayName }} ({{event.qualifiedParticipants[2].score}})</td>
+                    <td ng-if="ctrl.showFilteredRanking && $index<2">{{event.qualifiedParticipants[3].displayName }} ({{event.qualifiedParticipants[3].score}})</td>
                 </tr>
             </tbody>
         </table>

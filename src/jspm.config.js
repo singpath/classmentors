@@ -60,7 +60,7 @@ SystemJS.config({
     "angular-animate": "github:angular/bower-angular-animate@1.5.8",
     "angular-aria": "github:angular/bower-angular-aria@1.5.8",
     "angular-loading-bar": "github:chieffancypants/angular-loading-bar@0.8.0",
-    "angular-material": "github:angular/bower-material@1.0.9",
+    "angular-material": "github:angular/bower-material@1.1.1",
     "angular-messages": "github:angular/bower-angular-messages@1.5.8",
     "angular-route": "github:angular/bower-angular-route@1.5.8",
     "angular-timer": "github:siddii/angular-timer@1.3.4",
@@ -83,6 +83,8 @@ SystemJS.config({
     "get-parameter-names": "npm:get-parameter-names@0.3.0",
     "http": "github:jspm/nodelibs-http@0.2.0-alpha",
     "https": "github:jspm/nodelibs-https@0.2.0-alpha",
+    "lodash.camelcase": "npm:lodash.camelcase@4.3.0",
+    "lodash.upperfirst": "npm:lodash.upperfirst@4.3.1",
     "moment": "npm:moment@2.15.1",
     "os": "github:jspm/nodelibs-os@0.2.0-alpha",
     "path": "github:jspm/nodelibs-path@0.2.0-alpha",
@@ -310,14 +312,6 @@ SystemJS.config({
         "crypto-browserify": "npm:crypto-browserify@3.11.0"
       }
     },
-    "github:angular/bower-material@1.0.9": {
-      "map": {
-        "css": "github:systemjs/plugin-css@master",
-        "angular": "github:angular/bower-angular@1.5.8",
-        "angular-animate": "github:angular/bower-angular-animate@1.5.8",
-        "angular-aria": "github:angular/bower-angular-aria@1.5.8"
-      }
-    },
     "github:angular/bower-angular-aria@1.5.8": {
       "map": {
         "angular": "github:angular/bower-angular@1.5.8"
@@ -518,12 +512,20 @@ SystemJS.config({
         "minimalistic-assert": "npm:minimalistic-assert@1.0.0"
       }
     },
-    "github:siddii/angular-timer@1.3.4": {
+    "github:angular/bower-material@1.1.1": {
       "map": {
-        "moment": "npm:moment@2.15.1",
-        "humanize-duration": "github:EvanHahn/HumanizeDuration.js@3.9.1",
+        "css": "github:systemjs/plugin-css@0.1.27",
+        "angular-aria": "github:angular/bower-angular-aria@1.5.8",
+        "angular-animate": "github:angular/bower-angular-animate@1.5.8",
         "angular": "github:angular/bower-angular@1.5.8"
       }
+    },
+    "github:siddii/angular-timer@1.3.4": {
+          "map": {
+              "moment": "npm:moment@2.15.1",
+              "humanize-duration": "github:EvanHahn/HumanizeDuration.js@3.9.1",
+              "angular": "github:angular/bower-angular@1.5.8"
+          }
     }
   }
 });

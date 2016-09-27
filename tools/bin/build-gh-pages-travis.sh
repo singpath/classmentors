@@ -37,11 +37,7 @@ then
 	echo 'Will use default firebase database target.'
 	PROD_FIREBASE_CONFIG='{}'
 else
-	PROD_FIREBASE_CONFIG='{
-	"apiKey": "'$PROD_FIREBASE_CONFIG_API_KEY'",
-	"authDomain": "'$PROD_FIREBASE_CONFIG_AUTH_DOMAIN'",
-	"databaseURL": "'$PROD_FIREBASE_CONFIG_DATABASE_URL'"
-}'
+	PROD_FIREBASE_CONFIG='{"apiKey":"'$PROD_FIREBASE_CONFIG_API_KEY'","authDomain":"'$PROD_FIREBASE_CONFIG_AUTH_DOMAIN'","databaseURL":"'$PROD_FIREBASE_CONFIG_DATABASE_URL'"}'
 fi
 
 cd src/packages/singpath-core; npm install; npm run build; cd -
@@ -50,4 +46,4 @@ cp -r src/packages/singpath-core/dist dist/classmentors/singpath-core
 GIT_REMOTE_URL="https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git"
 GIT_COMMIT_NAME="Travis"
 
-npm run --silent build:gh-pages -- "$PROD_FIREBASE_ID" "$GIT_REMOTE_URL" "$GIT_COMMIT_NAME"
+npm run --silent build:gh-pages -- "$PROD_FIREBASE_CONFIG" "$GIT_REMOTE_URL" "$GIT_COMMIT_NAME"
