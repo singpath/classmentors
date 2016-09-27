@@ -250,7 +250,7 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
     console.log('Submitted Answers...', submittedAnswers);
     var score = 0;
     for(var i = 0; i < submittedAnswers.length; i ++){
-      console.log("loopin thru correctanswers:", correctAnswers[i]);
+
       score += arraysEqual(submittedAnswers[i], correctAnswers[i]);
     }
     console.log("score is:", score);

@@ -196,7 +196,7 @@ function startTRATInitialData($q, spfAuthData, eventService, clmDataStore, fireb
                 return {
                     team: $firebaseArray(teamRef).$loaded()
                         .then(function (team) {
-                            var outputTeam = []
+                            var outputTeam = [];
                             for (var i = 0; i < team.length; i++) {
                                 var idAtIdx = team[i].$id;
                                 if (idAtIdx != 'currentSize' && idAtIdx != 'maxSize') {
@@ -252,18 +252,14 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
     self.eventId = initialData.eventId;
     var teamAndteamId = initialData.teamAndteamId;
     self.teamId = teamAndteamId.teamId;
+
     self.team = null;
+    teamAndteamId.team.then(function(result){
+        self.team = result;
+    });
 
     var teamMembers = null;
-    teamAndteamId.team.then(function (result) {
-        self.team = result
-    });
-    // self.team = teamAndteamId.team.then(function(result){
-    //     return result
-    // }).then(function(data){
-    //     return data;
-    // });
-    // console.log("self team is:", self.team);
+
     self.tratId = initialData.tratId;
     self.teamFormId = initialData.teamFormId;
     var userAnswers = [];
@@ -294,7 +290,6 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
 
     function refreshLog() {
         $firebaseArray(teamLogRef.orderByKey()).$loaded(function (data) {
-            console.log("refresh log data iss:", data);
             self.teamLog = data;
         });
     }
@@ -350,7 +345,6 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
     }
 
     self.nextQuestion = function () {
-        console.log("next question has been clicked");
         // Check if all members have submit
         // Check if user's answers is the answer that will be saved under team record.
         // 
@@ -384,6 +378,7 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
             console.log(self.team);
             var selectedUserPubId = self.team[userIdx].$id;
 
+
             if (selectedUserPubId == userPublicId) {
                 $firebaseArray(teamAnsRef).$loaded(function (teamAnswers) {
                     var answers = [];
@@ -391,7 +386,6 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
 
                     for (var i = 0; i < teamAnswers.length; i++) {
                         var teamAnswer = teamAnswers[i];
-                        console.log("team answer isss:", teamAnswer);
                         if (teamAnswer.answer) {
                             answers.push(angular.fromJson(teamAnswer.answer))
                         }
