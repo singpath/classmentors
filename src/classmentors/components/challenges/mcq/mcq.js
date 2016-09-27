@@ -190,8 +190,19 @@ editMcqController.$inject = [
     '$location'
 ];
 
-export function startMcqController(initialData, challengeService, clmDataStore, $location, $mdDialog,urlFor, spfAlert ){
+export function startMcqController(initialData, challengeService, clmDataStore, $location, $mdDialog,urlFor, spfAlert, $scope ){
   var self = this;
+
+  var mcqInvalid = true;
+  $scope.$on("$routeChangeStart", function (event, next, current) {
+    if (mcqInvalid) {
+      if (!confirm("You have not finished this survey. Are you sure you want to continue? All data will be lost")) {
+        event.preventDefault();
+      }
+    }
+
+
+  });
 
   var data = initialData;
   var eventId = data.eventId;
@@ -253,11 +264,12 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
 
       score += arraysEqual(submittedAnswers[i], correctAnswers[i]);
     }
-    console.log("score is:", score);
+
     return score;
   }
 
   self.submit = function(){
+    mcqInvalid = false;
     var submission = {};
     var userAnswers = [];
     for(var i = 0; i < self.questions.length; i++){
@@ -299,6 +311,7 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
 
 
   self.discardChanges = function (ev){
+    mcqInvalid = false;
     var confirm = $mdDialog.confirm()
         .title('Would you like to discard your answers?')
         .textContent('All of your answers will be discarded. Are you sure you want to continue?')
@@ -324,7 +337,8 @@ startMcqController.$inject = [
   '$location',
     '$mdDialog',
     'urlFor',
-    'spfAlert'
+    'spfAlert',
+    '$scope'
 ];
 
 export function newMcqController(initialData, challengeService, $filter,$mdDialog,urlFor,$location){

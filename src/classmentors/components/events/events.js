@@ -1864,8 +1864,8 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         }
         // Store data in eventService
         eventService.set(data);
-        console.log('startTRAT triggered');
-        $location.path('/challenges/TRAT');
+
+        $location.path('/events/' + eventId + '/challenges/' + taskId + '/TRAT/start');
     }
 
     this.mustRegister = function (task, profile) {

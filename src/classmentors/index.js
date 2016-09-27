@@ -121,7 +121,7 @@ module.constant('routes', {
   viewSurvey: '/challenges/survey',
   createTeamActivity: '/challenges/team-activity/create',
   viewIRAT: '/challenges/IRAT',
-  viewTRAT: '/challenges/TRAT'
+  viewTRAT: '/events/:eventId/challenges/:taskId/TRAT/start'
 });
 
 export {module};

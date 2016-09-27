@@ -132,7 +132,7 @@ createTeamActivityController.$inject = [
     'eventService'
 ];
 
-function startTRATInitialData($q, spfAuthData, eventService, clmDataStore, firebaseApp, $firebaseObject, $firebaseArray) {
+function startTRATInitialData($q, spfAuthData, eventService, clmDataStore, firebaseApp, $firebaseObject, $firebaseArray, $route) {
     /*
      TODO:
      1. Load Teams
@@ -143,12 +143,14 @@ function startTRATInitialData($q, spfAuthData, eventService, clmDataStore, fireb
     var db = firebaseApp.database();
 
     console.log("my data is:", data);
-    var eventId = data.eventId;
-    var taskId = data.taskId;
+    var eventId = $route.current.params.eventId;
+    var taskId = $route.current.params.taskId;
+
     // var teamLogPromise = null;
     var tratId = taskId;
     var userTeamId = null;
     var userPublicId = data.participant.$id;
+    console.log("userpublicid iss:", data.participant);
     var teamFormationRefKey = data.task.teamFormationRef;
     var eventTeamRef = db.ref(`classMentors/eventTeams/${eventId}/${teamFormationRefKey}`);
 
@@ -184,6 +186,7 @@ function startTRATInitialData($q, spfAuthData, eventService, clmDataStore, fireb
         tratId: tratId,
         teamAndteamId: $firebaseArray(eventTeamRef).$loaded()
             .then(function (teams) {
+                console.log("teams in resolve:", spfAuthData.user());
                 // Sanity check that teams are retrieved
                 for (var i = 0; i < teams.length; i++) {
                     var team = teams[i];
@@ -233,7 +236,7 @@ function startTRATInitialData($q, spfAuthData, eventService, clmDataStore, fireb
 
 
 }
-startTRATInitialData.$inject = ['$q', 'spfAuthData', 'eventService', 'clmDataStore', 'firebaseApp', '$firebaseObject', '$firebaseArray'];
+startTRATInitialData.$inject = ['$q', 'spfAuthData', 'eventService', 'clmDataStore', 'firebaseApp', '$firebaseObject', '$firebaseArray', '$route'];
 
 function startTRATController($q, initialData, clmDataStore, $location, urlFor,
                              firebaseApp, $firebaseObject, $firebaseArray, spfAlert) {
@@ -258,7 +261,7 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
         self.team = result;
     });
 
-    self.teamMember = clmDataStore.events.getTeam(self.eventId, initialData.teamRefId, self.teamId);
+
     self.tratId = initialData.tratId;
     self.teamFormId = initialData.teamFormId;
     var userAnswers = [];
