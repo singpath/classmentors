@@ -84,10 +84,11 @@ You gh-pages should now be serving your Firebase App data.
 
 ## TODO
 
-- [ ] Add include export and security rules with the gh-pages branch.
-- [ ] How to add an admin.
-- [ ] How to add a premium user (maybe rename this role).
-- [ ] How to change the landing page.
+- [x] initial draft
+- [x] Include export and security rules with the gh-pages branch.
+- [ ] Explain how to add an admin.
+- [ ] Explain how to add a premium user (maybe rename this role).
+- [ ] Explain how to change the landing page.
 - [ ] Add screencasts.
 
 [Class Mentors project]: https://github.com/singpath/classmentors

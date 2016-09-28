@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 
+const path = require('path');
 const config = require('./config.js');
 const sh = require('shelljs');
 const tools = require('@singpath/tools');
@@ -23,7 +24,10 @@ sh.echo(`NOTICE:
 tools.clean(config.build.root);
 sh.echo(`Setting up "${config.build.app.root}/"...`);
 sh.mkdir('-p', config.build.app.root);
-sh.cp('-r', 'LICENSE', 'README.md', 'tools/assets/*', config.build.app.root);
+sh.cp('-r', 'LICENSE', 'tools/assets/*', config.build.app.root);
+sh.cp('HOSTING.md', path.join(config.build.app.root, 'README.md'));
+sh.cp('database/security-rules.json', path.join(config.build.app.root, 'rules.json'));
+sh.cp('database/data/init.json', path.join(config.build.app.root, 'data.json'));
 
 
 // Bundles
