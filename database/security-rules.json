@@ -795,7 +795,6 @@
           },
           "services": {
             "$serviceId": {
-              ".validate": "newData.hasChildren(['details'])",
               "badges": {
                 "$badgeId": {
                   ".validate": "newData.hasChildren(['id', 'name', 'iconUrl'])",
@@ -827,10 +826,9 @@
                 }
               },
               "lastUpdate": {
-                ".validate": "newData.val() == data.val()"
+
               },
               "lastUpdateRequest": {
-                ".validate": "newData.val() === now",
                 ".write": "auth !== null && root.child('classMentors/admins').child(auth.uid).val() === true"
               }
             }
