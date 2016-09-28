@@ -1,0 +1,9 @@
+0, 12
+Edit index.html
+
+14, 18
+Commit the change
+
+19, 25
+Go to "Setting" > "GitHubPages"
+to find the link to your project Pages

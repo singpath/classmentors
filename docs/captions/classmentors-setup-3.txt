@@ -1,0 +1,12 @@
+0, 7
+Create a new Firebase project.
+
+14, 20
+Setup a sign-in method.
+
+20, 28
+Enable Google sign-in.
+
+30, 46
+Add your GitHub Pages domain 
+to the list of authorised domains.
