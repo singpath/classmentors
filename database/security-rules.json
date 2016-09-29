@@ -362,7 +362,6 @@
         ".read": true
       },
       "eventTeamsLog":{
-       //DONT DELETE
         ".write":true,
         ".read":true
       },
