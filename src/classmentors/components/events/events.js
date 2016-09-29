@@ -588,9 +588,14 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
         //self.event.owner.publicId === self.currentUser.publicId
         if (self.isOwner || self.isEditAssistant) {
             options.push({
-                title: 'Edit',
+                title: 'Edit Challenge',
                 url: `#${urlFor('editEvent', {eventId: self.event.$id})}`,
                 icon: 'create'
+            });
+            options.push({
+                title: 'Add New Challenge',
+                url: `#${urlFor('addEventTask', {eventId: self.event.$id})}`,
+                icon: 'add-circle-outline'
             });
             options.push({
                 title: 'Update',
@@ -838,9 +843,9 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
             title: this.event.title,
             url: `#${urlFor('oneEvent', {eventId: this.event.$id})}`
         }], [{
-            title: 'New Challenge',
+            title: 'Add New Challenge',
             url: `#${urlFor('addEventTask', {eventId: this.event.$id})}`,
-            icon: 'create'
+            icon: 'add-circle-outline'
         }]
     );
 
