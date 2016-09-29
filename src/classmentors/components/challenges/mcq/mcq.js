@@ -22,7 +22,6 @@ function mcqQuestionFactory(){
 export function editMcqController(initialData, challengeService, $filter,$mdDialog, urlFor, $location){
   var self = this;
 
-
   // Checks if all questions have at least one answer
 
   self.task = initialData.data.task;
@@ -99,6 +98,7 @@ export function editMcqController(initialData, challengeService, $filter,$mdDial
     }
     self.isMcqValid = true;
   }
+
   self.removeQuestion = function(ev,itemIndex) {
 
     var confirm = $mdDialog.confirm()
@@ -340,7 +340,17 @@ export function newMcqController(initialData, challengeService, $filter,$mdDialo
   // Checks if all questions have at least one answer
   self.isMcqValid = false;
   self.task = initialData.task;
-  
+
+  self.isTextFilled = false;
+  self.checkMCQValid = function(text){
+    console.log(text);
+    if(text.length == 0){
+      self.isTextFilled = false;
+    }else{
+      self.isTextFilled = true;
+    }
+  };
+
   self.questions = [{
     text:"",
     answers:[],
