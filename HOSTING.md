@@ -75,7 +75,7 @@ Any arbitrary change will do to publish your inintial version.
 
     You should see something like that:
 
-    ```
+    ```html
     <script src="https://www.gstatic.com/firebasejs/3.4.1/firebase.js"></script>
     <script>
       // Initialize Firebase
@@ -127,14 +127,41 @@ You gh-pages should now be serving your Firebase App data.
 [Video](http://screencast-o-matic.com/u/h0kl/classmentors-setup-7)
 
 
-## TODO
+## Add premium user (can create event)
 
-- [x] initial draft
-- [x] Include export and security rules with the gh-pages branch.
-- [x] Explain how to add an admin.
-- [ ] Explain how to add a premium user (maybe rename this role).
-- [ ] Explain how to change the landing page.
-- [x] Add screencasts.
+TODO
+
+
+## Override landing page
+
+1. Go to your Github fork of Classmentors.
+1. Click "index.html" in the list of files.
+1. Click on the edit icon (a pen icon).
+1. Find this commented out block:
+
+    ```js
+    // module.config([
+    //   '$routeProvider',
+    //   function($routeProvider) {
+    //     $routeProvider
+    //       .when('/home', {
+    //         templateUrl: './home.html',
+    //         resolve: {
+    //           navbar: function() {
+    //             return {title: 'Welcome'};
+    //           }
+    //         }
+    //       })
+    //       .otherwise('/home');
+    //   }
+    // ]);
+    ```
+
+    Remove the comment prefix ("// ") to enable this block.
+1. Save the changes
+1. Return to the list of files.
+1. Click "home.html" and edit it.
+1. Save the changes
 
 
 [Class Mentors project]: https://github.com/singpath/classmentors
