@@ -495,7 +495,6 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
     this.assistantObj = initialData.assistantObj;
     this.asstArr = [];
     this.isReviewSuperUser = false;
-
     for (let asst in self.assistants) {
         if (self.assistants[asst].$id) {
             self.asstArr.push(self.assistants[asst].$id);
@@ -1842,16 +1841,17 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
 
     this.startMCQ = function (eventId, taskId, task, participant, userSolution) {
         // Assign eventTable variables to data
-        var data = {
-            eventId: eventId,
-            taskId: taskId,
-            task: task,
-            participant: participant,
-            userSolution: userSolution
-        }
-        // Store data in eventService
-        eventService.set(data);
-        $location.path('/challenges/mcq/start');
+        // var data = {
+        //     eventId: eventId,
+        //     taskId: taskId,
+        //     task: task,
+        //     participant: participant,
+        //     userSolution: userSolution
+        // }
+        // // Store data in eventService
+        // eventService.set(data);
+        console.log("participant isss:", participant);
+        $location.path('/events/' + eventId + '/challenges/' + taskId + '/mcq/start');
     }
 
     this.startTRAT = function(eventId, taskId, task, participant){
@@ -1864,8 +1864,8 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         }
         // Store data in eventService
         eventService.set(data);
-        console.log('startTRAT triggered');
-        $location.path('/challenges/TRAT');
+
+        $location.path('/events/' + eventId + '/challenges/' + taskId + '/TRAT/start');
     }
 
     this.mustRegister = function (task, profile) {
@@ -2642,7 +2642,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
         //console.log("all the VALUES HERE: " + surveyResp + ", " + questionNumber + "," + taskId + ", " + eventId + ", " + userId + ", " + surveyType)
         clmDataStore.events.saveSurveyResponse(surveyResp, questionNumber, taskId, eventId, userId, surveyType);
 
-    }
+    };
     this.saveEduDisMultiResponse = function (selectedArr, item, task, qnTitle) {
 
         var questionNumber = item.currentTarget.getAttribute("data-id");
@@ -2679,7 +2679,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
         }
 
 
-    }
+    };
     this.saveEduDisResponse = function (response, age, item, task, siblingNum, selectedMonth, country, language, qnTitle, bestResp) {
 
         var surveyResp = response;
@@ -2722,7 +2722,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             clmDataStore.events.saveSurveyEduDisResponse(bestResp, questionNumber, taskId, eventId, userId, surveyType, qnTitle);
         }
 
-    }
+    };
     this.submitSchEngageResponse = function (schEngageResp) {
 
         //to set warning
@@ -2819,7 +2819,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             $location.path(urlFor('oneEvent', {eventId: self.event.$id}));
 
         }
-    }
+    };
 
     this.submitEduDissResponse = function (eduDissResp, selectedFamily, selectedRaceEthnicity) {
 
@@ -2881,13 +2881,13 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
 
             $location.path(urlFor('oneEvent', {eventId: self.event.$id}));
         }
-    }
+    };
 
     this.backToChallenge = function () {
         $location.path(urlFor('oneEvent', {eventId: self.event.$id}));
     }
 
-};
+}
 
 SurveyFormFillCtrl.$inject = [
     'spfNavBarService',
