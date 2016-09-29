@@ -2642,7 +2642,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
         //console.log("all the VALUES HERE: " + surveyResp + ", " + questionNumber + "," + taskId + ", " + eventId + ", " + userId + ", " + surveyType)
         clmDataStore.events.saveSurveyResponse(surveyResp, questionNumber, taskId, eventId, userId, surveyType);
 
-    }
+    };
     this.saveEduDisMultiResponse = function (selectedArr, item, task, qnTitle) {
 
         var questionNumber = item.currentTarget.getAttribute("data-id");
@@ -2679,7 +2679,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
         }
 
 
-    }
+    };
     this.saveEduDisResponse = function (response, age, item, task, siblingNum, selectedMonth, country, language, qnTitle, bestResp) {
 
         var surveyResp = response;
@@ -2722,7 +2722,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             clmDataStore.events.saveSurveyEduDisResponse(bestResp, questionNumber, taskId, eventId, userId, surveyType, qnTitle);
         }
 
-    }
+    };
     this.submitSchEngageResponse = function (schEngageResp) {
 
         //to set warning
@@ -2819,7 +2819,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             $location.path(urlFor('oneEvent', {eventId: self.event.$id}));
 
         }
-    }
+    };
 
     this.submitEduDissResponse = function (eduDissResp, selectedFamily, selectedRaceEthnicity) {
 
@@ -2881,13 +2881,13 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
 
             $location.path(urlFor('oneEvent', {eventId: self.event.$id}));
         }
-    }
+    };
 
     this.backToChallenge = function () {
         $location.path(urlFor('oneEvent', {eventId: self.event.$id}));
     }
 
-};
+}
 
 SurveyFormFillCtrl.$inject = [
     'spfNavBarService',
