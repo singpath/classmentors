@@ -833,7 +833,8 @@
 
               },
               "lastUpdateRequest": {
-                ".write": "auth !== null && root.child('classMentors/admins').child(auth.uid).val() === true"
+                ".validate": "newData.val() === now",
+                ".write": true
               }
             }
           },
