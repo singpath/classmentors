@@ -1,0 +1,20 @@
+0, 5
+Make sure you are logged in.
+
+5, 22
+Go to "Profile" and register.
+
+24, 30
+Find your user ID in your Firebase project
+
+30, 36
+Copy your user ID.
+
+36, 41
+Manually edit your database to set your user as Admin.
+
+41, 52
+Set "classMentors/admins/<you-user-id>"" to true.
+
+55, 72
+Set "classMentors/userProfiles/<you-public-id>/user/isAdmin" to true

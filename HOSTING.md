@@ -103,11 +103,35 @@ You gh-pages should now be serving your Firebase App data.
 [Video](http://screencast-o-matic.com/u/h0kl/classmentors-setup-6)
 
 
+## Set yourself as a - Class Mentors - admin
+
+1. Go to your Class Mentors GitHub Pages.
+1. Go to "Profile" to register.
+1. Pick a public ID and register.
+1. Go to the [Firebase console].
+1. Go to "Auth" > "Users".
+1. Find the your user; there should be only one but you want find some other
+   user later when more user logged on your project, you can search by email.
+1. Copy your user ID
+1. Go to "Database" > "Data"
+1. Expand "classMentors" and click the "+" icon next to "classMentors".
+1. In the new node form, set "Name" to "admins" and instead of setting a value,
+   click the "+" icon.
+1. in The new node form, set "Name" to your user ID (paste it) and set "Value"
+   to "true" (no quote).
+1. click Add.
+1. Expand the "userProfiles" node, expand the node named after your
+   public ID, expand the "user" node and click the "+" icon.
+1. In the new node form, set "Name" to "isAdmin" and the "Value" to "true".
+
+[Video](http://screencast-o-matic.com/u/h0kl/classmentors-setup-7)
+
+
 ## TODO
 
 - [x] initial draft
 - [x] Include export and security rules with the gh-pages branch.
-- [ ] Explain how to add an admin.
+- [x] Explain how to add an admin.
 - [ ] Explain how to add a premium user (maybe rename this role).
 - [ ] Explain how to change the landing page.
 - [x] Add screencasts.
