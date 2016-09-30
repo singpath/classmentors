@@ -3,30 +3,12 @@ import {expect} from 'chai';
 import sinon from 'sinon';
 
 import tmpl from './ace-view.html!text';
-import {component, getStats, ACE_STATS_URL} from './ace.js';
+import {component, getStats, ACE_STATS_URL, configRoute} from './ace.js';
 
 describe('ace component', function() {
 
   it('should set the template', function() {
     expect(component.template).to.equal(tmpl);
-  });
-
-  describe('controller', function() {
-    let navBarService;
-
-    beforeEach(function() {
-      navBarService = {
-        update: sinon.spy()
-      };
-    });
-
-    it('should update the navbar title', function() {
-      new component.controller(navBarService);
-
-      expect(navBarService.update).to.have.been.calledOnce;
-      expect(navBarService.update).to.have.been.calledWithExactly(sinon.match.string);
-    });
-
   });
 
 });
@@ -66,4 +48,36 @@ describe('getStats resolver helper', function() {
       data => expect(data).to.equal(resp.data)
     );
   });
+});
+
+describe('configRoute', function() {
+  let $routeProvider, routes;
+
+  beforeEach(function() {
+    $routeProvider = {
+      when: sinon.stub(),
+      otherwise: sinon.stub()
+    };
+    $routeProvider.when.returnsThis();
+    $routeProvider.otherwise.returnsThis();
+
+    routes = {aceOfCoders: 'foo'};
+
+    configRoute($routeProvider, routes);
+  });
+
+  it('should config the ace route', function() {
+    expect($routeProvider.when).to.have.been.calledOnce();
+    expect($routeProvider.when).to.have.been.calledWith(routes.aceOfCoders, sinon.match({
+      template: sinon.match.string,
+      resolve: sinon.match({navBar: sinon.match.func})
+    }));
+  });
+
+  it('should configure navbar title', function() {
+    const resolveNavbar = $routeProvider.when.lastCall.args[1].resolve.navBar;
+
+    expect(resolveNavbar()).to.eql({title: 'Ace of Coders'});
+  });
+
 });
