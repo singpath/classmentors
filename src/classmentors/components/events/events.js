@@ -587,7 +587,7 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
         //self.event.owner.publicId === self.currentUser.publicId
         if (self.isOwner || self.isEditAssistant) {
             options.push({
-                title: 'Edit Challenge',
+                title: 'Edit Challenges',
                 url: `#${urlFor('editEvent', {eventId: self.event.$id})}`,
                 icon: 'create'
             });
