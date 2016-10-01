@@ -39,14 +39,15 @@
         </div>
     </form>
 
-    <md-divider></md-divider>
+    <!--<md-divider></md-divider>-->
+    <hr style="background:#D9D9D9; border: 0; height: 1px"/>
     <table>
         <tr>
             <td>
-                <font size="4"><b>Event Assistants</b></font></td>
+                <md-subheader><font size="4">EVENT ASSISTANTS</font></td></md-subheader>
             <td>
                 <md-subheader>
-                    <md-button ng-click="ctrl.toggleAssistants()">{{ctrl.eventAssistantBttnText}}
+                    <md-button class="md-raised" style="height:10px" ng-click="ctrl.toggleAssistants()"><md-subheader>{{ctrl.eventAssistantBttnText}}</md-subheader>
                         <md-tooltip ng-if="!ctrl.showingAssistants">Click to view and edit event assistants</md-tooltip>
                         <md-tooltip ng-if="ctrl.showingAssistants">Click to hide event assistants</md-tooltip>
                     </md-button>
@@ -175,15 +176,30 @@
     </div>
     <!--</div>-->
 
-    <md-divider></md-divider>
+    <!--<md-divider></md-divider>-->
+    <hr style="background:#D9D9D9; border: 0; height: 1px"/>
 
-    <font size="4"><b>Event Challenges</b></font>
-    <md-button style="height:20px" ng-click="ctrl.toggleTaskEditView()">{{ctrl.eventChallengeBttnText}}
-        <md-tooltip ng-if="!ctrl.showingTasks">Click to view and edit event challenges</md-tooltip>
-        <md-tooltip ng-if="ctrl.showingTasks">Click to hide event challenges</md-tooltip>
-    </md-button>
+    <table>
+        <tr>
+            <td>
+                <md-subheader><font size="4" >EVENT CHALLENGES</font></md-subheader>
+            </td>
+            <td>
+                <md-subheader>
+                    <md-button class="md-raised" style="height:10px" ng-click="ctrl.toggleTaskEditView()"><md-subheader>{{ctrl.eventChallengeBttnText}}</md-subheader>
+                        <md-tooltip ng-if="!ctrl.showingTasks">Click to view and edit event challenges</md-tooltip>
+                        <md-tooltip ng-if="ctrl.showingTasks">Click to hide event challenges</md-tooltip>
+                    </md-button>
+                </md-subheader>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <md-subheader class="md-no-sticky">{{ ctrl.tasks | spfLength }} challenges</md-subheader>
+            </td>
+        </tr>
+    </table>
     <md-list ng-if="ctrl.showingTasks">
-        <md-subheader class="md-no-sticky">{{ ctrl.tasks | spfLength }} challenges</md-subheader>
         <md-list-item class="md-3-line" ng-repeat="task in ctrl.tasks track by task.$id" ng-if="!task.archived">
             <div class="md-list-item-text">
                 <h3>

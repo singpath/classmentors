@@ -850,6 +850,10 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
             title: this.event.title,
             url: `#${urlFor('oneEvent', {eventId: this.event.$id})}`
         }], [{
+            title: 'View This Event',
+            url: `#${urlFor('oneEvent', {eventId: this.event.$id})}`,
+            icon: 'arrow-back'
+        }, {
             title: 'Add New Challenge',
             url: `#${urlFor('addEventTask', {eventId: this.event.$id})}`,
             icon: 'add-circle-outline'
