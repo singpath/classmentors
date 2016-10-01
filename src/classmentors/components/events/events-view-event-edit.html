@@ -8,7 +8,8 @@
     <form name="editEventForm" ng-submit="ctrl.save(ctrl.currentUser, ctrl.event, ctrl.newPassword, editEventForm)">
         <md-input-container>
             <label for="event-title">Event Name</label>
-            <input name="eventTitle" type="text" id="event-title" ng-model="ctrl.event.title" ng-minlength="3" ng-maxlength="60" required="true"/>
+            <input name="eventTitle" type="text" id="event-title" ng-model="ctrl.event.title" ng-minlength="3"
+                   ng-maxlength="60" required="true"/>
             <div ng-messages="editEventForm.eventTitle.$error">
                 <div ng-message="required">An event should have a name.</div>
                 <div ng-message="minlength">An event name shouldn't be shorter than 3 characters.</div>
@@ -18,69 +19,97 @@
 
         <md-input-container>
             <label for="event-pw">New Password</label>
-            <input name="eventPw" type="text" id="event-pw" ng-model="ctrl.newPassword" />
+            <input name="eventPw" type="text" id="event-pw" ng-model="ctrl.newPassword"/>
             <div ng-messages="editEventForm.eventPw.$error">
             </div>
         </md-input-container>
 
-        <md-progress-circular ng-show="ctrl.savingEvent" md-mode="indeterminate" style="margin: 16px auto"></md-progress-circular>
+        <md-progress-circular ng-show="ctrl.savingEvent" md-mode="indeterminate"
+                              style="margin: 16px auto"></md-progress-circular>
 
         <div class="information">Created by {{ctrl.event.owner.displayName}} on ({{ctrl.event.createdAt|date}})</div>
         <div layout="row" layout-align="center center">
-            <md-button type="submit" class="md-raised md-primary" ng-disabled="editEventForm.$pristine || editEventForm.$invalid || ctrl.savingEvent || !ctrl.isOwner">Save</md-button>
-            <md-button type="reset" class="md-raised" ng-click="ctrl.reset(editEventForm)" ng-disabled="ctrl.savingEvent || editEventForm.$pristine">Reset</md-button>
+            <md-button type="submit" class="md-raised md-primary"
+                       ng-disabled="editEventForm.$pristine || editEventForm.$invalid || ctrl.savingEvent || !ctrl.isOwner">
+                Save
+            </md-button>
+            <md-button type="reset" class="md-raised" ng-click="ctrl.reset(editEventForm)"
+                       ng-disabled="ctrl.savingEvent || editEventForm.$pristine">Reset
+            </md-button>
         </div>
     </form>
 
     <md-divider></md-divider>
+    <table>
+        <tr>
+            <td>
+                <font size="4"><b>Event Assistants</b></font></td>
+            <td>
+                <md-subheader>
+                    <md-button ng-click="ctrl.toggleAssistants()">{{ctrl.eventAssistantBttnText}}
+                        <md-tooltip ng-if="!ctrl.showingAssistants">Click to view and edit event assistants</md-tooltip>
+                        <md-tooltip ng-if="ctrl.showingAssistants">Click to hide event assistants</md-tooltip>
+                    </md-button>
+                </md-subheader>
+            </td>
+        </tr>
+    </table>
+    <!--<div ng-if="ctrl.showingAssistants">-->
 
-    <md-subheader><md-button ng-click="ctrl.toggleAssistants()">Event Assistants<md-tooltip ng-if="!ctrl.showingAssistants">Click to view and edit event assistants</md-tooltip><md-tooltip ng-if="ctrl.showingAssistants">Click to hide event assistants</md-tooltip></md-button></md-subheader>
-    <div ng-if="ctrl.showingAssistants">
-        <div class="information">
-            <md-button ng-click="ctrl.addAssistant()">
-                <md-icon md-svg-icon="add"></md-icon>
-                <md-tooltip>
-                    Add assistant
-                </md-tooltip>
-            </md-button>
-        </div>
-        <form name="addAssistantForm" ng-submit="ctrl.saveNewAssistant(ctrl.event.$id)">
-            <md-card ng-if="ctrl.addingNewAssistant">
-                <md-card-content>
-                    <md-autocomplete flex required
-                                     md-input-name="assistantName"
-                                     md-input-minlength="1"
-                                     md-input-maxlength="64"
-                                     md-no-cache="true"
-                                     md-selected-item="ctrl.selectedUser"
-                                     md-search-text="ctrl.searchUser"
-                                     md-items="user in ctrl.querySearch(ctrl.searchUser)"
-                                     md-item-text="user.displayName"
-                                     placeholder="Select assistant profile">
-                        <md-item-template>
-                            <span md-highlight-text="ctrl.searchUser">{{user.displayName}}</span>
-                        </md-item-template>
-                        <div ng-messages="addAssistantForm.assistantName.$error" ng-if="addAssistantForm.assistantName.$touched">
-                            <div ng-message="required">You <b>must</b> select a user.</div>
-                        </div>
-                        <md-not-found>
-                            No users matching "{{ctrl.searchUser}}" were found.
-                        </md-not-found>
-                    </md-autocomplete>
+    <div class="information collapsable" ng-class="{showMe: ctrl.showingAssistants}">
 
-                    <md-switch ng-model="ctrl.newAssistant.canEdit" aria-label="canEdit?">
-                        Can Edit Events: {{ ctrl.newAssistant.canEdit }}
-                    </md-switch>
-                    <md-switch ng-model="ctrl.newAssistant.canReview" aria-label="canReview?">
-                        Can Review Event Submissions: {{ ctrl.newAssistant.canReview }}
-                    </md-switch>
-                </md-card-content>
-                <md-card-actions layout="row" layout-align="start center">
-                    <md-button class="md-raised md-primary" type="submit" ng-disabled="addAssistantForm.$pristine || addAssistantForm.$invalid || !ctrl.selectedUser">Approve Assistant</md-button>
-                    <md-button class="md-raised" ng-click="ctrl.closeNewAssistant()">Cancel</md-button>
-                </md-card-actions>
-            </md-card>
-        </form>
+        <md-button ng-click="ctrl.addAssistant()">
+            <md-icon md-svg-icon="add"></md-icon>
+            <md-tooltip>
+                Add assistant
+            </md-tooltip>
+            Add Assistant
+        </md-button>
+
+    </div>
+    <form name="addAssistantForm" ng-submit="ctrl.saveNewAssistant(ctrl.event.$id)">
+        <md-card ng-if="ctrl.addingNewAssistant">
+            <md-card-content>
+                <md-autocomplete flex required
+                                 md-input-name="assistantName"
+                                 md-input-minlength="1"
+                                 md-input-maxlength="64"
+                                 md-no-cache="true"
+                                 md-selected-item="ctrl.selectedUser"
+                                 md-search-text="ctrl.searchUser"
+                                 md-items="user in ctrl.querySearch(ctrl.searchUser)"
+                                 md-item-text="user.displayName"
+                                 placeholder="Select assistant profile">
+                    <md-item-template>
+                        <span md-highlight-text="ctrl.searchUser">{{user.displayName}}</span>
+                    </md-item-template>
+                    <div ng-messages="addAssistantForm.assistantName.$error"
+                         ng-if="addAssistantForm.assistantName.$touched">
+                        <div ng-message="required">You <b>must</b> select a user.</div>
+                    </div>
+                    <md-not-found>
+                        No users matching "{{ctrl.searchUser}}" were found.
+                    </md-not-found>
+                </md-autocomplete>
+
+                <md-switch ng-model="ctrl.newAssistant.canEdit" aria-label="canEdit?">
+                    Can Edit Events: {{ ctrl.newAssistant.canEdit }}
+                </md-switch>
+                <md-switch ng-model="ctrl.newAssistant.canReview" aria-label="canReview?">
+                    Can Review Event Submissions: {{ ctrl.newAssistant.canReview }}
+                </md-switch>
+            </md-card-content>
+            <md-card-actions layout="row" layout-align="start center">
+                <md-button class="md-raised md-primary" type="submit"
+                           ng-disabled="addAssistantForm.$pristine || addAssistantForm.$invalid || !ctrl.selectedUser">
+                    Approve Assistant
+                </md-button>
+                <md-button class="md-raised" ng-click="ctrl.closeNewAssistant()">Cancel</md-button>
+            </md-card-actions>
+        </md-card>
+    </form>
+    <div class="collapsable" id="testingCollapse" ng-class="{'showMe2' : ctrl.showingAssistants}"
+         ng-style="ctrl.divStyle">
         <md-list>
             <md-subheader class="md-no-sticky">{{ ctrl.assistants | spfLength }} assistants</md-subheader>
             <md-list-item ng-repeat="asst in ctrl.assistants track by asst.$id">
@@ -144,10 +173,15 @@
             </md-list-item>
         </md-list>
     </div>
-        
+    <!--</div>-->
+
     <md-divider></md-divider>
 
-    <md-subheader><md-button ng-click="ctrl.toggleTaskEditView()">Event Challenges<md-tooltip ng-if="!ctrl.showingTasks">Click to view and edit event challenges</md-tooltip><md-tooltip ng-if="ctrl.showingTasks">Click to hide event challenges</md-tooltip></md-button></md-subheader>
+    <font size="4"><b>Event Challenges</b></font>
+    <md-button style="height:20px" ng-click="ctrl.toggleTaskEditView()">{{ctrl.eventChallengeBttnText}}
+        <md-tooltip ng-if="!ctrl.showingTasks">Click to view and edit event challenges</md-tooltip>
+        <md-tooltip ng-if="ctrl.showingTasks">Click to hide event challenges</md-tooltip>
+    </md-button>
     <md-list ng-if="ctrl.showingTasks">
         <md-subheader class="md-no-sticky">{{ ctrl.tasks | spfLength }} challenges</md-subheader>
         <md-list-item class="md-3-line" ng-repeat="task in ctrl.tasks track by task.$id" ng-if="!task.archived">
@@ -162,45 +196,46 @@
             </div>
 
             <div layout="row">
-                <md-button ng-href="#{{ 'editEventTask'|urlFor: {eventId: ctrl.event.$id, taskId: task.$id} }}" layout layout-align="center center" class="md-raised md-primary" aria-label="Edit">
+                <md-button ng-href="#{{ 'editEventTask'|urlFor: {eventId: ctrl.event.$id, taskId: task.$id} }}" layout
+                           layout-align="center center" class="md-raised md-primary" aria-label="Edit">
                     <md-icon md-svg-icon="create"></md-icon>
                     Edit
                 </md-button>
                 <md-button ng-click="ctrl.openTask(ctrl.event.$id, task.$id)"
-                    ng-if="task.closedAt"
-                    layout layout-align="center center" class="md-raised md-primary"
-                    aria-label="open"
+                           ng-if="task.closedAt"
+                           layout layout-align="center center" class="md-raised md-primary"
+                           aria-label="open"
                 >
                     <md-icon md-svg-icon="done"></md-icon>
                     Open
                 </md-button>
                 <md-button ng-click="ctrl.closeTask(ctrl.event.$id, task.$id)"
-                    ng-if="task.openedAt"
-                    layout layout-align="center center" class="md-raised md-primary"
-                    aria-label="open"
+                           ng-if="task.openedAt"
+                           layout layout-align="center center" class="md-raised md-primary"
+                           aria-label="open"
                 >
                     <md-icon md-svg-icon="clear"></md-icon>
                     Close
                 </md-button>
                 <md-button ng-click="ctrl.showTask(ctrl.event.$id, task.$id)"
-                    ng-if="task.hidden"
-                    layout layout-align="center center" class="md-raised md-primary"
-                    aria-label="open"
+                           ng-if="task.hidden"
+                           layout layout-align="center center" class="md-raised md-primary"
+                           aria-label="open"
                 >
                     <md-icon md-svg-icon="done"></md-icon>
                     Show
                 </md-button>
                 <md-button ng-click="ctrl.hideTask(ctrl.event.$id, task.$id)"
-                    ng-if="!task.hidden"
-                    layout layout-align="center center" class="md-raised md-primary"
-                    aria-label="open"
+                           ng-if="!task.hidden"
+                           layout layout-align="center center" class="md-raised md-primary"
+                           aria-label="open"
                 >
                     <md-icon md-svg-icon="clear"></md-icon>
                     Hide
                 </md-button>
                 <md-button ng-click="ctrl.archiveTask(ctrl.event.$id, task.$id)"
-                    layout layout-align="center center" class="md-raised md-primary"
-                    aria-label="open"
+                           layout layout-align="center center" class="md-raised md-primary"
+                           aria-label="open"
                 >
                     <md-icon md-svg-icon="clear"></md-icon>
                     Archive
