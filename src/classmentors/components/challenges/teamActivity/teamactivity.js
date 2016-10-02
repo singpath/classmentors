@@ -133,12 +133,7 @@ createTeamActivityController.$inject = [
 ];
 
 function startTRATInitialData($q, spfAuthData, eventService, clmDataStore, firebaseApp, $firebaseObject, $firebaseArray, $route) {
-    /*
-     TODO:
-     1. Load Teams
-     2. Load Team Log
-     3. Load Answers [done]
-     */
+    
     var data = eventService.get();
     var db = firebaseApp.database();
 
