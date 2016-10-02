@@ -2131,11 +2131,6 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
              });
             }
 
-            
-
-            this.save = function () {
-
-            };
 
             this.cancel = function () {
                 $mdDialog.hide();
