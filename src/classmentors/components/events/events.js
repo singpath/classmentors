@@ -942,15 +942,23 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
         });
     };
 
-    this.openTask = function (eventId, taskId) {
+    this.openTask = function (eventId, task) {
+        var taskId = task.$id;
         clmDataStore.events.openTask(eventId, taskId).then(function () {
             spfAlert.success('Challenge opened.');
+        }).then(function(){
+            if(task){
+                console.log(task);
+            }
         }).catch(function () {
             spfAlert.error('Failed to open challenge.');
         });
     };
 
-    this.closeTask = function (eventId, taskId) {
+    this.closeTask = function (eventId, task) {
+        // What event is here.
+        console.log(task);
+        var taskId = task.$id;
         clmDataStore.events.closeTask(eventId, taskId).then(function () {
             spfAlert.success('Challenge closed.');
         }).catch(function () {

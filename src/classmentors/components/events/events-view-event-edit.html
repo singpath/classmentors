@@ -166,7 +166,7 @@
                     <md-icon md-svg-icon="create"></md-icon>
                     Edit
                 </md-button>
-                <md-button ng-click="ctrl.openTask(ctrl.event.$id, task.$id)"
+                <md-button ng-click="ctrl.openTask(ctrl.event.$id, task)"
                     ng-if="task.closedAt"
                     layout layout-align="center center" class="md-raised md-primary"
                     aria-label="open"
@@ -174,7 +174,7 @@
                     <md-icon md-svg-icon="done"></md-icon>
                     Open
                 </md-button>
-                <md-button ng-click="ctrl.closeTask(ctrl.event.$id, task.$id)"
+                <md-button ng-click="ctrl.closeTask(ctrl.event.$id, task)"
                     ng-if="task.openedAt"
                     layout layout-align="center center" class="md-raised md-primary"
                     aria-label="open"
