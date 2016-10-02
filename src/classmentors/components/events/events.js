@@ -2099,7 +2099,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             var teamEventPromise = $firebaseArray(ref);
             return $q.all({
                 teams: teamEventPromise.$loaded().then(function (result) {
-                    console.log(result);
+
                     return result;
                 }),
                 selectedTeam: teamEventPromise.$loaded().then(function (result) {
@@ -2124,10 +2124,24 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             var self = this;
             // Learning point here. undefined means not yet assigned a value. Whereas null is a special object.
             self.selectedTeam = initialData.selectedTeam;
-            console.log(self.selectedTeam);
-            self.teams = {}
+            self.teams = {};
             self.teams = initialData.teams;
-            console.log(self.teams);
+
+            // var teamMembers = [];
+            //separate the names to be populated
+            // for (var i = 0; i < self.teams.length; i++) {
+            //     teamMembers = [];
+            //     var obj = self.teams[i];
+            //     for (var key in obj) {
+            //         if (key != "$id" && key != "$$hashkey" && key != "$priority" && key != "currentSize" && key != "maxSize") {
+            //             teamMembers.push(key);
+            //         }
+            //         self.teams[i]['teamMembers'] = teamMembers;
+            //     }
+            //
+            // }
+
+            // console.log("team members:", self.teams);
             var previousSelectedTeam = undefined;
             var index2 = undefined;
             for (var i = 0; i < self.teams.length; i++) {
@@ -2136,11 +2150,8 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                     break;
                 }
             }
-            console.log("participant id isss:", participant.$id);
-            self.onChange = function (index) {
-                console.log('onChange fired');
-                console.log(index);
 
+            self.onChange = function (index) {
                 // If user has not joined any team before
                 if (previousSelectedTeam == undefined) {
                     if (index2 != undefined) {
@@ -2161,24 +2172,48 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             function leaveTeam(index) {
                 var team = self.teams[index];
                 var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${team.$id}/${participant.$id}`);
-                console.log(ref);
+                // console.log(ref);
                 //  spfFirebase.remove(['classMentors/eventTeams/',eventId,taskId,team.$id,participant.$id])
                 ref.remove().then(function () {
                     team.currentSize -= 1;
                 });
+
             }
 
             function joinTeam(index) {
                 var team = self.teams[index];
                 var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${team.$id}/${participant.$id}`);
                 // spfFirebase.set(['classMentors/eventTeams/',eventId,taskId,team.$id,participant.$id],participant.user)
-                console.log(participant.user);
+                // console.log(participant.user);
                 ref.set(participant.user).then(function () {
                     team.currentSize += 1;
                     clmDataStore.events.submitSolution(eventId, taskId, participant.$id, "Completed");
                 });
+
             }
 
+            // var refreshLog = function () {
+            //     //refreshes the array everytime a user changes his team
+            //     var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}`);
+            //     var teamEventPromise = $firebaseArray(ref);
+            //     teamEventPromise.$loaded().then(function (result) {
+            //
+            //         self.teams = result;
+            //
+            //         for (var i = 0; i < self.teams.length; i++) {
+            //             teamMembers = [];
+            //             var obj = self.teams[i];
+            //             for (var key in obj) {
+            //                 if (key != "$id" && key != "$$hashkey" && key != "$priority" && key != "currentSize" && key != "maxSize") {
+            //                     teamMembers.push(key);
+            //                 }
+            //                 self.teams[i]['teamMembers'] = teamMembers;
+            //             }
+            //
+            //         }
+            //     });
+            //
+            // }
 
             this.save = function () {
 
