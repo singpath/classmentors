@@ -106,22 +106,24 @@
                                    target="_blank"
                                    ng-disabled="task.closedAt"
                                    aria-label="Start form team"
-                        >
-
-                            Form Team
+                        >Form Team
                         </md-button>
+                        
                         <span ng-if="!ctrl.currentUserSolutions[task.$id]">
-                        <md-button class="md-raised md-primary" ng-if="task.startTRAT"
-                                   ng-click="ctrl.startTRAT(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant)"
-                                   target="_blank"
-                                   ng-disabled="task.closedAt"
-                                   aria-label="Start trat"
-                        >
-                            Start TRAT
-                        </md-button>
+
+                            <md-button class="md-raised md-primary" ng-if="task.startTRAT"
+                                    ng-click="ctrl.startTRAT(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant)"
+                                    target="_blank"
+                                    ng-disabled="task.closedAt"
+                                    aria-label="Start trat"
+                            >
+                                Start TRAT
+                            </md-button>
+                        {{ctrl.isTeamLeader(ctrl.event.$id, task.teamFormationRef, ctrl.currentUserParticipant)}}
+                        {{ctrl.teamLeader}}
                         </span>
                     </div>
-
+                    
                     <div ng-if="task.serviceId">
                             <span ng-if="ctrl.currentUserSolutions[task.$id]">
                                 Completed<span ng-if="!ctrl.currentUserProgress[task.$id].completed"></span>

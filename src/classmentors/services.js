@@ -1148,7 +1148,6 @@ export function clmDataStoreFactory(
           return task;
         });
       },
-
       closeTask: function(eventId, taskId) {
         var ref = db.ref(`classMentors/eventTasks/${eventId}/${taskId}`);
         var abort;
