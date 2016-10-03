@@ -65,7 +65,23 @@
                             <!--</span>-->
                     <!--</div>-->
                     
-                    <div ng-if="ctrl.selected.mcqQuestions">
+                    <div ng-if="ctrl.selected.mcqQuestions && ctrl.selected.startTRAT">
+                        <span ng-if="ctrl.solutions[participant.$id][ctrl.selected.$id]">
+                            <md-button class="md-raised md-primary"
+                                       aria-label="View MCQ"
+                                       ng-click="ctrl.viewMultipleChoiceResponse(ctrl.event.$id, ctrl.selected.$id, ctrl.selected, participant, ctrl.solutions[participant.$id])"
+                                       ng-if="ctrl.selected.openedAt"
+                                       ng-disabled='true'
+                            >Currently Unavailable
+                            </md-button>
+                        </span>
+
+                        <span ng-if="!ctrl.solutions[participant.$id][ctrl.selected.$id]">
+                            No Submission
+                        </span>
+                    </div>
+                    
+                    <div ng-if="ctrl.selected.mcqQuestions && !ctrl.selected.startTRAT">
                         <span ng-if="ctrl.solutions[participant.$id][ctrl.selected.$id]">
                             <md-button class="md-raised md-primary"
                                        aria-label="View MCQ"
@@ -134,8 +150,6 @@
                     <!--{{ctrl.scores[participant.$id][ctrl.selected.$id]}}-->
                     <md-input-container flex ng-disabled="ctrl.selected.mcqQuestions">
                         <label for="edit-task-score">Score</label>
-                        {{ctrl.selected}}
-                        {{ctrl.scores[participant.$id]}}
                         <input ng-disabled="ctrl.selected.mcqQuestions" type="number" name="editTaskScore" id="edit-task-score"
                                ng-model="ctrl.scores[participant.$id][ctrl.selected.$id]"
                                min="0" step="1"
