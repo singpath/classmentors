@@ -118,7 +118,7 @@
                             >
                                 You are the team leader
                             </md-button>
-                            <label ng-show="ctrl.teamLeader != ctrl.currentUserParticipant.$id">
+                            <label ng-show="ctrl.teamLeader != ctrl.currentUserParticipant.$id && task.startTRAT">
                                 Your team leader is: {{ctrl.teamLeader}}
                             </label>
                             <!--{{ctrl.currentUserParticipant}}-->
