@@ -35,6 +35,7 @@ const noop = () => undefined;
 
 export function configServices(clmServices) {
   clmServices.register('Code Combat');
+  clmServices.register('Code School');
   clmServices.register('Free Code Camp');
   clmServices.register('Pivotal Expert');
 }
