@@ -23,7 +23,7 @@ createTeamActivityInitialData.$inject = ['$q', 'eventService', 'clmDataStore'];
 function createTeamActivityController($q, initialData, clmDataStore, $location, urlFor, eventService) {
     var self = this;
 
-    console.log("initialdata are", initialData);
+    console.log("initialdata for teamform are", initialData);
     // event variable consist of event id,timecreated,owner and event title
     self.event = initialData.data.event;
 

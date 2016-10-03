@@ -2,7 +2,7 @@
     <form name="editMcq" ng-submit="ctrl.save(ctrl.questions)">
         {{ctrl.data}}
         <div align="center">
-            <h3>Multiple Choice</h3>
+            <h4>Multiple Choice Question Details</h4>
             <h4>Title: {{ctrl.task.title}}</h4>
             <h4>Description: {{ctrl.task.description}}</h4>
             <br><br>
@@ -72,9 +72,9 @@
 
         <!------------------starting of questions--------------------------------------------->
 
-        <div align="center">
-            <h4>Question Details</h4>
-        </div>
+        <!--<div align="center">-->
+            <!--<h4>Question Details</h4>-->
+        <!--</div>-->
 
         <div ng-repeat="question in ctrl.questions">
             <h3>
@@ -85,14 +85,16 @@
             </h3>
 
 
-            <div align="center" layout="row">
+            <div layout="row">
                 <md-input-container flex>
                     <label for="edit-question_{{$index}}">Click here to set your question</label>
                     <input type="text" name="editQuestion" id="edit-question_{{$index}}"
                            ng-change="ctrl.checkMCQValid(question.text)"
                            ng-model="question.text"
-                           placeholer="Question"
+                           placeholer="Click here to set your question"
+
                     />
+
                 </md-input-container>
             </div>
 
@@ -102,17 +104,17 @@
                 </md-button>
             </md-input-container>
 
-            <p ng-show="ctrl.isMcqValid == false"><font color="red">*One of the option must be an answer.</font></p>
+            <!--<p ng-show="!ctrl.isMcqValid"><font color="red">*One of the option must be an answer.</font></p>-->
 
             <!--answer options-->
-            <div align="center" layout="row" ng-repeat="option in question.options">
+            <div layout="row" ng-repeat="option in question.options">
                 <!--{{$index}}-->
                 <md-input-container flex>
                     <label for="q-option_{{$index}}">Click here to set your option</label>
                     <input type="text" name="editQuestion" id="q-option_{{$index}}"
                            ng-model="option.text"
                            placeholer="Options"
-                           ng-change="ctrl.checkMCQValid(option.text)"
+                           ng-change="ctrl.checkOptionValid(option.text)"
                     />
                 </md-input-container>
 
@@ -143,7 +145,7 @@
         <br>
 
         <div align="center">
-            <md-button type="submit" ng-disabled="!ctrl.isMcqValid || !ctrl.isTextFilled" class="md-raised md-primary">Save
+            <md-button type="submit" ng-disabled="!ctrl.isMcqValid || !ctrl.isTextFilled || !ctrl.isOptionValid" class="md-raised md-primary">Save
             </md-button>
             <md-button type="reset" class="md-raised" ng-click="ctrl.discardChanges($event)">Cancel</md-button>
         </div>
