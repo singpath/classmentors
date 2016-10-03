@@ -336,6 +336,7 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
             }else{
                 // Add score if correct
                 self.totalScore += addScore(self.noOfTries, 1);
+                updateLog(buildMessage("Correct!", 'Remaining attempts: ' + self.noOfTries, '#259b24'));
                 attempts.push(tempArray);
                 if(self.index == self.questions.length - 1){
                         userAnswers.push(attempts);
@@ -347,7 +348,7 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
                     self.noOfTries = 3;
                     userAnswers.push(attempts);
                     attempts = [];
-                    updateLog(buildMessage("Correct!", 'Remaining attempts: ' + self.noOfTries, '#259b24'));
+                    updateLog(buildMessage("New Question ", 'Remaining attempts: ' + self.noOfTries, 'black'));
                     self.question = loadQuestion(self.index += 1, self.questions);
                     self.options = loadOptions(self.question);
                 }
@@ -404,7 +405,7 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
                     self.noOfTries = 3
                     userAnswers.push(attempts);
                     attempts = [];
-                    updateLog(buildMessage("New Questiion ", 'Remaining attempts: ' + self.noOfTries, 'black'));
+                    updateLog(buildMessage("New Question ", 'Remaining attempts: ' + self.noOfTries, 'black'));
                     self.question = loadQuestion(self.index += 1, self.questions);
                     self.options = loadOptions(self.question);
                 }
@@ -476,84 +477,6 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
         // }
         return score;
     }
-    self._nextQuestion = function () {
-        // Check if all members have submit
-        // Check if user's answers is the answer that will be saved under team record.
-        
-        if (self.selected != null) {
-            var tempArray = []
-            tempArray.push(self.selected);
-            userAnswers.push(tempArray);
-            // teamAns(tempArray);
-            self.selected = null;
-        } else {// Multi-ans questions
-            userAnswers.push(self.multiAns);
-            // teamAns(self.multiAns);
-            self.multiAns = [];
-
-        }
-        if (self.index + 1 < self.questions.length) {
-            self.index += 1;
-            self.question = self.questions[self.index];
-            self.options = self.question.options;
-        } else {
-            console.log(userAnswers);
-            // Mark indiv
-            // Mark team
-
-            // If current user is the last user to submit
-            // var indivScore = markQuestions(answers);
-
-            var userIdx = self.index % self.team.length;
-            console.log(userIdx);
-            console.log(self.team);
-            var selectedUserPubId = self.team[userIdx].$id;
-
-
-            if (selectedUserPubId == userPublicId) {
-                $firebaseArray(teamAnsRef).$loaded(function (teamAnswers) {
-                    var answers = [];
-                    var score = null;
-
-                    for (var i = 0; i < teamAnswers.length; i++) {
-                        var teamAnswer = teamAnswers[i];
-                        if (teamAnswer.answer) {
-                            answers.push(angular.fromJson(teamAnswer.answer))
-                        }
-                    }
-
-                    return markQuestions(answers);
-                }).then(function (score) {
-                    //   saveScore: function(eventId, publicId, taskId, score)
-                    for (var i = 0; i < self.team.length; i++) {
-                        var publicId = self.team[i].$id;
-                        clmDataStore.events.saveScore(self.eventId, publicId, self.tratId, score);
-                    }
-                }).then(function () {
-                    console.log('Sucess!');
-                    var indivSolutionRef = db.ref(`classMentors/eventSolutions/${self.eventId}/${userPublicId}/${self.tratId}`);
-                    return indivSolutionRef.set(angular.toJson(userAnswers));
-                }).then(function () {
-                    clmDataStore.events.submitSolution(self.eventId, self.tratId, initialData.currentUser.publicId, "Completed");
-                    spfAlert.success('TRAT Submitted');
-                    $location.path(urlFor('oneEvent', {eventId: self.eventId}));
-                });
-            } else {
-                var indivSolutionRef = db.ref(`classMentors/eventSolutions/${self.eventId}/${userPublicId}/${self.tratId}`);
-                indivSolutionRef.set(angular.toJson(userAnswers)).then(function () {
-                    clmDataStore.events.submitSolution(self.eventId, self.tratId, initialData.currentUser.publicId, "Completed");
-                    spfAlert.success('TRAT Submitted');
-                    $location.path(urlFor('oneEvent', {eventId: self.eventId}));
-                });
-            }
-
-
-            // $location.path(urlFor('oneEvent', {eventId: event.$id}));
-
-        }
-
-    }
-    
 
 }
 

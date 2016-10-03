@@ -64,10 +64,11 @@
                                 <!--</md-button>-->
                             <!--</span>-->
                     <!--</div>-->
+                    
                     <div ng-if="ctrl.selected.mcqQuestions">
                         <span ng-if="ctrl.solutions[participant.$id][ctrl.selected.$id]">
                             <md-button class="md-raised md-primary"
-                                       aria-label="Update response"
+                                       aria-label="View MCQ"
                                        ng-click="ctrl.viewMultipleChoiceResponse(ctrl.event.$id, ctrl.selected.$id, ctrl.selected, participant, ctrl.solutions[participant.$id])"
                                        ng-if="ctrl.selected.openedAt"
                             >View Submission
@@ -133,8 +134,9 @@
                     <!--{{ctrl.scores[participant.$id][ctrl.selected.$id]}}-->
                     <md-input-container flex ng-disabled="ctrl.selected.mcqQuestions">
                         <label for="edit-task-score">Score</label>
+                        {{ctrl.selected}}
+                        {{ctrl.scores[participant.$id]}}
                         <input ng-disabled="ctrl.selected.mcqQuestions" type="number" name="editTaskScore" id="edit-task-score"
-
                                ng-model="ctrl.scores[participant.$id][ctrl.selected.$id]"
                                min="0" step="1"
                                placeholder="Allocate task score"
@@ -147,8 +149,7 @@
                     <md-button ng-show="!ctrl.selected.mcqQuestions" class="md-raised md-primary"
                                aria-label="Save Score"
                                ng-click="ctrl.saveAllocatedPoints(ctrl.event.$id, ctrl.selected.$id, ctrl.selected, participant, ctrl.scores[participant.$id][ctrl.selected.$id])"
-                    >
-                        Save
+                    >Save
                     </md-button>
                 </td>
             </tr>
