@@ -95,7 +95,7 @@
                                     target="_blank"
                                     ng-disabled="task.closedAt"
                                     aria-label="Start irat"
-                            > Start IRAT </md-button>
+                            > Start</md-button>
                         </span>
 
                         <md-button class="md-raised md-primary" ng-if="task.formationPattern"
@@ -110,15 +110,15 @@
                         {{ctrl.isTeamLeader(ctrl.event.$id, task.teamFormationRef, ctrl.currentUserParticipant)}}
                         <span ng-if="!ctrl.currentUserSolutions[task.$id]">
                             <md-button class="md-raised md-primary" ng-if="task.startTRAT"
-                                    ng-hide="ctrl.teamLeader != ctrl.currentUserParticipant.$id"
+                                    ng-hide="ctrl.teamLeader && ctrl.teamLeader != ctrl.currentUserParticipant.$id"
                                     ng-click="ctrl.startTRAT(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant)"
                                     target="_blank"
                                     ng-disabled="task.closedAt"
                                     aria-label="Start trat"
                             >
-                                You are the team leader
+                                Start
                             </md-button>
-                            <label ng-show="ctrl.teamLeader != ctrl.currentUserParticipant.$id && task.startTRAT">
+                            <label ng-show="ctrl.teamLeader != ctrl.currentUserParticipant.$id && task.startTRAT && ctrl.teamLeader">
                                 Your team leader is: {{ctrl.teamLeader}}
                             </label>
                             <!--{{ctrl.currentUserParticipant}}-->
