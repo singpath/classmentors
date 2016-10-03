@@ -1,10 +1,12 @@
 <md-content class="md-padding">
-    <form name="newEventForm" ng-submit="ctrl.save(ctrl.currentUser, ctrl.newEvent.data, ctrl.newEvent.password, newEventForm)">
+    <form name="newEventForm"
+          ng-submit="ctrl.save(ctrl.currentUser, ctrl.newEvent.data, ctrl.newEvent.password, ctrl.featureEvent, newEventForm)">
         <spf-sign-form current-user="ctrl.currentUser" ng-if="ctrl.profileNeedsUpdate"></spf-sign-form>
 
         <md-input-container>
             <label for="event-title">Event Name</label>
-            <input name="eventTitle" type="text" id="event-title" ng-model="ctrl.newEvent.data.title" ng-minlength="3" ng-maxlength="60" required="true"/>
+            <input name="eventTitle" type="text" id="event-title" ng-model="ctrl.newEvent.data.title" ng-minlength="3"
+                   ng-maxlength="60" required="true"/>
             <div ng-messages="newEventForm.eventTitle.$error">
                 <div ng-message="required">An event should have a name.</div>
                 <div ng-message="minlength">An event name shouldn't be shorten than 3 characters.</div>
@@ -14,17 +16,25 @@
 
         <md-input-container>
             <label for="event-pw">Event Password</label>
-            <input name="eventPw" type="text" id="event-pw" required ng-model="ctrl.newEvent.password" />
+            <input name="eventPw" type="text" id="event-pw" required ng-model="ctrl.newEvent.password"/>
             <div ng-messages="newEventForm.eventPw.$error">
                 <div ng-message="required">An event should have a password.</div>
             </div>
         </md-input-container>
 
-        <md-progress-circular ng-show="ctrl.creatingEvent" md-mode="indeterminate" style="margin: 16px auto"></md-progress-circular>
+        <md-progress-circular ng-show="ctrl.creatingEvent" md-mode="indeterminate"
+                              style="margin: 16px auto"></md-progress-circular>
+
+        <md-checkbox ng-model="featureEvent" ng-checked="ctrl.featureEvent" ng-click="ctrl.toggle()"> Feature this event
+        </md-checkbox>
 
         <div layout="row" layout-align="center center">
-            <md-button type="submit" class="md-primary" ng-disabled="newEventForm.$invalid || ctrl.creatingEvent">Create</md-button>
-            <md-button type="reset" ng-click="ctrl.reset(newEventForm)" ng-disabled="ctrl.creatingEvent || newEventForm.$pristine">Reset</md-button>
+            <md-button type="submit" class="md-primary" ng-disabled="newEventForm.$invalid || ctrl.creatingEvent">
+                Create
+            </md-button>
+            <md-button type="reset" ng-click="ctrl.reset(newEventForm)"
+                       ng-disabled="ctrl.creatingEvent || newEventForm.$pristine">Reset
+            </md-button>
         </div>
     </form>
 </md-content>

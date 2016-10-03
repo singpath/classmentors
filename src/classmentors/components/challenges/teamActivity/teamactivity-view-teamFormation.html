@@ -12,18 +12,35 @@
                                         ng-change="ctrl.onChange(ctrl.selectedTeam)">
                             <md-radio-button ng-disabled='t.currentSize == t.maxSize'
                                              ng-repeat='t in ctrl.teams'
-                                             ng-disabled="t.currentSize == t.maxSize"
                                              ng-value="$index">
                                 <table>
                                     <tr>
                                         <td>
+                                            <!--team currentsize: {{t.currentSize}}-->
+                                            <!--<br>-->
+                                            <!--team max size: {{t.maxSize}}-->
+                                            <!--<br>-->
                                             Team {{$index + 1}} <font color="#A2A2A2" size="2px"><i>max: {{t.maxSize}}
                                             members</i></font>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td colspan="2">
-                                            <div ng-repeat="(key, value) in t" ng-if="key != 'maxSize' && key != 'currentSize'">{{key}}</div>
+                                            <table>
+                                                <tr>
+                                                    <td  ng-repeat="(key, value) in t"
+                                                         ng-if="key != 'maxSize' && key != 'currentSize'">
+                                                        <div>
+                                                            {{key}}
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            <!--<md-chips ng-model="ctrl.items" readonly="true">-->
+                                            <!--<md-chip-template>-->
+                                            <!--{{$chip.key}}-->
+                                            <!--</md-chip-template>-->
+                                            <!--</md-chips>-->
                                         </td>
                                     </tr>
                                 </table>

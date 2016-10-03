@@ -329,11 +329,21 @@ function NewEventCtrl($q, $location, initialData, urlFor, spfAuthData, spfAlert,
         self.profileNeedsUpdate = !self.currentUser.$completed();
     }
 
-    this.save = function (currentUser, newEvent, password) {
+    //allow users to feature their event
+    this.featureEvent = true;
+    this.toggle = function () {
+        if (this.featureEvent) {
+            this.featureEvent = false;
+        } else {
+            this.featureEvent = true;
+        }
+    };
+
+    this.save = function (currentUser, newEvent, password, featuredEvent) {
         var next;
 
         self.creatingEvent = true;
-
+        console.log("featuredEvent isss:", featuredEvent);
         if (!self.profile) {
             cleanProfile();
             next = spfAuthData.publicId(currentUser).then(function () {
@@ -356,6 +366,7 @@ function NewEventCtrl($q, $location, initialData, urlFor, spfAuthData, spfAlert,
                     displayName: currentUser.displayName,
                     gravatar: currentUser.gravatar
                 },
+                featured : featuredEvent,
                 createdAt: {
                     '.sv': 'timestamp'
                 }
@@ -2099,7 +2110,6 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             var teamEventPromise = $firebaseArray(ref);
             return $q.all({
                 teams: teamEventPromise.$loaded().then(function (result) {
-
                     return result;
                 }),
                 selectedTeam: teamEventPromise.$loaded().then(function (result) {
@@ -2108,8 +2118,8 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                     for (var i = 0; i < teams.length; i++) {
                         var team = teams[i];
                         // If participant's public Id can be found, return team index.
-                        console.log('Team: ', team);
-                        console.log('Participant id: ', participant.$id);
+                        // console.log('Team: ', team);
+                        // console.log('Participant id: ', participant.$id);
                         if (team[participant.$id]) {
                             return i;
                         }
@@ -2120,13 +2130,11 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         };
 
         function DialogController(initialData) {
-            console.log('initial data is: ', initialData);
             var self = this;
             // Learning point here. undefined means not yet assigned a value. Whereas null is a special object.
             self.selectedTeam = initialData.selectedTeam;
             self.teams = {};
             self.teams = initialData.teams;
-
             // var teamMembers = [];
             //separate the names to be populated
             // for (var i = 0; i < self.teams.length; i++) {
@@ -2141,7 +2149,6 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             //
             // }
 
-            // console.log("team members:", self.teams);
             var previousSelectedTeam = undefined;
             var index2 = undefined;
             for (var i = 0; i < self.teams.length; i++) {
@@ -2172,23 +2179,67 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             function leaveTeam(index) {
                 var team = self.teams[index];
                 var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${team.$id}/${participant.$id}`);
+                var currentSize;
                 // console.log(ref);
                 //  spfFirebase.remove(['classMentors/eventTeams/',eventId,taskId,team.$id,participant.$id])
                 ref.remove().then(function () {
-                    team.currentSize -= 1;
+                    //do nothing
+                    var refCurrentSize = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${team.$id}/currentSize`);
+                    refCurrentSize.on("value", function (snapshot) {
+                        currentSize = snapshot.val();
+                        currentSize--;
+                    })
+
+                    refCurrentSize.set(currentSize).then(function () {
+                        //retrieve the newly updated team promise and assign to this.teams
+                        var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}`);
+                        var teamEventPromise = $firebaseArray(ref);
+                        teamEventPromise.$loaded().then(function (result) {
+
+                            this.teams = result;
+                        })
+
+                    });
+
+                    // var refCurrentSize = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${team.$id}/currentSize`);
+                    // var currentSize = 0;
+                    // refCurrentSize.on("value", function(snapshot){
+                    //     currentSize = snapshot.val();
+                    //     currentSize -= 1;
+                    // }).then(function(){
+                    //     refCurrentSize.set(currentSize).then(function(){
+                    //         //do nothing
+                    //     });
+                    // })
                 });
+                console.log("currentSize after snapshot:", currentSize);
+                // self.teams[index].currentSize -= 1;
 
             }
 
             function joinTeam(index) {
                 var team = self.teams[index];
                 var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${team.$id}/${participant.$id}`);
-                // spfFirebase.set(['classMentors/eventTeams/',eventId,taskId,team.$id,participant.$id],participant.user)
-                // console.log(participant.user);
+                // var currentSize = 0;
+                var currentSize;
                 ref.set(participant.user).then(function () {
-                    team.currentSize += 1;
                     clmDataStore.events.submitSolution(eventId, taskId, participant.$id, "Completed");
+                    var refCurrentSize = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${team.$id}/currentSize`);
+                    refCurrentSize.on("value", function (snapshot) {
+                        currentSize = snapshot.val();
+                        currentSize++;
+                    })
+
+                    refCurrentSize.set(currentSize).then(function () {
+                        //retrieve the newly updated team promise and assign to this.teams
+                        var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}`);
+                        var teamEventPromise = $firebaseArray(ref);
+                        teamEventPromise.$loaded().then(function (result) {
+                            this.teams = result;
+                        })
+                    })
                 });
+                // self.teams[index].currentSize += 1;
 
             }
 
