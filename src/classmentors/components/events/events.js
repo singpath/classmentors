@@ -160,14 +160,12 @@ export function eventServiceFactory($q, $route, spfAuthData, clmDataStore, $log,
     var eventService = {
         set: function (data) {
             savedData = data;
-            console.log(savedData);
         },
         get: function () {
             return savedData;
         },
         save: function (event, _, task, taskType, isOpen) {
             var copy = cleanObj(task);
-            console.log('Copy is.. : ', copy);
 
             if (taskType === 'linkPattern') {
                 delete copy.badge;
@@ -343,7 +341,6 @@ function NewEventCtrl($q, $location, initialData, urlFor, spfAuthData, spfAlert,
         var next;
 
         self.creatingEvent = true;
-        console.log("featuredEvent isss:", featuredEvent);
         if (!self.profile) {
             cleanProfile();
             next = spfAuthData.publicId(currentUser).then(function () {
@@ -362,11 +359,12 @@ function NewEventCtrl($q, $location, initialData, urlFor, spfAuthData, spfAlert,
         next.then(function () {
             var data = Object.assign({
                 owner: {
+                    id: currentUser.$id,
                     publicId: currentUser.publicId,
                     displayName: currentUser.displayName,
                     gravatar: currentUser.gravatar
                 },
-                featured : featuredEvent,
+                featured: featuredEvent,
                 createdAt: {
                     '.sv': 'timestamp'
                 }
@@ -598,7 +596,7 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
         //self.event.owner.publicId === self.currentUser.publicId
         if (self.isOwner || self.isEditAssistant) {
             options.push({
-                title: 'Edit Challenges',
+                title: 'Edit This Event',
                 url: `#${urlFor('editEvent', {eventId: self.event.$id})}`,
                 icon: 'create'
             });
@@ -795,11 +793,33 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
             this.nonArchivedTask.push(this.tasks[i]);
         }
     }
-
+    console.log("this event id isss:", this.event.$id);
     this.assistants = initialData.assistants;
     this.newPassword = '';
     this.isOwner = false;
     this.savingEvent = false;
+
+    //allow users to feature their events
+    //retrieve the current featured status
+    this.featureEvent = clmDataStore.events.getFeatured(this.event.$id);
+    
+    //set the selection by user
+    this.toggle = function () {
+        if (this.featureEvent) {
+            this.featureEvent = false;
+
+        } else {
+            this.featureEvent = true;
+        }
+        clmDataStore.events.setFeatured(this.event.$id, this.featureEvent);
+        if (this.featureEvent) {
+            spfAlert.success("You have featured your event");
+        } else {
+            spfAlert.success("You have removed your event from being featured");
+        }
+
+    };
+
 
     if (
         self.event &&
@@ -1287,7 +1307,6 @@ AddEventTaskCtrl.$inject = [
     'clmSurvey'
 ];
 
-//////////////////////////////implemented survey challenge//////////////////////////////////////
 export function clmSurveyTaskFactory() {
     var sharedData = {};
     //console.log("it comes in here");
