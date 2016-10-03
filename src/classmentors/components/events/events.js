@@ -945,6 +945,7 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
     this.openTask = function (eventId, task) {
         var taskId = task.$id;
         clmDataStore.events.openTask(eventId, taskId).then(function () {
+            assignTeamLeaders(eventId, task);
             spfAlert.success('Challenge opened.');
         }).catch(function () {
             spfAlert.error('Failed to open challenge.');
@@ -956,7 +957,6 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
         console.log(task);
         var taskId = task.$id;
         clmDataStore.events.closeTask(eventId, taskId).then(function () {
-            assignTeamLeaders(eventId, task);
             spfAlert.success('Challenge closed.');
         }).catch(function () {
             spfAlert.error('Failed to close challenge.');
@@ -967,16 +967,31 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
         if(task.teamFormationRef){
             var db = firebaseApp.database();
             console.log(task.teamFormationRef);
+            console.log(eventId);
             var ref = db.ref(`classMentors/eventTeams/${eventId}/${task.teamFormationRef}`);
             ref.once("value")
                 .then(function(snapshot){
                     snapshot.forEach(function(childSnapshot){
-                        // Assign team leader if does not exists
+                        // Assign team leader if it does not exists
                         var team = childSnapshot.val();
                         console.log(team);
                         if(!('teamLeader' in team)){
+                            var acc = []; //accumulator for team members.
                             for(var key in team){
-                                
+                                if(key != 'currentSize' && key != 'maxSize'){
+                                    acc.push(key);
+                                }
+                            }
+                            // If there are memebers in the team.
+                            if(acc.length > 0){
+                                // Randomly pick a value out of acc.
+                                console.log(acc);
+                                var item = acc[Math.floor(Math.random()*acc.length)];
+                                console.log(item);
+                                // assign here.
+                                var teamRef = ref.child(childSnapshot.key);
+                                console.log(teamRef); // Sanity check here
+                                teamRef.child('teamLeader').set(item);
                             }
                         }
                     });
@@ -1622,24 +1637,19 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         teamRef.once("value")
             .then(function(snapshot){
                 snapshot.forEach(function(childSnapShot){
-                    console.log(childSnapShot.key);
-                    console.log(childSnapShot.val());
-                    self.teamLeader =  childSnapShot.key;
+                    // console.log(childSnapShot.key);
+                    var team = childSnapShot.val();
+                    console.log(team);
+                    // console.log(team.teamLeader);
+                    // console.log(currentUserId);
+                    if(team[currentUserId.$id] != null){
+                        console.log(team.teamLeader);
+                        self.teamLeader = team.teamLeader;
+                        // Break execution.
+                        return true;                    
+                    }
                 })
             });
-        // $firebaseArray(teamRef) 
-        // $firebaseArray(teamRef)
-        // .$loaded(function(teams){
-        //     for(var i = 0; i < teams.length; i ++){
-        //         var team = teams[i];
-        //         console.log(team);
-        //         console.log(currentUserId);
-        //         if(team[currentUserId]){
-        //             return true;
-        //         }
-        //     }
-        //     return false;
-        // });
     };
 
     //Find superReviewUser rights

@@ -90,15 +90,12 @@
                     </div>
                     <div ng-if="task.teamFormationMethod">
                         <span ng-if="!ctrl.currentUserSolutions[task.$id]">
-                        <md-button class="md-raised md-primary" ng-if="task.startIRAT"
-                                   ng-click="ctrl.startMCQ(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant, ctrl.currentUserSolutions)"
-                                   target="_blank"
-                                   ng-disabled="task.closedAt"
-                                   aria-label="Start irat"
-                        >
-                            Start IRAT
-
-                        </md-button>
+                            <md-button class="md-raised md-primary" ng-if="task.startIRAT"
+                                    ng-click="ctrl.startMCQ(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant, ctrl.currentUserSolutions)"
+                                    target="_blank"
+                                    ng-disabled="task.closedAt"
+                                    aria-label="Start irat"
+                            > Start IRAT </md-button>
                         </span>
 
                         <md-button class="md-raised md-primary" ng-if="task.formationPattern"
@@ -109,18 +106,25 @@
                         >Form Team
                         </md-button>
                         
+                        <!--What's this for?-->
+                        {{ctrl.isTeamLeader(ctrl.event.$id, task.teamFormationRef, ctrl.currentUserParticipant)}}
                         <span ng-if="!ctrl.currentUserSolutions[task.$id]">
-
                             <md-button class="md-raised md-primary" ng-if="task.startTRAT"
+                                    ng-hide="ctrl.teamLeader != ctrl.currentUserParticipant.$id"
                                     ng-click="ctrl.startTRAT(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant)"
                                     target="_blank"
                                     ng-disabled="task.closedAt"
                                     aria-label="Start trat"
                             >
-                                Start TRAT
+                                You are the team leader
                             </md-button>
-                        {{ctrl.isTeamLeader(ctrl.event.$id, task.teamFormationRef, ctrl.currentUserParticipant)}}
-                        {{ctrl.teamLeader}}
+                            <label ng-show="ctrl.teamLeader != ctrl.currentUserParticipant.$id">
+                                Your team leader is: {{ctrl.teamLeader}}
+                            </label>
+                            <!--{{ctrl.currentUserParticipant}}-->
+                        
+                        
+                        
                         </span>
                     </div>
                     
