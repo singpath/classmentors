@@ -2193,7 +2193,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                     joinTeam(index);
                     previousSelectedTeam = index;
                 }
-            }
+            };
 
             function leaveTeam(index) {
                 var team = self.teams[index];
@@ -2207,7 +2207,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                     refCurrentSize.on("value", function (snapshot) {
                         currentSize = snapshot.val();
                         currentSize--;
-                    })
+                    });
 
                     refCurrentSize.set(currentSize).then(function () {
                         //retrieve the newly updated team promise and assign to this.teams
@@ -2247,7 +2247,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                     refCurrentSize.on("value", function (snapshot) {
                         currentSize = snapshot.val();
                         currentSize++;
-                    })
+                    });
 
                     refCurrentSize.set(currentSize).then(function () {
                         //retrieve the newly updated team promise and assign to this.teams

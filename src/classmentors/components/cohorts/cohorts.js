@@ -774,7 +774,8 @@ export function clmCohortsStatsPageFactory() {
         bindToController: true,
         scope: {
             cohort: '=',
-            profile: '='
+            profile: '=',
+            events: '='
         },
         controller: ClmCohortStatsPageCtrl,
         controllerAs: 'ctrl'
@@ -803,9 +804,9 @@ function ClmCohortStatsPageCtrl(
 
                 //Initialise dataObj
                 for(var e = 0; e < self.cohort.events.length; e++) {
-                    dataObj[self.cohort.events[e] + "_x"] = [];
-                    dataObj[self.cohort.events[e]] = [];
-                    axisParam[self.cohort.events[e]] = self.cohort.events[e] + "_x";
+                    dataObj[self.events[self.cohort.events[e]].title + "_x"] = [];
+                    dataObj[self.events[self.cohort.events[e]].title] = [];
+                    axisParam[self.events[self.cohort.events[e]].title] = self.events[self.cohort.events[e]].title + "_x";
                 }
 
                 var actionsRef = db.ref('classMentors/userActions');
@@ -817,8 +818,8 @@ function ClmCohortStatsPageCtrl(
                     for(var actionIndex = 0; actionIndex < self.submissionLogs.length; actionIndex++) {
                         var logHolder = self.submissionLogs[actionIndex];
                         if(self.cohort.events.indexOf(logHolder.eventId) >= 0) {
-                            dataObj[logHolder.eventId + "_x"].push(logHolder.timestamp);
-                            dataObj[logHolder.eventId].push(new Date(logHolder.timestamp).getMinutes());
+                            dataObj[self.events[logHolder.eventId].title + "_x"].push(logHolder.timestamp);
+                            dataObj[self.events[logHolder.eventId].title].push(new Date(logHolder.timestamp).getMinutes());
                         }
                     }
                 }).then(function () {
@@ -826,6 +827,7 @@ function ClmCohortStatsPageCtrl(
                         var newArr = [obj];
                         dataArr.push(newArr.concat(dataObj[obj]));
                     }
+                    // console.log()
                     var chart = c3.generate({
                         bindto: "#chart",
                         data: {
@@ -837,12 +839,31 @@ function ClmCohortStatsPageCtrl(
                             x: {
                                 label: 'timestamp',
                                 tick: {
+                                    format: function (x) {
+                                        var a = new Date(x);
+                                        var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                                        var year = a.getFullYear();
+                                        var month = months[a.getMonth()];
+                                        var date = a.getDate();
+                                        var hour = a.getHours();
+                                        var min = a.getMinutes();
+                                        var sec = a.getSeconds();
+                                        var time = date + ' ' + month + ' ' + year + ' ' + hour;
+                                        return time;
+                                    },
                                     fit: false
                                 }
                             },
                             y: {
-                                label: 'Date of Action'
+                                label: 'Time of Action'
                             }
+                        },
+                        point: {
+                            r: 5
+                        },
+                        padding: {
+                            left: 50,
+                            right: 50
                         }
                     });
                 }).catch(function (err) {
@@ -917,7 +938,7 @@ function ClmCohortRankPageCtrl($q, $scope, $log, firebaseApp, $firebaseObject, $
             });
         }
     }
-    
+
     function fetchParticipantInfo(eventId) {
         var participantsArray = $firebaseArray(db.ref(`classMentors/eventParticipants/${eventId}`));
         participantsArray.$loaded().then(
