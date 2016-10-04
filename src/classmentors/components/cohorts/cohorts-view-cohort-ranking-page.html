@@ -15,7 +15,7 @@
                 <th>
                     <md-button>Rank</md-button>
                 </th>
-                <th ng-if="!ctrl.showFilteredRanking">
+                <th>
                     <md-button>Registered ({{ctrl.cohortTotalParticipants.length}})</md-button>
                 </th>
                 <th ng-if="ctrl.showFilteredRanking">
@@ -46,16 +46,29 @@
                     <td>{{ event.participants.length }}</td>
                     <td><a href="#{{ 'oneEvent' | urlFor: {eventId: event.id} }}">{{ event.title }}</a></td>
                 </tr>
-                <tr ng-if="ctrl.showFilteredRanking" ng-repeat="event in ctrl.cohortEventData | orderBy:'-qualifiedParticipants'" ng-class="'index-' + $index + ' ' + ($odd ? 'odd' : 'even')">
+                <tr ng-if="ctrl.showFilteredRanking && ctrl.cohort.title.toLowerCase().indexOf('junior') < 0" ng-repeat="event in ctrl.cohortEventData | orderBy:'-qualifiedParticipants'" ng-class="'index-' + $index + ' ' + ($odd ? 'odd' : 'even')">
                     <th>
                         {{$index+1}}
                     </th>
+                    <td>{{ event.participants.length }}</td>
                     <td>{{ event.qualifiedParticipants.length }}</td>
                     <td><a href="#{{ 'oneEvent' | urlFor: {eventId: event.id} }}">{{ event.title }}</a></td>
-                    <td ng-if="ctrl.showFilteredRanking && $index<12">{{event.qualifiedParticipants[0].displayName }} ({{event.qualifiedParticipants[0].score}})</td>
-                    <td ng-if="ctrl.showFilteredRanking && $index<12">{{event.qualifiedParticipants[1].displayName }} ({{event.qualifiedParticipants[1].score}})</td>
-                    <td ng-if="ctrl.showFilteredRanking && $index<2">{{event.qualifiedParticipants[2].displayName }} ({{event.qualifiedParticipants[2].score}})</td>
-                    <td ng-if="ctrl.showFilteredRanking && $index<2">{{event.qualifiedParticipants[3].displayName }} ({{event.qualifiedParticipants[3].score}})</td>
+                    <td ng-if="ctrl.showFilteredRanking && $index<6 && event.qualifiedParticipants[0]">{{event.qualifiedParticipants[0].displayName }} ({{event.qualifiedParticipants[0].score}})</td>
+                    <td ng-if="ctrl.showFilteredRanking && $index<6 && event.qualifiedParticipants[1]">{{event.qualifiedParticipants[1].displayName }} ({{event.qualifiedParticipants[1].score}})</td>
+                    <td ng-if="ctrl.showFilteredRanking && $index<2 && event.qualifiedParticipants[2]">{{event.qualifiedParticipants[2].displayName }} ({{event.qualifiedParticipants[2].score}})</td>
+                    <td ng-if="ctrl.showFilteredRanking && $index<2 && event.qualifiedParticipants[3]">{{event.qualifiedParticipants[3].displayName }} ({{event.qualifiedParticipants[3].score}})</td>
+                </tr>
+                <tr ng-if="ctrl.showFilteredRanking && ctrl.cohort.title.toLowerCase().indexOf('junior') >= 0" ng-repeat="event in ctrl.cohortEventData | orderBy:'-qualifiedParticipants'" ng-class="'index-' + $index + ' ' + ($odd ? 'odd' : 'even')">
+                    <th>
+                        {{$index+1}}
+                    </th>
+                    <td>{{ event.participants.length }}</td>
+                    <td>{{ event.qualifiedParticipants.length }}</td>
+                    <td><a href="#{{ 'oneEvent' | urlFor: {eventId: event.id} }}">{{ event.title }}</a></td>
+                    <td ng-if="ctrl.showFilteredRanking && $index<12 && event.qualifiedParticipants[0]">{{event.qualifiedParticipants[0].displayName }} ({{event.qualifiedParticipants[0].score}})</td>
+                    <td ng-if="ctrl.showFilteredRanking && $index<12 && event.qualifiedParticipants[1]">{{event.qualifiedParticipants[1].displayName }} ({{event.qualifiedParticipants[1].score}})</td>
+                    <td ng-if="ctrl.showFilteredRanking && $index<4 && event.qualifiedParticipants[2]">{{event.qualifiedParticipants[2].displayName }} ({{event.qualifiedParticipants[2].score}})</td>
+                    <td ng-if="ctrl.showFilteredRanking && $index<4 && event.qualifiedParticipants[3]">{{event.qualifiedParticipants[3].displayName }} ({{event.qualifiedParticipants[3].score}})</td>
                 </tr>
             </tbody>
         </table>

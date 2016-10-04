@@ -819,7 +819,7 @@ function ClmCohortStatsPageCtrl(
                         var logHolder = self.submissionLogs[actionIndex];
                         if(self.cohort.events.indexOf(logHolder.eventId) >= 0) {
                             dataObj[self.events[logHolder.eventId].title + "_x"].push(logHolder.timestamp);
-                            dataObj[self.events[logHolder.eventId].title].push(new Date(logHolder.timestamp).getMinutes());
+                            dataObj[self.events[logHolder.eventId].title].push(new Date(logHolder.timestamp).getHours()*60 + new Date(logHolder.timestamp).getMinutes());
                         }
                     }
                 }).then(function () {
@@ -848,14 +848,20 @@ function ClmCohortStatsPageCtrl(
                                         var hour = a.getHours();
                                         var min = a.getMinutes();
                                         var sec = a.getSeconds();
-                                        var time = date + ' ' + month + ' ' + year + ' ' + hour;
+                                        var time = date + ' ' + month + ' ' + year;
                                         return time;
                                     },
                                     fit: false
                                 }
                             },
                             y: {
-                                label: 'Time of Action'
+                                label: 'Time of Action',
+                                tick: {
+                                    format: function (x) {
+                                        return Math.floor(x/60) + ':' + x%60;
+                                    },
+                                    fit: false
+                                }
                             }
                         },
                         point: {
@@ -909,6 +915,7 @@ function ClmCohortRankPageCtrl($q, $scope, $log, firebaseApp, $firebaseObject, $
     var unwatchers = [];
     this.cohortEventData = [];
     this.cohortTotalParticipants = [];
+    console.log(self.cohort);
 
     // *************************** Re-write code here ***************************
 
