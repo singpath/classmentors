@@ -777,7 +777,7 @@ editEventCtrllInitialData.$inject = ['$q', '$route', 'spfAuthData', 'clmDataStor
  * EditEventCtrl
  *
  */
-function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataStore) {
+function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataStore, firebaseApp, $firebaseArray) {
     var self = this;
 
     this.currentUser = initialData.currentUser;
@@ -1021,21 +1021,62 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
         });
     };
 
-    this.openTask = function (eventId, taskId) {
+    this.openTask = function (eventId, task) {
+        var taskId = task.$id;
         clmDataStore.events.openTask(eventId, taskId).then(function () {
+            assignTeamLeaders(eventId, task);
             spfAlert.success('Challenge opened.');
         }).catch(function () {
             spfAlert.error('Failed to open challenge.');
         });
     };
 
-    this.closeTask = function (eventId, taskId) {
+    this.closeTask = function (eventId, task) {
+        // What event is here.
+        console.log(task);
+        var taskId = task.$id;
         clmDataStore.events.closeTask(eventId, taskId).then(function () {
             spfAlert.success('Challenge closed.');
         }).catch(function () {
             spfAlert.error('Failed to close challenge.');
         });
     };
+
+    function assignTeamLeaders(eventId, task){
+        if(task.teamFormationRef){
+            var db = firebaseApp.database();
+            console.log(task.teamFormationRef);
+            console.log(eventId);
+            var ref = db.ref(`classMentors/eventTeams/${eventId}/${task.teamFormationRef}`);
+            ref.once("value")
+                .then(function(snapshot){
+                    snapshot.forEach(function(childSnapshot){
+                        // Assign team leader if it does not exists
+                        var team = childSnapshot.val();
+                        console.log(team);
+                        if(!('teamLeader' in team)){
+                            var acc = []; //accumulator for team members.
+                            for(var key in team){
+                                if(key != 'currentSize' && key != 'maxSize'){
+                                    acc.push(key);
+                                }
+                            }
+                            // If there are memebers in the team.
+                            if(acc.length > 0){
+                                // Randomly pick a value out of acc.
+                                console.log(acc);
+                                var item = acc[Math.floor(Math.random()*acc.length)];
+                                console.log(item);
+                                // assign here.
+                                var teamRef = ref.child(childSnapshot.key);
+                                console.log(teamRef); // Sanity check here
+                                teamRef.child('teamLeader').set(item);
+                            }
+                        }
+                    });
+                });
+        }
+    }
 
     this.showTask = function (eventId, taskId) {
         clmDataStore.events.showTask(eventId, taskId).then(function () {
@@ -1061,7 +1102,7 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
         });
     };
 }
-EditEventCtrl.$inject = ['initialData', 'spfNavBarService', 'urlFor', 'spfAlert', 'clmDataStore'];
+EditEventCtrl.$inject = ['initialData', 'spfNavBarService', 'urlFor', 'spfAlert', 'clmDataStore', 'firebaseApp', '$firebaseArray'];
 
 /**
  * AddEventTaskCtrl initial data
@@ -1665,6 +1706,30 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         reversed: false
     };
 
+    // Load 'team leaders' of each member. 
+    self.teamLeader = null;
+    self.isTeamLeader = function(eventId, teamFormationId, currentUserId){
+        // Get all teams.
+        var db = firebaseApp.database();
+        var teamRef = db.ref(`classMentors/eventTeams/${eventId}/${teamFormationId}`);
+        teamRef.once("value")
+            .then(function(snapshot){
+                snapshot.forEach(function(childSnapShot){
+                    // console.log(childSnapShot.key);
+                    var team = childSnapShot.val();
+                    console.log(team);
+                    // console.log(team.teamLeader);
+                    // console.log(currentUserId);
+                    if(team[currentUserId.$id] != null){
+                        console.log(team.teamLeader);
+                        self.teamLeader = team.teamLeader;
+                        // Break execution.
+                        return true;                    
+                    }
+                })
+            });
+    };
+
     //Find superReviewUser rights
     // console.log(self.profile);
     this.isReviewSuperUser = false;
@@ -1921,6 +1986,8 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         codeSchool: true,
         codeCombat: true
     };
+
+
 
     this.startMCQ = function (eventId, taskId, task, participant, userSolution) {
         // Assign eventTable variables to data
@@ -2498,6 +2565,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         }),
         userSolution: clmDataStore.events.getUserSolutions(this.event.$id, this.profile.$id).then(function (solutions) {
             self.currentUserSolutions = solutions;
+            console.log('What is this ',solutions);
             unwatchers.push(solutions.$destroy.bind(solutions));
             return solutions;
         }),
