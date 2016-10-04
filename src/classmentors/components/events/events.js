@@ -3177,11 +3177,15 @@ export function clmEventRankTableFactory() {
     };
 }
 
-function ClmEventRankTableCtrl($scope, $log, firebaseApp, $firebaseObject, $firebaseArray, clmDataStore, clmPagerOption) {
+/**
+ * Ranking table controller.
+ *
+ * @todo move code dependent on bound attributes to $onInit method
+ */
+function ClmEventRankTableCtrl($log, $q, $filter, firebaseApp, $firebaseObject, $firebaseArray, clmDataStore) {
 
     var self = this;
     var db = firebaseApp.database();
-    var unwatchers = [];
 
     var updateLog = function (actionObj) {
         actionObj.publicId = self.profile.$id;
@@ -3189,254 +3193,83 @@ function ClmEventRankTableCtrl($scope, $log, firebaseApp, $firebaseObject, $fire
         clmDataStore.logging.inputLog(actionObj);
     };
 
-    // June 2016
-    this.rankingView2 = []; // 2016 update to new cm-worker
-    // If there are no ranked services on the event, use the default.
-    // Add this after the event is fetched if rankedServices is null.
+    this.rankingView = [];
 
-    var addRankedServices = function (parentScope) {
-        if (parentScope.event.rankedServices) {
-            parentScope.rankedServices = [];
-            for (var property in parentScope.event.rankedServices) {
-                if (parentScope.event.rankedServices.hasOwnProperty(property)) {
-                    // do stuff
-                    parentScope.rankedServices.push({id: property, name: property});
-                }
-            }
-        } else { // load the default services to list in ranking table.
-            parentScope.rankedServices = [
-                {id: 'freeCodeCamp', name: 'Free Code Camp'},
-                //{id: 'pivotalExpert', name: 'Pivotal Expert'}
-                // {id: 'codeCombat',name: 'Code Combat'},
-                // {id: 'singPath',name:  'SingPath Problems'},
-                // {id: 'codeSchool', name: 'Code School'}
-            ];
+    setRankedServices(this);
+    setParticipants(this);
+
+    function setRankedServices(ctrl) {
+        if (!ctrl.event.rankedServices) {
+            ctrl.rankedServices = [{id: 'freeCodeCamp', name: 'Free Code Camp'}];
+            return;
         }
 
-    };
-    // Update the list of services to show in table.
-    addRankedServices(this);
+        ctrl.rankedServices = [];
 
-    var getUserProfile = function (publicId, parentScope) {
-        var profileRef = db.ref(`classMentors/userProfiles/${publicId}`);
-        var result = $firebaseObject(profileRef);
-
-        result.$loaded().then(function () {
-            var temp = {};
-
-            temp.$id = publicId;
-            temp.$ranking = parentScope.rankingView2.length + 1;
-            temp.services = result.services;
-
-            // console.log("In user profile fetch with services", result.services);
-            var total = 0;
-
-            // If the user has no registered services, add an empty object to support the following logic.
-            if (!result.services) {
-                result.services = {};
-            }
-
-            // For each ranked service in the event.
-            for (var i = 0; i < self.rankedServices.length; i++) {
-                // console.log(self.rankedServices[i].id);
-                // If the user has registered for the service and has a totoalAchievements value.
-                if (
-                    result.services[self.rankedServices[i].id] &&
-                    result.services[self.rankedServices[i].id].totalAchievements
-                ) {
-                    temp[self.rankedServices[i].id] = parseInt(
-                        result.services[self.rankedServices[i].id].totalAchievements, 10
-                    );
-                    total += parseInt(result.services[self.rankedServices[i].id].totalAchievements, 10);
-                } else {
-                    temp[self.rankedServices[i].id] = 0;
-                }
-            }
-
-            temp.total = total;
-            temp.displayName = result.user.displayName;
-            temp.name = result.user.displayName;
-            temp.user = result.user;
-            // console.log(parentScope.event);
-            // console.log(parentScope.profile);
-            if (parentScope.assistants.indexOf(result.$id) < 0 && parentScope.event.owner.publicId !== result.$id) {
-                parentScope.rankingView2.push(temp);
-            }
-        }, function (reason) {
-            console.log(`Failed ${reason}`);
-        });
-    };
-
-    var refreshAchievements = function (profileId, service) {
-        // TODO: Only request updates for the services that users have registered for.
-        console.log(`Requesting achievement update for ${profileId}`);
-        db.ref('queue/tasks').push({id: profileId, service: service});
-    };
-
-    this.updateAllParticipantUserProfiles = function () {
-        // console.log("Requesting all users in ranking to be updated.");
-        updateLog({action: "updateAllParticipantUserProfiles", "eventId": self.event.$id});
-        // For each user in the ranking
-        for (var i = 0; i < self.rankingView2.length; i++) {
-            var publicId = self.rankingView2[i].$id;
-            // for service in ranked services
-            for (var j = 0; j < self.rankedServices.length; j++) {
-                // console.log(self.rankedServices[j].id);
-                // If the user in the ranking has the key services and key for a service
-                if (self.rankingView2[i].services && self.rankingView2[i].services[self.rankedServices[j].id]) {
-                    // console.log("Adding "+self.rankedServices[j].id+ " for user "+publicId);
-                    refreshAchievements(publicId, self.rankedServices[j].id);
-                } else {
-                    // console.log("Skipping "+self.rankedServices[j].id+ " for user "+publicId+ " since not registered");
-                }
+        for (var property in ctrl.event.rankedServices) {
+            if (ctrl.event.rankedServices.hasOwnProperty(property)) {
+                // do stuff
+                ctrl.rankedServices.push({id: property, name: property});
             }
         }
     };
 
-    var getUserProfilesFromEventParticipants = function (parentScope) {
-        // Clear ranking and re-rank
-        parentScope.rankingView2 = [];
-        console.log('Fetching participants for event');
-        for (var i = 0; i < parentScope.eventParticipants.length; i++) {
-            var publicId = parentScope.eventParticipants[i].$id;
-            getUserProfile(publicId, parentScope);
-        }
-    };
-
-    this.getParticipants = function (parentScope) {
-        var ref = db.ref(`classMentors/eventParticipants/${parentScope.event.$id}`);
+    function setParticipants(ctrl) {
+        var ref = db.ref(`classMentors/eventParticipants/${ctrl.event.$id}`);
         var query = ref.limitToLast(100);
         var data = $firebaseArray(query);
 
-        data.$loaded().then(function () {
-            var result = data;
-            // console.log(result);
-            parentScope.eventParticipants = result;
-            getUserProfilesFromEventParticipants(parentScope);
-
-        }, function (reason) {
+        data.$loaded().then(function() {
+            ctrl.participants = data;
+            setRankingView(ctrl);
+        }).catch(function (reason) {
             console.log('Failed ' + reason);
         });
-
     };
 
-    this.getParticipants(this);
-    this.loading = true; // This will hide the table view.
+    function setRankingView(ctrl) {
+        ctrl.rankingView = [];
+
+        clmDataStore.events.getRanking(ctrl.event, ctrl.participants, ctrl.rankedServices, sortRanking).then(ranking => {
+            ctrl.rankingView = ranking;
+        }).catch(
+            err => console.log(`Failed: ${err}`)
+        );
+    };
+
+    function sortRanking(ranking) {
+        const order = self.orderOpts.map(opt => {
+            const dir = opt.reversed ? '-' : '+';
+
+            return `${dir}${opt.key}`;
+        });
+
+        return $filter('orderBy')(ranking, order);
+    }
+
+    /**
+     * Request update for all participants achievement.
+     *
+     * @todo redraw ranking when a profile is updated
+     */
+    this.updateAllParticipantUserProfiles = function () {
+        // console.log("Requesting all users in ranking to be updated.");
+        updateLog({action: "updateAllParticipantUserProfiles", "eventId": self.event.$id});
+        self.participants.forEach(p => clmDataStore.services.refresh(p));
+    };
+
     this.loading = false;
 
     this.currentUserRanking = undefined;
     this.orderOpts = [{
-        key: 'total',
+        key: '$total',
         reversed: true
     }, {
-        key: 'name',
+        key: '$user.displayName',
         reversed: false
     }];
-    this.pagerOpts = clmPagerOption();
-    unwatchers.push(self.pagerOpts.$destroy.bind(self.pagerOpts));
-    /*
-     load();
-
-     function load() {
-     $scope.$on('$destroy', unload);
-
-     return clmDataStore.events.getRanking(self.event.$id).then(function(ranking) {
-     self.ranking = ranking;
-
-     // Update ranking view via the pager range update event.
-     unwatchers.push(self.pagerOpts.onChange(rankingView));
-     updateRowCount();
-
-     unwatchers.push(self.ranking.$destroy.bind(self.ranking));
-     unwatchers.push(self.ranking.$watch(updateRowCount));
-     }).finally(function() {
-     self.loading = false;
-     }).catch(function(e) {
-     $log.error(e);
-     });
-     }
-
-     function unload() {
-     unwatchers.forEach(function(f) {
-     if (f) {
-     try {
-     f();
-     } catch (err) {
-     $log.error(err);
-     }
-     }
-     });
-     }
-     */
-    // function badgeComparer(propId) {
-    //   return function(a, b) {
-    //     var aB = a[propId] || 0;
-    //     var bB = b[propId] || 0;
-
-    //     return aB - bB;
-    //   };
-    // }
-
-    // function comparer(options) {
-    //   return chainComparer(options.map(function(opt) {
-    //     return reverseComparer(opt.reversed, _comparers[opt.key] || _comparers.total);
-    //   }));
-    // }
-
-    // function currentUserRanking() {
-    //   self.currentUserRanking = undefined;
-    //   rankingList.some(function(p) {
-    //     if (!self.profile) {
-    //       return true;
-    //     }
-
-    //     if (p.$id === self.profile.$id) {
-    //       self.currentUserRanking = p;
-    //       return true;
-    //     }
-
-    //     return false;
-    //   });
-    // }
-
-    // function rankingView() {
-    //   console.log('In ranking view');
-    //   rankingList.sort(comparer(self.orderOpts)).forEach(function(p, i) {
-    //     p.$ranking = i + 1;
-    //   });
-
-    //   self.rankingView2 = rankingList.slice(
-    //     self.pagerOpts.range.start,
-    //     self.pagerOpts.range.end
-    //   );
-
-    //   currentUserRanking();
-    // }
-
-    // Update pager's row count
-    // (the pager should trigger a range update and call rankingView)
-    // function updateRowCount() {
-    //   if (!self.ranking) {
-    //     rankingList = [];
-    //     self.pagerOpts.setRowCount(0);
-    //     return;
-    //   }
-
-    //   rankingList = Object.keys(self.ranking).filter(function(publicId) {
-    //     return self.ranking[publicId] && self.ranking[publicId].user;
-    //   }).map(function(publicId) {
-    //     self.ranking[publicId].$id = publicId;
-    //     return self.ranking[publicId];
-    //   });
-
-    //   self.pagerOpts.setRowCount(rankingList.length);
-    // }
 
     this.orderBy = function (key) {
-        // Adjust this to support new ordering mechanism.
-
-        console.log('orderBy ' + key);
-
         if (self.orderOpts[0] && self.orderOpts[0].key === key) {
             self.orderOpts[0].reversed = !self.orderOpts[0].reversed;
         } else {
@@ -3447,6 +3280,8 @@ function ClmEventRankTableCtrl($scope, $log, firebaseApp, $firebaseObject, $fire
             self.orderOpts = self.orderOpts.slice(0, 2);
         }
 
+        self.rankingView = sortRanking(self.rankingView);
+
         updateLog({
             action: "eventRankingOrderby",
             "eventId": self.event.$id,
@@ -3454,54 +3289,18 @@ function ClmEventRankTableCtrl($scope, $log, firebaseApp, $firebaseObject, $fire
             "reversed": self.orderOpts[0].reversed
         });
 
-        // TODO: Revisit when 2nd order ranking becomes a priority.
-        // There was an issue with getting both strings and numbers to rank properly.
-        // Just leaving the array as is and allowing the view to do the sorting.
-        // console.log(self.orderOpts);
-        // Can we use > rather than - to deal with strings?
-        /*
-         if(self.orderOpts[1].reversed){
-         self.rankingView2.sort(function(a, b) {
-         return b[self.orderOpts[1].key] - a[self.orderOpts[1].key];
-         });
-         }
-         else{
-         self.rankingView2.sort(function(a, b) {
-         return a[self.orderOpts[1].key] - b[self.orderOpts[1].key];
-         });
-         }
-
-         if(self.orderOpts[0].reversed){
-         self.rankingView2.sort(function(a, b) {
-         return b[self.orderOpts[0].key] - a[self.orderOpts[0].key];
-         });
-         }
-         else{
-         self.rankingView2.sort(function(a, b) {
-         return a[self.orderOpts[0].key] - b[self.orderOpts[0].key];
-         });
-         }
-
-         //Update ordering
-         for(var i=0; i<self.rankingView2.length; i++){
-         self.rankingView2[i]["$ranking"] = i+1;
-         }
-         */
-
-        // rankingView();
-
     };
 
 }
 
 ClmEventRankTableCtrl.$inject = [
-    '$scope',
     '$log',
+    '$q',
+    '$filter',
     'firebaseApp',
     '$firebaseObject',
     '$firebaseArray',
-    'clmDataStore',
-    'clmPagerOption'
+    'clmDataStore'
 ];
 
 // Show event participants and submissions in a paged table
