@@ -1051,6 +1051,21 @@ export function clmDataStoreFactory(
         });
       },
 
+      setFeatured: function (eventId, featured){
+        var ref = db.ref(`classMentors/events/${eventId}/featured`);
+        ref.set(featured);
+      },
+
+      getFeatured: function(eventId){
+        var ref = db.ref(`classMentors/events/${eventId}/featured`);
+        var featured;
+        ref.on("value", function(snapshot){
+          featured = snapshot.val();
+        })
+        return featured;
+
+      },
+
       updateTask: function(eventId, taskId, task) {
         var ref = db.ref(`classMentors/eventTasks/${eventId}/${taskId}`);
         var priority = task.priority;
@@ -1075,7 +1090,6 @@ export function clmDataStoreFactory(
           return task;
         });
       },
-
       closeTask: function(eventId, taskId) {
         var ref = db.ref(`classMentors/eventTasks/${eventId}/${taskId}`);
         var abort;
