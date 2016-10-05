@@ -1709,6 +1709,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
 
     // Load 'team leaders' of each member. 
     self.teamLeader = null;
+    self.team = null
     self.isTeamLeader = function(eventId, teamFormationId, currentUserId){
         // Get all teams.
         var db = firebaseApp.database();
@@ -1723,7 +1724,9 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                     // console.log(currentUserId);
                     if(team[currentUserId.$id] != null){
                         console.log(team.teamLeader);
-                        self.teamLeader = team[team.teamLeader].displayName;
+                        // self.teamLeader = team[team.teamLeader].displayName;
+                        self.team = team;
+                        self.teamLeader = team.teamLeader;
                         // Break execution.
                         return true;                    
                     }
