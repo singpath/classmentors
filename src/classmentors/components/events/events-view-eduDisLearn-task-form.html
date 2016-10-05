@@ -70,7 +70,7 @@
                                 <label>Month</label>
                                 <md-select ng-model="$parent.$parent.selectedMonth"
                                            ng-change="ctrl.eduDissResp[value.title][key2] = selectedMonth" required>
-                                    <md-option ng-repeat="bday in ctrl.bdayMonth" value="{{bday.month}}">
+                                    <md-option ng-repeat="bday in ctrl.bdayMonth" ng-value="bday.month">
                                         {{bday.month}}
                                     </md-option>
                                 </md-select>
