@@ -98,14 +98,20 @@
                             > Start</md-button>
                         </span>
 
-                        <md-button class="md-raised md-primary" ng-if="task.formationPattern"
+                        <md-button class="md-raised md-primary" ng-if="task.formationPattern && !ctrl.currentUserSolutions[task.$id]"
                                    ng-click="ctrl.promptForTeamFormation(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant, ctrl.currentUserSolutions)"
                                    target="_blank"
                                    ng-disabled="task.closedAt"
                                    aria-label="Start form team"
                         >Form Team
                         </md-button>
-                        
+                        <md-button class="md-raised md-primary" ng-if="task.formationPattern && ctrl.currentUserSolutions[task.$id]"
+                                   ng-click="ctrl.promptForTeamFormation(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant, ctrl.currentUserSolutions)"
+                                   target="_blank"
+                                   ng-disabled="task.closedAt"
+                                   aria-label="Change form team"
+                        >Change Team
+                        </md-button>
                         <!--What's this for?-->
                         {{ctrl.isTeamLeader(ctrl.event.$id, task.teamFormationRef, ctrl.currentUserParticipant)}}
                         <span ng-if="!ctrl.currentUserSolutions[task.$id]">
