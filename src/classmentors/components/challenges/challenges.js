@@ -119,7 +119,7 @@ export function configRoute($routeProvider, routes) {
         })
 
 }
-4
+
 configRoute.$inject = ['$routeProvider', 'routes'];
 
 
