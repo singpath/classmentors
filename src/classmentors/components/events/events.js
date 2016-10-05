@@ -1023,6 +1023,7 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
 
     this.openTask = function (eventId, task) {
         var taskId = task.$id;
+        console.log('The task id is : ',taskId);
         clmDataStore.events.openTask(eventId, taskId).then(function () {
             assignTeamLeaders(eventId, task);
             spfAlert.success('Challenge opened.');

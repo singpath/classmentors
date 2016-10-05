@@ -277,9 +277,9 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
             }
         }
         console.log('Members ', teamMembers);
-        for(var key in team){
+        for(var key in teamMembers){
             var publicId = team[key].$id;
-            console.log(publicId);
+            console.log('PublicID being processed now ',publicId);
             var eventSolRef = db.ref(`classMentors/eventSolutions/${self.eventId}/${publicId}/${self.tratId}`);
             eventSolRef.child('answer').set(angular.toJson(solution));
             eventSolRef.child('completed').set(TIMESTAMP);
