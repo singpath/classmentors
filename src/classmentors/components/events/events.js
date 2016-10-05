@@ -1723,7 +1723,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                     // console.log(currentUserId);
                     if(team[currentUserId.$id] != null){
                         console.log(team.teamLeader);
-                        self.teamLeader = team.teamLeader;
+                        self.teamLeader = team[team.teamLeader].displayName;
                         // Break execution.
                         return true;                    
                     }
