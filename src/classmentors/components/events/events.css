@@ -59,3 +59,21 @@ md-dialog.link-dialog {
     height: 50%;
     border-radius: 0;
 }
+
+
+.collapsable {
+    display: inline-block;
+    overflow: hidden;
+    height: 0;
+    transition: height 1s;
+    -webkit-transition: height 1s;
+    -moz-transition: height 1s;
+    -o-transition: height 1s;
+}
+.showMe {
+    height: 100px;
+}
+
+.showMe2{
+    height:100px;
+}

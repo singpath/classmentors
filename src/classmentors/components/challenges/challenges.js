@@ -119,7 +119,7 @@ export function configRoute($routeProvider, routes) {
         })
 
 }
-4
+
 configRoute.$inject = ['$routeProvider', 'routes'];
 
 
@@ -300,6 +300,7 @@ export function challengeServiceFactory
                         closedAt: {'.sv': 'timestamp'},
                         showProgress: copy.showProgress,
                         archived: false,
+                        type: "formTeam",
                         teamFormationMethod: copy.teamFormationMethod
                     };
                     // Create 'teams' in 'eventTeams'.
@@ -330,6 +331,7 @@ export function challengeServiceFactory
                         closedAt: {'.sv': 'timestamp'},
                         showProgress: copy.showProgress,
                         archived: false,
+                        type: "TRAT",
                         teamFormationMethod: copy.teamFormationMethod,
                         mcqQuestions: copy.mcqQuestions
                     }

@@ -8,20 +8,52 @@
                 </div>
                 <div>
                     <md-input-container md-no-float>
-                       <md-radio-group ng-model="ctrl.selectedTeam" ng-required='true' ng-change="ctrl.onChange(ctrl.selectedTeam)">
-                           <md-radio-button ng-disabled='t.currentSize == t.maxSize'
-                            ng-repeat='t in ctrl.teams'
-                            ng-disabled="t.currentSize == t.maxSize"
-                            ng-value="$index">Team {{$index + 1}}, max: {{t.maxSize}} <br> {{t | showTeamMembers}}</md-radio-button>
-                       </md-radio-group>
+                        <md-radio-group ng-model="ctrl.selectedTeam" ng-required='true'
+                                        ng-change="ctrl.onChange(ctrl.selectedTeam)">
+                            <md-radio-button ng-disabled='t.currentSize == t.maxSize'
+                                             ng-repeat='t in ctrl.teams'
+                                             ng-value="$index">
+                                <table>
+                                    <tr>
+                                        <td>
+                                            <!--team currentsize: {{t.currentSize}}-->
+                                            <!--<br>-->
+                                            <!--team max size: {{t.maxSize}}-->
+                                            <!--<br>-->
+                                            Team {{$index + 1}} <font color="#A2A2A2" size="2px"><i>max: {{t.maxSize}}
+                                            members</i></font>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                            <table>
+                                                <tr>
+                                                    <td  ng-repeat="(key, value) in t"
+                                                         ng-if="key != 'maxSize' && key != 'currentSize'">
+                                                        <div>
+                                                            {{value.displayName}}
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            <!--<md-chips ng-model="ctrl.items" readonly="true">-->
+                                            <!--<md-chip-template>-->
+                                            <!--{{$chip.key}}-->
+                                            <!--</md-chip-template>-->
+                                            <!--</md-chips>-->
+                                        </td>
+                                    </tr>
+                                </table>
+                            </md-radio-button>
+                        </md-radio-group>
                     </md-input-container>
                 </div>
-                        <!--ng-model="ctrl.selectedTeam"
-                            ng-change="ctrl.onClick($index)"-->
+                <!--ng-model="ctrl.selectedTeam"
+                    ng-change="ctrl.onClick($index)"-->
                 <!--{{ctrl.teams | json}}-->
                 <div flex align='row'>
-                <md-button ng-click="ctrl.cancel()" class="md-raised md-primary" style="width: 150px;">Close
-                        </md-button>
+                    <md-button ng-click="ctrl.cancel()" class="md-raised md-primary" style="width: 150px;">Close
+                    </md-button>
                 </div>
             </div>
         </md-dialog-content>

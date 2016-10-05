@@ -62,20 +62,19 @@
                                         <table class="md-list-item-text">
                                             <tr>
                                                 <td>
-                                                    <h3><b>{{ msg.user }}</b></h3>
-                                                </td>
-                                                <td>
-                                                    <div ng-style="{'font-size': '10px', 'color': '#A9A9A9'}"> at
-                                                        {{msg.timestamp | date: 'hh:mm:ss'}}
-                                                    </div>
+                                                    <h3 ng-style="{'color': msg.style}"><b>{{ msg.status }}</b></h3>
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td>
-                                                    Selected:
+                                                    <h3><b>{{ msg.text }}</b></h3>
                                                 </td>
+                                            </tr>
+                                            <tr>
                                                 <td>
-                                                    <h3 ng-style="{'color': '#A9241C'}"><b>{{ msg.text }}</b></h3>
+                                                    <div ng-style="{'font-size': '10px', 'color': '#A9A9A9'}"> at
+                                                        {{msg.timestamp | date: 'hh:mm:ss'}}
+                                                    </div>
                                                 </td>
                                             </tr>
                                         </table>
@@ -102,7 +101,6 @@
             </div>
         </div>
         <div layout="row" layout-align="center center">
-            {{ctrl.teamleader}}
             <md-button class="md-raised md-primary"
                        ng-disabled="(ctrl.multiAns.length == 0 && ctrl.multipleAns[ctrl.index]) ||
                     (ctrl.selected == null && !ctrl.multipleAns[ctrl.index])"
