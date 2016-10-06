@@ -282,12 +282,12 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
             var publicId = team[key].$id;
             console.log('PublicID being processed now ',publicId);
             var eventSolRef = db.ref(`classMentors/eventSolutions/${self.eventId}/${publicId}/${self.tratId}`);
-            eventSolRefPromise = evenSolRef.set({
+            var eventSolRefPromise = eventSolRef.set({
                 'answer': angular.toJson(solution),
                 'completed': TIMESTAMP
             });
             var eventScoreRef = db.ref(`classMentors/eventScores/${self.eventId}/${publicId}/${self.tratId}`);
-            eventScoreRefPromise = eventScoreRef.set(score);
+            var eventScoreRefPromise = eventScoreRef.set(score);
             promiseArray.push(eventSolRefPromise);
             promiseArray.push(eventScoreRefPromise);
         }

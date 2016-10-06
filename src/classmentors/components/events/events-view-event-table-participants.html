@@ -121,9 +121,9 @@
                             <label ng-show="ctrl.teamLeader != ctrl.currentUserParticipant.$id && task.startTRAT && ctrl.teamLeader">
                                 Your team leader is: {{ctrl.team[ctrl.teamLeader].displayName}}
                             </label>
-                            <span ng-if="ctrl.currentUserSolutions[task.$id]">
+                        </span>
+                        <span ng-if="ctrl.currentUserSolutions[task.$id]">
                                 Completed<span ng-if="!ctrl.currentUserProgress[task.$id].completed"></span>
-                            </span>
                         </span>
                     </div>
                     
