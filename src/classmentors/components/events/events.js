@@ -1701,7 +1701,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
     this.participantsView = [];
     this.visibleTasks = [];
     this.taskCompletion = {};
-
+    this.eventTeams = [];
     this.orderOptions = {
         key: undefined,
         reversed: false
@@ -1719,7 +1719,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                 snapshot.forEach(function(childSnapShot){
                     // console.log(childSnapShot.key);
                     var team = childSnapShot.val();
-                    console.log(team);
+                    // console.log(team);
                     // console.log(team.teamLeader);
                     // console.log(currentUserId);
                     if(team[currentUserId.$id] != null){
@@ -1733,6 +1733,10 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                 })
             });
     };
+
+    function currentTeams(){
+        
+    }
 
     //Find superReviewUser rights
     // console.log(self.profile);
@@ -1994,16 +1998,6 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
 
 
     this.startMCQ = function (eventId, taskId, task, participant, userSolution) {
-        // Assign eventTable variables to data
-        // var data = {
-        //     eventId: eventId,
-        //     taskId: taskId,
-        //     task: task,
-        //     participant: participant,
-        //     userSolution: userSolution
-        // }
-        // // Store data in eventService
-        // eventService.set(data);
         console.log("participant isss:", participant);
         $location.path('/events/' + eventId + '/challenges/' + taskId + '/mcq/start');
     }
@@ -2534,17 +2528,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
 
     this.update = function () {
     };
-    /*
-     this.update = function(event, tasks, userSolutions, profile) {
-     return clmDataStore.events.updateCurrentUserProfile(
-     event, tasks, userSolutions, profile
-     ).then(function() {
-     spfAlert.success('Profile updated');
-     }).catch(function(err) {
-     $log.error(err);
-     spfAlert.error('Failed to update profile');
-     });
-     };*/
+
 
     this.removeParticipant = function (e, event, participant) {
         var confirm = $mdDialog.confirm()
@@ -2571,14 +2555,18 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         }),
         userSolution: clmDataStore.events.getUserSolutions(this.event.$id, this.profile.$id).then(function (solutions) {
             self.currentUserSolutions = solutions;
-            console.log('What is this ',solutions);
+            // console.log('What is this ',solutions);
             unwatchers.push(solutions.$destroy.bind(solutions));
             return solutions;
         }),
         singpathQueuedSolution: clmDataStore.singPath.queuedSolutions(this.profile.$id).then(function (paths) {
             unwatchers.push(paths.$destroy.bind(paths));
             return paths;
-        })
+        }),
+        userTeams: function(){
+            var db = firebaseApp.database();
+            var eventTeamsReference = db.ref(`classMentors/eventTeams/${this.event.$id}`);
+        }
     }).then(function (results) {
 
         visibleTasks();
@@ -2592,6 +2580,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         unwatchers.push(self.progress.$watch(taskCompletion));
         unwatchers.push(self.participants.$watch(taskCompletion));
         unwatchers.push(self.participants.$watch(updateParticipantRowCount));
+        //unwatchers.push(); for teams
 
         return results;
     }).finally(function () {
