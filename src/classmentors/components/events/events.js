@@ -2219,6 +2219,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             self.selectedTeam = initialData.selectedTeam;
             self.teams = {};
             self.teams = initialData.teams;
+            console.log("self teams iss:", self.teams);
             // var teamMembers = [];
             //separate the names to be populated
             // for (var i = 0; i < self.teams.length; i++) {
@@ -2264,8 +2265,8 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                 var team = self.teams[index];
                 var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${team.$id}/${participant.$id}`);
                 var currentSize;
-                // console.log(ref);
                 //  spfFirebase.remove(['classMentors/eventTeams/',eventId,taskId,team.$id,participant.$id])
+                //retrieve currentsize, then decrement
                 ref.remove().then(function () {
                     //do nothing
                     var refCurrentSize = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${team.$id}/currentSize`);
@@ -2273,14 +2274,14 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                         currentSize = snapshot.val();
                         currentSize--;
                     });
-
+                    //update currentsize in firebase, then assign to self.teams
                     refCurrentSize.set(currentSize).then(function () {
                         //retrieve the newly updated team promise and assign to this.teams
                         var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}`);
                         var teamEventPromise = $firebaseArray(ref);
                         teamEventPromise.$loaded().then(function (result) {
 
-                            this.teams = result;
+                            self.teams = result;
                         })
 
                     });
@@ -2306,6 +2307,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                 var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${team.$id}/${participant.$id}`);
                 // var currentSize = 0;
                 var currentSize;
+                //retrieve currentsize, then increment
                 ref.set(participant.user).then(function () {
                     clmDataStore.events.submitSolution(eventId, taskId, participant.$id, "Completed");
                     var refCurrentSize = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${team.$id}/currentSize`);
@@ -2313,18 +2315,18 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                         currentSize = snapshot.val();
                         currentSize++;
                     });
-
+                    //update currentsize in firebase, then assign to self.teams
                     refCurrentSize.set(currentSize).then(function () {
                         //retrieve the newly updated team promise and assign to this.teams
                         var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}`);
                         var teamEventPromise = $firebaseArray(ref);
                         teamEventPromise.$loaded().then(function (result) {
-                            this.teams = result;
+                            self.teams = result;
                         })
                     })
                 });
                 // self.teams[index].currentSize += 1;
-
+                console.log("self teams isss:", self.teams);
             }
 
             // var refreshLog = function () {
