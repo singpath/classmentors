@@ -277,16 +277,21 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
             }
         }
         console.log('Members ', teamMembers);
+        var promiseArray = []
         for(var key in teamMembers){
             var publicId = team[key].$id;
             console.log('PublicID being processed now ',publicId);
             var eventSolRef = db.ref(`classMentors/eventSolutions/${self.eventId}/${publicId}/${self.tratId}`);
-            eventSolRef.child('answer').set(angular.toJson(solution));
-            eventSolRef.child('completed').set(TIMESTAMP);
+            eventSolRefPromise = evenSolRef.set({
+                'answer': angular.toJson(solution),
+                'completed': TIMESTAMP
+            });
             var eventScoreRef = db.ref(`classMentors/eventScores/${self.eventId}/${publicId}/${self.tratId}`);
-            eventScoreRef.set(score);
+            eventScoreRefPromise = eventScoreRef.set(score);
+            promiseArray.push(eventSolRefPromise);
+            promiseArray.push(eventScoreRefPromise);
         }
-        
+        return promiseArray;
         // Write progress for all members as completed.
     }
 
@@ -321,9 +326,10 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
                     if(self.index == self.questions.length - 1){
                         userAnswers.push(attempts);
                         attempts = [];
-                        writeScoreAndProgress(self.team, self.totalScore, userAnswers);
-                        spfAlert.success('TRAT Submitted');
-                        $location.path(urlFor('oneEvent', {eventId: self.eventId}));
+                        $q.all(writeScoreAndProgress(self.team, self.totalScore, userAnswers)).then(function(){
+                            spfAlert.success('TRAT Submitted');
+                            $location.path(urlFor('oneEvent', {eventId: self.eventId}));
+                        })
                     }else{
                         self.noOfTries = 3;
                         userAnswers.push(attempts);
@@ -341,9 +347,10 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
                 if(self.index == self.questions.length - 1){
                         userAnswers.push(attempts);
                         attempts = [];
-                        writeScoreAndProgress(self.team, self.totalScore, userAnswers);
-                        spfAlert.success('TRAT Submitted');
-                        $location.path(urlFor('oneEvent', {eventId: self.eventId}));
+                        $q.all(writeScoreAndProgress(self.team, self.totalScore, userAnswers)).then(function(){
+                            spfAlert.success('TRAT Submitted');
+                            $location.path(urlFor('oneEvent', {eventId: self.eventId}));
+                        })
                 }else{
                     self.noOfTries = 3;
                     userAnswers.push(attempts);
