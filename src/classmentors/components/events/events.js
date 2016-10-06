@@ -1156,15 +1156,16 @@ addEventTaskCtrlInitialData.$inject = ['$q', '$route', 'spfAuthData', 'clmDataSt
 function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNavBarService, clmDataStore, $mdDialog, $scope, eventService, clmSurvey) {
 
     var self = this;
+    var location;
 
     this.event = initialData.event;
     this.badges = initialData.badges;
     this.isOpen = true;
     this.singPath = initialData.singPath;
     this.savingTask = false;
-    this.task = {archived: false, showProgress: true};
+    this.task = {archived: false, showProgress: true, badge: null};
     this.enableBeta = true;
-    var location;
+    this.services = clmDataStore.services;
 
     this.selectedMetaData = [];
 
@@ -1470,6 +1471,11 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
     this.taskId = initialData.taskId;
     this.task = initialData.task;
 
+    if (!this.task.badge) {
+        this.task.badge = null;
+    }
+
+    this.services = clmDataStore.services;
     this.isOpen = Boolean(this.task.openedAt);
     this.savingTask = false;
     this.enableBeta = true;

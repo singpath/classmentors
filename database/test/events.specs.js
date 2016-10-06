@@ -273,4 +273,36 @@ describe('events', function() {
 
   });
 
+  describe('tasks', function() {
+    const tasksPath = 'classMentors/eventTasks/alice-event';
+
+    describe('creating', function() {
+      const serviceIds = ['singPath', 'codeSchool', 'codeCombat', 'freeCodeCamp', 'pivotalExpert'];
+      let newTask;
+
+      beforeEach(function() {
+        newTask = {
+          archived: false,
+          showProgress: true,
+          badge: null,
+          serviceId: 'freeCodeCamp',
+          title: 'Join service',
+          priority: 2,
+          description: 'Register and provide service user name',
+          openedAt: {'.sv': 'timestamp'},
+          closedAt: null
+        };
+      });
+
+      serviceIds.forEach(serviceId => {
+        it(`should let the owner create a service task with ${serviceId}`, function() {
+          newTask.serviceId = serviceId;
+          expect(auth.alice).can.write(newTask).to.path(`${tasksPath}/some-new-task`);
+        });
+      });
+
+    });
+
+  });
+
 });

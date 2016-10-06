@@ -71,6 +71,11 @@ export function clmServicesFactory($firebaseObject, $log, $q, $timeout, firebase
        */
       this.settingId = settingId || camelCase(`enable ${name}`);
 
+      /**
+       * Flag the service as enable/disabled
+       * @type {Boolean}
+       */
+      this.available = false;
     }
 
     /* deprecated methods */
@@ -244,12 +249,6 @@ export function clmServicesFactory($firebaseObject, $log, $q, $timeout, firebase
     constructor() {
 
       /**
-       * List of enabled services.
-       * @type {Array}
-       */
-      Object.defineProperty(this, '$enabledServices', {value: [], writable: true});
-
-      /**
        * List of settings
        * @type {Object}
        */
@@ -297,10 +296,11 @@ export function clmServicesFactory($firebaseObject, $log, $q, $timeout, firebase
     doEnableServices() {
       const ids = Object.keys(this);
 
-      this.$enabledServices = ids.filter(serviceId => {
-        const settingId = this[serviceId].settingId;
+      ids.forEach(serviceId => {
+        const service = this[serviceId];
+        const settingId = service.settingId;
 
-        return this.$settings[settingId] && this.$settings[settingId].value;
+        this[serviceId].available = this.$settings[settingId] && this.$settings[settingId].value;
       });
     }
 
@@ -310,7 +310,9 @@ export function clmServicesFactory($firebaseObject, $log, $q, $timeout, firebase
      * @return {object}
      */
     available() {
-      return this.$enabledServices.map(serviceId => this[serviceId]);
+      const ids = Object.keys(this);
+
+      return ids.map(serviceId => this[serviceId]).filter(service => service.available);
     }
 
     /**

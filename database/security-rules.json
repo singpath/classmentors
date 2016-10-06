@@ -474,7 +474,7 @@
               ".validate": "data.val() === newData.val() || newData.val() === now"
             },
             "serviceId": {
-              ".validate": "newData.isString() && newData.parent().child('linkPattern').exists() === false && newData.parent().child('textResponse').exists() === false && (\n  newData.val() === 'singPath'\n  || newData.val() === 'codeSchool'\n  || newData.val() === 'codeCombat'\n)"
+              ".validate": "newData.isString() && newData.parent().child('linkPattern').exists() === false && newData.parent().child('textResponse').exists() === false && (\n  newData.val() === 'singPath'\n || newData.val() === 'codeSchool'\n || newData.val() === 'codeCombat'\n || newData.val() === 'freeCodeCamp'\n || newData.val() === 'pivotalExpert'\n)"
             },
             "showLinks": {
               ".validate": "newData.isBoolean()"

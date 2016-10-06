@@ -163,7 +163,19 @@
     "eventProgress": {},
     "eventRankings": {},
     "eventSolutions": {},
-    "eventTasks": {},
+    "eventTasks": {
+      "alice-event": {
+        "provide-code-combat-name": {
+          "title": "Join code combat",
+          "description": "Register and provide code combat user name",
+          "serviceId": "codeCombat",
+          "openedAt": 125000002000,
+          "priority": 2,
+          "archived": false,
+          "showProgress": true
+        }
+      }
+    },
     "events": {
       "alice-event": {
         "createdAt": 125000000000,
