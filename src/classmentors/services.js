@@ -1125,20 +1125,22 @@ export function clmDataStoreFactory(
         return loaded(clmDataStore.events.ParticipantsFirebaseArray.create(eventId));
       },
 
-      join: function(event, pw) {
-        var refs, authData, eventId;
+      join: function(event, profile, pw) {
+        let refs;
 
         if (!event || !event.$id) {
           return $q.reject('Event was not provided');
         }
 
-        eventId = event.$id;
+        if (!profile || !profile.$id) {
+          return $q.reject('Participant profile not provided');
+        }
 
-        return spfAuthData.user().then(function(_authData) {
-          var uid = spfAuth.user && spfAuth.user.uid;
-          var publicId = _authData && _authData.publicId;
+        const eventId = event.$id;
+        const publicId = profile.$id;
 
-          authData = _authData;
+        return db.ref(`auth/publicIds/${publicId}`).once(function(snapshot) {
+          const uid = snapshot.val();
 
           if (!publicId) {
             return $q.reject(clmDataStore.events.errNoPublicId);
@@ -1160,12 +1162,26 @@ export function clmDataStoreFactory(
 
           return refs.application.set(hash);
         }).then(function() {
+          const user = {
+            displayName: profile.user.displayName,
+            gravatar: profile.user.gravatar,
+            school: cleanObj(profile.user.school) || null
+          };
+          const services = {};
+
+          clmServices.available().forEach(service => {
+            const details = service.details(profile);
+
+            if (!details) {
+              return;
+            }
+
+            services[service.serviceId] = {details: {id: details.id}};
+          });
+
           return refs.participation.set({
-            user: {
-              displayName: authData.displayName,
-              gravatar: authData.gravatar,
-              school: cleanObj(authData.school) || null
-            },
+            user,
+            services,
             joinedAt: {'.sv': 'timestamp'}
           });
         }).then(function() {
@@ -1393,12 +1409,28 @@ export function clmDataStoreFactory(
           solutions: solutions[publicId] || {},
           progress: userProgress
         }).then(function(data) {
-          // var detailsRef = db.ref(`classMentors/eventParticipants/${event.$id}/${data.classMentors.$id}/user`);
+          const participationRef = db.ref(`classMentors/eventParticipants/${event.$id}/${data.classMentors.$id}`);
+          const user = {
+            displayName: data.classMentors.user.displayName,
+            gravatar: data.classMentors.user.gravatar,
+            school: data.classMentors.user.school || null
+          };
+          const services = {};
 
-          // 4. save data
+          clmServices.available().forEach(service => {
+            const details = service.details(data.classMentors);
+
+            if (!details) {
+              return;
+            }
+
+            services[service.serviceId] = {details: {id: details.id}};
+          });
+
+          // 2. Update event data
           return $q.all([
 
-            // 2. check completness and update progress if needed.
+            // 3. check completness and update progress if needed.
             $q.resolve(clmDataStore.events._getProgress(tasks, data)).then(function(progress) {
               var ref = db.ref(`classMentors/eventProgress/${event.$id}/${data.classMentors.$id}`);
               var updated = Object.keys(progress).some(function(taskId) {
@@ -1413,19 +1445,10 @@ export function clmDataStoreFactory(
               }
 
               return null;
-            })
+            }),
 
-            // 3. get ranking - if we get the ranking we could check it needs an update
-            // rankingRef.set(clmDataStore.events._getRanking(data))
-
-            // This was causing the endless loop of failed updates when viewing the ranking.
-            // 5. update participants data
-            // TODO: only update it if necessary.
-            // detailsRef.set({
-            //   displayName: data.classMentors.user.displayName,
-            //   gravatar: data.classMentors.user.gravatar,
-            //   school: data.classMentors.user.school || null
-            // })
+            // 4. update participants data
+            participationRef.update({user, services})
           ]);
         }).catch(function(err) {
           $log.error(`Failed to update progress of ${publicId}: ${err.toString()}`);
