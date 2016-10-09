@@ -67,9 +67,7 @@
                 </div>
             </md-input-container>
         </div>
-            <!--<md-switch class="md-primary" ng-model="ctrl.enableBeta" aria-label="closed?">-->
-                <!--*Enable BETA functions (WARNING: MAY BREAK STUFF)-->
-            <!--</md-switch>-->
+
         <div>
             <h3>options</h3>
             <p>
@@ -105,25 +103,17 @@
 
         <div>
             <h3>Task type <small ng-if="!ctrl.taskType">(Required)</small></h3>
-            <md-radio-group ng-model="ctrl.taskType">
-                <table>
-                    <tr>
-                        <td style=' padding-bottom:80px;'>
-                            <md-radio-button value="service" class="md-primary">Service / Badge / Problem</md-radio-button>
-                            <md-radio-button value="linkPattern" class="md-primary">Link pattern</md-radio-button>
-                            <md-radio-button value="textResponse" class="md-primary">Text Response</md-radio-button>
-                            <md-radio-button ng-disabled="!ctrl.enableBeta" value="multipleChoice" class="md-primary">Multiple Choice*</md-radio-button>
-                            <md-radio-button value="code" class="md-primary">Code</md-radio-button>
-                        </td>
-                        <td style='padding-left:30px; padding-bottom:80px;'>
-                            <md-radio-button value="profileEdit" class="md-primary">Profile Update</md-radio-button>
-                            <md-radio-button ng-disabled="!ctrl.enableBeta" value="video" class="md-primary">Video*</md-radio-button>
-                            <md-radio-button ng-disabled="!ctrl.enableBeta" value="journalling" class="md-primary">Journalling*</md-radio-button>
-                            <md-radio-button ng-disabled="!ctrl.enableBeta" value="survey" class="md-primary">Survey*</md-radio-button>
-                            <md-radio-button ng-disabled="!ctrl.enableBeta" value="teamActivity" class="md-primary">Team Activity*</md-radio-button>
-                        </td>
-                    </tr>
-                </table>
+            <md-radio-group ng-model="ctrl.taskType" layout="row" layout-wrap>
+                <md-radio-button flex="100" flex-gt-xs="50" flex-gt-md="33" value="service" class="md-primary">Service / Achievements</md-radio-button>
+                <md-radio-button flex="100" flex-gt-xs="50" flex-gt-md="33" value="linkPattern" class="md-primary">Link pattern</md-radio-button>
+                <md-radio-button flex="100" flex-gt-xs="50" flex-gt-md="33" value="textResponse" class="md-primary">Text Response</md-radio-button>
+                <md-radio-button flex="100" flex-gt-xs="50" flex-gt-md="33" value="multipleChoice" class="md-primary">Multiple Choice</md-radio-button>
+                <md-radio-button flex="100" flex-gt-xs="50" flex-gt-md="33" value="code" class="md-primary">Code</md-radio-button>
+                <md-radio-button flex="100" flex-gt-xs="50" flex-gt-md="33" value="profileEdit" class="md-primary">Profile Update</md-radio-button>
+                <md-radio-button flex="100" flex-gt-xs="50" flex-gt-md="33" value="video" class="md-primary">Video</md-radio-button>
+                <md-radio-button flex="100" flex-gt-xs="50" flex-gt-md="33" value="journalling" class="md-primary">Journalling</md-radio-button>
+                <md-radio-button flex="100" flex-gt-xs="50" flex-gt-md="33" value="survey" class="md-primary">Survey</md-radio-button>
+                <md-radio-button flex="100" flex-gt-xs="50" flex-gt-md="33" value="teamActivity" class="md-primary">Team Activity</md-radio-button>
             </md-radio-group>
         </div>
         <div layout="row" ng-if="ctrl.taskType == 'service'">

@@ -25,7 +25,6 @@
  */
 
 import {cleanObj} from 'singpath-core/services/firebase.js';
-import firebase from 'firebase';
 import editTmpl from './events-view-event-edit.html!text';
 import eventTableParticipantsTmpl from './events-view-event-table-participants.html!text';
 import eventTableRankTmpl from './events-view-event-table-rank.html!text';
@@ -1356,7 +1355,7 @@ function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNav
             }).catch(function (err) {
                 $log.error(err);
                 spfAlert.error('Failed to created new challenge.');
-            }).finally(function () {
+            }).then(function () {
                 self.creatingTask = false;
             });
         }
