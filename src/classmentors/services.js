@@ -165,50 +165,6 @@ export function clmServicesFactory($firebaseObject, $log, $q, $timeout, firebase
     }
 
     /**
-     * Resolve when the user can request an update for this service.
-     *
-     * Reject if the user not registered.
-     *
-     * @param {{lastUpdateRequest: ?number}} serviceData Class Mentor profile of a user.
-     * @return {{value: boolean, timeout: Promise<void,Error>, cancel: function(): void}}
-     */
-    canRequestUpdate(serviceData) {
-      const result = (delay) => {
-        const value = !delay;
-        const timeout = value ? Promise.resolve() : $timeout(undefined, delay);
-        const cancel = value ? noop : (() => $timeout.cancel(timeout));
-
-        return {value, timeout, cancel};
-      };
-
-      if (!serviceData) {
-        throw new Error('no service data');
-      }
-
-      if (!serviceData.lastUpdateRequest) {
-        return result();
-      }
-
-      const delta = this.now() - serviceData.lastUpdateRequest;
-      const maxDelta = 60000;
-
-      if (delta >= maxDelta) {
-        return result();
-      }
-
-      return result(maxDelta - delta);
-    }
-
-    /**
-     * Return the current timestamps
-     * @return {number}
-     * @private
-     */
-    now() {
-      return new Date().getTime();
-    }
-
-    /**
      * It should create the user details for that service and request an update.
      *
      * @param  {string}                     publicId User's publiId.
@@ -369,35 +325,6 @@ export function clmServicesFactory($firebaseObject, $log, $q, $timeout, firebase
 
         return details !== undefined;
       });
-    }
-
-    /**
-     * Return a promise which resolve when the profile can request a refresh
-     * of at least some of the services.
-     *
-     * The rate limit for an update is once per minute.
-     *
-     * @param  {object} profile AngularFire sync object representing a user object.
-     * @return {Promise<void,Error>}
-     */
-    canRefresh(profile) {
-      const timers = this.registeredWith(profile).map(
-        service => service.canRequestUpdate(service.data(profile)).timeout
-      );
-      const cancel = () => timers.forEach(t => $timeout.cancel(t));
-
-      if (timers.length === 0) {
-        return $q.resolve();
-      }
-
-      return $q.race(timers).then(
-        () => cancel(),
-        err => {
-          cancel();
-
-          return $q.reject(err);
-        }
-      );
     }
 
     /**
@@ -1496,8 +1423,8 @@ export function clmDataStoreFactory(
         var cmProfilePromise = clmDataStore.profile(publicId);
         var badgesPromise = cmProfilePromise.then(function(profile) {
           return $q.all({
-            // codeCombat: clmDataStore.services.codeCombat.fetchBadges(profile),
-            // codeSchool: clmDataStore.services.codeSchool.fetchBadges(profile)
+            codeCombat: clmDataStore.services.codeCombat.fetchBadges(profile),
+            codeSchool: clmDataStore.services.codeSchool.fetchBadges(profile)
           });
         });
 

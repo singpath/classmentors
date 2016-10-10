@@ -77,16 +77,10 @@ describe('profile', function() {
         expect(auth.bob).can.patch(patch).to.path('/');
       });
 
-      it('should allow admin to request some user service update', function() {
+      it('should allow any users to request other users update', function() {
         const patch = requestPatch('bob');
 
-        expect(auth.admin).can.patch(patch).to.path('/');
-      });
-
-      it('should disallow users to request other users update', function() {
-        const patch = requestPatch('bob');
-
-        expect(auth.alice).cannot.patch(patch).to.path('/');
+        expect(auth.alice).can.patch(patch).to.path('/');
       });
     });
 
