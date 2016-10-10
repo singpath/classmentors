@@ -20,12 +20,11 @@ function feedbackController(initialData, spfNavBarService, urlFor, firebaseApp, 
     this.allFeedback = {};
 
     spfNavBarService.update('Feedback');
-    console.log(initialData);
 
     this.toggleFeedbackType = function (feedbackType) {
         self.feedbackType = feedbackType;
         self.feedback = {};
-        if(self.feedbackType=='view' && self.currentUser.$id=='HTIc4MVi5CWC4I9rsbM6x0AarN52') {
+        if(self.feedbackType=='view' && (self.currentUser.$id=='HTIc4MVi5CWC4I9rsbM6x0AarN52' || self.currentUser.$id=='google:114073075323099232966')) {
             var path = db.ref('classMentors/userFeedback');
             var fb = $firebaseObject(path);
             fb.$loaded().then(function () {
@@ -36,6 +35,9 @@ function feedbackController(initialData, spfNavBarService, urlFor, firebaseApp, 
 
     this.saveFeedback = function () {
         self.feedback.type = self.feedbackType;
+        var stamp = new Date(Date.now());
+        var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        self.feedback.timestamp = stamp.getDate() + "-" + months[stamp.getMonth()] + "-" + stamp.getFullYear() + " (" + stamp.getHours() + ":" + stamp.getMinutes() + ":" + stamp.getSeconds() + ")";
 
         if(!self.anonymity) {
             self.feedback.loggedBy = {};
