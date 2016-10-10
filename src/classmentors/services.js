@@ -1061,7 +1061,7 @@ export function clmDataStoreFactory(
         var featured;
         ref.on("value", function(snapshot){
           featured = snapshot.val();
-        })
+        });
         return featured;
 
       },

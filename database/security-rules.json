@@ -881,6 +881,10 @@
         },
         ".read": true,
         ".write": "auth.uid == 'queue-worker'"
+      },
+      "userFeedback": {
+        ".read": true,
+        ".write": true
       }
     },
     "logs": {
