@@ -1,10 +1,85 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-    Welcome to the feedback page!
-</body>
-</html>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
+<md-content flex class="md-padding">
+    <md-content layout-align="center">
+        <p>Classmentors is a small portal with big dreams. We want to change how educators conduct their classes and help students realise their potential through team activities and peer learning.</p>
+        <p>Your feedback would be greatly appreciated for the Classmentors team to continue making improvements to the site. Feedback here comes in two forms. You may choose to highlight an issue that you have found, such as a break or a functional issue, or simply provide your opinion on what you liked / disliked about the site.</p>
+        <md-content layout="row" layout-align="center">
+            <md-button ng-click="ctrl.toggleFeedbackType('issue')" ng-class="{false:'md-raised', true:'md-raised md-primary'}[ctrl.feedbackType=='issue']">
+                <md-icon class="material-icons">report_problem</md-icon>
+                Identify Issue
+            </md-button>
+            <md-button ng-click="ctrl.toggleFeedbackType('general')" ng-class="{false:'md-raised', true:'md-raised md-primary'}[ctrl.feedbackType=='general']">
+                <md-icon class="material-icons">thumbs_up_down</md-icon>
+                General Feedback
+            </md-button>
+            <md-button ng-if="ctrl.currentUser.$id=='HTIc4MVi5CWC4I9rsbM6x0AarN52'" ng-click="ctrl.toggleFeedbackType('view')" ng-class="{false:'md-raised', true:'md-raised md-primary'}[ctrl.feedbackType=='view']">
+                <md-icon class="material-icons">thumbs_up_down</md-icon>
+                Raw Feedback
+            </md-button>
+        </md-content>
+        <br>
+        <md-divider></md-divider>
+        <br>
+        <div ng-if="ctrl.feedbackType=='issue'">
+            <form name="issueForm" ng-submit="ctrl.saveFeedback()">
+                <md-switch ng-model="ctrl.anonimity">Remain Anonymous? {{ctrl.anonimity ? "Yes":"No"}}</md-switch>
+                <md-input-container class="md-block">
+                    <label>Issue Name</label>
+                    <input ng-model="ctrl.feedback.name" md-maxlength="50" required>
+                </md-input-container>
+                Please select the issue severity
+                <md-radio-group ng-model="ctrl.feedback.severity" layout="row" required>
+                    <md-radio-button value=1>1</md-radio-button>
+                    <md-radio-button value=2>2</md-radio-button>
+                    <md-radio-button value=3>3</md-radio-button>
+                    <md-radio-button value=4>4</md-radio-button>
+                    <md-radio-button value=5>5</md-radio-button>
+                </md-radio-group>
+                <md-input-container class="md-block">
+                    <label>Issue Description</label>
+                    <textarea ng-model="ctrl.feedback.description" md-maxlength="1000" rows="3" md-select-on-focus required placeholder="If possible, please describe the steps you took that eventually allowed you to arrive at discovering this issue."></textarea>
+                </md-input-container>
+                <div layout="row" layout-align="center center">
+                    <md-button type="submit" class="md-raised md-primary"
+                               ng-disabled="issueForm.$pristine || issueForm.$invalid">
+                        Save
+                    </md-button>
+                    <md-button type="reset" class="md-raised" ng-click="ctrl.reset()"
+                               ng-disabled="issueForm.$pristine">Reset
+                    </md-button>
+                </div>
+            </form>
+        </div>
+        <div ng-if="ctrl.feedbackType=='general'">
+            <form name="generalForm" ng-submit="ctrl.saveFeedback()">
+                <md-switch ng-model="ctrl.anonimity">Remain Anonymous? {{ctrl.anonimity ? "Yes":"No"}}</md-switch>
+                <md-input-container class="md-block">
+                    <label>Feedback Title</label>
+                    <input ng-model="ctrl.feedback.name" md-maxlength="50" required>
+                </md-input-container>
+                Please classify your feedback. This helps us with estimating user sentiment.
+                <md-radio-group ng-model="ctrl.feedback.severity" layout="row" required>
+                    <md-radio-button value="+">Positive</md-radio-button>
+                    <md-radio-button value="-">Negative</md-radio-button>
+                </md-radio-group>
+                <md-input-container class="md-block">
+                    <label>Feedback Description</label>
+                    <textarea ng-model="ctrl.feedback.description" md-maxlength="1000" rows="3" md-select-on-focus required></textarea>
+                </md-input-container>
+                <div layout="row" layout-align="center center">
+                    <md-button type="submit" class="md-raised md-primary"
+                               ng-disabled="issueForm.$pristine || issueForm.$invalid">
+                        Save
+                    </md-button>
+                    <md-button type="reset" class="md-raised" ng-click="ctrl.reset()"
+                               ng-disabled="issueForm.$pristine">Reset
+                    </md-button>
+                </div>
+            </form>
+        </div>
+        <div ng-if="ctrl.feedbackType=='view'">
+            {{ctrl.allFeedback}};
+        </div>
+    </md-content>
+</md-content>
