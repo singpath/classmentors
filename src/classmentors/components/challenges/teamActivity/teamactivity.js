@@ -68,7 +68,7 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
             for (var i = 0; i < methodParameter; i++) {
                 teamStructure.push(0);
             }
-            console.log('Line reaches here');
+
             console.log('teamStructure :', teamStructure);
             //add 1 to each team until there are no more participants left
             for (var i = 0; i < participants; i++) {

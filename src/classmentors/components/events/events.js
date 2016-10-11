@@ -2307,7 +2307,6 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                         var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}`);
                         var teamEventPromise = $firebaseArray(ref);
                         teamEventPromise.$loaded().then(function (result) {
-
                             self.teams = result;
                         })
 
@@ -2324,7 +2323,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                     //     });
                     // })
                 });
-                console.log("currentSize after snapshot:", currentSize);
+                // console.log("currentSize after snapshot:", currentSize);
                 // self.teams[index].currentSize -= 1;
 
             }
@@ -2334,9 +2333,31 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                 var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${team.$id}/${participant.$id}`);
                 // var currentSize = 0;
                 var currentSize;
-                //retrieve currentsize, then increment
-                ref.set(participant.user).then(function () {
-                    clmDataStore.events.submitSolution(eventId, taskId, participant.$id, "Team " + (initialData.teams.indexOf(initialData.teams.find(t => t[participant.$id])) + 1));
+
+                // ref.set(participant.user).then(function () {
+                //     clmDataStore.events.submitSolution(eventId, taskId, participant.$id, "Completed");
+                //     var refCurrentSize = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${team.$id}/currentSize`);
+                //     refCurrentSize.on("value", function (snapshot) {
+                //         currentSize = snapshot.val();
+                //         currentSize++;
+                //     });
+                //     //update currentsize in firebase, then assign to self.teams
+                //     refCurrentSize.set(currentSize).then(function () {
+                //         //retrieve the newly updated team promise and assign to this.teams
+                //         var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}`);
+                //         var teamEventPromise = $firebaseArray(ref);
+                //         teamEventPromise.$loaded().then(function (result) {
+                //             self.teams = result;
+                //         })
+                //     })
+                // });
+
+                clmDataStore.events.joinTeam(eventId, taskId, team.$id, participant.$id, participant.user).then(function(){
+                    var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}`);
+                    var teamEventPromise = $firebaseArray(ref);
+                    teamEventPromise.$loaded().then(function (result) {
+                        self.teams = result;
+                    });
                     clmDataStore.logging.inputLog(
                         {
                             action: "formTeam",
@@ -2346,23 +2367,9 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                             taskId: taskId
                         }
                     );
-                    var refCurrentSize = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${team.$id}/currentSize`);
-                    refCurrentSize.on("value", function (snapshot) {
-                        currentSize = snapshot.val();
-                        currentSize++;
-                    });
-                    //update currentsize in firebase, then assign to self.teams
-                    refCurrentSize.set(currentSize).then(function () {
-                        //retrieve the newly updated team promise and assign to this.teams
-                        var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}`);
-                        var teamEventPromise = $firebaseArray(ref);
-                        teamEventPromise.$loaded().then(function (result) {
-                            self.teams = result;
-                        })
-                    })
                 });
-                // self.teams[index].currentSize += 1;
-                console.log("self teams isss:", self.teams);
+
+                // console.log("self teams isss:", self.teams);
             }
 
             // var refreshLog = function () {
