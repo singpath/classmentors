@@ -1003,6 +1003,11 @@ export function clmDataStoreFactory(
         return loaded($firebaseObject(ref));
       },
 
+      getEventTaskSolutions: function(eventId, taskId) {
+        var ref = db.ref(`classMentors/eventSolutions/${eventId}/${taskId}`);
+        return loaded($firebaseObject(ref));
+      },
+
       getScores: function(eventId) {
         var ref = db.ref(`classMentors/eventScores/${eventId}`);
 

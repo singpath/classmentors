@@ -493,6 +493,7 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
     this.participants = initialData.participants;
     this.profile = initialData.profile;
     this.tasks = initialData.tasks;
+    this.loadingSolutions = true;
     this.progress = initialData.progress;
     this.solutions = initialData.solutions;
     this.scores = initialData.scores;
@@ -510,6 +511,8 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
         }
     }
 
+    console.log(self.solutions);
+
     if (
         self.event &&
         self.event.owner &&
@@ -517,9 +520,6 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
         self.currentUser &&
         self.event.owner.publicId === self.currentUser.publicId
     ) {
-        monitorHandler = clmDataStore.events.monitorEvent(
-            this.event, this.tasks, this.participants, this.solutions, this.progress
-        );
         this.isOwner = true;
     } else {
         monitorHandler = {
@@ -688,6 +688,19 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
             clmDataStore.events.removeParticpants(event.$id, participant.$id);
         });
     };
+
+    this.loadSolutions = function() {
+        self.loadingSolutions = true;
+        console.log("loading solutions....");
+        // self.solutions = clmDataStore.events.getSolutions(self.event.$id).then(function (solutions) {
+        //     console.log(solutions);
+        //     return solutions;
+        // }).then(self.loadingSolutions = false).then(
+        //     monitorHandler = clmDataStore.events.monitorEvent(
+        //         this.event, this.tasks, this.participants, this.solutions, this.progress
+        // ));
+        self.loadingSolutions = false;
+    }
 }
 ViewEventCtrl.$inject = [
     '$scope',
