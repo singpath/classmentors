@@ -1751,7 +1751,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                     // console.log(team.teamLeader);
                     // console.log(currentUserId);
                     if(team[currentUserId.$id] != null){
-                        console.log(team.teamLeader);
+                        // console.log(team.teamLeader);
                         // self.teamLeader = team[team.teamLeader].displayName;
                         self.team = team;
                         self.teamLeader = team.teamLeader;
@@ -2202,7 +2202,6 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         }
     };
 
-
     this.promptForTeamFormation = function (eventId, taskId, task, participant, userSolution) {
         var db = firebaseApp.database();
         $mdDialog.show({
@@ -2359,6 +2358,15 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                     teamEventPromise.$loaded().then(function (result) {
                         self.teams = result;
                     });
+                    clmDataStore.logging.inputLog(
+                        {
+                            action: "formTeam",
+                            eventId: eventId,
+                            publicId: participant.$id,
+                            timeStamp: Date.now(),
+                            taskId: taskId
+                        }
+                    );
                 });
 
                 // console.log("self teams isss:", self.teams);
@@ -2394,11 +2402,11 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             this.cancel = function () {
                 $mdDialog.hide();
             };
-
+            // console.log(participant.$id);
+            // console.log("Your team number is: " + (initialData.teams.indexOf(initialData.teams.find(t => t[participant.$id])) + 1));
         }
 
         DialogController.$inject = ['initialData'];
-
     };
 
 

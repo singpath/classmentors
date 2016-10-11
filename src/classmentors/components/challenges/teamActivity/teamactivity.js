@@ -7,7 +7,7 @@ import './teamActivity.css!';
 const TIMESTAMP = {'.sv': 'timestamp'};
 function createTeamActivityInitialData($q, eventService, clmDataStore) {
     var data = eventService.get();
-    console.log("team data is:", data);
+    // console.log("team data is:", data);
 
     return clmDataStore.events.participants(data.event.$id).then(
         function (result) {
@@ -23,7 +23,7 @@ createTeamActivityInitialData.$inject = ['$q', 'eventService', 'clmDataStore'];
 function createTeamActivityController($q, initialData, clmDataStore, $location, urlFor, eventService) {
     var self = this;
 
-    console.log("initialdata for teamform are", initialData);
+    // console.log("initialdata for teamform are", initialData);
     // event variable consist of event id,timecreated,owner and event title
     self.event = initialData.data.event;
 
@@ -53,14 +53,15 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
             event: self.event,
             task: self.task,
             isOpen: initialData.data.isOpen
-        })
+        });
         $location.path(urlFor('viewMcq'));
-    }
+    };
 
 
     function formTeams(method, methodParameter, participants) {
         var teams = [];
         var teamStructure = [];
+        participants = participants + 1;
         console.log('Total participants :', participants);
         if (method == 'noOfTeams') {
             //initialze teamStructure with team size of 0 each
@@ -91,17 +92,17 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
                 currentSize: 0
             });
         }
-        console.log('Teams is: ', teams);
+        // console.log('Teams is: ', teams);
         return teams;
     }
 
     function populateTeam(members) {
         var team = {}
-        console.log(members);
+        // console.log(members);
         for (var i = 0; i < members; i++) {
             team[i] = "";
         }
-        console.log(angular.toJson(team));
+        // console.log(angular.toJson(team));
         return team;
     }
 
@@ -111,8 +112,8 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
         // var noTeamsOrStudents = self.teamFormationInput;
         var totalParticipants = self.participants.length;
 
-        console.log("number is ", noTeamsOrStudents);
-        console.log("cal", Math.ceil(totalParticipants / noTeamsOrStudents));
+        // console.log("number is ", noTeamsOrStudents);
+        // console.log("cal", Math.ceil(totalParticipants / noTeamsOrStudents));
         self.teamsMaximumStudents = Math.ceil(totalParticipants / noTeamsOrStudents) ? Math.ceil(totalParticipants / noTeamsOrStudents) : 0;
 
     }
@@ -137,7 +138,7 @@ function startTRATInitialData($q, spfAuthData, eventService, clmDataStore, fireb
     var data = eventService.get();
     var db = firebaseApp.database();
 
-    console.log("my data is:", data);
+    // console.log("my data is:", data);
     var eventId = $route.current.params.eventId;
     var taskId = $route.current.params.taskId;
 
@@ -145,7 +146,7 @@ function startTRATInitialData($q, spfAuthData, eventService, clmDataStore, fireb
     var tratId = taskId;
     var userTeamId = null;
     var userPublicId = data.participant.$id;
-    console.log("userpublicid iss:", data.participant);
+    // console.log("userpublicid iss:", data.participant);
     var teamFormationRefKey = data.task.teamFormationRef;
     var eventTeamRef = db.ref(`classMentors/eventTeams/${eventId}/${teamFormationRefKey}`);
 
@@ -163,7 +164,7 @@ function startTRATInitialData($q, spfAuthData, eventService, clmDataStore, fireb
         tratId: tratId,
         teamAndteamId: $firebaseArray(eventTeamRef).$loaded()
             .then(function (teams) {
-                console.log("teams in resolve:", spfAuthData.user());
+                // console.log("teams in resolve:", spfAuthData.user());
                 // Sanity check that teams are retrieved
                 for (var i = 0; i < teams.length; i++) {
                     var team = teams[i];
@@ -237,10 +238,10 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
                 multipleAnsArray.push(false);
             }
         }
-        console.log('Sanity check: ', multipleAnsArray);
+        // console.log('Sanity check: ', multipleAnsArray);
         return multipleAnsArray;
     })();
-    console.log(self.multipleAns);
+    // console.log(self.multipleAns);
 
     var teamAnsRef = db.ref(`classMentors/eventSolutions/${self.eventId}/${self.teamId}/${self.tratId}`);
     self.noOfTries = 3;
@@ -258,17 +259,17 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
     // test this later
     var updateLog = function (msg) {
         teamLogRef.push().set(msg).then(function () {
-            console.log('Msg has been pushed');
+            // console.log('Msg has been pushed');
             refreshLog();
         });
-    }
+    };
 
     self.submitTrat = function () {
         $location.path(urlFor('oneEvent'));
-    }
+    };
 
     function writeScoreAndProgress(team, score, solution){
-        console.log(team);
+        // console.log(team);
         var teamMembers = [];
         for(var key in team){
             var id = team[key].$id;
@@ -276,11 +277,11 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
                 teamMembers.push(id);
             }
         }
-        console.log('Members ', teamMembers);
+        // console.log('Members ', teamMembers);
         var promiseArray = []
         for(var key in teamMembers){
             var publicId = team[key].$id;
-            console.log('PublicID being processed now ',publicId);
+            // console.log('PublicID being processed now ',publicId);
             var eventSolRef = db.ref(`classMentors/eventSolutions/${self.eventId}/${publicId}/${self.tratId}`);
             var eventSolRefPromise = eventSolRef.set({
                 'answer': angular.toJson(solution),
@@ -306,9 +307,9 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
 
     var attempts = [];
     self.nextQuestion = function(){
-        console.log(userAnswers);
-        console.log('Curr index ', self.index);
-        console.log(self.questions.length);
+        // console.log(userAnswers);
+        // console.log('Curr index ', self.index);
+        // console.log(self.questions.length);
         // For Single answer MCQ
         if (self.selected != null) {
             var tempArray = []
@@ -319,7 +320,7 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
                 updateLog(buildMessage("Incorrect", 'Remaining attempts: ' + self.noOfTries, '#A9241C'));
                 // Store reccord
                 attempts.push(tempArray);
-                console.log('Current attempts: ', attempts);
+                // console.log('Current attempts: ', attempts);
                 if(self.noOfTries == 0){
                     updateLog(buildMessage("Incorrect", 'No attempts remaining', '#A9241C'));
                     self.totalScore += 0;
@@ -360,7 +361,7 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
                     self.options = loadOptions(self.question);
                 }
             }
-            console.log(self.totalScore);
+            // console.log(self.totalScore);
             // teamAns(tempArray);
             self.selected = null;
         } else {// For multi answer MCQ
@@ -395,8 +396,8 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
                 self.multiAns = [];
             }else{
                 // Add score
-                console.log('Single ans mcq is correct!');
-                console.log('index is : ',self.index);
+                // console.log('Single ans mcq is correct!');
+                // console.log('index is : ',self.index);
                 attempts.push(self.multiAns);
                 self.totalScore += addScore(self.noOfTries, 1);
                 updateLog(buildMessage("Correct!", 'Remaining attempts: ' + self.noOfTries, '#259b24'));
@@ -407,8 +408,8 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
                     spfAlert.success('TRAT Submitted');
                     $location.path(urlFor('oneEvent', {eventId: self.eventId}));
                 }else{
-                    console.log('Questions : ', self.questions);
-                    console.log('Load next question!');
+                    // console.log('Questions : ', self.questions);
+                    // console.log('Load next question!');
                     self.noOfTries = 3
                     userAnswers.push(attempts);
                     attempts = [];
@@ -417,7 +418,7 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
                     self.options = loadOptions(self.question);
                 }
             }
-            console.log(self.totalScore);
+            // console.log(self.totalScore);
             self.multiAns = [];
         }
     }
@@ -439,7 +440,9 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
     }
 
     function addScore(attempts, score){
-        return (score * (attempts / 3));
+        var s = (score * (attempts / 3));
+        console.log(s);
+        return Math.round(s * 100) / 100;
     }
     function arraysEqual(arr1, arr2) {
         if (arr1.length !== arr2.length)
