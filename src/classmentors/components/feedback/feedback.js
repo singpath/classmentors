@@ -24,7 +24,7 @@ function feedbackController(initialData, spfNavBarService, urlFor, firebaseApp, 
     this.toggleFeedbackType = function (feedbackType) {
         self.feedbackType = feedbackType;
         self.feedback = {};
-        if(self.feedbackType=='view' && (self.currentUser.$id=='HTIc4MVi5CWC4I9rsbM6x0AarN52' || self.currentUser.$id=='google:114073075323099232966')) {
+        if(self.feedbackType=='view' && (self.currentUser.$id=='HTIc4MVi5CWC4I9rsbM6x0AarN52' || self.currentUser.$id=='google:113933988995739437762')) {
             var path = db.ref('classMentors/userFeedback');
             var fb = $firebaseObject(path);
             fb.$loaded().then(function () {
