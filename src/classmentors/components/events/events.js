@@ -450,7 +450,7 @@ function viewEventCtrlInitialData($q, $route, spfAuth, spfAuthData, clmDataStore
             }
         }),
         solutions: canviewPromise.then(function (canView) {
-            if (canView) {
+            if(canView) {
                 return clmDataStore.events.getSolutions(eventId);
             }
         }),
@@ -488,14 +488,18 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
     var self = this;
     var monitorHandler;
 
-    this.currentUser = initialData.currentUser;
     this.event = initialData.event;
+
+    // initialData.solutions = initialData.progress;
+
+    this.currentUser = initialData.currentUser;
     this.participants = initialData.participants;
     this.profile = initialData.profile;
     this.tasks = initialData.tasks;
     this.loadingSolutions = true;
     this.progress = initialData.progress;
     this.solutions = initialData.solutions;
+    // this.solutions = {};
     this.scores = initialData.scores;
     this.canView = initialData.canView;
     this.viewArchived = false;
@@ -511,7 +515,18 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
         }
     }
 
-    console.log(self.solutions);
+    // this.solutions = clmDataStore.events.getSolutions(self.event.$id).then(function (solutions) {
+    //     console.log(solutions);
+    //     return solutions;
+    // }).then(function () {
+    //     monitorHandler = clmDataStore.events.monitorEvent(
+    //         self.event, self.tasks, self.participants, self.solutions, self.progress
+    //     );
+    // });
+
+    monitorHandler = clmDataStore.events.monitorEvent(
+        this.event, this.tasks, this.participants, this.solutions, this.progress
+    );
 
     if (
         self.event &&
@@ -522,10 +537,10 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
     ) {
         this.isOwner = true;
     } else {
-        monitorHandler = {
-            update: noop,
-            unwatch: noop
-        };
+        // monitorHandler = {
+        //     update: noop,
+        //     unwatch: noop
+        // };
     }
 
     if (self.event && self.currentUser && self.asstArr.indexOf(self.currentUser.publicId) >= 0) {
