@@ -2337,6 +2337,15 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                 //retrieve currentsize, then increment
                 ref.set(participant.user).then(function () {
                     clmDataStore.events.submitSolution(eventId, taskId, participant.$id, "Team " + (initialData.teams.indexOf(initialData.teams.find(t => t[participant.$id])) + 1));
+                    clmDataStore.logging.inputLog(
+                        {
+                            action: "formTeam",
+                            eventId: eventId,
+                            publicId: participant.$id,
+                            timeStamp: Date.now(),
+                            taskId: taskId
+                        }
+                    );
                     var refCurrentSize = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${team.$id}/currentSize`);
                     refCurrentSize.on("value", function (snapshot) {
                         currentSize = snapshot.val();
