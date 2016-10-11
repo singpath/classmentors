@@ -54,24 +54,10 @@
                 </th>
 
                 <td ng-repeat="task in ctrl.visibleTasks track by task.$id">
-                    <div ng-if="task.mcqQuestions">
-                            <span ng-if="ctrl.currentUserSolutions[task.$id]">
-
-                                <!--todo: add timer and make it work before allowing re-attempts-->
-                                <!--<timer countdown = "10041" max-time-unit="minute" interval="1000"> {{mminutes}} minute {{minutesS}},{{sseconds}} second{{secondsS}}</timer>-->
-                                Completed<span ng-if="!ctrl.currentUserProgress[task.$id].completed"></span>
-
-                                <!--<md-button class="md-raised md-primary"-->
-                                <!--ng-click="ctrl.startMCQ(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant, ctrl.currentUserSolutions)"-->
-                                <!--target="_blank"-->
-                                <!--ng-if="task.openedAt"-->
-                                <!--aria-label="Re-attempt challenge"-->
-                                <!--&gt;-->
-
-                                <!--Re-attempt Mcq-->
-                                <!--</md-button>-->
-
-                            </span>
+                    <div ng-if="task.mcqQuestions && !task.teamFormationMethod">
+                        <span ng-if="ctrl.currentUserSolutions[task.$id]">
+                            Completed<span ng-if="!ctrl.currentUserProgress[task.$id].completed"></span>
+                        </span>
                         <!--added one more contraint to change the button to Start IRAT-->
                         <span ng-if="!ctrl.currentUserSolutions[task.$id]">
                                 <md-button ng-if="!task.teamFormationMethod" class="md-raised md-primary"
@@ -81,13 +67,10 @@
                                            aria-label="Start challenge"
                                 >
                                     Start Mcq
-                                    <!--<span ng-switch on="ctrl.mustRegister(task, ctrl.profile)">-->
-                                    <!--<span ng-switch-when="true">Register</span>-->
-                                    <!--<span ng-switch-default>Start challenge</span>-->
-                                    <!--</span>-->
                                 </md-button>
                             </span>
                     </div>
+
                     <div ng-if="task.teamFormationMethod">
                         <span ng-if="!ctrl.currentUserSolutions[task.$id]">
                             <md-button class="md-raised md-primary" ng-if="task.startIRAT"
@@ -97,6 +80,7 @@
                                     aria-label="Start irat"
                             > Start</md-button>
                         </span>
+
 
                         <md-button class="md-raised md-primary" ng-if="task.formationPattern && !ctrl.currentUserSolutions[task.$id]"
                                    ng-click="ctrl.promptForTeamFormation(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant, ctrl.currentUserSolutions)"
@@ -121,16 +105,14 @@
                                     target="_blank"
                                     ng-disabled="task.closedAt"
                                     aria-label="Start trat"
-                            >
-                                Start
+                            >Start
                             </md-button>
                             <label ng-show="ctrl.teamLeader != ctrl.currentUserParticipant.$id && task.startTRAT && ctrl.teamLeader">
                                 Your team leader is: {{ctrl.team[ctrl.teamLeader].displayName}}
                             </label>
-                            <!--{{ctrl.currentUserParticipant}}-->
-                        
-                        
-                        
+                        </span>
+                        <span ng-if="ctrl.currentUserSolutions[task.$id] && !task.formationPattern">
+                            Completed<span ng-if="!ctrl.currentUserProgress[task.$id].completed"></span>
                         </span>
                     </div>
                     
