@@ -35,6 +35,7 @@ const noop = () => undefined;
 
 export function configServices(clmServices) {
   clmServices.register('Code Combat');
+  clmServices.register('Code School');
   clmServices.register('Free Code Camp');
   clmServices.register('Pivotal Expert');
 }
@@ -126,24 +127,26 @@ clmShowProfileInitialDataResolver.$inject = ['$q', '$route', 'spfAuth', 'spfAuth
  *
  */
 function ClmProfileCtrl(
-  $log, $q, $timeout, $route, spfAuthData, spfNavBarService, initialData, clmDataStore, spfAlert
+  $log, $q, $timeout, $route, spfAuthData, spfNavBarService, initialData, clmDataStore, spfAlert, clmRefreshTimout
 ) {
   const refreshLabel = 'Refresh Achievements';
   const waitingLabel = 'Waiting...';
   var self = this;
-  var menu = [];
   var refreshButton = {
     title: refreshLabel,
     onClick: () => this.refreshAllService(),
     icon: 'loop',
     disabled: false
   };
+  var menu = [refreshButton];
 
   this.auth = initialData.auth;
   this.currentUser = initialData.currentUser;
   this.currentUserProfile = initialData.currentUserProfile;
   this.profile = initialData.profile;
   this.settings = initialData.settings;
+  this.canRefresh = true;
+  this.refreshTimeout = undefined;
 
   if (
     this.profile &&
@@ -151,11 +154,11 @@ function ClmProfileCtrl(
     this.currentUser &&
     this.currentUser.publicId === this.profile.$id
   ) {
-    menu = [refreshButton, {
+    menu.push({
       title: 'Edit',
       onClick: () => (this.profileNeedsUpdate = true),
       icon: 'create'
-    }];
+    });
   }
 
   spfNavBarService.update('Profile', undefined, menu);
@@ -203,7 +206,10 @@ function ClmProfileCtrl(
   };
 
   this.refreshAllService = () => {
+    this.disableRefresh();
+
     clmDataStore.services.refresh(this.profile).catch(err => {
+      this.canRefresh = true;
       $log.error(err);
       spfAlert.error('Failed to refresh achievements.');
     });
@@ -212,23 +218,34 @@ function ClmProfileCtrl(
   this.disableRefresh = () => {
     refreshButton.title = waitingLabel;
     refreshButton.disabled = true;
+    this.canRefresh = false;
 
-    clmDataStore.services.canRefresh(this.profile).catch(
-      err => $log.error(err)
-    ).then(() => {
-      refreshButton.title = refreshLabel;
-      refreshButton.disabled = false;
-    });
+    this.refreshTimeout = $timeout(clmRefreshTimout);
+    this.refreshTimeout.then(
+      () => this.enableRefresh()
+    );
   };
 
-  const servicesRef = clmDataStore.services.ref(this.profile.$id);
-  const serviceUpdatehandler = servicesRef.on('value', () => this.disableRefresh());
+  this.enableRefresh = () => {
+    refreshButton.title = refreshLabel;
+    refreshButton.disabled = false;
 
-  this.$onDestroy = () => servicesRef.off('value', serviceUpdatehandler);
+    if (this.refreshTimeout) {
+      $timeout.cancel(this.refreshTimeout);
+      this.refreshTimeout = undefined;
+    }
+  };
+
+  this.$onDestroy = () => {
+    if (this.refreshTimeout) {
+      $timeout.cancel(this.refreshTimeout);
+      this.refreshTimeout = undefined;
+    }
+  };
 }
 
 ClmProfileCtrl.$inject = [
   '$log', '$q', '$timeout', '$route',
   'spfAuthData', 'spfNavBarService',
-  'initialData', 'clmDataStore', 'spfAlert'
+  'initialData', 'clmDataStore', 'spfAlert', 'clmRefreshTimout'
 ];

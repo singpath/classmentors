@@ -1,9 +1,9 @@
 <md-content layout="row" layout-align="start center">
     <span flex></span>
-    
+
     <span class="label md-padding">Row per page: </span>
     <md-select ng-model="ctrl.rowPerPage.value" ng-change="ctrl.rowPerPage.set(ctrl.rowPerPage.value)" aria-label="row per page">
-        <md-option value="{{opt}}" ng-repeat="opt in ctrl.rowPerPage.options">{{opt}}</md-option>
+        <md-option ng-value="opt" ng-repeat="opt in ctrl.rowPerPage.options">{{opt}}</md-option>
     </md-select>
 
     <span class="md-padding">

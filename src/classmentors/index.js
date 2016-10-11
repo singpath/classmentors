@@ -52,6 +52,7 @@ module.component('clmServiceForm', components.serviceCard.serviceForm.component)
 module.config(components.ace.configRoute);
 module.config(components.admin.configRoute);
 module.constant('aceStatsUrl', components.ace.ACE_STATS_URL);
+module.constant('clmRefreshTimout', 60000);
 module.constant('spfProfilesPath', 'classMentors/userProfiles');
 module.directive('clmCohortsRankingPage', components.cohorts.clmCohortRankPageFactory);
 module.directive('clmCohortsStatsPage', components.cohorts.clmCohortsStatsPageFactory);
@@ -60,9 +61,7 @@ module.directive('clmEventResultsTable', components.events.clmEventResultsTableF
 module.directive('clmEventTable', components.events.clmEventTableFactory);
 module.directive('clmPager', components.events.clmPagerFactory);
 module.directive('cmContains', directives.cmContainsFactory);
-//add directive for page scroll
 module.directive('scrollBottom', components.challenges.scrollBottom);
-//
 module.factory('aceStats', components.ace.factory);
 module.factory('challengeService', components.challenges.challengeServiceFactory);
 module.factory('clmDataStore', services.clmDataStoreFactory);
@@ -81,6 +80,7 @@ module.factory('quizFactory', components.challenges.tratQuestionFactory);
 
 // TODO: convert those view controller/template to component and move them above
 module.config(components.cohorts.configRoute);
+module.config(components.feedback.configRoute);
 module.config(components.events.configRoute);
 module.config(components.profiles.configRoute);
 module.config(components.challenges.configRoute);
@@ -120,7 +120,8 @@ module.constant('routes', {
   viewSurvey: '/challenges/survey',
   createTeamActivity: '/challenges/team-activity/create',
   viewIRAT: '/challenges/IRAT',
-  viewTRAT: '/events/:eventId/challenges/:taskId/TRAT/start'
+  viewTRAT: '/events/:eventId/challenges/:taskId/TRAT/start',
+  feedback: '/feedback'
 });
 
 export {module};

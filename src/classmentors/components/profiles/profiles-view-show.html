@@ -14,7 +14,7 @@
 
     <div flex="66">
 
-        <clm-service-card service-id="freeCodeCamp" public-id="ctrl.profile.$id"
+        <clm-service-card service-id="freeCodeCamp" public-id="ctrl.profile.$id" disable-refresh="ctrl.refreshTimeout"
                 profile-template="https://www.freecodecamp.com/{{name}}"
         >
             <clm-description>
@@ -23,7 +23,7 @@
             </clm-description>
         </clm-service-card>
 
-        <clm-service-card service-id="pivotalExpert" public-id="ctrl.profile.$id"
+        <clm-service-card service-id="pivotalExpert" public-id="ctrl.profile.$id" disable-refresh="ctrl.refreshTimeout"
           profile-template="https://pivotal-expert.firebaseapp.com/#/profile/{{name}}"
         >
             <clm-description>
@@ -32,7 +32,7 @@
             </clm-description>
         </clm-service-card>
 
-        <clm-service-card service-id="codeCombat" public-id="ctrl.profile.$id"
+        <clm-service-card service-id="codeCombat" public-id="ctrl.profile.$id" disable-refresh="ctrl.refreshTimeout"
           profile-template="https://codecombat.com/user/{{name}}"
         >
             <clm-description>
