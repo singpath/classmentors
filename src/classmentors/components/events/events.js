@@ -524,10 +524,6 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
     //     );
     // });
 
-    monitorHandler = clmDataStore.events.monitorEvent(
-        this.event, this.tasks, this.participants, this.solutions, this.progress
-    );
-
     if (
         self.event &&
         self.event.owner &&
@@ -535,12 +531,15 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
         self.currentUser &&
         self.event.owner.publicId === self.currentUser.publicId
     ) {
+        monitorHandler = clmDataStore.events.monitorEvent(
+            this.event, this.tasks, this.participants, this.solutions, this.progress
+        );
         this.isOwner = true;
     } else {
-        // monitorHandler = {
-        //     update: noop,
-        //     unwatch: noop
-        // };
+        monitorHandler = {
+            update: noop,
+            unwatch: noop
+        };
     }
 
     if (self.event && self.currentUser && self.asstArr.indexOf(self.currentUser.publicId) >= 0) {
