@@ -450,7 +450,7 @@ function viewEventCtrlInitialData($q, $route, spfAuth, spfAuthData, clmDataStore
             }
         }),
         solutions: canviewPromise.then(function (canView) {
-            if (canView) {
+            if(canView) {
                 return clmDataStore.events.getSolutions(eventId);
             }
         }),
@@ -488,13 +488,18 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
     var self = this;
     var monitorHandler;
 
-    this.currentUser = initialData.currentUser;
     this.event = initialData.event;
+
+    // initialData.solutions = initialData.progress;
+
+    this.currentUser = initialData.currentUser;
     this.participants = initialData.participants;
     this.profile = initialData.profile;
     this.tasks = initialData.tasks;
+    this.loadingSolutions = true;
     this.progress = initialData.progress;
     this.solutions = initialData.solutions;
+    // this.solutions = {};
     this.scores = initialData.scores;
     this.canView = initialData.canView;
     this.viewArchived = false;
@@ -510,6 +515,19 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
         }
     }
 
+    // this.solutions = clmDataStore.events.getSolutions(self.event.$id).then(function (solutions) {
+    //     console.log(solutions);
+    //     return solutions;
+    // }).then(function () {
+    //     monitorHandler = clmDataStore.events.monitorEvent(
+    //         self.event, self.tasks, self.participants, self.solutions, self.progress
+    //     );
+    // });
+
+    monitorHandler = clmDataStore.events.monitorEvent(
+        this.event, this.tasks, this.participants, this.solutions, this.progress
+    );
+
     if (
         self.event &&
         self.event.owner &&
@@ -517,15 +535,12 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
         self.currentUser &&
         self.event.owner.publicId === self.currentUser.publicId
     ) {
-        monitorHandler = clmDataStore.events.monitorEvent(
-            this.event, this.tasks, this.participants, this.solutions, this.progress
-        );
         this.isOwner = true;
     } else {
-        monitorHandler = {
-            update: noop,
-            unwatch: noop
-        };
+        // monitorHandler = {
+        //     update: noop,
+        //     unwatch: noop
+        // };
     }
 
     if (self.event && self.currentUser && self.asstArr.indexOf(self.currentUser.publicId) >= 0) {
@@ -688,6 +703,19 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
             clmDataStore.events.removeParticpants(event.$id, participant.$id);
         });
     };
+
+    this.loadSolutions = function() {
+        self.loadingSolutions = true;
+        console.log("loading solutions....");
+        // self.solutions = clmDataStore.events.getSolutions(self.event.$id).then(function (solutions) {
+        //     console.log(solutions);
+        //     return solutions;
+        // }).then(self.loadingSolutions = false).then(
+        //     monitorHandler = clmDataStore.events.monitorEvent(
+        //         this.event, this.tasks, this.participants, this.solutions, this.progress
+        // ));
+        self.loadingSolutions = false;
+    }
 }
 ViewEventCtrl.$inject = [
     '$scope',
@@ -1034,7 +1062,7 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
 
     this.closeTask = function (eventId, task) {
         // What event is here.
-        console.log(task);
+        // console.log(task);
         var taskId = task.$id;
         clmDataStore.events.closeTask(eventId, taskId).then(function () {
             spfAlert.success('Challenge closed.');
@@ -1046,15 +1074,15 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
     function assignTeamLeaders(eventId, task){
         if(task.teamFormationRef){
             var db = firebaseApp.database();
-            console.log(task.teamFormationRef);
-            console.log(eventId);
+            // console.log(task.teamFormationRef);
+            // console.log(eventId);
             var ref = db.ref(`classMentors/eventTeams/${eventId}/${task.teamFormationRef}`);
             ref.once("value")
                 .then(function(snapshot){
                     snapshot.forEach(function(childSnapshot){
                         // Assign team leader if it does not exists
                         var team = childSnapshot.val();
-                        console.log(team);
+                        // console.log(team);
                         if(!('teamLeader' in team)){
                             var acc = []; //accumulator for team members.
                             for(var key in team){
@@ -1065,12 +1093,12 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
                             // If there are memebers in the team.
                             if(acc.length > 0){
                                 // Randomly pick a value out of acc.
-                                console.log(acc);
+                                // console.log(acc);
                                 var item = acc[Math.floor(Math.random()*acc.length)];
-                                console.log(item);
+                                // console.log(item);
                                 // assign here.
                                 var teamRef = ref.child(childSnapshot.key);
-                                console.log(teamRef); // Sanity check here
+                                // console.log(teamRef); // Sanity check here
                                 teamRef.child('teamLeader').set(item);
                             }
                         }
@@ -1306,7 +1334,7 @@ function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNav
                 event: event,
                 task: task
             };
-            console.log('Data shows... ', data);
+            // console.log('Data shows... ', data);
             spfNavBarService.update(
                 'Challenge Details', [{
                     title: 'Events',
@@ -2027,7 +2055,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
     };
 
     this.editProfileInfo = function (eventId, taskId, task, participant) {
-        console.log(task);
+        // console.log(task);
         $mdDialog.show({
             clickOutsideToClose: true,
             parent: $document.body,
@@ -3069,7 +3097,6 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
                 break;
             }
         }
-        console.log("edudissresp values: ", eduDissResp);
         if (!allResponses) {
             spfAlert.warning('Failed to save the responses.');
         } else {
@@ -3756,7 +3783,6 @@ function ClmEventResultsTableCtrl($scope, $q, $log, $mdDialog, $document,
     };
 
     this.viewLink = function (eventId, taskId, task, participant, userSolution) {
-        console.log(participant);
         $mdDialog.show({
             clickOutsideToClose: true,
             parent: $document.body,
@@ -3822,11 +3848,9 @@ function ClmEventResultsTableCtrl($scope, $q, $log, $mdDialog, $document,
                 this.solution = userSolution[taskId];
             }
             var userAnswers = angular.fromJson(this.solution).userAnswers;
-            console.log(userAnswers);
             for (var i = 0; i < this.questions.length; i++) {
                 this.questions[i].answers = userAnswers[i];
             }
-            console.log(this.questions);
             this.cancel = function () {
                 $mdDialog.hide();
             };

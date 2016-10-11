@@ -13,19 +13,21 @@ export class ServiceCardCtrl {
   /**
    * clm-service-card controller constructor
    *
-   * @param  {$compile.directive.Attributes} $attrs Controllers normalized DOM element attributes .
-   * @param  {jqLite}   $document       JqLite wrapper for the window document.
-   * @param  {function} $firebaseObject AngularFire sync. object factory
-   * @param  {function} $interpolate    Angular template compiler.
-   * @param  {object}   $log            Angular logging service.
-   * @param  {object}   $mdDialog       Angular Material dialog service.
-   * @param  {object}   clmServices     List 3rd party services.
-   * @param  {object}   spfAlert        singpath-core alert service.
-   * @param  {object}   spfCurrentUser  currentUser data.
+   * @param {$compile.directive.Attributes} $attrs Controllers normalized DOM element attributes .
+   * @param {jqLite}   $document       JqLite wrapper for the window document.
+   * @param {function} $firebaseObject AngularFire sync. object factory
+   * @param {function} $interpolate    Angular template compiler.
+   * @param {object}   $log            Angular logging service.
+   * @param {object}   $mdDialog       Angular Material dialog service.
+   * @param {function} $q              Angular promise service.
+   * @param {function} $timeout        Angular timeout service.
+   * @param {object}   clmServices     List 3rd party services.
+   * @param {object}   spfAlert        singpath-core alert service.
+   * @param {object}   spfCurrentUser  currentUser data.
    */
   constructor(
-    $attrs, $document, $firebaseObject, $interpolate, $log, $mdDialog,
-    clmServices, spfAlert, spfCurrentUser
+    $attrs, $document, $firebaseObject, $interpolate, $log, $mdDialog, $q, $timeout,
+    clmServices, spfAlert, spfCurrentUser, clmRefreshTimout
   ) {
 
     /**
@@ -64,11 +66,24 @@ export class ServiceCardCtrl {
     this.$log = $log;
 
     /**
+     * Angular promise service.
+     * @type {function}
+     * @private
+     */
+    this.$q = $q;
+
+    /**
      * List of 3rd party service manager.
      * @type {Map<string,Service>}
      * @private
      */
     this.$services = clmServices;
+
+    /**
+     * Angular timeout service.
+     * @type {function}
+     */
+    this.$timeout = $timeout;
 
     /**
      * Current user service
@@ -84,7 +99,7 @@ export class ServiceCardCtrl {
      * @type {function}
      * @private
      */
-    this.$unwatchUser = this.currentUser.$watch(() => this.$onChanges());
+    this.$unwatchUser = this.currentUser.$watch(() => this.watchData());
 
     /**
      * Third party service "service" - used to interact with the user data for
@@ -92,7 +107,6 @@ export class ServiceCardCtrl {
      *
      * @type {?{
      *         dataRef: function(publicId: string): firebase.database.Reference,
-     *         canRequestUpdate: function(data: object): Promise<void, Error>,
      *         requestUpdate: function(publicId: string): Promise<void, Error>,
      *         saveDetails: function(publicId: string, data: {id: string, name: string}): Promise<void, Error>
      *       }}
@@ -166,37 +180,37 @@ export class ServiceCardCtrl {
     this.canRefresh = false;
 
     /**
-     * `canRefresh` timeout canceller.
-     *
-     * Should be called before trying to update canRefresh or when the component
-     * is destroyed.
-     *
-     * @type {function(): void}
-     * @private
+     * Timer for the resfresh button
+     * @type {?Promise<void,Error>}
      */
-    this.$cancelRefreshTimer = noop;
+    this.$disableRefresh = undefined;
+
+    /**
+     * Timer delay
+     * @type {number}
+     */
+    this.$timoutDelay = clmRefreshTimout;
+
   }
 
   /* Angular Controller hooks */
   /* see https://docs.angularjs.org/api/ng/service/$compile#life-cycle-hooks */
 
   /**
-   * Called by angular when component bindings changes, and by our current user
-   * changes handler.
+   * Called by angular when component bindings changes.
    *
    * Should reset flags, `service` and `data` related properties.
+   *
+   * @param {object} changes list of changes.
    */
-  $onChanges() {
-    this.loading = true;
-    this.canEdit = Boolean(
-      this.currentUser.publicId
-      && (this.publicId === this.currentUser.publicId)
-    );
-    this.updating = false;
-    this.canRefresh = false;
+  $onChanges(changes) {
+    if (changes.publicId || changes.serviceId) {
+      this.watchData();
+    }
 
-    this.service = this.$services[this.serviceId];
-    this.watchData();
+    if (changes.disableRefresh) {
+      this.setCanRefresh();
+    }
   }
 
   /**
@@ -208,10 +222,14 @@ export class ServiceCardCtrl {
   $onDestroy() {
     this.$unwatchData();
     this.$unwatchUser();
-    this.$cancelRefreshTimer();
 
     if (this.data && this.data.$destroy) {
       this.data.$destroy();
+    }
+
+    if (this.$disableRefresh) {
+      this.$timeout.cancel(this.$disableRefresh);
+      this.$disableRefresh = undefined;
     }
   }
 
@@ -225,8 +243,17 @@ export class ServiceCardCtrl {
    * @private
    */
   watchData() {
-    this.$unwatchData();
+    this.service = this.$services[this.serviceId];
+    this.loading = true;
+    this.updating = false;
+    this.profileUrl = undefined;
 
+    this.canEdit = Boolean(
+      this.currentUser.publicId
+      && (this.publicId === this.currentUser.publicId)
+    );
+
+    this.$unwatchData();
     if (this.data && this.data.$destroy) {
       this.data.$destroy();
     }
@@ -241,56 +268,38 @@ export class ServiceCardCtrl {
    * Service data change (details, lastUpdate or lastUpdateRequest) handler.
    *
    * @private
-   * @return {Promise<void>}
    */
   onDataChanged() {
     this.loading = false;
 
     if (!this.data || this.data.$value === null || !this.data.details) {
       this.updating = false;
-      this.canRefresh = false;
       this.profileUrl = undefined;
 
-      return Promise.resolve();
+      return;
     }
 
     this.setProfileUrl();
     this.setUpdating();
-
-    return this.setCanRefresh();
   }
 
   /**
-   * Update `canRefresh` propety and if it is not yet set to true, set timer
-   * to set it to true.
+   * Update `canRefresh` propety.
    *
    * @private
    * @return {Promise<void>}
    */
   setCanRefresh() {
-    if (!this.canEdit) {
-      return Promise.resolve();
-    }
-
-    const canRefresh = this.service.canRequestUpdate(this.data);
-
-    this.$cancelRefreshTimer();
-    this.canRefresh = canRefresh.value;
-
-    if (this.canRefresh) {
-      this.$cancelRefreshTimer = noop;
-
-      return Promise.resolve();
-    }
-
-    this.$cancelRefreshTimer = canRefresh.cancel;
-
-    return canRefresh.timeout.then(() => {
-      this.canRefresh = true;
-      this.$cancelRefreshTimer = noop;
-    }).catch(
-      () => this.$log.debug('canRefresh timeout cancelled.')
+    const timers = [this.disableRefresh, this.$disableRefresh].filter(
+      t => t && t.then !== undefined
     );
+
+    this.canRefresh = false;
+
+    return this.$q.all(timers).then(() => {
+      this.canRefresh = true;
+      this.$disableRefresh = undefined;
+    });
   }
 
   /**
@@ -341,9 +350,19 @@ export class ServiceCardCtrl {
    * @return {Promise<void>}
    */
   refresh() {
-    return this.service.requestUpdate(this.publicId).catch(err => {
+    if (!this.canRefresh) {
+      return Promise.reject(new Error('Refresh is currently disable.'));
+    }
+
+    this.canRefresh = false;
+
+    return this.service.requestUpdate(this.publicId).then(() => {
+      this.$disableRefresh = this.$timeout(this.$timoutDelay);
+      this.setCanRefresh();
+    }).catch(err => {
+      this.canRefresh = true;
       this.$log.error(err);
-      this.$alert.error(`Failed to request on an update of your ${this.service.name} profile.`);
+      this.$alert.error(`Failed to request a ${this.service.name} profile update.`);
     });
   }
 
@@ -370,9 +389,12 @@ ServiceCardCtrl.$inject = [
   '$interpolate',
   '$log',
   '$mdDialog',
+  '$q',
+  '$timeout',
   'clmServices',
   'spfAlert',
-  'spfCurrentUser'
+  'spfCurrentUser',
+  'clmRefreshTimout'
 ];
 
 /**
@@ -380,13 +402,13 @@ ServiceCardCtrl.$inject = [
  *
  * @example
  * <!-- using default form -->
- * <clm-service-card public-id="$ctrl.publicId" service-id="myService">
+ * <clm-service-card public-id="$ctrl.publicId" service-id="myService" disable-refresh="$ctrl.refreshTimeout">
  *   <clm-description>myService let you gain achievements...</clm-description>
  * </clm-service-card>
  *
  * @example
  *  <!-- using custom dialog form -->
- *  <clm-service-card public-id="$ctrl.publicId" service-id="myService">
+ *  <clm-service-card public-id="$ctrl.publicId" service-id="myService" disable-refresh="$ctrl.refreshTimeout">
  *    <clm-description>myService let you gain achievements...</clm-description>
  *    <clm-service-form>
  *      <md-dialog aria-label="Link service profile" layout-padding style="min-width: 50%">
@@ -436,7 +458,8 @@ export const component = {
   // properties).
   bindings: {
     publicId: '<',
-    serviceId: '@'
+    serviceId: '@',
+    disableRefresh: '<'
   },
 
   // controller which an instance will accessible as `$ctrl` in the component

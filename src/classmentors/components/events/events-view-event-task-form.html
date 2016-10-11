@@ -8,7 +8,7 @@
 
                         ng-model="ctrl.task.title"
                         required="required" ng-minLength="3" md-maxLength="30"
-                        placeholder="Challenge name" value="{{ctrl.task.title}}"
+                        placeholder="Challenge name"
 
                     />
 
@@ -24,7 +24,7 @@
 
                         ng-model="ctrl.task.priority"
                         min="0" step="1"
-                        placeholer="Challenge priority" value="{{ctrl.task.priority}}"
+                        placeholer="Challenge priority"
 
                     />
                     <div ng-messages="editTask.editTaskPriority.$error">
@@ -59,7 +59,7 @@
 
                     ng-model="ctrl.task.link"
                     pattern="^(https?://.+|#/).+$"
-                    placeholder="URL to a challenge help page" value="{{ctrl.task.link}}"
+                    placeholder="URL to a challenge help page"
 
                 />
                 <div ng-messages="editTask.editTaskLink.$error">
@@ -200,7 +200,7 @@
 
                     ng-model="ctrl.task.linkPattern"
                     required="true"
-                    placeholer="Pattern" value="{{ctrl.task.linkPattern}}"
+                    placeholer="Pattern"
 
                 />
 
@@ -217,7 +217,7 @@
                 <input type="text" name="editTextResponse" id="edit-text-response"
                     ng-model="ctrl.task.textResponse"
                     required="true"
-                    placeholer="Question" value="{{ctrl.task.textResponse}}"
+                    placeholer="Question"
 
                 />
 
@@ -233,7 +233,7 @@
                 <input type="number" name="editMaxCards" id="edit-max-cards"
                        ng-model="ctrl.task.cards"
                        min="0" step="1"
-                       placeholer="index Cards" value="{{ctrl.task.cards}}"
+                       placeholer="index Cards"
                 />
                 <div ng-messages="editTask.editTaskPriority.$error">
                     <div ng-message="number">The max cards allowed should be a positive number.</div>
@@ -248,7 +248,7 @@
                 <input type="text" name="editCodeQuestion" id="edit-code-question"
                        ng-model="ctrl.task.textResponse"
                        required
-                       placeholder="Question" value="{{ctrl.task.textResponse}}"
+                       placeholder="Question"
                 />
 
                 <div ng-messages="editTask.editCodeQuestion.$error">
