@@ -2362,7 +2362,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                             action: "formTeam",
                             eventId: eventId,
                             publicId: participant.$id,
-                            timeStamp: Date.now(),
+                            timestamp: Date.now(),
                             taskId: taskId
                         }
                     );
