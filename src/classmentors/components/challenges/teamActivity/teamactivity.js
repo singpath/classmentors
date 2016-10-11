@@ -439,7 +439,9 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
     }
 
     function addScore(attempts, score){
-        return (score * (attempts / 3));
+        var s = (score * (attempts / 3));
+        console.log(s);
+        return Math.round(s * 100) / 100;
     }
     function arraysEqual(arr1, arr2) {
         if (arr1.length !== arr2.length)
