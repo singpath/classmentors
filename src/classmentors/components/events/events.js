@@ -1751,7 +1751,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                     // console.log(team.teamLeader);
                     // console.log(currentUserId);
                     if(team[currentUserId.$id] != null){
-                        console.log(team.teamLeader);
+                        // console.log(team.teamLeader);
                         // self.teamLeader = team[team.teamLeader].displayName;
                         self.team = team;
                         self.teamLeader = team.teamLeader;
@@ -2202,7 +2202,6 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         }
     };
 
-
     this.promptForTeamFormation = function (eventId, taskId, task, participant, userSolution) {
         var db = firebaseApp.database();
         $mdDialog.show({
@@ -2337,7 +2336,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                 var currentSize;
                 //retrieve currentsize, then increment
                 ref.set(participant.user).then(function () {
-                    clmDataStore.events.submitSolution(eventId, taskId, participant.$id, "Completed");
+                    clmDataStore.events.submitSolution(eventId, taskId, participant.$id, "Team " + (initialData.teams.indexOf(initialData.teams.find(t => t[participant.$id])) + 1));
                     var refCurrentSize = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${team.$id}/currentSize`);
                     refCurrentSize.on("value", function (snapshot) {
                         currentSize = snapshot.val();
@@ -2387,11 +2386,11 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             this.cancel = function () {
                 $mdDialog.hide();
             };
-
+            // console.log(participant.$id);
+            // console.log("Your team number is: " + (initialData.teams.indexOf(initialData.teams.find(t => t[participant.$id])) + 1));
         }
 
         DialogController.$inject = ['initialData'];
-
     };
 
 
