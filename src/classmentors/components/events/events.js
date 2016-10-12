@@ -127,6 +127,7 @@ export function configRoute($routeProvider, routes) {
 
 
         })
+
         .when('/events/:eventId/:taskId/survey2/:surveyTask', {
 
             template: motiStratLearnTmpl,
@@ -1334,7 +1335,7 @@ function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNav
                 event: event,
                 task: task
             };
-            // console.log('Data shows... ', data);
+            console.log('Data shows... ', data);
             spfNavBarService.update(
                 'Challenge Details', [{
                     title: 'Events',
@@ -1463,10 +1464,10 @@ editEventTaskCtrlInitialData.$inject = ['$q', '$route', 'spfAuthData', 'clmDataS
 
 
 /**Todo: enable edit to multiple choice, index card, etc. **/
-function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmDataStore, eventService, $mdDialog, $location){
+function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmDataStore, eventService, $mdDialog, $location, clmSurvey){
     var self = this;
 
-    // console.log("the initialdata looks like this:", initialData);
+    console.log("the initialdata looks like this:", initialData);
     this.event = initialData.event;
     this.badges = initialData.badges;
     this.taskId = initialData.taskId;
@@ -1499,6 +1500,8 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
     } else if (this.task.mcqQuestions) {
         this.taskType = 'multipleChoice';
 
+    } else if (this.task.survey){
+        this.taskType = 'survey';
     }
     // else if (this.task.profileEdit) {
     //     return 'Save';
@@ -1574,6 +1577,13 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
         } else if (this.tasktype === 'profileEdit') {
             return 'Save';
 
+        } else if (this.taskType == 'survey'){
+            clmSurvey.set(this.event.$id, this.event, this.task, this.taskType, this.isOpen);
+            var obj = clmSurvey.get();
+
+            location = 'challenges/survey/edit';
+            return 'Continue';
+
         } else {
             return 'Save';
         }
@@ -1637,7 +1647,7 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
         }
 
         self.creatingTask = true;
-        if (taskType === 'multipleChoice' || taskType === 'journalling' || taskType === 'video' || taskType === 'survey') {
+        if (taskType === 'multipleChoice' || taskType === 'journalling' || taskType === 'survey') {
             var data = {
                 taskType: taskType,
                 isOpen: isOpen,
@@ -1698,7 +1708,8 @@ EditEventTaskCtrl.$inject = [
     'clmDataStore',
     'eventService',
     '$mdDialog',
-    '$location'
+    '$location',
+    'clmSurvey'
 ];
 
 
