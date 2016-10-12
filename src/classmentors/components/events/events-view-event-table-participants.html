@@ -78,7 +78,7 @@
                                     target="_blank"
                                     ng-disabled="task.closedAt"
                                     aria-label="Start irat"
-                            > Start</md-button>
+                            >Start</md-button>
                         </span>
 
 
@@ -89,13 +89,16 @@
                                    aria-label="Start form team"
                         >Form Team
                         </md-button>
-                        <md-button class="md-raised md-primary" ng-if="task.formationPattern && ctrl.currentUserSolutions[task.$id]"
-                                   ng-click="ctrl.promptForTeamFormation(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant, ctrl.currentUserSolutions)"
-                                   target="_blank"
-                                   ng-disabled="task.closedAt"
-                                   aria-label="Change form team"
-                        >Change Team
-                        </md-button>
+                        <div ng-if="task.formationPattern && ctrl.currentUserSolutions[task.$id]">
+                            {{ctrl.currentUserSolutions[task.$id]}}
+                            <md-button class="md-icon-button md-primary small-icon" ng-click="ctrl.promptForTeamFormation(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant, ctrl.currentUserSolutions)"
+                                       target="_blank"
+                                       ng-disabled="task.closedAt"
+                                       aria-label="Change form team"
+                            >
+                                <md-icon md-svg-icon="create"></md-icon>
+                            </md-button>
+                        </div>
                         <!--What's this for?-->
                         {{ctrl.isTeamLeader(ctrl.event.$id, task.teamFormationRef, ctrl.currentUserParticipant)}}
                         <span ng-if="!ctrl.currentUserSolutions[task.$id]">
@@ -315,8 +318,13 @@
                             </span>
 
                         <span ng-if="!task.showLinks">
+                            <span ng-if="task.formationPattern && ctrl.solutions[participant.$id][task.$id]">
+                                {{ctrl.solutions[participant.$id][task.$id]}}
+                            </span>
+                            <span ng-if="!task.formationPattern">
                                 Completed
                             </span>
+                        </span>
                     </div>
                 </td>
                 <!--for team activity (temporary)
