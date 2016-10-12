@@ -1493,19 +1493,16 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
     } else if (this.task.lang) {
         this.taskType = 'code';
 
-    } else if (this.task.toEdit) {
-        this.taskType = 'profileEdit';
-
     } else if (this.task.textResponse) {
         this.taskType = 'textResponse';
 
     } else if (this.task.mcqQuestions) {
         this.taskType = 'multipleChoice';
 
-    } else if(this.task.survey){
-        this.taskType = 'survey';
-
-
+    }
+    // else if (this.task.profileEdit) {
+    //     return 'Save';
+    // }
 
     // md-select badge list and the the ng-model are compared
     // by reference.
@@ -1547,9 +1544,6 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
             console.log('linkPattern is clicked');
             return 'Save';
 
-        } else if (this.taskType === 'profileEdit') {
-            return 'Save';
-
         } else if (this.taskType == 'textResponse') {
             console.log('textResponse is clicked');
             return 'Save';
@@ -1564,19 +1558,21 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
             console.log('code is clicked');
             return 'Save';
 
+        } else if (this.taskType == 'video') {
+            console.log('video is clicked');
+            return 'Continue';
+
         } else if (this.taskType == 'journalling') {
             console.log('journalling is clicked');
             return 'Continue';
 
-        } else if (this.taskType == 'teamActivity') {
+        } else if (this.tasktype == 'teamActivity') {
             console.log('teamActivity is clicked');
             location = '/challenges/team-activity/edit';
             return 'Continue';
 
-        } else if (this.taskType == 'survey'){
-            console.log('survey selected');
-            location = '/challenges/survey';
-            return 'Continue';
+        } else if (this.tasktype === 'profileEdit') {
+            return 'Save';
 
         } else {
             return 'Save';

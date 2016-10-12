@@ -117,6 +117,7 @@
                         </td>
                         <td style='padding-left:30px; padding-bottom:80px;'>
                             <md-radio-button value="profileEdit" class="md-primary">Profile Update</md-radio-button>
+                            <md-radio-button ng-disabled="!ctrl.enableBeta" value="video" class="md-primary">Video*</md-radio-button>
                             <md-radio-button ng-disabled="!ctrl.enableBeta" value="journalling" class="md-primary">Journalling*</md-radio-button>
                             <md-radio-button ng-disabled="!ctrl.enableBeta" value="survey" class="md-primary">Survey*</md-radio-button>
                             <md-radio-button ng-disabled="!ctrl.enableBeta" value="teamActivity" class="md-primary">Team Activity*</md-radio-button>
@@ -261,6 +262,12 @@
                         {{opt}}
                     </md-option>
                 </md-select>
+            </md-input-container>
+        </div>
+
+        <div ng-if="ctrl.taskType == 'video'">
+            <md-input-container>
+                Video
             </md-input-container>
         </div>
 
