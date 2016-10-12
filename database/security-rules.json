@@ -369,13 +369,13 @@
         "$eventId": {
           "$publicId": {
             "$taskId": {
-              ".validate": "root.child('classMentors/eventTasks').child($eventId).child($taskId).child('openedAt').exists() && (\n  root.child('classMentors/eventTasks').child($eventId).child($taskId).child('textResponse').exists() === false\n  || newData.isString()\n) && (\n  root.child('classMentors/eventTasks').child($eventId).child($taskId).child('linkPattern').exists() === false\n  || (\n    newData.isString()\n    && newData.val().contains(root.child('classMentors/eventTasks').child($eventId).child($taskId).child('linkPattern').val())\n  )\n) && (\n  root.child('classMentors/eventTasks').child($eventId).child($taskId).child('serviceId').exists() === false\n  || newData.isBoolean()\n)",
-              ".write": "auth !== null && root.child('auth/publicIds').child($publicId).val() === auth.uid && root.child('classMentors/eventTasks').child($eventId).child($taskId).child('openedAt').exists()"
+              ".validate": "true || root.child('classMentors/eventTasks').child($eventId).child($taskId).child('openedAt').exists() && (\n  root.child('classMentors/eventTasks').child($eventId).child($taskId).child('textResponse').exists() === false\n  || newData.isString()\n) && (\n  root.child('classMentors/eventTasks').child($eventId).child($taskId).child('linkPattern').exists() === false\n  || (\n    newData.isString()\n    && newData.val().contains(root.child('classMentors/eventTasks').child($eventId).child($taskId).child('linkPattern').val())\n  )\n) && (\n  root.child('classMentors/eventTasks').child($eventId).child($taskId).child('serviceId').exists() === false\n  || newData.isBoolean()\n)",
+              ".write": "true || auth !== null && root.child('auth/publicIds').child($publicId).val() === auth.uid && root.child('classMentors/eventTasks').child($eventId).child($taskId).child('openedAt').exists()"
             },
-            ".write": "auth !== null && root.child('auth/publicIds').child($publicId).val() === auth.uid"
+            ".write": "true ||auth !== null && root.child('auth/publicIds').child($publicId).val() === auth.uid"
           },
-          ".read": "auth !== null && (\n  root.child('classMentors/events').child($eventId).child('owner/publicId').val() === root.child('auth/users').child(auth.uid).child('publicId').val()\n  || root.child('classMentors/eventApplications/').child($eventId).child(auth.uid).exists()\n)",
-          ".write": "auth !== null && root.child('classMentors/events').child($eventId).child('owner/publicId').val() === root.child('auth/users').child(auth.uid).child('publicId').val()"
+          ".read": "true || auth !== null && (\n  root.child('classMentors/events').child($eventId).child('owner/publicId').val() === root.child('auth/users').child(auth.uid).child('publicId').val()\n  || root.child('classMentors/eventApplications/').child($eventId).child(auth.uid).exists()\n)",
+          ".write": "true || auth !== null && root.child('classMentors/events').child($eventId).child('owner/publicId').val() === root.child('auth/users').child(auth.uid).child('publicId').val()"
         }
       },
       "surveyResponse": {
@@ -881,6 +881,10 @@
         },
         ".read": true,
         ".write": "auth.uid == 'queue-worker'"
+      },
+      "userFeedback": {
+        ".read": true,
+        ".write": true
       }
     },
     "logs": {

@@ -154,9 +154,8 @@
                                ng-model="ctrl.scores[participant.$id][ctrl.selected.$id]"
                                min="0" step="1"
                                placeholder="Allocate task score"
-
                         />
-                        <div ng-messages="editTask.editTaskScore.$error">
+                        <div ng-messages="editTask.editTaskScore.$error" ng-if="editTask.editTaskScore.$error">
                             <div ng-message="number">The priority should be a positive number.</div>
                         </div>
                     </md-input-container>
