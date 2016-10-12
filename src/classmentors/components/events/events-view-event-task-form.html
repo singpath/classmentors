@@ -290,7 +290,7 @@
             <!--TODO: 1. Create continue button controller to route to other views depending on challenge type-->
 
             <md-button type="submit" class="md-raised md-primary" ng-disabled="editTask.$invalid || !ctrl.taskType ||ctrl.savingTask">{{ ctrl.challengeRouteProvider(ctrl.taskType, ctrl.task, ctrl.isOpen)}}</md-button>
-            <md-button type="reset" class="md-raised" ng-click="ctrl.discardChanges($event)">Back</md-button>
+            <md-button type="button" class="md-raised" ng-click="ctrl.discardChanges($event)">Back</md-button>
 
         </div>
     </form>
