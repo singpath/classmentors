@@ -1236,10 +1236,6 @@ function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNav
             console.log('code is clicked');
             return 'Save';
 
-        } else if (tasktype == 'video') {
-            console.log('video is clicked');
-            return 'Continue';
-
         } else if (tasktype == 'teamActivity') {
             console.log('teamActivity is clicked');
             location = '/challenges/team-activity/create';
@@ -1328,7 +1324,7 @@ function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNav
 
 
         self.creatingTask = true;
-        if (taskType === 'multipleChoice' || taskType === 'journalling' || taskType === 'video' || taskType === 'survey' || taskType === 'teamActivity') {
+        if (taskType === 'multipleChoice' || taskType === 'journalling' || taskType === 'survey' || taskType === 'teamActivity') {
             var data = {
                 taskType: taskType,
                 isOpen: isOpen,
@@ -1560,10 +1556,6 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
         } else if (this.taskType == 'code') {
             console.log('code is clicked');
             return 'Save';
-
-        } else if (this.taskType == 'video') {
-            console.log('video is clicked');
-            return 'Continue';
 
         } else if (this.taskType == 'journalling') {
             console.log('journalling is clicked');
