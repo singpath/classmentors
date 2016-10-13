@@ -507,7 +507,7 @@ surveyFormEvent.$inject = [
     '$mdDialog'
 ];
 
-function editsurveyFormEvent($scope, clmSurvey, clmDataStore, $log, spfAlert, $location, urlFor,spfNavBarService,eventService) {
+function editsurveyFormEvent($scope, clmSurvey, clmDataStore, $log, spfAlert, $location, urlFor,spfNavBarService,eventService, $mdDialog) {
 
     //todo: sheryl comment to add corner cases checking; only allow edit when 1. there are no submission for the challenge 2. the challenge is closed (avoid race conditions)
     this.surveys = [
@@ -521,6 +521,17 @@ function editsurveyFormEvent($scope, clmSurvey, clmDataStore, $log, spfAlert, $l
     //console.log("surveyFormEvent eventId : " + sharedData.taskType);
     var getTask = sharedData.task;
     var self = this;
+
+    self.hasSurveyTitle = false;
+
+    //check if survey template has been selected.
+    this.checkSurveyValid = function(){
+        if(self.surveyType == 0 || self.surveyType == undefined){
+            self.hasSurveyTitle = false;
+        }else{
+            self.hasSurveyTitle = true;
+        }
+    };
 
     spfNavBarService.update(
         sharedData.task.title, [{
@@ -598,6 +609,20 @@ function editsurveyFormEvent($scope, clmSurvey, clmDataStore, $log, spfAlert, $l
 
     };
 
+    this.discardChanges = function (ev){
+        var confirm = $mdDialog.confirm()
+            .title('Would you like to discard your changes?')
+            .textContent('All of the information input will be discarded. Are you sure you want to continue?')
+            .ariaLabel('Discard changes')
+            .targetEvent(ev)
+            .ok('Cancel Editing')
+            .cancel('Continue Editing');
+        $mdDialog.show(confirm).then(function() {
+            // decided to discard data, bring user to previous page
+            $location.path(urlFor('editEvent', {eventId: sharedData.event.$id}));
+        })
+    }
+
 }
 editsurveyFormEvent.$inject = [
     '$scope',
@@ -608,7 +633,8 @@ editsurveyFormEvent.$inject = [
     '$location',
     'urlFor',
     'spfNavBarService',
-    'eventService'
+    'eventService',
+    '$mdDialog'
 ];
 
 
