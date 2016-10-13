@@ -213,12 +213,12 @@
             <md-input-container>
 
                 <label for="edit-text-response">Question</label>
-                <input type="text" name="editTextResponse" id="edit-text-response"
+                <textarea name="editTextResponse" id="edit-text-response"
                     ng-model="ctrl.task.textResponse"
-                    required="true"
-                    placeholer="Question"
-
-                />
+                    required
+                    placeholder="Question"
+                    rows="2" md-select-on-focus
+                ></textarea>
 
                 <div ng-messages="editTask.editTextResponse.$error">
                     <div ng-message="required">Required.</div>
@@ -244,11 +244,12 @@
         <div ng-if="ctrl.taskType == 'code'">
             <md-input-container>
                 <label for="edit-text-response">Question</label>
-                <input type="text" name="editCodeQuestion" id="edit-code-question"
+                <textarea name="editCodeQuestion" id="edit-code-question"
                        ng-model="ctrl.task.textResponse"
                        required
                        placeholder="Question"
-                />
+                       rows="2" md-select-on-focus
+                ></textarea>
 
                 <div ng-messages="editTask.editCodeQuestion.$error">
                     <div ng-message="required">Required.</div>
