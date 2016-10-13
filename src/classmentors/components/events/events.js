@@ -591,7 +591,7 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
             self.participants.$indexFor(self.currentUser.publicId) > -1
         ) {
             options.push({
-                title: 'Leave',
+                title: 'Leave Event',
                 onClick: function () {
                     clmDataStore.events.leave(self.event.$id).then(function () {
                         $route.reload();

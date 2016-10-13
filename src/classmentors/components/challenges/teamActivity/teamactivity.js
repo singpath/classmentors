@@ -20,7 +20,7 @@ function createTeamActivityInitialData($q, eventService, clmDataStore) {
 }
 createTeamActivityInitialData.$inject = ['$q', 'eventService', 'clmDataStore'];
 
-function createTeamActivityController($q, initialData, clmDataStore, $location, urlFor, eventService) {
+function createTeamActivityController($q, initialData, clmDataStore, $location, urlFor, eventService, $mdDialog) {
     var self = this;
 
     // console.log("initialdata for teamform are", initialData);
@@ -123,6 +123,21 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
         return self.teamsMaximumStudents;
     }
 
+    //this function double checks with user if he wishes to go back and discard all changes thus far
+    this.discardChanges = function (ev) {
+        var confirm = $mdDialog.confirm()
+            .title('You have not saved your input information')
+            .textContent('All of the information input will be discarded. Are you sure you want to continue?')
+            .ariaLabel('Discard all')
+            .targetEvent(ev)
+            .ok('Discard All')
+            .cancel('Continue editing');
+        $mdDialog.show(confirm).then(function () {
+            // decided to discard data, bring user to previous page
+            $location.path(urlFor('editEvent', {eventId: self.event.$id}));
+        });
+    };
+
 }
 createTeamActivityController.$inject = [
     '$q',
@@ -130,7 +145,8 @@ createTeamActivityController.$inject = [
     'clmDataStore',
     '$location',
     'urlFor',
-    'eventService'
+    'eventService',
+    '$mdDialog'
 ];
 
 function startTRATInitialData($q, spfAuthData, eventService, clmDataStore, firebaseApp, $firebaseObject, $firebaseArray, $route) {
