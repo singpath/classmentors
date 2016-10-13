@@ -219,8 +219,8 @@ function classMentorsEventResolver($q, spfAuth, spfAuthData, clmDataStore) {
     return $q.all({
         events: clmDataStore.events.list(),
         auth: spfAuth.$loaded(),
-        currentUser: spfAuthData.user().catch(function () {
-            return;
+        currentUser: spfAuthData.user().catch(function (error) {
+            return error;
         }),
         profile: clmDataStore.currentUserProfile(),
         createdEvents: clmDataStore.events.listCreatedEvents(),
