@@ -1499,19 +1499,7 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
         this.taskType = 'survey';
     }
 
-    this.toggle = function (item, list) {
-        var idx = list.indexOf(item);
-        if (idx > -1) {
-            list.splice(idx, 1);
-        }
-        else {
-            list.push(item);
-        }
-    };
 
-    this.exists = function (item, list) {
-        return list.indexOf(item) > -1;
-    };
     // else if (this.task.profileEdit) {
     //     return 'Save';
     // }
