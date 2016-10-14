@@ -232,7 +232,7 @@ export function clmServicesFactory($firebaseObject, $log, $q, $timeout, firebase
   }
 
   /**
-   * List of third party services providing user achiements.
+   * List of third party services providing user achievements.
    */
   class Services {
 
@@ -355,6 +355,14 @@ export function clmServicesFactory($firebaseObject, $log, $q, $timeout, firebase
       }
 
       return db.ref(`classMentors/userProfiles/${publicId}/services`);
+    }
+
+    userAchievementsRef(publicId) {
+      if (!publicId) {
+        throw new Error('Note public id provided.');
+      }
+
+      return db.ref(`classMentors/userAchievements/${publicId}`);
     }
 
   }
@@ -906,72 +914,38 @@ export function clmDataStoreFactory(
         return loaded($firebaseObject(ref));
       },
 
-      getRanking: function(eventId) {
-        var ref = db.ref(`classMentors/eventRankings/${eventId}`);
+      getRanking: function(event, participants, rankedServices, sort) {
+        const defaultSort = ranking => ranking.sort((a, b) => a.$total > b.$total);
+        const assistants = event.assistants || {};
+        const asyncRanking = participants.filter(p => {
+          const isAssistant = assistants[p.$id] !== undefined;
+          const isOwner = event.owner.publicId === p.$id;
 
-        return loaded($firebaseObject(ref)).then(function(ranking) {
-          setRankInSchool();
-          ranking.$watch(setRankInSchool);
+          return !isAssistant && !isOwner;
+        }).map(p => {
+          const achievementsRef = clmServices.userAchievementsRef(p.$id);
 
-          return ranking;
+          return achievementsRef.once('value').then(snapshot => {
+            const val = snapshot.val();
+            const achievements = val && val.services || {};
+            const stats = {$id: p.$id, $user: p.user, $total: 0};
 
-          function setRankInSchool() {
+            rankedServices.forEach(service => {
+              const rawCount = (
+                achievements[service.id] &&
+                achievements[service.id].totalAchievements
+              );
+              const count = parseInt(rawCount, 10) || 0;
 
-            // 1. sort participant by school
-            var schoolRankings = Object.keys(ranking).filter(function(publicId) {
-              return publicId.length > 0 && ranking[publicId] && ranking[publicId].user;
-            }).reduce(function(all, publicId) {
-              var participant = ranking[publicId];
-              var schoolId;
-
-              if (
-                participant.user.school == null || !participant.user.school.name || !participant.user.school.type
-              ) {
-                return all;
-              }
-
-              schoolId = `${participant.user.school.type}/${participant.user.school.name}`;
-              if (!all[schoolId]) {
-                all[schoolId] = [];
-              }
-
-              all[schoolId].push(participant);
-
-              return all;
-            }, {});
-
-            Object.keys(schoolRankings).map(function(schoolId) {
-
-              // 2. Sort each school participants in their school
-              schoolRankings[schoolId].sort(function(a, b) {
-
-                //  sort on total by desc. order.
-                if (a.total !== b.total) {
-                  return b.total - a.total;
-                }
-
-                if (!a.user || a.user.displayName) {
-                  return -1;
-                }
-
-                if (!b.user || b.user.displayName) {
-                  return 1;
-                }
-
-                // sort by display name if total is equal (asc. order)
-                return a.user.displayName.localeCompare(b.user.displayName);
-              });
-
-              return schoolRankings[schoolId];
-            }).forEach(function(sortedParticipants) {
-
-              // 3. add `$rankInSchool` property
-              sortedParticipants.forEach(function(p, index) {
-                p.$rankInSchool = index + 1;
-              });
+              stats[service.id] = count;
+              stats.$total += count;
             });
-          }
+
+            return stats;
+          });
         });
+
+        return $q.all(asyncRanking).then(sort || defaultSort);
       },
 
       getProgress: function(eventId) {
@@ -1151,20 +1125,22 @@ export function clmDataStoreFactory(
         return loaded(clmDataStore.events.ParticipantsFirebaseArray.create(eventId));
       },
 
-      join: function(event, pw) {
-        var refs, authData, eventId;
+      join: function(event, profile, pw) {
+        let refs;
 
         if (!event || !event.$id) {
           return $q.reject('Event was not provided');
         }
 
-        eventId = event.$id;
+        if (!profile || !profile.$id) {
+          return $q.reject('Participant profile not provided');
+        }
 
-        return spfAuthData.user().then(function(_authData) {
-          var uid = spfAuth.user && spfAuth.user.uid;
-          var publicId = _authData && _authData.publicId;
+        const eventId = event.$id;
+        const publicId = profile.$id;
 
-          authData = _authData;
+        return db.ref(`auth/publicIds/${publicId}`).once(function(snapshot) {
+          const uid = snapshot.val();
 
           if (!publicId) {
             return $q.reject(clmDataStore.events.errNoPublicId);
@@ -1186,12 +1162,26 @@ export function clmDataStoreFactory(
 
           return refs.application.set(hash);
         }).then(function() {
+          const user = {
+            displayName: profile.user.displayName,
+            gravatar: profile.user.gravatar,
+            school: cleanObj(profile.user.school) || null
+          };
+          const services = {};
+
+          clmServices.available().forEach(service => {
+            const details = service.details(profile);
+
+            if (!details) {
+              return;
+            }
+
+            services[service.serviceId] = {details: {id: details.id}};
+          });
+
           return refs.participation.set({
-            user: {
-              displayName: authData.displayName,
-              gravatar: authData.gravatar,
-              school: cleanObj(authData.school) || null
-            },
+            user,
+            services,
             joinedAt: {'.sv': 'timestamp'}
           });
         }).then(function() {
@@ -1213,13 +1203,9 @@ export function clmDataStoreFactory(
       removeParticpants: function(eventId, publicId) {
         var profileRef = db.ref(`classMentors/userProfiles/${publicId}/joinedEvents/${eventId}`);
         var particpantRef = db.ref(`classMentors/eventParticipants/${eventId}/${publicId}`);
-        var rankingRef = db.ref(`classMentors/eventRankings/${eventId}/${publicId}`);
 
         return profileRef.remove().then(function() {
-          return $q.all([
-            particpantRef.remove(),
-            rankingRef.remove()
-          ]);
+          return particpantRef.remove();
         }).catch(function(err) {
           $log.error(err);
 
@@ -1247,7 +1233,7 @@ export function clmDataStoreFactory(
         );
       },
 
-      _hasBadge: function(task, badges) {
+      _hasAchievement: function(task, achievements) {
         if (
           !task.badge || !task.badge.id
         ) {
@@ -1259,8 +1245,10 @@ export function clmDataStoreFactory(
         return (
           task.badge &&
           task.badge.id &&
-          badges[serviceId] &&
-          badges[serviceId][task.badge.id]
+          achievements.services &&
+          achievements.services[serviceId] &&
+          achievements.services[serviceId].achievements &&
+          achievements.services[serviceId].achievements[task.badge.id]
         );
       },
 
@@ -1325,22 +1313,7 @@ export function clmDataStoreFactory(
         );
       },
 
-      _solvedProblems: function(singPathProfile) {
-        var queueId = 'default';
-
-        return clmDataStore.singPath.countSolvedSolution(singPathProfile, queueId);
-      },
-
       _getProgress: function(tasks, data) {
-
-        // Transform array of badges to a collection of badges.
-        var badges = Object.keys(data.badges).reduce(function(serviceBadges, serviceId) {
-          serviceBadges[serviceId] = data.badges[serviceId].reduce(function(results, badge) {
-            results[badge.id] = badge;
-            return results;
-          }, {});
-          return serviceBadges;
-        }, {});
 
         return tasks.reduce(function(progress, task) {
 
@@ -1352,7 +1325,8 @@ export function clmDataStoreFactory(
             return progress;
           }
 
-          // We recheck solved closed tasks in case requirements changed.
+          // We skip unsolved closed tasks, but recheck solved ones in case of
+          // requirements changed.
           if (
             task.closedAt && !(
               data.progress &&
@@ -1367,7 +1341,7 @@ export function clmDataStoreFactory(
             clmDataStore.events._isSolutionLinkValid(task, data.solutions) ||
             clmDataStore.events._isResponseValid(task, data.solutions) ||
             clmDataStore.events._hasRegistered(task, data.classMentors, data.singPath) ||
-            clmDataStore.events._hasBadge(task, badges) ||
+            clmDataStore.events._hasAchievement(task, data.userAchievements) ||
             clmDataStore.events._hasSolvedSingpathProblem(task, data.singPath) ||
             clmDataStore.events._hasDoneSurvey(task, data.solutions) ||
             clmDataStore.events._hasDoneMcq(task, data.solutions) ||
@@ -1380,22 +1354,6 @@ export function clmDataStoreFactory(
 
           return progress;
         }, {});
-      },
-
-      _getRanking: function(data) {
-        var ranking = {
-          singPath: clmDataStore.events._solvedProblems(data.singPath),
-          codeCombat: data.badges.codeCombat.length,
-          codeSchool: data.badges.codeSchool.length
-        };
-
-        ranking.total = Object.keys(ranking).reduce(function(sum, key) {
-          return sum + ranking[key];
-        }, 0);
-
-        ranking.user = data.classMentors.user;
-
-        return ranking;
       },
 
       monitorEvent: function(event, tasks, participants, solutions, progress) {
@@ -1441,29 +1399,38 @@ export function clmDataStoreFactory(
         }
 
         var cmProfilePromise = clmDataStore.profile(publicId);
-        var badgesPromise = cmProfilePromise.then(function(profile) {
-          return $q.all({
-            codeCombat: clmDataStore.services.codeCombat.fetchBadges(profile),
-            codeSchool: clmDataStore.services.codeSchool.fetchBadges(profile)
-          });
-        });
+        var userAchievementsRef = clmDataStore.services.userAchievementsRef(publicId);
 
-        // 1. load profile, badges and current progress
+        // 1. load profile, userAchievements and current progress
         return $q.all({
           singPath: clmDataStore.singPath.profile(publicId),
           classMentors: cmProfilePromise,
-          badges: badgesPromise,
+          userAchievements: userAchievementsRef.once('value'),
           solutions: solutions[publicId] || {},
           progress: userProgress
         }).then(function(data) {
-          var rankingRef = db.ref(`classMentors/eventRankings/${event.$id}/${data.classMentors.$id}`);
+          const participationRef = db.ref(`classMentors/eventParticipants/${event.$id}/${data.classMentors.$id}`);
+          const user = {
+            displayName: data.classMentors.user.displayName,
+            gravatar: data.classMentors.user.gravatar,
+            school: data.classMentors.user.school || null
+          };
+          const services = {};
 
-          // var detailsRef = db.ref(`classMentors/eventParticipants/${event.$id}/${data.classMentors.$id}/user`);
+          clmServices.available().forEach(service => {
+            const details = service.details(data.classMentors);
 
-          // 4. save data
+            if (!details) {
+              return;
+            }
+
+            services[service.serviceId] = {details: {id: details.id}};
+          });
+
+          // 2. Update event data
           return $q.all([
 
-            // 2. check completness and update progress if needed.
+            // 3. check completness and update progress if needed.
             $q.resolve(clmDataStore.events._getProgress(tasks, data)).then(function(progress) {
               var ref = db.ref(`classMentors/eventProgress/${event.$id}/${data.classMentors.$id}`);
               var updated = Object.keys(progress).some(function(taskId) {
@@ -1480,17 +1447,8 @@ export function clmDataStoreFactory(
               return null;
             }),
 
-            // 3. get ranking - if we get the ranking we could check it needs an update
-            rankingRef.set(clmDataStore.events._getRanking(data))
-
-            // This was causing the endless loop of failed updates when viewing the ranking.
-            // 5. update participants data
-            // TODO: only update it if necessary.
-            // detailsRef.set({
-            //   displayName: data.classMentors.user.displayName,
-            //   gravatar: data.classMentors.user.gravatar,
-            //   school: data.classMentors.user.school || null
-            // })
+            // 4. update participants data
+            participationRef.update({user, services})
           ]);
         }).catch(function(err) {
           $log.error(`Failed to update progress of ${publicId}: ${err.toString()}`);
@@ -1512,20 +1470,11 @@ export function clmDataStoreFactory(
           return Boolean(solutions[task.$id]);
         }
 
-        return $q.all({
+        var userAchievementsRef = clmDataStore.services.userAchievementsRef(profile.$id);
 
-          // 1. Update user profile
-          codeCombat: clmDataStore.services.codeCombat.updateProfile(profile),
-          codeSchool: clmDataStore.services.codeSchool.updateProfile(profile),
+        return $q.all({
+          userAchievements: userAchievementsRef.once('value'),
           singPath: clmDataStore.singPath.profile(profile.$id)
-        }).then(function(data) {
-          return $q.all({
-            singPath: data.singPath,
-            badges: {
-              codeCombat: clmDataStore.services.codeCombat.badges(profile),
-              codeSchool: clmDataStore.services.codeSchool.badges(profile)
-            }
-          });
         }).then(function(data) {
           var updatedTasks = tasks.filter(function(task) {
             if (solvedTask(task, userSolutions)) {
@@ -1535,7 +1484,7 @@ export function clmDataStoreFactory(
             return (
               clmDataStore.events._hasRegistered(task, profile, data.singPath) ||
               clmDataStore.events._hasSolvedSingpathProblem(task, data.singPath) ||
-              clmDataStore.events._hasBadge(task, data.badges)
+              clmDataStore.events._hasAchievement(task, data.userAchievements)
             );
           }).map(function(task) {
             userSolutions[task.$id] = true;
@@ -1904,6 +1853,7 @@ export function clmDataStoreFactory(
         }
 
         queueId = queueId || 'default';
+
         return Object.keys(solutions).map(function(pathId) {
           return Object.keys(solutions[pathId]).map(function(levelId) {
             return Object.keys(solutions[pathId][levelId]).filter(function(problemId) {
