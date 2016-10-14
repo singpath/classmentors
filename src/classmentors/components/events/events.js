@@ -804,6 +804,7 @@ editEventCtrllInitialData.$inject = ['$q', '$route', 'spfAuthData', 'clmDataStor
  * EditEventCtrl
  *
  */
+
 function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataStore, firebaseApp, $firebaseArray) {
     var self = this;
 
@@ -820,7 +821,7 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
             this.nonArchivedTask.push(this.tasks[i]);
         }
     }
-    console.log("this event id isss:", this.event.$id);
+    // console.log("this event id isss:", this.event.$id);
     this.assistants = initialData.assistants;
     this.newPassword = '';
     this.isOwner = false;
@@ -840,9 +841,9 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
         }
         clmDataStore.events.setFeatured(this.event.$id, this.featureEvent);
         if (this.featureEvent) {
-            spfAlert.success("You have featured your event");
+            spfAlert.success("You have featured your event.");
         } else {
-            spfAlert.success("You have removed your event from being featured");
+            spfAlert.success("You have unfeatured your event.");
         }
 
     };
@@ -969,7 +970,7 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
         clmDataStore.events.enableAssistantReviewing(eventId, assistantId).then(function () {
             spfAlert.success(assistantName + ' can now review event challenge submissions.');
         }).catch(function () {
-            spfAlert.error('Failed to change assistant rights');
+            spfAlert.error('Failed to change assistant rights.');
         });
     };
 
@@ -1130,7 +1131,7 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
         });
     };
 }
-EditEventCtrl.$inject = ['initialData', 'spfNavBarService', 'urlFor', 'spfAlert', 'clmDataStore', 'firebaseApp', '$firebaseArray'];
+EditEventCtrl.$inject = ['initialData', 'spfNavBarService', 'urlFor', 'spfAlert', 'clmDataStore', 'firebaseApp', '$firebaseArray','$mdDialog','$location'];
 
 /**
  * AddEventTaskCtrl initial data
@@ -1462,13 +1463,17 @@ editEventTaskCtrlInitialData.$inject = ['$q', '$route', 'spfAuthData', 'clmDataS
 
 
 /**Todo: enable edit to multiple choice, index card, etc. **/
-function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmDataStore, eventService, $mdDialog, $location) {
+function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmDataStore, eventService, $mdDialog, $location){
     var self = this;
 
+    // console.log("the initialdata looks like this:", initialData);
     this.event = initialData.event;
     this.badges = initialData.badges;
     this.taskId = initialData.taskId;
     this.task = initialData.task;
+
+    this.taskTitle = initialData.task.title;
+    console.log(this.taskTitle);
 
     this.isOpen = Boolean(this.task.openedAt);
     this.savingTask = false;
@@ -1511,7 +1516,7 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
     }
 
     spfNavBarService.update(
-        this.task.title, [{
+      this.taskTitle, [{
             title: 'Events',
             url: `#${urlFor('events')}`
         }, {
@@ -1573,6 +1578,7 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
             return 'Save';
         }
     };
+
 
     //this function double checks with user if he wishes to go back and discard all changes thus far
     this.discardChanges = function (ev) {
@@ -1640,7 +1646,11 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
             };
 
             spfNavBarService.update(
-                'New Challenge Details', [{
+                {
+                    title: this.event.title,
+                    url: `#${urlFor('oneEvent', {eventId: this.event.$id})}`
+                },
+                [{
                     title: 'Events',
                     url: `#${urlFor('events')}`
                 }, {
@@ -1687,10 +1697,8 @@ EditEventTaskCtrl.$inject = [
     'spfNavBarService',
     'clmDataStore',
     'eventService',
-    '$location',
     '$mdDialog',
-    '$location',
-    'eventService'
+    '$location'
 ];
 
 
@@ -2362,7 +2370,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                             action: "formTeam",
                             eventId: eventId,
                             publicId: participant.$id,
-                            timeStamp: Date.now(),
+                            timestamp: Date.now(),
                             taskId: taskId
                         }
                     );
@@ -2874,7 +2882,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
     var eduDissInvalid = true;
     $scope.$on("$routeChangeStart", function (event, next, current) {
         if (schEngageInvalid && motiStratInvalid && eduDissInvalid) {
-            if (!confirm("You have not finished this survey. Are you sure you want to continue? All data will be lost")) {
+            if (!confirm("You have not finish this survey. Are you sure you want to continue? All data will be lost")) {
                 event.preventDefault();
             }
         }
@@ -3072,7 +3080,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             });
 
 
-            spfAlert.success('Survey response has been submitted.');
+            spfAlert.success('Survey responses have been submitted.');
             clmDataStore.events.saveSurveyResponseOnSubmit(taskId, eventId, userId, surveyType, motiResp);
             clmDataStore.events.submitSolution(eventId, taskId, userId, "Completed");
 
@@ -3134,7 +3142,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             });
 
 
-            spfAlert.success('Survey response has been submitted.');
+            spfAlert.success('Survey responses have been submitted.');
             //add into firebase
             clmDataStore.events.saveSurveyResponseOnSubmit(taskId, eventId, userId, surveyType, eduDissResp);
             clmDataStore.events.submitSolution(eventId, taskId, userId, "Completed");
