@@ -1219,7 +1219,7 @@ export function clmDataStoreFactory(
       _hasRegistered: function(task, clmProfile, spfProfile) {
         var serviceId = task.serviceId;
 
-        if (!task.serviceId || task.badge || task.singPathProblem) {
+        if (!task.serviceId || task.badge || task.minTotalAchievements || task.singPathProblem) {
           return false;
         }
 
@@ -1233,6 +1233,32 @@ export function clmDataStoreFactory(
           clmProfile.services[serviceId].details &&
           clmProfile.services[serviceId].details.id
         );
+      },
+
+      _hasEnoughAchievements: function(task, achievements, spfProfile) {
+        if (!task.serviceId || task.minTotalAchievements) {
+          return false;
+        }
+
+        const min = parseInt(task.minTotalAchievements, 10) || 1;
+        const serviceId = task.serviceId;
+        let rawCount, count;
+
+        switch (serviceId) {
+          case 'singPath':
+            count = clmDataStore.singPath.countSolvedSolution(spfProfile);
+            break;
+
+          default:
+            rawCount = (
+              achievements.services &&
+              achievements.services[serviceId] &&
+              achievements.services[serviceId].totalAchievements
+            );
+            count = parseInt(rawCount, 10) || 0;
+        }
+
+        return count >= min;
       },
 
       _hasAchievement: function(task, achievements) {
@@ -1343,6 +1369,7 @@ export function clmDataStoreFactory(
             clmDataStore.events._isSolutionLinkValid(task, data.solutions) ||
             clmDataStore.events._isResponseValid(task, data.solutions) ||
             clmDataStore.events._hasRegistered(task, data.classMentors, data.singPath) ||
+            clmDataStore.events._hasEnoughAchievements(task, data.userAchievements, data.singPath) ||
             clmDataStore.events._hasAchievement(task, data.userAchievements) ||
             clmDataStore.events._hasSolvedSingpathProblem(task, data.singPath) ||
             clmDataStore.events._hasDoneSurvey(task, data.solutions) ||

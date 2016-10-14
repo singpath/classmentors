@@ -277,7 +277,8 @@ describe('events', function() {
     const tasksPath = 'classMentors/eventTasks/alice-event';
 
     describe('creating', function() {
-      const serviceIds = ['singPath', 'codeSchool', 'codeCombat', 'freeCodeCamp', 'pivotalExpert'];
+      const badgeServiceIds = ['codeSchool', 'codeCombat', 'freeCodeCamp', 'pivotalExpert'];
+      const serviceIds = ['singPath'].concat(badgeServiceIds);
       let newTask;
 
       beforeEach(function() {
@@ -295,10 +296,31 @@ describe('events', function() {
       });
 
       serviceIds.forEach(serviceId => {
-        it(`should let the owner create a service task with ${serviceId}`, function() {
+        it(`should allow the owner create a service task with ${serviceId}`, function() {
           newTask.serviceId = serviceId;
           expect(auth.alice).can.write(newTask).to.path(`${tasksPath}/some-new-task`);
         });
+      });
+
+      badgeServiceIds.forEach(serviceId => {
+
+        it(`should allow the owner create a task for a service badge for ${serviceId}`, function() {
+          newTask.serviceId = serviceId;
+          newTask.badge = {id: 'foo', name: 'foo', iconUrl: '/default-icon'};
+          expect(auth.alice).can.write(newTask).to.path(`${tasksPath}/some-new-task`);
+        });
+
+      });
+
+      it('should allow the owner create a task for a minimal number of achievements', function() {
+        newTask.minTotalAchievements = 1;
+        expect(auth.alice).can.write(newTask).to.path(`${tasksPath}/some-new-task`);
+      });
+
+      it('should disallow the owner create a badge task with minimal achievements', function() {
+        newTask.badge = {id: 'foo', name: 'foo', iconUrl: '/default-icon'};
+        newTask.minTotalAchievements = 1;
+        expect(auth.alice).cannot.write(newTask).to.path(`${tasksPath}/some-new-task`);
       });
 
     });
