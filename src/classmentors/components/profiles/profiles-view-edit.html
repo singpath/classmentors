@@ -20,7 +20,7 @@
 
     <div ng-if="ctrl.profile && !ctrl.profileNeedsUpdate" layout="row" layout-wrap>
         <div class="profile" flex="33" flex-sm="100">
-            <div class="md-whiteframe-z1 avatar">
+            <div class="avatar" md-whiteframe="1">
                 <img ng-src="{{ctrl.profile.user.gravatar}}?s=200&amp;r=g&amp;d=mm" alt="user avatar">
                 <h2>
                     {{ctrl.profile.user.displayName}}
