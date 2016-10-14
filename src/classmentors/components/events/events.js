@@ -219,8 +219,8 @@ function classMentorsEventResolver($q, spfAuth, spfAuthData, clmDataStore) {
     return $q.all({
         events: clmDataStore.events.list(),
         auth: spfAuth.$loaded(),
-        currentUser: spfAuthData.user().catch(function () {
-            return;
+        currentUser: spfAuthData.user().catch(function (error) {
+            return error;
         }),
         profile: clmDataStore.currentUserProfile(),
         createdEvents: clmDataStore.events.listCreatedEvents(),
@@ -944,7 +944,7 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
         }
     };
 
-    self.eventChallengeBttnText = "Hide Challenges"
+    self.eventChallengeBttnText = "Hide Challenges";
     this.toggleTaskEditView = function () {
         if (self.showingTasks) {
             self.showingTasks = false;
@@ -1463,7 +1463,7 @@ editEventTaskCtrlInitialData.$inject = ['$q', '$route', 'spfAuthData', 'clmDataS
 function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmDataStore, eventService, $mdDialog, $location, clmSurvey){
     var self = this;
 
-    console.log("the initialdata looks like this:", initialData);
+    // console.log("the initialdata looks like this:", initialData);
     this.event = initialData.event;
     this.badges = initialData.badges;
     this.taskId = initialData.taskId;
@@ -1483,22 +1483,35 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
 
     if (this.task.serviceId) {
         this.taskType = 'service';
-
     } else if (this.task.linkPattern) {
         this.taskType = 'linkPattern';
-
     } else if (this.task.lang) {
         this.taskType = 'code';
-
+    } else if(this.task.toEdit) {
+        this.taskType = 'profileEdit';
+        this.selectedMetaData = this.task.toEdit;
+        console.log(this.task.toEdit);
     } else if (this.task.textResponse) {
         this.taskType = 'textResponse';
-
     } else if (this.task.mcqQuestions) {
         this.taskType = 'multipleChoice';
-
     } else if (this.task.survey){
         this.taskType = 'survey';
     }
+
+    this.toggle = function (item, list) {
+        var idx = list.indexOf(item);
+        if (idx > -1) {
+            list.splice(idx, 1);
+        }
+        else {
+            list.push(item);
+        }
+    };
+
+    this.exists = function (item, list) {
+        return list.indexOf(item) > -1;
+    };
     // else if (this.task.profileEdit) {
     //     return 'Save';
     // }
