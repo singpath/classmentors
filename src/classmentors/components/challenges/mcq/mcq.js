@@ -20,10 +20,7 @@ function mcqQuestionFactory(){
 }
 
 export function editMcqController(initialData,spfNavBarService, challengeService, $filter,$mdDialog, urlFor, $location){
-  //todo: to check with eventsSolution. The error should show when edit button is clicked.
-  //todo: If there are already answers for the challenge, event owner can no longer edit the event.
-
-  //todo: to check with status of challenge (open/close). If challenge is open, event owner cannot edit. This is to prevent race conditions as well.
+  //todo: sheryl comment to add corner cases checking; only allow edit when 1. there are no submission for the challenge 2. the challenge is closed (avoid race conditions)
 
   var self = this;
 

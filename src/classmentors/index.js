@@ -119,6 +119,7 @@ module.constant('routes', {
   startMcq: '/events/:eventId/challenges/:taskId/mcq/start',
   editMcq: '/challenges/mcq/edit',
   viewSurvey: '/challenges/survey',
+  editSurvey: '/challenges/survey/edit',
   createTeamActivity: '/challenges/team-activity/create',
   viewIRAT: '/challenges/IRAT',
   viewTRAT: '/events/:eventId/challenges/:taskId/TRAT/start',

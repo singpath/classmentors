@@ -19,7 +19,7 @@ function loaded(syncObjOrArray) {
 export function tratQuestionFactory($q, spfAuthData, eventService, clmDataStore) {
     var self = this;
     self.data = eventService.get();
-    console.log("my data is:", self.data);
+    // console.log("my data is:", self.data);
     // var question = $q.all ({
     //     questions: angular.fromJson(data.task.mcqQuestions)
     // }).then (function (result){
@@ -78,6 +78,15 @@ export function configRoute($routeProvider, routes) {
         .when(routes.viewSurvey, {
             template: survey.showSurveyTmpl,
             controller: surveyFormEvent,
+            controllerAs: 'ctrl',
+            resolve: {
+                initialData: getTaskSurveyValues
+            }
+        })
+
+        .when(routes.editSurvey, {
+            template: survey.showSurveyTmpl,
+            controller: editsurveyFormEvent,
             controllerAs: 'ctrl',
             resolve: {
                 initialData: getTaskSurveyValues
@@ -406,7 +415,7 @@ challengeServiceFactory.$inject =
 //
 // }
 
-function surveyFormEvent($scope, clmSurvey, clmDataStore, $log, spfAlert, $location, urlFor) {
+function surveyFormEvent($scope, clmSurvey, clmDataStore, $log, spfAlert, $location, urlFor,$mdDialog) {
 
     this.surveys = [
         {id: 1, name: 'Education vs Dissatisfaction with learning'},
@@ -416,9 +425,23 @@ function surveyFormEvent($scope, clmSurvey, clmDataStore, $log, spfAlert, $locat
     ];
     //TODO: retrieve selected value, add task into firebase
     var sharedData = clmSurvey.get();
-    //console.log("surveyFormEvent eventId : " + sharedData.taskType);
     var getTask = sharedData.task;
     var self = this;
+
+    // console.log("my survey temp is ", self.surveyType);
+
+    self.hasSurveyTitle = false;
+
+    //check if survey template has been selected.
+    this.checkSurveyValid = function(){
+        if(self.surveyType == 0 || self.surveyType == undefined){
+            self.hasSurveyTitle = false;
+        }else{
+            self.hasSurveyTitle = true;
+        }
+    };
+
+    // console.log("the survey t/f is", self.hasSurveyTitle);
 
     this.saveSurveyTask = function (surveyType) {
         var copy = cleanObj(getTask);
@@ -458,6 +481,20 @@ function surveyFormEvent($scope, clmSurvey, clmDataStore, $log, spfAlert, $locat
         });
     };
 
+    this.discardChanges = function (ev){
+        var confirm = $mdDialog.confirm()
+            .title('Would you like to discard your changes?')
+            .textContent('All of the information input will be discarded. Are you sure you want to continue?')
+            .ariaLabel('Discard changes')
+            .targetEvent(ev)
+            .ok('Cancel Editing')
+            .cancel('Continue Editing');
+        $mdDialog.show(confirm).then(function() {
+            // decided to discard data, bring user to previous page
+            $location.path(urlFor('editEvent', {eventId: sharedData.event.$id}));
+        })
+    }
+
 }
 surveyFormEvent.$inject = [
     '$scope',
@@ -466,7 +503,144 @@ surveyFormEvent.$inject = [
     '$log',
     'spfAlert',
     '$location',
-    'urlFor'
+    'urlFor',
+    '$mdDialog'
+];
+
+function editsurveyFormEvent($scope, clmSurvey, clmDataStore, $log, spfAlert, $location, urlFor,spfNavBarService,eventService, $mdDialog) {
+
+    //todo: sheryl comment to add corner cases checking; only allow edit when 1. there are no submission for the challenge 2. the challenge is closed (avoid race conditions)
+    this.surveys = [
+        {id: 1, name: 'Education vs Dissatisfaction with learning'},
+        {id: 2, name: 'Motivated strategies for learning'},
+        {id: 3, name: 'School engagement scale'}
+
+    ];
+    //TODO: retrieve selected value, add task into firebase
+    var sharedData = clmSurvey.get();
+    var getTask = sharedData.task;
+    var self = this;
+
+    self.currentSelected = sharedData.task.survey;
+
+    console.log(self.currentSelected);
+
+    //NOTE: no need to check for valid cause you cannot deselect your previous option.
+    self.hasSurveyTitle = false;
+
+    //check if survey template has been selected.
+    this.checkSurveyValid = function(){
+        // self.currentSelected = self.surveyType.name;
+
+        if(self.surveyType == 0 || self.surveyType == undefined){
+            self.hasSurveyTitle = false;
+        }else{
+            self.hasSurveyTitle = true;
+        }
+    };
+
+    spfNavBarService.update(
+        sharedData.task.title, [{
+            title: 'Events',
+            url: `#${urlFor('events')}`
+        }, {
+            title: sharedData.event.title,
+            url: `#${urlFor('oneEvent', {eventId: sharedData.event.$id})}`
+        }, {
+            title: 'Challenges',
+            url: `#${urlFor('editEvent', {eventId: sharedData.event.$id})}`
+        }]
+    );
+
+    this.saveSurveyTask = function (surveyType) {
+        var copy = cleanObj(getTask);
+
+        // console.log('my copy is ', copy);
+        if (sharedData.taskType === 'linkPattern') {
+            delete copy.badge;
+            delete copy.serviceId;
+            delete copy.singPathProblem;
+        } else if (copy.serviceId === 'singPath') {
+            delete copy.badge;
+            if (copy.singPathProblem) {
+                copy.singPathProblem.path = cleanObj(getTask.singPathProblem.path);
+                copy.singPathProblem.level = cleanObj(getTask.singPathProblem.level);
+                copy.singPathProblem.problem = cleanObj(getTask.singPathProblem.problem);
+            }
+        } else {
+            delete copy.singPathProblem;
+            copy.badge = cleanObj(getTask.badge);
+        }
+
+        if (!copy.link) {
+            // delete empty link. Can't be empty string
+            delete copy.link;
+        }
+
+
+        //copied & pasted
+        self.creatingTask = true;
+        copy.survey = surveyType;
+        var data = {
+            taskType: copy.survey,
+            isOpen: sharedData.isOpen,
+            event: sharedData.event,
+            task: getTask
+        };
+
+            eventService.set(data);
+
+            $location.path(location);
+
+            self.savingTask = true;
+            clmDataStore.events.updateTask(sharedData.eventId, sharedData.task.$id, copy).then(function () {
+                if (
+                    (sharedData.isOpen && sharedData.task.openedAt) ||
+                    (!sharedData.isOpen && sharedData.task.closedAt)
+                ) {
+                    return;
+                } else if (sharedData.isOpen) {
+                    return clmDataStore.events.openTask(sharedData.eventId, sharedData.task.$id);
+                }
+
+                return clmDataStore.events.closeTask(sharedData.eventId, sharedData.task.$id);
+            }).then(function () {
+                $location.path(urlFor('editEvent', {eventId: sharedData.event.$id}));
+                spfAlert.success('Challenge saved.');
+            }).catch(function () {
+                spfAlert.error('Failed to save the challenge.');
+            }).then(function () {
+                self.savingTask = false;
+            });
+
+    };
+
+    this.discardChanges = function (ev){
+        var confirm = $mdDialog.confirm()
+            .title('Would you like to discard your changes?')
+            .textContent('All of the information input will be discarded. Are you sure you want to continue?')
+            .ariaLabel('Discard changes')
+            .targetEvent(ev)
+            .ok('Cancel Editing')
+            .cancel('Continue Editing');
+        $mdDialog.show(confirm).then(function() {
+            // decided to discard data, bring user to previous page
+            $location.path(urlFor('editEvent', {eventId: sharedData.event.$id}));
+        })
+    }
+
+}
+editsurveyFormEvent.$inject = [
+    '$scope',
+    'clmSurvey',
+    'clmDataStore',
+    '$log',
+    'spfAlert',
+    '$location',
+    'urlFor',
+    'spfNavBarService',
+    'eventService',
+    '$mdDialog'
 ];
 
 
