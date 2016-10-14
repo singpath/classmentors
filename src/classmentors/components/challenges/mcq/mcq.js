@@ -208,18 +208,18 @@ export function editMcqController(initialData,spfNavBarService, challengeService
   //todo:add back button controls here
   self.discardChanges = function (ev){
     var confirm = $mdDialog.confirm()
-        .title('Would you like to discard your changes?')
-        .textContent('All of the information input will be discarded. Are you sure you want to continue?')
+        .title('You have not saved your changes')
+        .textContent('All of your changes will be discarded. Are you sure you want to continue?')
         .ariaLabel('Discard changes')
         .targetEvent(ev)
-        .ok('Cancel Editing')
-        .cancel('Continue Editing');
+        .ok('Discard my changes')
+        .cancel('Continue editing');
     $mdDialog.show(confirm).then(function() {
       // decided to discard data, bring user to previous page
 
       //todo: link back to previous page
       //$location.path(urlFor('editEventTask', {eventId: initialData.event.$id},{taskId: task.$id}));
-      $location.path(urlFor('oneEvent', {eventId: initialData.event.$id}));
+      $location.path(urlFor('editEvent', {eventId: initialData.data.event.$id}));
     })
   }
 
@@ -546,17 +546,15 @@ export function newMcqController(initialData, challengeService, $filter,$mdDialo
   //todo:back button add here
   self.discardChanges = function (ev){
     var confirm = $mdDialog.confirm()
-        .title('Would you like to discard your changes?')
+        .title('You have not save your challenge information')
         .textContent('All of the information input will be discarded. Are you sure you want to continue?')
         .ariaLabel('Discard changes')
         .targetEvent(ev)
-        .ok('Cancel Editing')
+        .ok('Discard Challenge')
         .cancel('Continue Editing');
     $mdDialog.show(confirm).then(function() {
-      // decided to discard data, bring user to previous page
 
       //todo: link back to previous page
-      //$location.path(urlFor('addEventTask', {eventId: initialData.event.$id}));
       $location.path(urlFor('oneEvent', {eventId: initialData.event.$id}));
 
     })
