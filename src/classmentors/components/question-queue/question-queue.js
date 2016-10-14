@@ -14,12 +14,19 @@ import qqHome from './question-queue.html!text';
  * @param {firebaseApp} firebaseApp
  * Alert for success and errors
  * @param {spfAlert} spfAlert
- * Firebase reference for objects. Returns promise.
+ * Firebase reference for objects. Returns promises
  * @param {$firebaseObject} $firebaseObject
  */
 function qqController(initialData, spfNavBarService, urlFor, firebaseApp, spfAlert, $firebaseObject) {
     var self = this;
     var db = firebaseApp.database();
+
+    this.currentUser = initialData.currentuser;
+    this.profile = initialData.profile;
+    this.createdEvents = initialData.createdEvents;
+    this.joinedEvents = initialData.joinedEvents;
+
+    spfNavBarService.update('Question Queues');
 
 }
 
@@ -56,9 +63,8 @@ function clmQQResolver($q, spfAuth, spfAuthData, clmDataStore) {
             return error;
         }),
         profile: clmDataStore.currentUserProfile(),
-        createdCohorts: clmDataStore.cohorts.listCreatedCohorts(),
         joinedEvents: clmDataStore.events.listJoinedEvents(),
-        allCohorts: clmDataStore.cohorts.listAllCohorts()
+        createdEvents: clmDataStore.events.listCreatedEvents()
     });
 }
 clmQQResolver.$inject = ['$q', 'spfAuth', 'spfAuthData', 'clmDataStore'];

@@ -1,10 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-    HELLO MATE! ASK AWAYYYYY
-</body>
-</html>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
+<md-content flex class="md-padding">
+    <md-content layout-align="center">
+        <md-subheader>Events that I joined</md-subheader>
+        <md-list-item ng-repeat="event in ctrl.joinedEvents">
+            <div> {{ event.title }} </div>
+            <div flex></div>
+            <div flex="10">x open</div>
+            <div flex="10">x closed</div>
+            <div flex="10">x instructor attention</div>
+        </md-list-item>
+        <md-divider></md-divider>
+        <md-subheader>Events that I created</md-subheader>
+        <md-list-item ng-repeat="event in ctrl.createdEvents">
+            <p> {{ event.title }} </p>
+            <div flex></div>
+            <div flex="10">x open</div>
+            <div flex="10">x closed</div>
+            <div flex="10">x instructor attention</div>
+        </md-list-item>
+        <md-divider></md-divider>
+        <md-subheader>Events that I am an assistant of</md-subheader>
+    </md-content>
+</md-content>
