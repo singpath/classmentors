@@ -1696,6 +1696,7 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
                 return clmDataStore.events.closeTask(event.$id, taskId);
             }).then(function () {
                 spfAlert.success('Challenge saved.');
+                $location.path(urlFor('editEvent', {eventId: self.event.$id}));
             }).catch(function () {
                 spfAlert.error('Failed to save the challenge.');
             }).then(function () {
