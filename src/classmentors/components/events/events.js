@@ -1265,12 +1265,12 @@ function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNav
     //this function double checks with user if he wishes to go back and discard all changes thus far
     this.discardChanges = function (ev) {
         var confirm = $mdDialog.confirm()
-            .title('You have not saved your input information')
+            .title('You have not save your challenge information')
             .textContent('All of the information input will be discarded. Are you sure you want to continue?')
-            .ariaLabel('Discard all')
+            .ariaLabel('Discard changes')
             .targetEvent(ev)
-            .ok('Discard All')
-            .cancel('Continue editing');
+            .ok('Discard Challenge')
+            .cancel('Continue Editing');
         $mdDialog.show(confirm).then(function () {
             // decided to discard data, bring user to previous page
             $location.path(urlFor('editEvent', {eventId: self.event.$id}));
