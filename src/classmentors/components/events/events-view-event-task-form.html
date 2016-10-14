@@ -115,9 +115,8 @@
                             <md-radio-button ng-disabled="!ctrl.enableBeta" value="multipleChoice" class="md-primary">Multiple Choice*</md-radio-button>
                             <md-radio-button value="code" class="md-primary">Code</md-radio-button>
                         </td>
-                        <td style='padding-left:30px; padding-bottom:80px;'>
+                        <td style='padding-left:30px; padding-bottom:120px;'>
                             <md-radio-button value="profileEdit" class="md-primary">Profile Update</md-radio-button>
-                            <md-radio-button ng-disabled="!ctrl.enableBeta" value="video" class="md-primary">Video*</md-radio-button>
                             <md-radio-button ng-disabled="!ctrl.enableBeta" value="journalling" class="md-primary">Journalling*</md-radio-button>
                             <md-radio-button ng-disabled="!ctrl.enableBeta" value="survey" class="md-primary">Survey*</md-radio-button>
                             <md-radio-button ng-disabled="!ctrl.enableBeta" value="teamActivity" class="md-primary">Team Activity*</md-radio-button>
@@ -265,12 +264,6 @@
             </md-input-container>
         </div>
 
-        <div ng-if="ctrl.taskType == 'video'">
-            <md-input-container>
-                Video
-            </md-input-container>
-        </div>
-
         <div ng-if="ctrl.taskType == 'journalling'">
             <md-input-container>
                 Journalling
@@ -290,7 +283,7 @@
             <!--TODO: 1. Create continue button controller to route to other views depending on challenge type-->
 
             <md-button type="submit" class="md-raised md-primary" ng-disabled="editTask.$invalid || !ctrl.taskType ||ctrl.savingTask">{{ ctrl.challengeRouteProvider(ctrl.taskType, ctrl.task, ctrl.isOpen)}}</md-button>
-            <md-button type="button" class="md-raised" ng-click="ctrl.discardChanges($event)">Back</md-button>
+            <md-button type="button" class="md-accent" ng-click="ctrl.discardChanges($event)">Back</md-button>
 
         </div>
     </form>
