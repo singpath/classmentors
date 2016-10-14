@@ -6,6 +6,7 @@
         <div align="center">
             <p>
                 Choose the appropriate survey to be administered as your end of class survey.
+                <span ng-hide="ctrl.currentSelected == 0 || ctrl.currentSelected == undefined"><br><br> Your previously selected survey is <b>{{ctrl.currentSelected}}</b></span>
             </p>
         </div>
         <br>

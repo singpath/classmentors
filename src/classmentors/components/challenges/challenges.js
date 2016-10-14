@@ -19,7 +19,7 @@ function loaded(syncObjOrArray) {
 export function tratQuestionFactory($q, spfAuthData, eventService, clmDataStore) {
     var self = this;
     self.data = eventService.get();
-    console.log("my data is:", self.data);
+    // console.log("my data is:", self.data);
     // var question = $q.all ({
     //     questions: angular.fromJson(data.task.mcqQuestions)
     // }).then (function (result){
@@ -428,7 +428,7 @@ function surveyFormEvent($scope, clmSurvey, clmDataStore, $log, spfAlert, $locat
     var getTask = sharedData.task;
     var self = this;
 
-    console.log("my survey temp is ", self.surveyType);
+    // console.log("my survey temp is ", self.surveyType);
 
     self.hasSurveyTitle = false;
 
@@ -441,7 +441,7 @@ function surveyFormEvent($scope, clmSurvey, clmDataStore, $log, spfAlert, $locat
         }
     };
 
-    console.log("the survey t/f is", self.hasSurveyTitle);
+    // console.log("the survey t/f is", self.hasSurveyTitle);
 
     this.saveSurveyTask = function (surveyType) {
         var copy = cleanObj(getTask);
@@ -518,14 +518,20 @@ function editsurveyFormEvent($scope, clmSurvey, clmDataStore, $log, spfAlert, $l
     ];
     //TODO: retrieve selected value, add task into firebase
     var sharedData = clmSurvey.get();
-    //console.log("surveyFormEvent eventId : " + sharedData.taskType);
     var getTask = sharedData.task;
     var self = this;
 
+    self.currentSelected = sharedData.task.survey;
+
+    console.log(self.currentSelected);
+
+    //NOTE: no need to check for valid cause you cannot deselect your previous option.
     self.hasSurveyTitle = false;
 
     //check if survey template has been selected.
     this.checkSurveyValid = function(){
+        // self.currentSelected = self.surveyType.name;
+
         if(self.surveyType == 0 || self.surveyType == undefined){
             self.hasSurveyTitle = false;
         }else{
