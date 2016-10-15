@@ -433,7 +433,7 @@
               ".validate": "newData.isBoolean()"
             },
             "badge": {
-              ".validate": "newData.hasChildren(['id', 'name', 'iconUrl']) && newData.parent().child('serviceId').exists() && (\n  newData.parent().child('serviceId').val() == 'codeSchool'\n  || newData.parent().child('serviceId').val() == 'codeCombat'\n) && newData.parent().child('singPathProblem').exists() === false && newData.parent().child('linkPattern').exists() === false",
+              ".validate": "newData.hasChildren(['id', 'name', 'iconUrl']) && newData.parent().child('serviceId').exists() && newData.parent().child('minTotalAchievements').exists() == false && (\n  newData.parent().child('serviceId').val() == 'codeSchool'\n  || newData.parent().child('serviceId').val() == 'codeCombat'\n  || newData.parent().child('serviceId').val() == 'freeCodeCamp'\n  || newData.parent().child('serviceId').val() == 'pivotalExpert'\n) && newData.parent().child('singPathProblem').exists() === false && newData.parent().child('linkPattern').exists() === false",
               "iconUrl": {
                 ".validate": "newData.isString() && newData.val().matches(/(https?\\:\\/)?\\/.+/)"
               },
@@ -446,6 +446,9 @@
               "url": {
                 ".validate": "newData.isString() && newData.val().matches(/(https?\\:)?\\/\\/.+/)"
               }
+            },
+            "minTotalAchievements": {
+              ".validate": "newData.isNumber() && newData.parent().child('serviceId').exists() && newData.parent().child('badge').exists() == false"
             },
             "closedAt": {
               ".validate": "data.val() === newData.val() || newData.val() == now"
@@ -474,7 +477,7 @@
               ".validate": "data.val() === newData.val() || newData.val() === now"
             },
             "serviceId": {
-              ".validate": "newData.isString() && newData.parent().child('linkPattern').exists() === false && newData.parent().child('textResponse').exists() === false && (\n  newData.val() === 'singPath'\n  || newData.val() === 'codeSchool'\n  || newData.val() === 'codeCombat'\n)"
+              ".validate": "newData.isString() && newData.parent().child('linkPattern').exists() === false && newData.parent().child('textResponse').exists() === false && (\n  newData.val() === 'singPath'\n || newData.val() === 'codeSchool'\n || newData.val() === 'codeCombat'\n || newData.val() === 'freeCodeCamp'\n || newData.val() === 'pivotalExpert'\n)"
             },
             "showLinks": {
               ".validate": "newData.isBoolean()"

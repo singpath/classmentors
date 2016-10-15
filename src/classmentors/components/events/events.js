@@ -25,7 +25,6 @@
  */
 
 import {cleanObj} from 'singpath-core/services/firebase.js';
-import firebase from 'firebase';
 import editTmpl from './events-view-event-edit.html!text';
 import eventTableParticipantsTmpl from './events-view-event-table-participants.html!text';
 import eventTableRankTmpl from './events-view-event-table-rank.html!text';
@@ -829,7 +828,7 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
     //allow users to feature their events
     //retrieve the current featured status
     this.featureEvent = clmDataStore.events.getFeatured(this.event.$id);
-    
+
     //set the selection by user
     this.toggle = function () {
         if (this.featureEvent) {
@@ -1156,15 +1155,18 @@ addEventTaskCtrlInitialData.$inject = ['$q', '$route', 'spfAuthData', 'clmDataSt
 function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNavBarService, clmDataStore, $mdDialog, $scope, eventService, clmSurvey) {
 
     var self = this;
+    var location;
 
     this.event = initialData.event;
     this.badges = initialData.badges;
     this.isOpen = true;
     this.singPath = initialData.singPath;
     this.savingTask = false;
+    this.serviceTaskType = 'register';
+    this.serviceTaskTypeChanged = serviceTaskTypeChanged;
     this.task = {archived: false, showProgress: true};
     this.enableBeta = true;
-    var location;
+    this.services = clmDataStore.services;
 
     this.selectedMetaData = [];
 
@@ -1355,7 +1357,7 @@ function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNav
             }).catch(function (err) {
                 $log.error(err);
                 spfAlert.error('Failed to created new challenge.');
-            }).finally(function () {
+            }).then(function () {
                 self.creatingTask = false;
             });
         }
@@ -1375,6 +1377,24 @@ AddEventTaskCtrl.$inject = [
     'eventService',
     'clmSurvey'
 ];
+
+export function serviceTaskTypeChanged(type, task) {
+    switch (type) {
+
+    case 'badge':
+        task.minTotalAchievements = null;
+        break;
+
+    case 'minTotalAchievements':
+        task.minTotalAchievements = 1;
+        task.badge = null;
+        break;
+
+    default:
+        task.minTotalAchievements = null;
+        task.badge = null;
+    }
+}
 
 export function clmSurveyTaskFactory() {
     var sharedData = {};
@@ -1469,7 +1489,16 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
     this.badges = initialData.badges;
     this.taskId = initialData.taskId;
     this.task = initialData.task;
+    this.serviceTaskType = 'register';
+    this.serviceTaskTypeChanged = serviceTaskTypeChanged;
 
+    if (this.task.badge) {
+        this.serviceTaskType = 'badge';
+    } else if (this.task.minTotalAchievements) {
+        this.serviceTaskType = 'minTotalAchievements';
+    }
+
+    this.services = clmDataStore.services;
     this.isOpen = Boolean(this.task.openedAt);
     this.savingTask = false;
     this.enableBeta = true;
@@ -1734,7 +1763,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         reversed: false
     };
 
-    // Load 'team leaders' of each member. 
+    // Load 'team leaders' of each member.
     self.teamLeader = null;
     self.team = null
     self.isTeamLeader = function(eventId, teamFormationId, currentUserId){
@@ -1755,14 +1784,14 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                         self.team = team;
                         self.teamLeader = team.teamLeader;
                         // Break execution.
-                        return true;                    
+                        return true;
                     }
                 })
             });
     };
 
     function currentTeams(){
-        
+
     }
 
     //Find superReviewUser rights

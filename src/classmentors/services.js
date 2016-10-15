@@ -71,6 +71,11 @@ export function clmServicesFactory($firebaseObject, $log, $q, $timeout, firebase
        */
       this.settingId = settingId || camelCase(`enable ${name}`);
 
+      /**
+       * Flag the service as enable/disabled
+       * @type {Boolean}
+       */
+      this.available = false;
     }
 
     /* deprecated methods */
@@ -244,12 +249,6 @@ export function clmServicesFactory($firebaseObject, $log, $q, $timeout, firebase
     constructor() {
 
       /**
-       * List of enabled services.
-       * @type {Array}
-       */
-      Object.defineProperty(this, '$enabledServices', {value: [], writable: true});
-
-      /**
        * List of settings
        * @type {Object}
        */
@@ -297,10 +296,11 @@ export function clmServicesFactory($firebaseObject, $log, $q, $timeout, firebase
     doEnableServices() {
       const ids = Object.keys(this);
 
-      this.$enabledServices = ids.filter(serviceId => {
-        const settingId = this[serviceId].settingId;
+      ids.forEach(serviceId => {
+        const service = this[serviceId];
+        const settingId = service.settingId;
 
-        return this.$settings[settingId] && this.$settings[settingId].value;
+        this[serviceId].available = this.$settings[settingId] && this.$settings[settingId].value;
       });
     }
 
@@ -310,7 +310,9 @@ export function clmServicesFactory($firebaseObject, $log, $q, $timeout, firebase
      * @return {object}
      */
     available() {
-      return this.$enabledServices.map(serviceId => this[serviceId]);
+      const ids = Object.keys(this);
+
+      return ids.map(serviceId => this[serviceId]).filter(service => service.available);
     }
 
     /**
@@ -1217,7 +1219,7 @@ export function clmDataStoreFactory(
       _hasRegistered: function(task, clmProfile, spfProfile) {
         var serviceId = task.serviceId;
 
-        if (!task.serviceId || task.badge || task.singPathProblem) {
+        if (!task.serviceId || task.badge || task.minTotalAchievements || task.singPathProblem) {
           return false;
         }
 
@@ -1231,6 +1233,32 @@ export function clmDataStoreFactory(
           clmProfile.services[serviceId].details &&
           clmProfile.services[serviceId].details.id
         );
+      },
+
+      _hasEnoughAchievements: function(task, achievements, spfProfile) {
+        if (!task.serviceId || task.minTotalAchievements) {
+          return false;
+        }
+
+        const min = parseInt(task.minTotalAchievements, 10) || 1;
+        const serviceId = task.serviceId;
+        let rawCount, count;
+
+        switch (serviceId) {
+          case 'singPath':
+            count = clmDataStore.singPath.countSolvedSolution(spfProfile);
+            break;
+
+          default:
+            rawCount = (
+              achievements.services &&
+              achievements.services[serviceId] &&
+              achievements.services[serviceId].totalAchievements
+            );
+            count = parseInt(rawCount, 10) || 0;
+        }
+
+        return count >= min;
       },
 
       _hasAchievement: function(task, achievements) {
@@ -1341,6 +1369,7 @@ export function clmDataStoreFactory(
             clmDataStore.events._isSolutionLinkValid(task, data.solutions) ||
             clmDataStore.events._isResponseValid(task, data.solutions) ||
             clmDataStore.events._hasRegistered(task, data.classMentors, data.singPath) ||
+            clmDataStore.events._hasEnoughAchievements(task, data.userAchievements, data.singPath) ||
             clmDataStore.events._hasAchievement(task, data.userAchievements) ||
             clmDataStore.events._hasSolvedSingpathProblem(task, data.singPath) ||
             clmDataStore.events._hasDoneSurvey(task, data.solutions) ||

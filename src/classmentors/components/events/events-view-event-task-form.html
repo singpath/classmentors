@@ -67,9 +67,7 @@
                 </div>
             </md-input-container>
         </div>
-            <!--<md-switch class="md-primary" ng-model="ctrl.enableBeta" aria-label="closed?">-->
-                <!--*Enable BETA functions (WARNING: MAY BREAK STUFF)-->
-            <!--</md-switch>-->
+
         <div>
             <h3>options</h3>
             <p>
@@ -105,44 +103,64 @@
 
         <div>
             <h3>Task type <small ng-if="!ctrl.taskType">(Required)</small></h3>
-            <md-radio-group ng-model="ctrl.taskType">
-                <table>
-                    <tr>
-                        <td style=' padding-bottom:80px;'>
-                            <md-radio-button value="service" class="md-primary">Service / Badge / Problem</md-radio-button>
-                            <md-radio-button value="linkPattern" class="md-primary">Link pattern</md-radio-button>
-                            <md-radio-button value="textResponse" class="md-primary">Text Response</md-radio-button>
-                            <md-radio-button ng-disabled="!ctrl.enableBeta" value="multipleChoice" class="md-primary">Multiple Choice*</md-radio-button>
-                            <md-radio-button value="code" class="md-primary">Code</md-radio-button>
-                        </td>
-                        <td style='padding-left:30px; padding-bottom:80px;'>
-                            <md-radio-button value="profileEdit" class="md-primary">Profile Update</md-radio-button>
-                            <md-radio-button ng-disabled="!ctrl.enableBeta" value="video" class="md-primary">Video*</md-radio-button>
-                            <md-radio-button ng-disabled="!ctrl.enableBeta" value="journalling" class="md-primary">Journalling*</md-radio-button>
-                            <md-radio-button ng-disabled="!ctrl.enableBeta" value="survey" class="md-primary">Survey*</md-radio-button>
-                            <md-radio-button ng-disabled="!ctrl.enableBeta" value="teamActivity" class="md-primary">Team Activity*</md-radio-button>
-                        </td>
-                    </tr>
-                </table>
+            <md-radio-group ng-model="ctrl.taskType" layout="row" layout-wrap>
+                <md-radio-button flex="100" flex-gt-xs="50" flex-gt-md="33" value="service" class="md-primary">Service / Achievements</md-radio-button>
+                <md-radio-button flex="100" flex-gt-xs="50" flex-gt-md="33" value="linkPattern" class="md-primary">Link pattern</md-radio-button>
+                <md-radio-button flex="100" flex-gt-xs="50" flex-gt-md="33" value="textResponse" class="md-primary">Text Response</md-radio-button>
+                <md-radio-button flex="100" flex-gt-xs="50" flex-gt-md="33" value="multipleChoice" class="md-primary">Multiple Choice</md-radio-button>
+                <md-radio-button flex="100" flex-gt-xs="50" flex-gt-md="33" value="code" class="md-primary">Code</md-radio-button>
+                <md-radio-button flex="100" flex-gt-xs="50" flex-gt-md="33" value="profileEdit" class="md-primary">Profile Update</md-radio-button>
+                <md-radio-button flex="100" flex-gt-xs="50" flex-gt-md="33" value="video" class="md-primary">Video</md-radio-button>
+                <md-radio-button flex="100" flex-gt-xs="50" flex-gt-md="33" value="journalling" class="md-primary">Journalling</md-radio-button>
+                <md-radio-button flex="100" flex-gt-xs="50" flex-gt-md="33" value="survey" class="md-primary">Survey</md-radio-button>
+                <md-radio-button flex="100" flex-gt-xs="50" flex-gt-md="33" value="teamActivity" class="md-primary">Team Activity</md-radio-button>
             </md-radio-group>
         </div>
-        <div layout="row" ng-if="ctrl.taskType == 'service'">
+
+        <div ng-if="ctrl.taskType == 'service'">
             <md-input-container flex layout="column">
-                <md-select flex name="editTaskServiceId"
-                           ng-model="ctrl.task.serviceId" required placeholder="Select a Service">
-                    <md-option ng-value="opt" ng-repeat="opt in ['codeSchool', 'codeCombat', 'treeHouse', 'singPath']">
-                        {{opt}}
+                <label for="editTaskServiceIdID">Select a Service</label>
+                <md-select flex id="editTaskServiceIdID" name="editTaskServiceId" ng-model="ctrl.task.serviceId" required>
+                    <md-option value="singPath">SingPath</md-option>
+                    <md-option ng-value="service.serviceId" ng-repeat="service in ctrl.services" ng-if="service.available">
+                        {{service.name}}
                     </md-option>
                 </md-select>
                 <div ng-messages="editTask.editTaskServiceId.$error">
                     <div ng-message="required">A challenge needs a service id.</div>
                 </div>
             </md-input-container>
-            <md-input-container flex layout="column" ng-if="ctrl.task.serviceId &amp;&amp; ctrl.task.serviceId != 'singPath'">
-                <md-select flex name="editTaskBadge"
-                           ng-model="ctrl.task.badge"
-                           placeholder="Select a badge (optional)"
-                >
+        </div>
+
+        <div ng-if="ctrl.task.serviceId">
+            <h3>Select a requirement type</h3>
+            <md-radio-group ng-model="ctrl.serviceTaskType" ng-change="ctrl.serviceTaskTypeChanged(ctrl.serviceTaskType, ctrl.task)">
+                <md-radio-button value="register" class="md-primary">Register Only.</md-radio-button>
+                <md-radio-button value="minTotalAchievements" class="md-primary">A number of achievements.</md-radio-button>
+                <md-radio-button value="badge" class="md-primary">A specific badge / achievement.</md-radio-button>
+            </md-radio-group>
+        </div>
+
+        <div layout ng-if="ctrl.serviceTaskType == 'minTotalAchievements'">
+            <md-input-container flex>
+                <label for="edit-task-min-total-achievements">Minimum number of achievements</label>
+                <input type="number" name="editTaskMinTotalAchievements" id="edit-task-min-total-achievements"
+                    ng-model="ctrl.task.minTotalAchievements"
+                    step="1"
+                    min="1"
+                />
+
+                <div ng-messages="editTask.editTaskMinTotalAchievements.$error">
+                    <div ng-message="required">A challenge needs a name.</div>
+                    <div ng-message="min">You require at least 1 badge / achievement.</div>
+                </div>
+            </md-input-container>
+        </div>
+
+        <div layout ng-if="ctrl.serviceTaskType == 'badge' && ctrl.task.serviceId != 'singPath'">
+            <md-input-container flex layout="column">
+                <label for="editTaskBadgeID">Select a badge</label>
+                <md-select flex id="editTaskBadgeID" name="editTaskBadge" ng-model="ctrl.task.badge">
                     <md-option ng-value="badge" ng-repeat="badge in ctrl.badges[ctrl.task.serviceId]">
                         {{badge.name}}
                     </md-option>
@@ -150,9 +168,10 @@
             </md-input-container>
         </div>
 
-        <div layout="row" ng-if="ctrl.task.serviceId == 'singPath'">
+        <div layout="row" ng-if="ctrl.serviceTaskType == 'badge' && ctrl.task.serviceId == 'singPath'">
             <md-input-container flex layout="column">
-                <md-select flex name="editTaskSingPathPath"
+                <label for="editTaskSingPathPathID">Select a Path</label>
+                <md-select flex id="editTaskSingPathPathID" name="editTaskSingPathPath"
                            ng-model="ctrl.task.singPathProblem.path"
                            placeholder="Select a Path (optional)"
                 >
@@ -162,11 +181,11 @@
                 </md-select>
             </md-input-container>
             <md-input-container flex layout="column" ng-if="ctrl.task.singPathProblem.path">
-                <md-select flex name="editTaskSingPathLevel"
+                <label for="editTaskSingPathLevelID">Select a Level</label>
+                <md-select flex id="editTaskSingPathLevelID" name="editTaskSingPathLevel"
                            ng-model="ctrl.task.singPathProblem.level"
                            required
                            md-on-open="ctrl.loadLevels(ctrl.task.singPathProblem)"
-                           placeholder="Select a Level"
                 >
                     <md-option ng-value="opt" ng-repeat="opt in ctrl.singPath.levels">
                         {{opt.title}}
@@ -177,11 +196,11 @@
                 </div>
             </md-input-container>
             <md-input-container flex layout="column" ng-if="ctrl.task.singPathProblem.level">
-                <md-select flex name="editTaskSingPathProblem"
+                <label for="editTaskSingPathProblemID">Select a Problem</label>
+                <md-select flex id="editTaskSingPathProblemID" name="editTaskSingPathProblem"
                            ng-model="ctrl.task.singPathProblem.problem"
                            required
                            md-on-open="ctrl.loadProblems(ctrl.task.singPathProblem)"
-                           placeholder="Select a Problem"
                 >
                     <md-option ng-value="opt" ng-repeat="opt in ctrl.singPath.problems">
                         {{opt.title}}

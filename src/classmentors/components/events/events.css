@@ -77,3 +77,8 @@ md-dialog.link-dialog {
 .showMe2{
     height:100px;
 }
+
+md-radio-group.layout-row > md-radio-button[flex] {
+    margin: 0;
+    padding: 8px;
+}
