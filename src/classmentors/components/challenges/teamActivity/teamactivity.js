@@ -54,26 +54,30 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
             task: self.task,
             isOpen: initialData.data.isOpen
         });
-        $location.path(urlFor('viewMcq'));
+        console.log(self.task.activityType);
+        if(self.task.activityType == 'viewMcq'){
+            $location.path(urlFor('viewMcq'));
+        }else if(self.task.activityType == 'indexCards'){
+            $location.path(urlFor('indexCards'));
+        }
+        
     };
 
 
     function formTeams(method, methodParameter, participants) {
         var teams = [];
         var teamStructure = [];
-        participants = participants + 1;
+        // participants = participants + 1;// hmm, shouldn't need to add 1 here.
         console.log('Total participants :', participants);
         if (method == 'noOfTeams') {
             //initialze teamStructure with team size of 0 each
-            for (var i = 0; i < methodParameter; i++) {
-                teamStructure.push(0);
-            }
-
+            teamStructure = Array.apply(null, Array(methodParameter)).map(Number.prototype.valueOf,0);
             console.log('teamStructure :', teamStructure);
             //add 1 to each team until there are no more participants left
             for (var i = 0; i < participants; i++) {
                 teamStructure[i % methodParameter] += 1;
             }
+
         } else {//else by teamSize
             while (participants > methodParameter) {
                 teamStructure.push(methodParameter);
