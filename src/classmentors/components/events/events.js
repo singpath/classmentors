@@ -828,7 +828,7 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
     //allow users to feature their events
     //retrieve the current featured status
     this.featureEvent = clmDataStore.events.getFeatured(this.event.$id);
-    
+
     //set the selection by user
     this.toggle = function () {
         if (this.featureEvent) {
@@ -1162,7 +1162,9 @@ function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNav
     this.isOpen = true;
     this.singPath = initialData.singPath;
     this.savingTask = false;
-    this.task = {archived: false, showProgress: true, badge: null};
+    this.serviceTaskType = 'register';
+    this.serviceTaskTypeChanged = serviceTaskTypeChanged;
+    this.task = {archived: false, showProgress: true};
     this.enableBeta = true;
     this.services = clmDataStore.services;
 
@@ -1376,6 +1378,24 @@ AddEventTaskCtrl.$inject = [
     'clmSurvey'
 ];
 
+export function serviceTaskTypeChanged(type, task) {
+    switch (type) {
+
+    case 'badge':
+        task.minTotalAchievements = null;
+        break;
+
+    case 'minTotalAchievements':
+        task.minTotalAchievements = 1;
+        task.badge = null;
+        break;
+
+    default:
+        task.minTotalAchievements = null;
+        task.badge = null;
+    }
+}
+
 export function clmSurveyTaskFactory() {
     var sharedData = {};
     //console.log("it comes in here");
@@ -1469,9 +1489,13 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
     this.badges = initialData.badges;
     this.taskId = initialData.taskId;
     this.task = initialData.task;
+    this.serviceTaskType = 'register';
+    this.serviceTaskTypeChanged = serviceTaskTypeChanged;
 
-    if (!this.task.badge) {
-        this.task.badge = null;
+    if (this.task.badge) {
+        this.serviceTaskType = 'badge';
+    } else if (this.task.minTotalAchievements) {
+        this.serviceTaskType = 'minTotalAchievements';
     }
 
     this.services = clmDataStore.services;
@@ -1739,7 +1763,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         reversed: false
     };
 
-    // Load 'team leaders' of each member. 
+    // Load 'team leaders' of each member.
     self.teamLeader = null;
     self.team = null
     self.isTeamLeader = function(eventId, teamFormationId, currentUserId){
@@ -1760,14 +1784,14 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                         self.team = team;
                         self.teamLeader = team.teamLeader;
                         // Break execution.
-                        return true;                    
+                        return true;
                     }
                 })
             });
     };
 
     function currentTeams(){
-        
+
     }
 
     //Find superReviewUser rights

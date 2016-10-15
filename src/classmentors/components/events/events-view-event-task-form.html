@@ -116,7 +116,8 @@
                 <md-radio-button flex="100" flex-gt-xs="50" flex-gt-md="33" value="teamActivity" class="md-primary">Team Activity</md-radio-button>
             </md-radio-group>
         </div>
-        <div layout="row" ng-if="ctrl.taskType == 'service'">
+
+        <div ng-if="ctrl.taskType == 'service'">
             <md-input-container flex layout="column">
                 <label for="editTaskServiceIdID">Select a Service</label>
                 <md-select flex id="editTaskServiceIdID" name="editTaskServiceId" ng-model="ctrl.task.serviceId" required>
@@ -129,10 +130,37 @@
                     <div ng-message="required">A challenge needs a service id.</div>
                 </div>
             </md-input-container>
-            <md-input-container flex layout="column" ng-if="ctrl.task.serviceId &amp;&amp; ctrl.task.serviceId != 'singPath'">
-                <label for="editTaskBadgeID">Select a badge (optional)</label>
+        </div>
+
+        <div ng-if="ctrl.task.serviceId">
+            <h3>Select a requirement type</h3>
+            <md-radio-group ng-model="ctrl.serviceTaskType" ng-change="ctrl.serviceTaskTypeChanged(ctrl.serviceTaskType, ctrl.task)">
+                <md-radio-button value="register" class="md-primary">Register Only.</md-radio-button>
+                <md-radio-button value="minTotalAchievements" class="md-primary">A number of achievements.</md-radio-button>
+                <md-radio-button value="badge" class="md-primary">A specific badge / achievement.</md-radio-button>
+            </md-radio-group>
+        </div>
+
+        <div layout ng-if="ctrl.serviceTaskType == 'minTotalAchievements'">
+            <md-input-container flex>
+                <label for="edit-task-min-total-achievements">Minimum number of achievements</label>
+                <input type="number" name="editTaskMinTotalAchievements" id="edit-task-min-total-achievements"
+                    ng-model="ctrl.task.minTotalAchievements"
+                    step="1"
+                    min="1"
+                />
+
+                <div ng-messages="editTask.editTaskMinTotalAchievements.$error">
+                    <div ng-message="required">A challenge needs a name.</div>
+                    <div ng-message="min">You require at least 1 badge / achievement.</div>
+                </div>
+            </md-input-container>
+        </div>
+
+        <div layout ng-if="ctrl.serviceTaskType == 'badge' && ctrl.task.serviceId != 'singPath'">
+            <md-input-container flex layout="column">
+                <label for="editTaskBadgeID">Select a badge</label>
                 <md-select flex id="editTaskBadgeID" name="editTaskBadge" ng-model="ctrl.task.badge">
-                    <md-option ng-value="null">Register only</md-option>
                     <md-option ng-value="badge" ng-repeat="badge in ctrl.badges[ctrl.task.serviceId]">
                         {{badge.name}}
                     </md-option>
@@ -140,14 +168,13 @@
             </md-input-container>
         </div>
 
-        <div layout="row" ng-if="ctrl.task.serviceId == 'singPath'">
+        <div layout="row" ng-if="ctrl.serviceTaskType == 'badge' && ctrl.task.serviceId == 'singPath'">
             <md-input-container flex layout="column">
-                <label for="editTaskSingPathPathID">Select a Path (optional)</label>
+                <label for="editTaskSingPathPathID">Select a Path</label>
                 <md-select flex id="editTaskSingPathPathID" name="editTaskSingPathPath"
                            ng-model="ctrl.task.singPathProblem.path"
                            placeholder="Select a Path (optional)"
                 >
-                    <md-option ng-value="null">Register only</md-option>
                     <md-option ng-value="opt" ng-repeat="opt in ctrl.singPath.paths">
                         {{opt.title}}
                     </md-option>
