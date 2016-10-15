@@ -167,11 +167,13 @@ function startMCQInitialData($q, spfAuthData, eventService, clmDataStore, $route
         currentUser: spfAuthData.user(),
         answers: clmDataStore.events.getTaskAnswers(eventId, taskId),
         getProgress: clmDataStore.events.getProgress(eventId),
-        task: clmDataStore.events.getTask(eventId, taskId)
+        task: clmDataStore.events.getTask(eventId, taskId),
+        event: clmDataStore.events.get(eventId)
 
     }).then(function (result) {
         // console.log("result isss:", result);
         return {
+            eventTitle: result.event.title,
             eventId: eventId,
             taskId: taskId,
             task: result.task,
