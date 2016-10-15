@@ -831,7 +831,7 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
     //allow users to feature their events
     //retrieve the current featured status
     this.featureEvent = clmDataStore.events.getFeatured(this.event.$id);
-    
+
     //set the selection by user
     this.toggle = function () {
         if (this.featureEvent) {
@@ -1780,14 +1780,14 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                         self.team = team;
                         self.teamLeader = team.teamLeader;
                         // Break execution.
-                        return true;                    
+                        return true;
                     }
                 })
             });
     };
 
     function currentTeams(){
-        
+
     }
 
     //Find superReviewUser rights
@@ -2270,7 +2270,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             self.selectedTeam = initialData.selectedTeam;
             self.teams = {};
             self.teams = initialData.teams;
-            console.log("self teams iss:", self.teams);
+
             // var teamMembers = [];
             //separate the names to be populated
             // for (var i = 0; i < self.teams.length; i++) {
@@ -2353,6 +2353,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             }
 
             function joinTeam(index) {
+                console.log("index isss:", index);
                 var team = self.teams[index];
                 var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${team.$id}/${participant.$id}`);
                 // var currentSize = 0;
@@ -2391,6 +2392,9 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                             taskId: taskId
                         }
                     );
+                }).then(function(){
+                    //update progress asynchronously
+                    clmDataStore.events.submitSolution(eventId, taskId, participant.$id, "Team " + (index+1));
                 });
 
                 // console.log("self teams isss:", self.teams);
