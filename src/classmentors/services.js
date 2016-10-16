@@ -1742,28 +1742,22 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                  * @param  {string}   eventId The event id to query question for.
                  * @return {firebase.database.Reference}
                  */
-                allRef() {
+                allRef(eventId) {
+                    var ref = db.ref(`classMentors/eventQuestions/${eventId}/questions`);
+                    var query = ref.orderByChild('createdAt');
+                    return loaded($firebaseArray(query));
                 },
 
                 /**
                  * Create a question on behalf of the current user.
                  *
                  * @param  {string}   eventId The event id to submit the question for.
-                 * @param  {{title: string, body: string}} details Question details
+                 * @param  {{title: string, body: string}} question Question details
                  * @return {Promise<firebase.database.Reference,Error>}
                  */
-                create() {
-
-                },
-
-                /**
-                 * Upvote a question.
-                 *
-                 * @param  {string}   eventId    The event id of the question.
-                 * @param  {string}   questionId The question id to upvote.
-                 * @return {Promise<void,Error>}
-                 */
-                upVote() {
+                create(question, eventId) {
+                    var ref = db.ref(`classMentors/eventQuestions/${eventId}/questions`);
+                    return ref.push(question);
                 },
 
                 answers: {

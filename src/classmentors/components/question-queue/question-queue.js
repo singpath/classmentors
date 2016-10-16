@@ -5,6 +5,8 @@ import qqHome from './question-queue.html!text';
 import eventQ from './event-queue.html!text';
 import askQnTmpl from './askQuestion.html!text';
 
+import './question-queue.css!';
+
 /**
  * Update navBar with a title and no action.
  * @param {spfNavBarService} spfNavBarService
@@ -46,13 +48,25 @@ function qqController(initialData, spfNavBarService, urlFor, firebaseApp, spfAle
 
 qqController.$inject = ['initialData', 'spfNavBarService', 'urlFor', 'firebaseApp', 'spfAlert', '$firebaseObject'];
 
-function eventQController(initialData, spfNavBarService, urlFor, firebaseApp, spfAlert, $firebaseObject, $mdDialog, $document) {
+function eventQController(initialData, spfNavBarService, urlFor, firebaseApp, spfAlert, $firebaseObject, $mdDialog, $document, clmDataStore) {
     var self = this;
     var db = firebaseApp.database();
 
     this.currentUser = initialData.currentUser;
     this.profile = initialData.profile;
     this.event = initialData.event;
+    this.questions = initialData.questions;
+    this.myQuestions = [];
+    this.myQnLimit = 3;
+    this.voteQnLimit = 3;
+
+    this.expandMyQns = function() {
+      self.myQnLimit += 3;
+    };
+
+    this.expandVoteQns = function() {
+        self.voteQnLimit += 3;
+    };
 
     spfNavBarService.update(
         self.event.title,
@@ -60,6 +74,19 @@ function eventQController(initialData, spfNavBarService, urlFor, firebaseApp, sp
         title: 'Question Queues',
         url: `#${urlFor('questionQueue')}`
     });
+
+    this.toggleVote = function (question, questionId) {
+        var ref = db.ref(`classMentors/eventQuestions/${self.event.$id}/questions/${questionId}/upVotes/${self.currentUser.publicId}`);
+        if(question.owner.publicId == self.currentUser.publicId) {
+            spfAlert.error("You cannot upvote your own question.");
+        } else {
+            if(question.upVotes && question.upVotes[self.currentUser.publicId]) {
+                ref.remove()
+            } else {
+                return ref.set(Date.now());
+            }
+        }
+    };
 
     this.askNewQuestion = function (event, currentUser) {
         $mdDialog.show({
@@ -71,8 +98,29 @@ function eventQController(initialData, spfNavBarService, urlFor, firebaseApp, sp
         });
 
         function askQnController() {
+            var self = this;
             this.event = event;
-            this.user = currentUser;
+            this.user = {
+                publicId: currentUser.publicId,
+                displayName: currentUser.displayName,
+                gravatar: currentUser.gravatar
+            };
+            this.question = {};
+            this.postQn = function () {
+                self.question.owner = self.user;
+                self.question.createdAt = Date.now();
+                clmDataStore.events.questions.create(self.question, self.event.$id).then(
+                    spfAlert.success('You have successfully posted a new question')
+                ).then($mdDialog.hide()).catch(function () {
+                    spfAlert.error('You failed to post your question. Please ensure that title and questions are at least 3 characters long')
+                });
+                clmDataStore.logging.inputLog({
+                    action: "askQuestion",
+                    publicId: self.currentUser.publicId,
+                    eventId: self.event.$id,
+                    timestamp: self.question.createdAt
+                });
+            };
             this.closeDialog = function() {
                 $mdDialog.hide();
             };
@@ -81,7 +129,7 @@ function eventQController(initialData, spfNavBarService, urlFor, firebaseApp, sp
 
 }
 
-eventQController.$inject = ['initialData', 'spfNavBarService', 'urlFor', 'firebaseApp', 'spfAlert', '$firebaseObject', '$mdDialog', '$document'];
+eventQController.$inject = ['initialData', 'spfNavBarService', 'urlFor', 'firebaseApp', 'spfAlert', '$firebaseObject', '$mdDialog', '$document', 'clmDataStore'];
 
 // export const component = {
 //     qqHome,
@@ -135,7 +183,8 @@ function eventQResolver($q, spfAuth, spfAuthData, clmDataStore, $route) {
             return error;
         }),
         profile: clmDataStore.currentUserProfile(),
-        event: clmDataStore.events.get(eventId)
+        event: clmDataStore.events.get(eventId),
+        questions: clmDataStore.events.questions.allRef(eventId)
     });
 }
 eventQResolver.$inject = ['$q', 'spfAuth', 'spfAuthData', 'clmDataStore', '$route'];

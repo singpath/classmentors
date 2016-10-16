@@ -121,7 +121,7 @@
                 "$participantId": {}
               },
               "createdAt": {
-                ".validate": "data.exists() == false && newData.val() == now"
+                ".validate": "true || data.exists() == false && newData.val() == now"
               },
               "answeredBy": {},
               "$other": {

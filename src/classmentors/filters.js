@@ -63,6 +63,17 @@ export function showTeamMembersFilterFactory() {
     }
 }
 
+export function countObjKeysFactory() {
+    return function countObjKeys(obj) {
+        if(obj) {
+            return `${Object.keys(obj).length}`;
+        }
+        return 0;
+    }
+}
+
+countObjKeysFactory.$inject = [];
+
 // export function reverseArray (){
 //   return function(items) {
 //     return items.slice().reverse();

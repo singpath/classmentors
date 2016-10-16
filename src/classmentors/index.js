@@ -73,6 +73,7 @@ module.filter('cmTruncate', filters.cmTruncateFilterFactory);
 module.filter('cmTruncated', filters.cmTruncateFilterBooleanFactory);
 module.filter('showSchool', filters.showSchoolFilterFactory);
 module.filter('showTeamMembers', filters.showTeamMembersFilterFactory);
+module.filter('countObjKeys', filters.countObjKeysFactory);
 // module.filter('reverseArray', filters.reverseArray);
 //for page controls in trat
 module.run(components.profiles.configServices);

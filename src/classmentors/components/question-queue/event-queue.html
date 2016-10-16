@@ -1,8 +1,47 @@
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
       rel="stylesheet">
 <md-content flex class="md-padding">
-    x open x closed x instructor attention
-    <md-button ng-click="ctrl.askNewQuestion(ctrl.event, ctrl.currentUser)">Ask New Question</md-button>
-    <md-subheader>My recently posted questions</md-subheader>
-    <md-subheader>Most voted questions</md-subheader>
+    x open x closed x instructor attention<br>
+    <md-button class="md-raised md-primary" ng-click="ctrl.askNewQuestion(ctrl.event, ctrl.currentUser)">Ask New Question</md-button>
+
+    <md-list>
+        <md-subheader class="md-no-sticky">My recently posted questions</md-subheader>
+        <md-list-item ng-repeat="question in ctrl.questions | orderBy:'-' | limitTo:ctrl.myQnLimit" ng-if="question.owner.publicId == ctrl.currentUser.publicId">
+            <div layout="column" layout-align="end center">
+                <md-button aria-label="Vote" ng-click="ctrl.toggleVote(question, question.$id)">
+                    <md-icon ng-if="!question.upVotes || !question.upVotes[ctrl.currentUser.publicId]" style="font-size: 30px">thumb_up</md-icon>
+                    <md-icon ng-if="question.upVotes && question.upVotes[ctrl.currentUser.publicId]" style="font-size: 30px">thumb_down</md-icon>
+                </md-button><div style="font-size: 12px" >{{question.upVotes | countObjKeys}} vote(s)</div>
+            </div>
+            <div layout="column" layout-align="end start" class="md-list-item-text">
+                <div style="font-size: 20px">{{question.title}}</div>
+                <div style="font-size: 10px; color:grey;">Posted by {{question.owner.displayName}} ({{question.createdAt | date:'dd/MM/yy hh:mma'}})</div>
+            </div>
+            <div></div>
+            <md-divider ng-if="!$last"></md-divider>
+            <div ng-if="!$last"></div>
+        </md-list-item>
+        <md-button class="md-accent" ng-click="ctrl.expandMyQns()">Show More</md-button>
+    </md-list>
+
+    <md-list>
+        <md-subheader class="md-no-sticky">Most voted questions</md-subheader>
+        <md-list-item ng-repeat="question in ctrl.questions | orderBy:['-upVotes | countObjKeys', '-createdAt'] | limitTo:ctrl.voteQnLimit">
+            <div layout="column" layout-align="end center">
+                <md-button aria-label="Vote" ng-click="ctrl.toggleVote(question, question.$id)">
+                    <md-icon ng-if="!question.upVotes || !question.upVotes[ctrl.currentUser.publicId]" style="font-size: 30px">thumb_up</md-icon>
+                    <md-icon ng-if="question.upVotes && question.upVotes[ctrl.currentUser.publicId]" style="font-size: 30px">thumb_down</md-icon>
+                </md-button><div style="font-size: 12px" >{{question.upVotes | countObjKeys}} vote(s)</div>
+            </div>
+            <div flex="5"></div>
+            <div layout="column" layout-align="end start" class="md-list-item-text">
+                <div style="font-size: 20px">{{question.title}}</div>
+                <div style="font-size: 10px; color:grey;">Posted by {{question.owner.displayName}} ({{question.createdAt | date:'dd/MM/yy hh:mma'}})</div>
+            </div>
+            <div></div>
+            <md-divider ng-if="!$last"></md-divider>
+            <div ng-if="!$last"></div>
+        </md-list-item>
+        <md-button class="md-accent" ng-click="ctrl.expandVoteQns()">Show More</md-button>
+    </md-list>
 </md-content>

@@ -1,5 +1,5 @@
 <md-dialog aria-label="askQuestion" class="question-dialog">
-    <form name="newQuestionForm" ng-submit="ctrl.save(ctrl.solution)">
+    <form name="newQuestionForm" ng-submit="ctrl.postQn()">
         <md-dialog-content class="sticky-container">
             <md-subheader class="md-sticky-no-effect">{{ctrl.event.title}}</md-subheader>
             <div>
@@ -19,7 +19,7 @@
                     <label for="question-body">Question</label>
                     <textarea name="qnBody" id="question-body"
                            ng-model="ctrl.question.body"
-                           required md-select-on-focus md-maxlength="1000" rows="3">
+                           required md-select-on-focus md-maxlength="300" rows="3">
                     </textarea>
                     <div ng-messages="newQuestionForm.question-body.$error">
                         <div ng-message="required">Required.</div>
@@ -27,7 +27,7 @@
                 </md-input-container>
             </div>
             <div class="md-dialog-actions" align="center">
-                <md-button type="submit" class="md-primary md-raised" ng-hide="ctrl.viewOnly" ng-disabled="!newQuestionForm.$valid">
+                <md-button type="submit" class="md-primary md-raised" ng-disabled="!newQuestionForm.$valid">
                     Post
                 </md-button>
                 <md-button ng-click="ctrl.closeDialog()" type="button" class="md-accent">Cancel</md-button>
