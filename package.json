@@ -126,7 +126,7 @@
         "main": "angular-animate.js",
         "registry": "jspm",
         "dependencies": {
-          "angular": "^1.3.0"
+          "angular": "^1.5.8"
         },
         "meta": {
           "angular-animate.js": {
@@ -141,7 +141,7 @@
         "main": "angular-aria.js",
         "registry": "jspm",
         "dependencies": {
-          "angular": "^1.3.0"
+          "angular": "^1.5.8"
         },
         "meta": {
           "angular-aria.js": {
@@ -156,7 +156,7 @@
         "main": "angular-messages.js",
         "registry": "jspm",
         "dependencies": {
-          "angular": "^1.5.0"
+          "angular": "^1.5.8"
         },
         "meta": {
           "angular-messages.js": {
@@ -171,7 +171,7 @@
         "main": "angular-route.js",
         "registry": "jspm",
         "dependencies": {
-          "angular": "^1.3.0"
+          "angular": "^1.5.8"
         },
         "meta": {
           "angular-route.js": {
@@ -195,9 +195,9 @@
         "main": "angular-material.js",
         "registry": "jspm",
         "dependencies": {
-          "angular": "^1.5.0",
-          "angular-animate": "^1.5.0",
-          "angular-aria": "^1.5.0",
+          "angular": "^1.5.8",
+          "angular-animate": "^1.5.8",
+          "angular-aria": "^1.5.8",
           "css": "^0.1.0"
         },
         "meta": {
@@ -216,7 +216,7 @@
         "main": "build/loading-bar.js",
         "registry": "jspm",
         "dependencies": {
-          "angular": "^1.2.9",
+          "angular": "^1.5.8",
           "css": "*"
         },
         "meta": {
@@ -233,8 +233,8 @@
         "main": "dist/angularfire.js",
         "registry": "jspm",
         "dependencies": {
-          "angular": "^1.3.0",
-          "firebase": "^3.0.0"
+          "angular": "^1.5.8",
+          "firebase": "^3.3.2"
         },
         "meta": {
           "dist/angularfire.js": {
@@ -260,7 +260,7 @@
         "registry": "jspm",
         "format": "global",
         "dependencies": {
-          "angular": "^1.4.1",
+          "angular": "^1.5.8",
           "moment": "^2.10.3",
           "humanize-duration": "^3.0.0"
         },
@@ -595,4 +595,5 @@
   "keywords": [],
   "author": "",
   "license": "MIT"
+
 }

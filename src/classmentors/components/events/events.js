@@ -127,6 +127,7 @@ export function configRoute($routeProvider, routes) {
 
 
         })
+
         .when('/events/:eventId/:taskId/survey2/:surveyTask', {
 
             template: motiStratLearnTmpl,
@@ -218,8 +219,8 @@ function classMentorsEventResolver($q, spfAuth, spfAuthData, clmDataStore) {
     return $q.all({
         events: clmDataStore.events.list(),
         auth: spfAuth.$loaded(),
-        currentUser: spfAuthData.user().catch(function () {
-            return;
+        currentUser: spfAuthData.user().catch(function (error) {
+            return error;
         }),
         profile: clmDataStore.currentUserProfile(),
         createdEvents: clmDataStore.events.listCreatedEvents(),
@@ -590,7 +591,7 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
             self.participants.$indexFor(self.currentUser.publicId) > -1
         ) {
             options.push({
-                title: 'Leave',
+                title: 'Leave Event',
                 onClick: function () {
                     clmDataStore.events.leave(self.event.$id).then(function () {
                         $route.reload();
@@ -943,7 +944,7 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
         }
     };
 
-    self.eventChallengeBttnText = "Hide Challenges"
+    self.eventChallengeBttnText = "Hide Challenges";
     this.toggleTaskEditView = function () {
         if (self.showingTasks) {
             self.showingTasks = false;
@@ -1235,10 +1236,6 @@ function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNav
             console.log('code is clicked');
             return 'Save';
 
-        } else if (tasktype == 'video') {
-            console.log('video is clicked');
-            return 'Continue';
-
         } else if (tasktype == 'teamActivity') {
             console.log('teamActivity is clicked');
             location = '/challenges/team-activity/create';
@@ -1268,12 +1265,12 @@ function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNav
     //this function double checks with user if he wishes to go back and discard all changes thus far
     this.discardChanges = function (ev) {
         var confirm = $mdDialog.confirm()
-            .title('You have not saved your input information')
+            .title('You have not save your challenge information')
             .textContent('All of the information input will be discarded. Are you sure you want to continue?')
-            .ariaLabel('Discard all')
+            .ariaLabel('Discard changes')
             .targetEvent(ev)
-            .ok('Discard All')
-            .cancel('Continue editing');
+            .ok('Discard Challenge')
+            .cancel('Continue Editing');
         $mdDialog.show(confirm).then(function () {
             // decided to discard data, bring user to previous page
             $location.path(urlFor('editEvent', {eventId: self.event.$id}));
@@ -1327,14 +1324,14 @@ function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNav
 
 
         self.creatingTask = true;
-        if (taskType === 'multipleChoice' || taskType === 'journalling' || taskType === 'video' || taskType === 'survey' || taskType === 'teamActivity') {
+        if (taskType === 'multipleChoice' || taskType === 'journalling' || taskType === 'survey' || taskType === 'teamActivity') {
             var data = {
                 taskType: taskType,
                 isOpen: isOpen,
                 event: event,
                 task: task
             };
-            // console.log('Data shows... ', data);
+            console.log('Data shows... ', data);
             spfNavBarService.update(
                 'Challenge Details', [{
                     title: 'Events',
@@ -1463,7 +1460,7 @@ editEventTaskCtrlInitialData.$inject = ['$q', '$route', 'spfAuthData', 'clmDataS
 
 
 /**Todo: enable edit to multiple choice, index card, etc. **/
-function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmDataStore, eventService, $mdDialog, $location){
+function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmDataStore, eventService, $mdDialog, $location, clmSurvey){
     var self = this;
 
     // console.log("the initialdata looks like this:", initialData);
@@ -1486,20 +1483,35 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
 
     if (this.task.serviceId) {
         this.taskType = 'service';
-
     } else if (this.task.linkPattern) {
         this.taskType = 'linkPattern';
-
     } else if (this.task.lang) {
         this.taskType = 'code';
-
+    } else if(this.task.toEdit) {
+        this.taskType = 'profileEdit';
+        this.selectedMetaData = this.task.toEdit;
+        console.log(this.task.toEdit);
     } else if (this.task.textResponse) {
         this.taskType = 'textResponse';
-
     } else if (this.task.mcqQuestions) {
         this.taskType = 'multipleChoice';
-
+    } else if (this.task.survey){
+        this.taskType = 'survey';
     }
+
+    this.toggle = function (item, list) {
+        var idx = list.indexOf(item);
+        if (idx > -1) {
+            list.splice(idx, 1);
+        }
+        else {
+            list.push(item);
+        }
+    };
+
+    this.exists = function (item, list) {
+        return list.indexOf(item) > -1;
+    };
     // else if (this.task.profileEdit) {
     //     return 'Save';
     // }
@@ -1558,10 +1570,6 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
             console.log('code is clicked');
             return 'Save';
 
-        } else if (this.taskType == 'video') {
-            console.log('video is clicked');
-            return 'Continue';
-
         } else if (this.taskType == 'journalling') {
             console.log('journalling is clicked');
             return 'Continue';
@@ -1573,6 +1581,13 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
 
         } else if (this.tasktype === 'profileEdit') {
             return 'Save';
+
+        } else if (this.taskType == 'survey'){
+            clmSurvey.set(this.event.$id, this.event, this.task, this.taskType, this.isOpen);
+            var obj = clmSurvey.get();
+
+            location = 'challenges/survey/edit';
+            return 'Continue';
 
         } else {
             return 'Save';
@@ -1637,7 +1652,7 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
         }
 
         self.creatingTask = true;
-        if (taskType === 'multipleChoice' || taskType === 'journalling' || taskType === 'video' || taskType === 'survey') {
+        if (taskType === 'multipleChoice' || taskType === 'journalling' || taskType === 'survey') {
             var data = {
                 taskType: taskType,
                 isOpen: isOpen,
@@ -1681,6 +1696,7 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
                 return clmDataStore.events.closeTask(event.$id, taskId);
             }).then(function () {
                 spfAlert.success('Challenge saved.');
+                $location.path(urlFor('editEvent', {eventId: self.event.$id}));
             }).catch(function () {
                 spfAlert.error('Failed to save the challenge.');
             }).then(function () {
@@ -1698,7 +1714,8 @@ EditEventTaskCtrl.$inject = [
     'clmDataStore',
     'eventService',
     '$mdDialog',
-    '$location'
+    '$location',
+    'clmSurvey'
 ];
 
 
