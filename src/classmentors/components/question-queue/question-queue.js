@@ -3,6 +3,7 @@
  */
 import qqHome from './question-queue.html!text';
 import eventQ from './event-queue.html!text';
+import askQnTmpl from './askQuestion.html!text';
 
 /**
  * Update navBar with a title and no action.
@@ -45,32 +46,42 @@ function qqController(initialData, spfNavBarService, urlFor, firebaseApp, spfAle
 
 qqController.$inject = ['initialData', 'spfNavBarService', 'urlFor', 'firebaseApp', 'spfAlert', '$firebaseObject'];
 
-function eventQController(initialData, spfNavBarService, urlFor, firebaseApp, spfAlert, $firebaseObject) {
+function eventQController(initialData, spfNavBarService, urlFor, firebaseApp, spfAlert, $firebaseObject, $mdDialog, $document) {
     var self = this;
     var db = firebaseApp.database();
 
     this.currentUser = initialData.currentUser;
     this.profile = initialData.profile;
-    this.createdEvents = initialData.createdEvents;
-    this.joinedEvents = initialData.joinedEvents;
+    this.event = initialData.event;
 
-    spfNavBarService.update('Question Queues', getOptions());
+    spfNavBarService.update(
+        self.event.title,
+    {
+        title: 'Question Queues',
+        url: `#${urlFor('questionQueue')}`
+    });
 
-    function getOptions() {
-        var options = [];
+    this.askNewQuestion = function (event, currentUser) {
+        $mdDialog.show({
+            clickOutsideToClose: true,
+            parent: $document.body,
+            template: askQnTmpl,
+            controller: askQnController,
+            controllerAs: 'ctrl'
+        });
 
-        // options.push({
-        //     title: 'Add New Challenge',
-        //     url: `#${urlFor('events')}`,
-        //     icon: 'add-circle-outline'
-        // });
-
-        return options;
+        function askQnController() {
+            this.event = event;
+            this.user = currentUser;
+            this.closeDialog = function() {
+                $mdDialog.hide();
+            };
+        }
     }
 
 }
 
-eventQController.$inject = ['initialData', 'spfNavBarService', 'urlFor', 'firebaseApp', 'spfAlert', '$firebaseObject'];
+eventQController.$inject = ['initialData', 'spfNavBarService', 'urlFor', 'firebaseApp', 'spfAlert', '$firebaseObject', '$mdDialog', '$document'];
 
 // export const component = {
 //     qqHome,
@@ -124,8 +135,7 @@ function eventQResolver($q, spfAuth, spfAuthData, clmDataStore, $route) {
             return error;
         }),
         profile: clmDataStore.currentUserProfile(),
-        joinedEvents: clmDataStore.events.listJoinedEvents(),
-        createdEvents: clmDataStore.events.listCreatedEvents()
+        event: clmDataStore.events.get(eventId)
     });
 }
 eventQResolver.$inject = ['$q', 'spfAuth', 'spfAuthData', 'clmDataStore', '$route'];

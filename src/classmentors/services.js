@@ -1746,13 +1746,14 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                 },
 
                 /**
-                 * Create a question on behave of the current user.
+                 * Create a question on behalf of the current user.
                  *
                  * @param  {string}   eventId The event id to submit the question for.
                  * @param  {{title: string, body: string}} details Question details
                  * @return {Promise<firebase.database.Reference,Error>}
                  */
                 create() {
+
                 },
 
                 /**

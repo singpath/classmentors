@@ -1,10 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-    Welcome to the event specific question queue
-</body>
-</html>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
+<md-content flex class="md-padding">
+    x open x closed x instructor attention
+    <md-button ng-click="ctrl.askNewQuestion(ctrl.event, ctrl.currentUser)">Ask New Question</md-button>
+    <md-subheader>My recently posted questions</md-subheader>
+    <md-subheader>Most voted questions</md-subheader>
+</md-content>
