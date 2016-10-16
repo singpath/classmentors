@@ -1,0 +1,31 @@
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
+<md-content flex class="md-padding">
+    <div layout="row">
+        <div layout="column" layout-align="center center" flex="10">
+            <md-icon style="font-size: 35px">thumb_up</md-icon>
+            <div style="font-size: 15px" >{{ctrl.question.upVotes | countObjKeys}} vote(s)</div>
+        </div>
+        <div layout="column" flex>
+            <div style="font-size: 20px">{{ctrl.question.title}}</div>
+            <div style="font-size: 10px; color:grey;">Posted by {{ctrl.question.owner.displayName}} ({{ctrl.question.createdAt | date:'dd/MM/yy hh:mma'}})</div>
+            <div style="font-size: 15px;">{{ctrl.question.body}}</div>
+        </div>
+        <md-button class="md-raised md-primary" ng-click="ctrl.answerQuestion(ctrl.event.$id, ctrl.question.$id, ctrl.currentUser)">Post a Response</md-button>
+    </div>
+
+    <md-list>
+        <md-list-item ng-repeat="answer in ctrl.answers | orderBy:'-'">
+            <div layout="row">
+                <div layout="column" layout-align="center center" flex="10">
+                    <md-icon style="font-size: 35px">thumb_up</md-icon>
+                    <div style="font-size: 15px" >{{answer.upVotes | countObjKeys}} vote(s)</div>
+                </div>
+                <div layout="column" flex>
+                    <div style="font-size: 10px; color:grey;">Posted by {{answer.displayName}} ({{ctrl.question.createdAt | date:'dd/MM/yy hh:mma'}})</div>
+                    <div style="font-size: 15px;">{{answer.body}}</div>
+                </div>
+            </div>
+        </md-list-item>
+    </md-list>
+</md-content>

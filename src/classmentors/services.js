@@ -1760,6 +1760,11 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                     return ref.push(question);
                 },
 
+                getQuestion(eventId, questionId) {
+                    var ref = db.ref(`classMentors/eventQuestions/${eventId}/questions/${questionId}`);
+                    return loaded($firebaseObject(ref));
+                },
+
                 answers: {
 
                     /**
@@ -1769,7 +1774,10 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                      * @param  {string}   questionId The question id to query comments for.
                      * @return {firebase.database.Reference}
                      */
-                    allRef() {
+                    allRef(eventId, questionId) {
+                        var ref = db.ref(`classMentors/eventQuestions/${eventId}/answers/${questionId}`);
+                        var query = ref.orderByChild('createdAt');
+                        return loaded($firebaseArray(query));
                     },
 
                     /**
@@ -1780,7 +1788,9 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                      * @param  {string} body       The answer body.
                      * @return {Promise<firebase.database.Reference,Error>}
                      */
-                    create() {
+                    postAnswer(eventId, questionId, answer) {
+                        var ref = db.ref(`classMentors/eventQuestions/${eventId}/answers/${questionId}`);
+                        return ref.push(answer);
                     },
 
                     /**

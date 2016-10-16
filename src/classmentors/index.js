@@ -125,7 +125,8 @@ module.constant('routes', {
   viewTRAT: '/events/:eventId/challenges/:taskId/TRAT/start',
   feedback: '/feedback',
   questionQueue: '/question-queue',
-  eventQueue: '/question-queue/:eventId'
+  eventQueue: '/question-queue/:eventId',
+  oneQuestion: '/question-queue/:eventId/questions/:questionId'
 });
 
 export {module};

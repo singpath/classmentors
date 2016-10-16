@@ -3,7 +3,9 @@
  */
 import qqHome from './question-queue.html!text';
 import eventQ from './event-queue.html!text';
+import oneQn from './view-question.html!text';
 import askQnTmpl from './askQuestion.html!text';
+import ansQnTmpl from './answerQuestion.html!text';
 
 import './question-queue.css!';
 
@@ -131,6 +133,73 @@ function eventQController(initialData, spfNavBarService, urlFor, firebaseApp, sp
 
 eventQController.$inject = ['initialData', 'spfNavBarService', 'urlFor', 'firebaseApp', 'spfAlert', '$firebaseObject', '$mdDialog', '$document', 'clmDataStore'];
 
+function oneQnController(initialData, spfNavBarService, urlFor, firebaseApp, spfAlert, $firebaseObject, $document, clmDataStore, $mdDialog) {
+    var self = this;
+    var db = firebaseApp.database();
+
+    this.event = initialData.event;
+    this.currentUser = initialData.currentUser;
+    this.question = initialData.question;
+    this.answers = initialData.answers;
+
+    console.log(self.currentUser);
+
+    spfNavBarService.update(
+        'View Question', [{
+            title: 'Question Queues',
+            url: `#${urlFor('questionQueue')}`
+        }, {
+            title: self.event.title,
+            url: `#${urlFor('eventQueue', {eventId: this.event.$id})}`
+        }], [{
+            title: 'View Other Questions',
+            url: `#${urlFor('eventQueue', {eventId: this.event.$id})}`,
+            icon: 'arrow-back'
+        }]
+    );
+
+    this.answerQuestion = function (eventId, questionId, currentUser) {
+        $mdDialog.show({
+            clickOutsideToClose: true,
+            parent: $document.body,
+            template: ansQnTmpl,
+            controller: ansQnController,
+            controllerAs: 'ctrl'
+        });
+
+        function ansQnController() {
+            var self = this;
+            this.answer = {};
+            this.answerQn = function () {
+                self.answer.createdAt = Date.now();
+                self.answer.owner = {
+                  publicId: currentUser.publicId,
+                  gravatar: currentUser.gravatar,
+                  displayName: currentUser.displayName
+                };
+                clmDataStore.events.questions.answers.postAnswer(eventId, questionId, self.answer)
+                    .then(spfAlert.success("Successfully posted your response"))
+                    .then($mdDialog.hide())
+                    .catch(function () {
+                        spfAlert.error("Failed to post your response");
+                    });
+                clmDataStore.logging.inputLog({
+                    action: "respondToQuestion",
+                    questionId: questionId,
+                    publicId: currentUser.publicId,
+                    eventId: eventId,
+                    timestamp: self.answer.createdAt
+                });
+            };
+            this.closeDialog = function() {
+                $mdDialog.hide();
+            };
+        }
+    }
+}
+
+oneQnController.$inject = ['initialData', 'spfNavBarService', 'urlFor', 'firebaseApp', 'spfAlert', '$firebaseObject', '$document', 'clmDataStore', '$mdDialog'];
+
 // export const component = {
 //     qqHome,
 //     // controller: qqController,
@@ -156,6 +225,12 @@ export function configRoute($routeProvider, routes) {
             controller: eventQController,
             controllerAs: 'ctrl',
             resolve: {initialData: eventQResolver}
+        })
+        .when(routes.oneQuestion, {
+            template: oneQn,
+            controller: oneQnController,
+            controllerAs: 'ctrl',
+            resolve: {initialData: oneQnResolver}
         })
         .otherwise(routes.home);
 }
@@ -188,3 +263,18 @@ function eventQResolver($q, spfAuth, spfAuthData, clmDataStore, $route) {
     });
 }
 eventQResolver.$inject = ['$q', 'spfAuth', 'spfAuthData', 'clmDataStore', '$route'];
+
+function oneQnResolver($q, spfAuth, spfAuthData, clmDataStore, $route) {
+    var eventId = $route.current.params.eventId;
+    var questionId = $route.current.params.questionId;
+    return $q.all({
+        auth: spfAuth.$loaded(),
+        currentUser: spfAuthData.user().catch(function(error) {
+            return error;
+        }),
+        event: clmDataStore.events.get(eventId),
+        question: clmDataStore.events.questions.getQuestion(eventId, questionId),
+        answers: clmDataStore.events.questions.answers.allRef(eventId, questionId)
+    });
+}
+oneQnResolver.$inject = ['$q', 'spfAuth', 'spfAuthData', 'clmDataStore', '$route'];
