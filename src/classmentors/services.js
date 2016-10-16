@@ -1075,7 +1075,6 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
             },
 
             joinTeam: function (eventId, taskId, teamId, participantId, user) {
-                // console.log("jointeam user iss:", user);
                 var currentSize;
                 var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${teamId}`);
                 return ref.transaction(function (team) {
