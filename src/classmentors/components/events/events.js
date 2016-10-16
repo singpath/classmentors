@@ -2225,6 +2225,37 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             };
         }
     };
+    this.promptForReviewQuestion = function(eventId, taskId, task, participant, userSolution){
+        $mdDialog.show({
+            parent: $document.body,
+            template: "",
+            controller: DialogController,
+            controllerAs: 'ctrl',
+            resolve:{
+                initialData: voteQuestionIntitalData
+            }
+        });
+
+        function reviewQuestionIntitalData(){
+            //TODO needed?
+        }
+    } 
+
+    this.promptForVoteQuestion = function(eventId, taskId, task, participant, userSolution){
+        $mdDialog.show({
+            parent: $document.body,
+            template: "",
+            controller: DialogController,
+            controllerAs: 'ctrl',
+            resolve:{
+                initialData: voteQuestionIntitalData
+            }
+        });
+
+        function voteQuestionIntitalData(){
+            //TODO
+        }
+    }
 
     this.promptForTeamFormation = function (eventId, taskId, task, participant, userSolution) {
         var db = firebaseApp.database();

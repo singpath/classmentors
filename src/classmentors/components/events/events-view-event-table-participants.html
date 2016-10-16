@@ -137,7 +137,38 @@
                                 </md-button>
                             </span>
                     </div>
-
+                    
+                    <div ng-if="task.type == 'voteQuestions'">
+                        <!--{{task}}-->
+                        <span ng-if="ctrl.currentUserSolutions[task.$id] && !task.formationPattern">
+                            Completed<span ng-if="!ctrl.currentUserProgress[task.$id].completed"></span>
+                        </span>
+                        <span ng-if="!ctrl.currentUserSolutions[task.$id]">
+                            <md-button class="md-raised md-primary"
+                                        target="_blank"
+                                        ng-disabled="task.closedAt"
+                                        aria-label="Vote Questions"
+                                        ng-click="ctrl.promptForVoteQuestion(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant, ctrl.currentUserSolutions)"
+                            >
+                            Vote
+                            </md-button>
+                        </span>
+                    </div>
+                    <div ng-if="task.type == 'reflectionQuestion'">
+                        <!--{{task}}-->
+                        <span ng-if="ctrl.currentUserSolutions[task.$id] && !task.formationPattern">
+                            Completed<span ng-if="!ctrl.currentUserProgress[task.$id].completed"></span>
+                        </span>
+                        <span ng-if="!ctrl.currentUserSolutions[task.$id]">
+                            <md-button class="md-raised md-primary"
+                                        target="_blank"
+                                        ng-disabled="task.closedAt"
+                                        aria-label="Vote Questions"
+                            >
+                            Review
+                            </md-button>
+                        </span>
+                    </div>
                     <div ng-if="task.textResponse && !task.lang && !task.toEdit">
                             <span ng-if="ctrl.currentUserSolutions[task.$id]">
                                 {{ ctrl.currentUserSolutions[task.$id] | cmTruncate: 10 }}<span
