@@ -1287,7 +1287,7 @@ function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNav
 
         //check if user keys in http inside Link Pattern
         var checkLinkPattern = copy.linkPattern;
-        if (checkLinkPattern != null) {
+        if (checkLinkPattern != null) { 
             if (checkLinkPattern.indexOf("http:") > -1) {
                 checkLinkPattern = checkLinkPattern.replace("http:", "https:");
             }

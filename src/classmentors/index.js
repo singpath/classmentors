@@ -123,7 +123,8 @@ module.constant('routes', {
   viewIRAT: '/challenges/IRAT',
   viewTRAT: '/events/:eventId/challenges/:taskId/TRAT/start',
   feedback: '/feedback',
-  questionQueue: '/question-queue'
+  questionQueue: '/question-queue',
+  indexCard: '/challenges/team-activity/indexCard'
 });
 
 export {module};
