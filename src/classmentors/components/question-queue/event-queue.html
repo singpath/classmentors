@@ -1,7 +1,13 @@
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
       rel="stylesheet">
 <md-content flex class="md-padding">
-    x open x closed x instructor attention<br>
+    <div layout="row">
+        <md-chips>
+            <md-chip>{{(ctrl.questions | countConditionally: ['answeredBy', false])}} open</md-chip>
+            <md-chip class="md-accent">{{(ctrl.questions | countConditionally: ['answeredBy', true])}} closed</md-chip>
+            <md-chip class="md-raised md-primary">{{ctrl.questions.length}} instructor attention</md-chip>
+        </md-chips>
+    </div>
     <md-button class="md-raised md-primary" ng-click="ctrl.askNewQuestion(ctrl.event, ctrl.currentUser)">Ask New Question</md-button>
 
     <md-list>
@@ -19,7 +25,7 @@
             </div>
             <md-button class="md-padding" ng-href="#{{ 'oneQuestion' | urlFor:{'eventId': ctrl.event.$id, 'questionId': question.$id} }}">
                 <md-icon style="font-size: 30px">sms</md-icon>
-                <div>View answers</div>
+                <div>View {{question.respondedBy | countObjKeys}} answer(s)</div>
             </md-button>
             <md-divider ng-if="!$last"></md-divider>
             <div ng-if="!$last"></div>
@@ -36,12 +42,14 @@
                     <md-icon ng-if="question.upVotes && question.upVotes[ctrl.currentUser.publicId]" style="font-size: 30px">thumb_down</md-icon>
                 </md-button><div style="font-size: 12px" >{{question.upVotes | countObjKeys}} vote(s)</div>
             </div>
-            <div flex="5"></div>
-            <div layout="column" layout-align="end start" class="md-list-item-text">
+            <div layout="column" layout-align="end start" class="md-list-item-text" flex>
                 <div style="font-size: 20px">{{question.title}}</div>
                 <div style="font-size: 10px; color:grey;">Posted by {{question.owner.displayName}} ({{question.createdAt | date:'dd/MM/yy hh:mma'}})</div>
             </div>
-            <div></div>
+            <md-button class="md-padding" ng-href="#{{ 'oneQuestion' | urlFor:{'eventId': ctrl.event.$id, 'questionId': question.$id} }}">
+                <md-icon style="font-size: 30px">sms</md-icon>
+                <div>View {{question.respondedBy | countObjKeys}} answer(s)</div>
+            </md-button>
             <md-divider ng-if="!$last"></md-divider>
             <div ng-if="!$last"></div>
         </md-list-item>

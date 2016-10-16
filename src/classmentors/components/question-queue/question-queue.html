@@ -18,8 +18,8 @@
                 {{ event.title }}
             </md-button>
             <div flex></div>
-            <div flex="10">x open</div>
-            <div flex="10">x closed</div>
+            <div flex="10">{{(event.questions | countConditionally: ['answeredBy', false])}} open</div>
+            <div flex="10">{{(event.questions | countConditionally: ['answeredBy', true])}} open</div>
             <div flex="10">x instructor attention</div>
         </md-list-item>
         <md-divider></md-divider>

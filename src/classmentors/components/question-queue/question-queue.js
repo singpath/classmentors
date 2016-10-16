@@ -23,7 +23,7 @@ import './question-queue.css!';
  * Firebase reference for objects. Returns promises
  * @param {$firebaseObject} $firebaseObject
  */
-function qqController(initialData, spfNavBarService, urlFor, firebaseApp, spfAlert, $firebaseObject) {
+function qqController(initialData, spfNavBarService, urlFor, firebaseApp, spfAlert, $firebaseObject, clmDataStore) {
     var self = this;
     var db = firebaseApp.database();
 
@@ -32,23 +32,24 @@ function qqController(initialData, spfNavBarService, urlFor, firebaseApp, spfAle
     this.createdEvents = initialData.createdEvents;
     this.joinedEvents = initialData.joinedEvents;
 
-    spfNavBarService.update('Question Queues', getOptions());
-
-    function getOptions() {
-        var options = [];
-
-        // options.push({
-        //     title: 'Add New Challenge',
-        //     url: `#${urlFor('events')}`,
-        //     icon: 'add-circle-outline'
-        // });
-
-        return options;
+    for(var index in self.createdEvents) {
+        var eventId = self.createdEvents[index].$id;
+        if(eventId) {
+            console.log(eventId);
+            clmDataStore.events.questions.allRef(eventId)
+                .then(function(questions) {
+                    console.log(questions);
+                    console.log(self.createdEvents);
+                    // self.createdEvents.find(e => e.$id == eventId).questions = questions;
+                })
+        }
     }
+
+    spfNavBarService.update('Question Queues');
 
 }
 
-qqController.$inject = ['initialData', 'spfNavBarService', 'urlFor', 'firebaseApp', 'spfAlert', '$firebaseObject'];
+qqController.$inject = ['initialData', 'spfNavBarService', 'urlFor', 'firebaseApp', 'spfAlert', '$firebaseObject', 'clmDataStore'];
 
 function eventQController(initialData, spfNavBarService, urlFor, firebaseApp, spfAlert, $firebaseObject, $mdDialog, $document, clmDataStore) {
     var self = this;
@@ -58,6 +59,7 @@ function eventQController(initialData, spfNavBarService, urlFor, firebaseApp, sp
     this.profile = initialData.profile;
     this.event = initialData.event;
     this.questions = initialData.questions;
+    console.log(self.questions);
     this.myQuestions = [];
     this.myQnLimit = 3;
     this.voteQnLimit = 3;
@@ -79,7 +81,7 @@ function eventQController(initialData, spfNavBarService, urlFor, firebaseApp, sp
 
     this.toggleVote = function (question, questionId) {
         var ref = db.ref(`classMentors/eventQuestions/${self.event.$id}/questions/${questionId}/upVotes/${self.currentUser.publicId}`);
-        if(question.owner.publicId == self.currentUser.publicId) {
+        if(false && question.owner.publicId == self.currentUser.publicId) {
             spfAlert.error("You cannot upvote your own question.");
         } else {
             if(question.upVotes && question.upVotes[self.currentUser.publicId]) {
@@ -158,6 +160,21 @@ function oneQnController(initialData, spfNavBarService, urlFor, firebaseApp, spf
         }]
     );
 
+    this.toggleAskerChoice = function (answerId, accepted, answer) {
+        var ref1 = db.ref(`classMentors/eventQuestions/${self.event.$id}/answers/${self.question.$id}/${answerId}/acceptedAt`);
+        var ref2 = db.ref(`classMentors/eventQuestions/${self.event.$id}/questions/${self.question.$id}/answeredBy`);
+        if(accepted) {
+            ref1.remove();
+            ref2.remove();
+        } else {
+            ref1.set(Date.now());
+            ref2.set({
+                publicId: answer.owner.publicId,
+                answeredAt: answer.createdAt
+            });
+        }
+    };
+
     this.answerQuestion = function (eventId, questionId, currentUser) {
         $mdDialog.show({
             clickOutsideToClose: true,
@@ -183,6 +200,8 @@ function oneQnController(initialData, spfNavBarService, urlFor, firebaseApp, spf
                     .catch(function () {
                         spfAlert.error("Failed to post your response");
                     });
+                var ref = db.ref(`classMentors/eventQuestions/${eventId}/questions/${questionId}/respondedBy/${currentUser.publicId}`);
+                ref.set(self.answer.createdAt);
                 clmDataStore.logging.inputLog({
                     action: "respondToQuestion",
                     questionId: questionId,

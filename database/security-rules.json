@@ -120,6 +120,9 @@
               "upVotes": {
                 "$participantId": {}
               },
+              "respondedBy": {
+                "$participantId": {}
+              },
               "createdAt": {
                 ".validate": "true || data.exists() == false && newData.val() == now"
               },
