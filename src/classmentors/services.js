@@ -982,7 +982,6 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
             getTeam: function (eventId, taskId, teamId) {
                 var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${teamId}`);
                 return loaded($firebaseObject(ref)).then(function (result) {
-                    console.log("result sissssss:", Object.keys(result));
                     return Object.keys(result);
                 });
             },

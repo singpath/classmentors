@@ -23,7 +23,7 @@ import './question-queue.css!';
  * Firebase reference for objects. Returns promises
  * @param {$firebaseObject} $firebaseObject
  */
-function qqController(initialData, spfNavBarService, urlFor, firebaseApp, spfAlert, $firebaseObject, clmDataStore) {
+function qqController(initialData, spfNavBarService, urlFor, firebaseApp, spfAlert, $firebaseObject, clmDataStore, $q) {
     var self = this;
     var db = firebaseApp.database();
 
@@ -32,24 +32,36 @@ function qqController(initialData, spfNavBarService, urlFor, firebaseApp, spfAle
     this.createdEvents = initialData.createdEvents;
     this.joinedEvents = initialData.joinedEvents;
 
-    for(var index in self.createdEvents) {
-        var eventId = self.createdEvents[index].$id;
+    for(let index in self.joinedEvents) {
+        let eventId = self.joinedEvents[index].$id;
         if(eventId) {
-            console.log(eventId);
-            clmDataStore.events.questions.allRef(eventId)
-                .then(function(questions) {
-                    console.log(questions);
-                    console.log(self.createdEvents);
-                    // self.createdEvents.find(e => e.$id == eventId).questions = questions;
-                })
+            resolveEventQuestions('joined', eventId);
         }
+    }
+
+    for(let index in self.createdEvents) {
+        let eventId = self.createdEvents[index].$id;
+        if(eventId) {
+            resolveEventQuestions('created', eventId);
+        }
+    }
+
+    function resolveEventQuestions(type, eventId) {
+        clmDataStore.events.questions.allRef(eventId).then(function (questions) {
+            if(type=='joined') {
+                self.joinedEvents.find(e => e.$id == eventId).questions = questions;
+            }
+            if(type=='created') {
+                self.createdEvents.find(e => e.$id == eventId).questions = questions;
+            }
+        });
     }
 
     spfNavBarService.update('Question Queues');
 
 }
 
-qqController.$inject = ['initialData', 'spfNavBarService', 'urlFor', 'firebaseApp', 'spfAlert', '$firebaseObject', 'clmDataStore'];
+qqController.$inject = ['initialData', 'spfNavBarService', 'urlFor', 'firebaseApp', 'spfAlert', '$firebaseObject', 'clmDataStore', '$q'];
 
 function eventQController(initialData, spfNavBarService, urlFor, firebaseApp, spfAlert, $firebaseObject, $mdDialog, $document, clmDataStore) {
     var self = this;
@@ -59,7 +71,6 @@ function eventQController(initialData, spfNavBarService, urlFor, firebaseApp, sp
     this.profile = initialData.profile;
     this.event = initialData.event;
     this.questions = initialData.questions;
-    console.log(self.questions);
     this.myQuestions = [];
     this.myQnLimit = 3;
     this.voteQnLimit = 3;
@@ -143,8 +154,6 @@ function oneQnController(initialData, spfNavBarService, urlFor, firebaseApp, spf
     this.currentUser = initialData.currentUser;
     this.question = initialData.question;
     this.answers = initialData.answers;
-
-    console.log(self.currentUser);
 
     spfNavBarService.update(
         'View Question', [{
