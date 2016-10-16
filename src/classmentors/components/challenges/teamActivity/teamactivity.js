@@ -21,7 +21,7 @@ function createTeamActivityInitialData($q, eventService, clmDataStore) {
 createTeamActivityInitialData.$inject = ['$q', 'eventService', 'clmDataStore'];
 
 function createTeamActivityController($q, initialData, clmDataStore, $location, 
-    urlFor, eventService, $mdDialog, firebaseApp, $firebaseObject, $firebaseArray) {
+    urlFor, eventService, $mdDialog, firebaseApp, $firebaseObject, $firebaseArray, $log) {
     var self = this;
 
     // console.log("initialdata for teamform are", initialData);
@@ -67,11 +67,17 @@ function createTeamActivityController($q, initialData, clmDataStore, $location,
             // var priority = 1;
             var textResponsePromise = addTask(eventTaskRef ,addTextResponse(self.task), initialData.data.isOpen);
             textResponsePromise.then(function(ref){
-                console.log(ref);
-                // TODO, init eventTeams in parallel
                 return addTask(eventTaskRef, buildTeamFormationTask(ref.key, self.task), false);
+            }).then(function(teamFormationPromise){
+                var eventTeamsRef = db.ref(`classMentors/eventTeams/${self.event.$id}/${teamFormationPromise.key}`);
+                return $q.all({
+                    teamVotingTask: addTask(eventTaskRef, buildTeamVotingTask(teamFormationPromise.key, self.task), false),
+                    initTeams: self.event.teams.map(function(team){return eventTeamsRef.push(team)})
+                });
+            }).then(function(voteTaskPromise){
+                return addTask(eventTaskRef, buildReflectionQuestion(voteTaskPromise.teamVotingTask.key,self.task), false);
             })
-            
+
             // console.log(textResponsePromise)
             // textResponsePromise.then();
             // var teamFormationPromise = clmDataStore.event.addTask()
@@ -83,6 +89,27 @@ function createTeamActivityController($q, initialData, clmDataStore, $location,
         
     };
 
+    function buildReflectionQuestion(taskFrom, task){
+        return{
+            taskFrom: taskFrom,
+            title: task.title,
+            description: "Tell us about your question",
+            showProgress: task.showProgress,
+            archived: false,
+            question: angular.toJson({
+                question:"Select the appropriate response below for your question",
+                options: [
+                    "Instructor answered it",
+                    "Teaching Assistants answered it",
+                    "Figured it out on my own or answered by peers",
+                    "Post this question to Question Queue to seek for an answer"
+                ]
+            }), 
+            type: "reflectionQuestion"
+        }
+
+    }
+
     function addTask(ref, task, isOpen){
         if (isOpen) {
             task.openedAt = {'.sv': 'timestamp'};
@@ -91,20 +118,21 @@ function createTeamActivityController($q, initialData, clmDataStore, $location,
             task.closedAt = {'.sv': 'timestamp'};
             task.openedAt = null;
         }
-        return ref.push(task);
+        var promise = ref.push(task);
+        $log.info(`Task: ${angular.toJson(task)} is stored at ${ref}, ${promise.key}`)
+        return promise;
     }
 
     function buildTeamVotingTask(taskFrom, task){
         return{
             taskFrom: taskFrom,
             title: task.title,
-            description: "Click Below To Join Team",
+            description: "As a team, select your favorite question",
             formationPattern: true,
             closedAt: {'.sv': 'timestamp'},
             showProgress: task.showProgress,
             archived: false,
-            type: "formTeam",
-            teamFormationMethod: task.teamFormationMethod
+            type: "voteQuestions"
         }
     }
 
@@ -217,7 +245,8 @@ createTeamActivityController.$inject = [
     '$mdDialog',
     'firebaseApp', 
     '$firebaseObject', 
-    '$firebaseArray'
+    '$firebaseArray',
+    '$log'
 ];
 
 function startTRATInitialData($q, spfAuthData, eventService, clmDataStore, firebaseApp, $firebaseObject, $firebaseArray, $route) {
