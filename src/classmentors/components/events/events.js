@@ -3200,7 +3200,8 @@ function ClmEventRankTableCtrl($log, $q, $filter, firebaseApp, $firebaseObject, 
 
     function setRankedServices(ctrl) {
         if (!ctrl.event.rankedServices) {
-            ctrl.rankedServices = [{id: 'freeCodeCamp', name: 'Free Code Camp'}];
+            ctrl.rankedServices = [{id: 'freeCodeCamp', name: 'Free Code Camp'},
+                                  {id: 'codeCombat', name: 'Code Combat'}];
             return;
         }
 
