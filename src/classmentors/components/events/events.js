@@ -1761,7 +1761,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
 
     // Load 'team leaders' of each member. 
     self.teamLeader = null;
-    self.team = null
+    self.team = null;
     self.isTeamLeader = function(eventId, teamFormationId, currentUserId){
         // Get all teams.
         var db = firebaseApp.database();
@@ -1769,26 +1769,18 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         teamRef.once("value")
             .then(function(snapshot){
                 snapshot.forEach(function(childSnapShot){
-                    // console.log(childSnapShot.key);
                     var team = childSnapShot.val();
-                    // console.log(team);
-                    // console.log(team.teamLeader);
-                    // console.log(currentUserId);
                     if(team[currentUserId.$id] != null){
-                        // console.log(team.teamLeader);
-                        // self.teamLeader = team[team.teamLeader].displayName;
                         self.team = team;
+                        console.log("self team isss:", self.team);
                         self.teamLeader = team.teamLeader;
+
                         // Break execution.
                         return true;
                     }
                 })
             });
     };
-
-    function currentTeams(){
-
-    }
 
     //Find superReviewUser rights
     // console.log(self.profile);
