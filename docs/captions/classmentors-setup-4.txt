@@ -1,0 +1,18 @@
+0, 5
+Open our security rules definition,
+select them all and copy them.
+
+5, 8
+Go to your Firebase Project.
+
+8, 13
+Go to "Database" > "Rules".
+
+14, 18
+Select the existing rules and delete them.
+
+18, 22
+Paste Class Mentors rules you copied earlier.
+
+22, 28
+Scroll back up and Publish the rules.

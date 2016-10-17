@@ -268,7 +268,22 @@
                 }
               },
               "$key": {
-                ".validate": "($key == 'displayName' || $key == 'gravatar') && newData.val() == root.child('auth/users').child(auth.uid).child($key).val()"
+                ".validate": "($key == 'displayName' || $key == 'gravatar') && newData.val() == root.child('auth/users').child(root.child('auth/publicIds').child($publicId).val()).child($key).val()"
+              }
+            },
+            "services": {
+              "$serviceId": {
+                "details": {
+                  "id": {
+                    ".validate": "newData.val() == root.child('classMentors/userProfiles').child($publicId).child('services').child($serviceId).child('details/id').val()"
+                  },
+                  "$other": {
+                    ".validate": "false"
+                  }
+                },
+                "$other": {
+                  ".validate": "false"
+                }
               }
             },
             "joinedAt": {
@@ -799,24 +814,6 @@
           },
           "services": {
             "$serviceId": {
-              "badges": {
-                "$badgeId": {
-                  ".validate": "newData.hasChildren(['id', 'name', 'iconUrl'])",
-                  "iconUrl": {
-                    ".validate": "newData.isString() && newData.val().matches(/(https?\\:\\/)?\\/.+/)"
-                  },
-                  "id": {
-                    ".validate": "newData.isString() && newData.val().length >= 3"
-                  },
-                  "name": {
-                    ".validate": "newData.isString() && newData.val().length >= 3"
-                  },
-                  "url": {
-                    ".validate": "newData.isString() && newData.val().matches(/(https?\\:)?\\/\\/.+/)"
-                  }
-                },
-                ".write": "auth !== null && root.child('classMentors/admins').child(auth.uid).val() === true"
-              },
               "details": {
                 ".validate": "newData.hasChildren(['id', 'name', 'registeredBefore'])",
                 "id": {
