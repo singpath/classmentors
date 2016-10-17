@@ -239,6 +239,8 @@ function oneQnController(initialData, spfNavBarService, urlFor, firebaseApp, spf
     this.question = initialData.question;
     this.answers = initialData.answers;
 
+    // console.log(self.event);
+
     spfNavBarService.update(
         'View Question', [{
             title: 'Question Queues',
@@ -309,6 +311,21 @@ function oneQnController(initialData, spfNavBarService, urlFor, firebaseApp, spf
             ref2.set(answer.$id);
             db.ref(`classMentors/eventQuestions/${self.event.$id}/questions/${self.question.$id}/flagged`).remove();
             spfAlert.success('You have marked this question as resolved');
+            var action = '';
+            if(answer.owner.publicId == self.event.owner.publicId) {
+                action = 'questionResolvedByEducator';
+            } else if(self.event.assistants[answer.owner.publicId]) {
+                action = 'questionResolvedByAssistant';
+            } else {
+                action = 'questionResolvedByPeers';
+            }
+            clmDataStore.logging({
+                publicId: self.currentUser.publicId,
+                action: action,
+                timestamp: Date.now(),
+                questionId: self.question.$id,
+                answerId: answerId
+            })
         }
     };
 
