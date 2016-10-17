@@ -14,10 +14,10 @@
     <md-list>
         <md-subheader class="md-no-sticky">My recently posted questions</md-subheader>
         <md-list-item ng-repeat="question in ctrl.questions | orderBy:'-' | limitTo:ctrl.myQnLimit" ng-if="question.owner.publicId == ctrl.currentUser.publicId">
-            <div layout="column" layout-align="end center">
+            <div layout="column" layout-align="end center" ng-show="question.owner.publicId == ctrl.currentUser.publicId">
                 <md-button class="md-icon-button launch" aria-label="Flag">
-                    <md-icon ng-if="!question.flagged && question.owner.publicId == ctrl.currentUser.publicId" style="font-size: 30px" ng-click="ctrl.toggleQnFlag(question)">error_outline</md-icon>
-                    <md-icon ng-if="question.flagged && question.owner.publicId == ctrl.currentUser.publicId" style="font-size: 30px; color: red" ng-click="ctrl.toggleQnFlag(question)">error_outline</md-icon>
+                    <md-icon ng-if="!question.flagged" style="font-size: 30px" ng-click="ctrl.toggleQnFlag(question)">error_outline</md-icon>
+                    <md-icon ng-if="question.flagged" style="font-size: 30px; color: red" ng-click="ctrl.toggleQnFlag(question)">error_outline</md-icon>
                 </md-button>
                 <div style="font-size: 12px" >Alert</div>
                 <div style="font-size: 12px" >Educator</div>
@@ -25,7 +25,7 @@
             <div layout="column" layout-align="end center">
                 <md-button class="md-icon-button launch" aria-label="Vote" ng-click="ctrl.toggleVote(question, question.$id)">
                     <md-icon ng-if="!question.upVotes || !question.upVotes[ctrl.currentUser.publicId]" style="font-size: 30px">thumb_up</md-icon>
-                    <md-icon ng-if="question.upVotes && question.upVotes[ctrl.currentUser.publicId]" style="font-size: 30px">thumb_down</md-icon>
+                    <md-icon ng-if="question.upVotes && question.upVotes[ctrl.currentUser.publicId]" style="font-size: 30px; color: orange;">thumb_up</md-icon>
                 </md-button><div style="font-size: 12px" >{{question.upVotes | countObjKeys}} vote(s)</div>
             </div>
             <div layout="column" layout-align="end start" class="md-list-item-text" flex>
@@ -47,10 +47,10 @@
     <md-list>
         <md-subheader class="md-no-sticky">Most voted questions</md-subheader>
         <md-list-item ng-repeat="question in ctrl.questions | orderBy:['-upVotes | countObjKeys', '-createdAt'] | limitTo:ctrl.voteQnLimit">
-            <div layout="column" layout-align="end center">
+            <div layout="column" layout-align="end center" ng-show="question.owner.publicId == ctrl.currentUser.publicId">
                 <md-button class="md-icon-button launch" aria-label="Flag">
-                    <md-icon ng-if="!question.flagged && question.owner.publicId == ctrl.currentUser.publicId" style="font-size: 30px" ng-click="ctrl.toggleQnFlag(question)">error_outline</md-icon>
-                    <md-icon ng-if="question.flagged && question.owner.publicId == ctrl.currentUser.publicId" style="font-size: 30px; color: red" ng-click="ctrl.toggleQnFlag(question)">error_outline</md-icon>
+                    <md-icon ng-if="!question.flagged" style="font-size: 30px" ng-click="ctrl.toggleQnFlag(question)">error_outline</md-icon>
+                    <md-icon ng-if="question.flagged" style="font-size: 30px; color: red" ng-click="ctrl.toggleQnFlag(question)">error_outline</md-icon>
                 </md-button>
                 <div style="font-size: 12px" >Alert</div>
                 <div style="font-size: 12px" >Educator</div>
@@ -58,7 +58,7 @@
             <div layout="column" layout-align="end center">
                 <md-button class="md-icon-button launch" aria-label="Vote" ng-click="ctrl.toggleVote(question, question.$id)">
                     <md-icon ng-if="!question.upVotes || !question.upVotes[ctrl.currentUser.publicId]" style="font-size: 30px">thumb_up</md-icon>
-                    <md-icon ng-if="question.upVotes && question.upVotes[ctrl.currentUser.publicId]" style="font-size: 30px">thumb_down</md-icon>
+                    <md-icon ng-if="question.upVotes && question.upVotes[ctrl.currentUser.publicId]" style="font-size: 30px; color: orange;">thumb_up</md-icon>
                 </md-button><div style="font-size: 12px" >{{question.upVotes | countObjKeys}} vote(s)</div>
             </div>
             <div layout="column" layout-align="end start" class="md-list-item-text" flex>

@@ -1143,20 +1143,22 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                 return loaded(clmDataStore.events.ParticipantsFirebaseArray.create(eventId));
             },
 
-            join: function (event, pw) {
-                var refs, authData, eventId;
+            join: function(event, profile, pw) {
+                let refs;
 
                 if (!event || !event.$id) {
                     return $q.reject('Event was not provided');
                 }
 
-                eventId = event.$id;
+                if (!profile || !profile.$id) {
+                    return $q.reject('Participant profile not provided');
+                }
 
-                return spfAuthData.user().then(function (_authData) {
-                    var uid = spfAuth.user && spfAuth.user.uid;
-                    var publicId = _authData && _authData.publicId;
+                const eventId = event.$id;
+                const publicId = profile.$id;
 
-                    authData = _authData;
+                return db.ref(`auth/publicIds/${publicId}`).once(function(snapshot) {
+                    const uid = snapshot.val();
 
                     if (!publicId) {
                         return $q.reject(clmDataStore.events.errNoPublicId);
@@ -1170,23 +1172,37 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                     };
 
                     return refs;
-                }).then(function () {
+                }).then(function() {
                     return refs.hashOptions.once('value');
-                }).then(function (snapshot) {
+                }).then(function(snapshot) {
                     var options = snapshot.val();
                     var hash = spfCrypto.password.fromSalt(pw, options.salt, options);
 
                     return refs.application.set(hash);
-                }).then(function () {
+                }).then(function() {
+                    const user = {
+                        displayName: profile.user.displayName,
+                        gravatar: profile.user.gravatar,
+                        school: cleanObj(profile.user.school) || null
+                    };
+                    const services = {};
+
+                    clmServices.available().forEach(service => {
+                        const details = service.details(profile);
+
+                        if (!details) {
+                            return;
+                        }
+
+                        services[service.serviceId] = {details: {id: details.id}};
+                    });
+
                     return refs.participation.set({
-                        user: {
-                            displayName: authData.displayName,
-                            gravatar: authData.gravatar,
-                            school: cleanObj(authData.school) || null
-                        },
+                        user,
+                        services,
                         joinedAt: {'.sv': 'timestamp'}
                     });
-                }).then(function () {
+                }).then(function() {
                     return refs.profile.set({
                         createdAt: event.createdAt,
                         featured: event.featured || false,
