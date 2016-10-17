@@ -1135,12 +1135,12 @@ export function clmDataStoreFactory(
                 if (!profile || !profile.$id) {
                     return $q.reject('Participant profile not provided');
                 }
-                console.log('reached 1');
+                // console.log('reached 1');
 
                 const eventId = event.$id;
                 const publicId = profile.$id;
 
-                console.log('reached 2');
+                // console.log('reached 2');
                 return db.ref(`auth/publicIds/${publicId}`).once('value')
                     .then(function(snapshot) {
                     const uid = snapshot.val();
@@ -1155,11 +1155,11 @@ export function clmDataStoreFactory(
                         participation: db.ref(`classMentors/eventParticipants/${eventId}/${publicId}`),
                         profile: db.ref(`classMentors/userProfiles/${publicId}/joinedEvents/${eventId}`)
                     };
-                    console.log('reached 3');
+                    // console.log('reached 3');
 
                     return refs;
                 }).then(function() {
-                    console.log('reached 4');
+                    // console.log('reached 4');
                     return refs.hashOptions.once('value');
                 }).then(function(snapshot) {
                     var options = snapshot.val();
