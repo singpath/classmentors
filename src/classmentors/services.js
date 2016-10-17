@@ -8,7 +8,7 @@ import camelCase from 'lodash.camelcase';
 const noop = () => undefined;
 
 function loaded(syncObjOrArray) {
-  return syncObjOrArray.$loaded().then(() => syncObjOrArray);
+    return syncObjOrArray.$loaded().then(() => syncObjOrArray);
 }
 
 /**
@@ -232,7 +232,7 @@ export function clmServicesFactory($firebaseObject, $log, $q, $timeout, firebase
     }
 
     /**
-     * List of third party services providing user achiements.
+     * List of third party services providing user achievements.
      */
     class Services {
 
@@ -357,6 +357,14 @@ export function clmServicesFactory($firebaseObject, $log, $q, $timeout, firebase
             return db.ref(`classMentors/userProfiles/${publicId}/services`);
         }
 
+        userAchievementsRef(publicId) {
+            if (!publicId) {
+                throw new Error('Note public id provided.');
+            }
+
+            return db.ref(`classMentors/userAchievements/${publicId}`);
+        }
+
     }
 
     const services = new Services();
@@ -381,13 +389,15 @@ clmServicesFactory.$inject = ['$firebaseObject', '$log', '$q', '$timeout', 'fire
  * Service to interact with singpath firebase db
  *
  */
-export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeout,
-                                    firebaseApp, $firebaseObject, $firebaseArray, spfSchools,
-                                    routes, spfAuth, spfAuthData, spfCrypto, clmServices, clmServicesUrl) {
+export function clmDataStoreFactory(
+    $window, $location, $q, $log, $http, $timeout,
+    firebaseApp, $firebaseObject, $firebaseArray, spfSchools,
+    routes, spfAuth, spfAuthData, spfCrypto, clmServices, clmServicesUrl
+) {
     var clmDataStore;
     var db = firebaseApp.database();
     var ProfileFirebaseObject = $firebaseObject.$extend({
-        canView: function (obj) {
+        canView: function(obj) {
             var kind = obj && obj.$ref && obj.$ref().parent.path.toString();
 
             // if (this.user && this.user.isAdmin) {
@@ -399,7 +409,6 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
             }
 
             if (obj.assistants && obj.assistants[this.$id]) {
-
                 // $log.info(obj.assistants );
                 return true;
             }
@@ -417,15 +426,15 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
         }
     });
 
-    ProfileFirebaseObject.create = function (publicId) {
+    ProfileFirebaseObject.create = function(publicId) {
         var ref = db.ref(`classMentors/userProfiles/${publicId}`);
 
         return new ProfileFirebaseObject(ref);
     };
 
     var ParticipantsFirebaseArray = $firebaseArray.$extend({
-        $schools: function () {
-            return this.$list.reduce(function (schools, participant) {
+        $schools: function() {
+            return this.$list.reduce(function(schools, participant) {
                 if (
                     !participant.user || !participant.user.school || !participant.user.school.name
                 ) {
@@ -439,7 +448,7 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
         }
     });
 
-    ParticipantsFirebaseArray.create = function (eventId) {
+    ParticipantsFirebaseArray.create = function(eventId) {
         var ref = db.ref(`classMentors/eventParticipants/${eventId}`);
 
         return new ParticipantsFirebaseArray(ref);
@@ -457,9 +466,9 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
          * they will get updated.
          *
          */
-        currentUserProfile: function () {
+        currentUserProfile: function() {
             var currentUserPromise = spfAuthData.user();
-            var profilePromise = spfAuthData.user().then(function (currentUser) {
+            var profilePromise = spfAuthData.user().then(function(currentUser) {
                 if (!currentUser.publicId) {
                     return undefined;
                 }
@@ -470,7 +479,7 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
             return $q.all({
                 currentUser: currentUserPromise,
                 profile: profilePromise
-            }).then(function (resp) {
+            }).then(function(resp) {
                 var userData = resp.profile && resp.profile.user;
 
                 if (!userData) {
@@ -494,26 +503,26 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
         },
 
         logging: {
-            inputLog: function (actionObj) {
+            inputLog: function(actionObj) {
                 var ref = db.ref('classMentors/userActions');
 
                 return ref.push(actionObj);
             }
         },
 
-        profile: function (publicId) {
-            return $q.resolve(publicId).then(function (id) {
+        profile: function(publicId) {
+            return $q.resolve(publicId).then(function(id) {
                 return loaded(clmDataStore.ProfileFirebaseObject.create(id));
             });
         },
 
-        getProfileData: function (publicId) {
+        getProfileData: function(publicId) {
             var ref = db.ref(`classMentors/userProfiles/${publicId}/user`);
 
             return loaded($firebaseObject(ref));
         },
 
-        updateProfile: function (userData) {
+        updateProfile: function(userData) {
             var ref = db.ref(`classMentors/userProfiles/${userData.publicId}/user`);
 
             return ref.update({
@@ -524,17 +533,17 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                 country: cleanObj(userData.country),
                 yearOfBirth: cleanObj(userData.yearOfBirth),
                 school: cleanObj(userData.school)
-            }).then(function () {
+            }).then(function() {
                 return clmDataStore.profile(userData.publicId);
             });
         },
 
-        getSchools: function () {
+        getSchools: function() {
             return spfSchools();
         },
 
-        initProfile: function () {
-            return spfAuthData.user().then(function (currentUser) {
+        initProfile: function() {
+            return spfAuthData.user().then(function(currentUser) {
                 if (!currentUser || !currentUser.publicId) {
                     return $q.reject(new Error('The user has not set a user public id.'));
                 }
@@ -546,14 +555,14 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
         cohorts: {
             errNoPublicId: new Error('You should have a public id to join a cohort'),
 
-            create: function (cohort) {
+            create: function(cohort) {
                 var rootRef = db.ref('classMentors/cohorts');
                 var publicId = cohort.owner.publicId;
                 var ref = rootRef.push(cohort);
 
-                return ref.then(function () {
+                return ref.then(function() {
                     return ref.once('value');
-                }).then(function (snapshot) {
+                }).then(function(snapshot) {
                     var val = snapshot.val();
                     var profileRef = db.ref(`classMentors/userProfiles/${publicId}/createdCohorts/${snapshot.key}`);
 
@@ -562,46 +571,46 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                         title: val.title,
                         featured: val.featured || false
                     });
-                }).then(function () {
+                }).then(function() {
                     return ref.key;
                 });
             },
 
-            updateCohort: function (cohort) {
+            updateCohort: function(cohort) {
                 if (!cohort || !cohort.$id || !cohort.$save) {
                     return $q.reject(new Error('Cohort is not a firebase object'));
                 }
 
-                return cohort.$save().then(function () {
+                return cohort.$save().then(function() {
                     var cohortId = cohort.$id;
-                }).catch(function (err) {
+                }).catch(function(err) {
                     $log.error(err);
                     return err;
                 });
             },
 
-            get: function (cohortId) {
+            get: function(cohortId) {
                 var ref = db.ref(`classMentors/cohorts/${cohortId}`);
 
                 return loaded($firebaseObject(ref));
             },
 
-            listAllCohorts: function () {
+            listAllCohorts: function() {
                 var ref = db.ref('classMentors/cohorts');
                 var query = ref.orderByChild('createdAt').limitToLast(50);
 
                 return loaded($firebaseArray(query));
             },
 
-            listFeaturedCohorts: function () {
+            listFeaturedCohorts: function() {
                 var ref = db.ref('classMentors/cohorts');
                 var query = ref.orderByChild('featured').equalTo(true).limitToLast(50);
 
                 return loaded($firebaseArray(query));
             },
 
-            listCreatedCohorts: function () {
-                return spfAuthData.user().then(function (authData) {
+            listCreatedCohorts: function() {
+                return spfAuthData.user().then(function(authData) {
                     var ref, query;
 
                     if (!authData.publicId) {
@@ -612,20 +621,20 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                     query = ref.orderByChild('createdAt').limitToLast(50);
 
                     return loaded($firebaseArray(query));
-                }).catch(function (err) {
+                }).catch(function(err) {
                     $log.error(`Failed to list created cohorts: ${err}`);
 
                     return [];
                 });
             },
 
-            addEvent: function (cohortId, eventId, eventNum) {
+            addEvent: function(cohortId, eventId, eventNum) {
                 var ref = db.ref(`classMentors/cohorts/${cohortId}/events/${eventNum}`);
 
                 return ref.set(eventId);
             },
 
-            removeEvent: function (cohortId, newEventArray) {
+            removeEvent: function(cohortId, newEventArray) {
                 var ref = db.ref(`classMentors/cohorts/${cohortId}/events`);
 
                 $log.error(new Error(
@@ -635,7 +644,7 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                 return ref.set(newEventArray);
             },
 
-            addAnnouncement: function (cohortId, madeBy, announcement, isArchived) {
+            addAnnouncement: function(cohortId, madeBy, announcement, isArchived) {
                 var rootRef = db.ref(`classMentors/cohortAnnouncements/${cohortId}`);
                 var ref = rootRef.push();
                 var priority = announcement.priority;
@@ -646,37 +655,37 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
 
                 promise = priority ? ref.setWithPriority(announcement, priority) : ref.set(announcement);
 
-                return promise.then(function () {
+                return promise.then(function() {
                     return ref;
                 });
             },
 
-            getAnnouncements: function (cohortId) {
+            getAnnouncements: function(cohortId) {
                 var ref = db.ref(`classMentors/cohortAnnouncements/${cohortId}`);
                 var query = ref.orderByChild('createdAt').limitToLast(50);
 
                 return loaded($firebaseArray(query));
             },
 
-            featureAnnouncement: function (cohortId, announcementId) {
+            featureAnnouncement: function(cohortId, announcementId) {
                 var ref = db.ref(`classMentors/cohortAnnouncements/${cohortId}/${announcementId}/featured`);
 
                 return ref.set(true);
             },
 
-            unfeatureAnnouncement: function (cohortId, announcementId) {
+            unfeatureAnnouncement: function(cohortId, announcementId) {
                 var ref = db.ref(`classMentors/cohortAnnouncements/${cohortId}/${announcementId}/featured`);
 
                 return ref.set(false);
             },
 
-            showAnnouncement: function (cohortId, announcementId) {
+            showAnnouncement: function(cohortId, announcementId) {
                 var ref = db.ref(`classMentors/cohortAnnouncements/${cohortId}/${announcementId}/visible`);
 
                 return ref.set(true);
             },
 
-            hideAnnouncement: function (cohortId, announcementId) {
+            hideAnnouncement: function(cohortId, announcementId) {
                 var ref = db.ref(`classMentors/cohortAnnouncements/${cohortId}/${announcementId}/visible`);
 
                 return ref.set(false);
@@ -685,7 +694,7 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
         },
 
         events: {
-            addTaskWithAns: function (eventId, task, isOpen, answers) {
+            addTaskWithAns: function(eventId, task, isOpen, answers) {
                 var rootRef = db.ref(`classMentors/eventTasks/${eventId}`);
                 var ref = rootRef.push();
                 var priority = task.priority;
@@ -704,7 +713,7 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
 
                 promise = priority ? ref.setWithPriority(task, priority) : ref.set(task);
 
-                return promise.then(function () {
+                return promise.then(function() {
                     var taskId = ref.key;
                     var answerRef = db.ref(`classMentors/eventAnswers/${eventId}/${taskId}`);
 
@@ -712,38 +721,38 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                 });
             },
 
-            getTaskAnswers: function (eventId, taskId) {
+            getTaskAnswers: function(eventId, taskId) {
                 var ref = db.ref(`classMentors/eventAnswers/${eventId}/${taskId}`);
 
                 return loaded($firebaseObject(ref));
             },
 
-            addTeamFormation: function (eventId, task, priority) {
-                return spfFirebase.push(['classMentors/eventTasks', eventId], task).then(function (ref) {
+            addTeamFormation: function(eventId, task, priority) {
+                return spfFirebase.push(['classMentors/eventTasks', eventId], task).then(function(ref) {
                     ref.setPriority(priority);
                     return ref;
                 });
             },
 
-            addTrat: function (eventId, task, priority) {
-                return spfFirebase.push(['classMentors/eventTasks', eventId], task).then(function (ref) {
+            addTrat: function(eventId, task, priority) {
+                return spfFirebase.push(['classMentors/eventTasks', eventId], task).then(function(ref) {
                     ref.setPriority(priority);
                     var taskId = ref.key();
                     return ref;
                 });
             },
 
-            updateTaskWithAns: function (eventId, taskId, task, answers) {
+            updateTaskWithAns: function(eventId, taskId, task, answers) {
                 var ref = db.ref(`classMentors/eventTasks/${eventId}/${taskId}`);
                 var ansRef = db.ref(`classMentors/eventAnswers/${eventId}/${taskId}`);
                 var priority = task.priority;
 
-                return ref.setWithPriority(task, priority).then(function () {
+                return ref.setWithPriority(task, priority).then(function() {
                     return ansRef.set(answers);
                 });
             },
 
-            addTaskAnswers: function (eventId, answers) {
+            addTaskAnswers: function(eventId, answers) {
                 var ref = db.ref(`classMentors/eventAnswers/${eventId}`);
 
                 return ref.push(answers);
@@ -751,29 +760,29 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
 
             errNoPublicId: new Error('You should have a public id to join an event'),
 
-            list: function () {
+            list: function() {
                 var ref = db.ref('classMentors/events');
                 var query = ref.orderByChild('featured').equalTo(true).limitToLast(50);
 
                 return loaded($firebaseArray(query));
             },
 
-            listAll: function () {
+            listAll: function() {
                 var ref = db.ref('classMentors/events');
                 var query = ref.orderByChild('createdAt');
 
                 return loaded($firebaseObject(query));
             },
 
-            listAllArr: function () {
+            listAllArr: function() {
                 var ref = db.ref('classMentors/events');
                 var query = ref.orderByChild('createdAt');
 
                 return loaded($firebaseArray(query));
             },
 
-            listCreatedEvents: function () {
-                return spfAuthData.user().then(function (authData) {
+            listCreatedEvents: function() {
+                return spfAuthData.user().then(function(authData) {
                     var ref, query;
 
                     if (!authData.publicId) {
@@ -784,15 +793,15 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                     query = ref.orderByChild('createdAt').limitToLast(50);
 
                     return loaded($firebaseArray(query));
-                }).catch(function (err) {
+                }).catch(function(err) {
                     $log.error(`Failed to list created events: ${err}`);
 
                     return [];
                 });
             },
 
-            listJoinedEvents: function () {
-                return spfAuthData.user().then(function (authData) {
+            listJoinedEvents: function() {
+                return spfAuthData.user().then(function(authData) {
                     var ref, query;
 
                     if (!authData.publicId) {
@@ -803,15 +812,15 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                     query = ref.orderByChild('createdAt').limitToLast(50);
 
                     return loaded($firebaseArray(query));
-                }).catch(function (err) {
+                }).catch(function(err) {
                     $log.error(`Failed to list joined events: ${err}`);
 
                     return [];
                 });
             },
 
-            listJoinedEventsObj: function () {
-                return spfAuthData.user().then(function (authData) {
+            listJoinedEventsObj: function() {
+                return spfAuthData.user().then(function(authData) {
                     var ref, query;
 
                     if (!authData.publicId) {
@@ -822,14 +831,14 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                     query = ref.orderByChild('createdAt').limitToLast(50);
 
                     return loaded($firebaseObject(query));
-                }).catch(function (err) {
+                }).catch(function(err) {
                     $log.error(`Failed to list joined events: ${err}`);
 
                     return [];
                 });
             },
 
-            create: function (event, password) {
+            create: function(event, password) {
                 var eventRef = db.ref('classMentors/events').push(event);
 
                 var eventId = eventRef.key;
@@ -838,7 +847,7 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                 var ownerId = event.owner.publicId;
                 var profileRef = db.ref(`classMentors/userProfiles/${ownerId}/createdEvents/${eventId}`);
 
-                return eventRef.then(function () {
+                return eventRef.then(function() {
                     var hash = spfCrypto.password.newHash(password);
                     var opts = {
                         hash: hash.value,
@@ -846,9 +855,9 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                     };
 
                     return passwordRef.set(opts);
-                }).then(function () {
+                }).then(function() {
                     return eventRef.once('value');
-                }).then(function (snapshot) {
+                }).then(function(snapshot) {
                     var val = snapshot.val();
 
                     return profileRef.set({
@@ -856,12 +865,12 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                         title: val.title,
                         featured: val.featured || false
                     });
-                }).then(function () {
+                }).then(function() {
                     return eventId;
                 });
             },
 
-            updateEvent: function (event, password) {
+            updateEvent: function(event, password) {
                 var eventId = event && event.$id;
                 var ownerId = event && event.owner && event.owner.publicId;
                 var passwordRef, profileRef;
@@ -873,7 +882,7 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                 passwordRef = db.ref(`classMentors/eventPasswords/${eventId}`);
                 profileRef = db.ref(`classMentors/userProfiles/${ownerId}/createdEvents/${eventId}`);
 
-                return event.$save().then(function () {
+                return event.$save().then(function() {
                     var hash, opts;
 
                     if (!password) {
@@ -887,148 +896,117 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                     };
 
                     return passwordRef.set(opts);
-                }).then(function () {
+                }).then(function() {
                     return profileRef.update({
                         title: event.title,
                         featured: event.featured || false
                     });
-                }).catch(function (err) {
+                }).catch(function(err) {
                     $log.error(err);
 
                     return err;
                 });
             },
 
-            get: function (eventId) {
+            get: function(eventId) {
                 var ref = db.ref(`classMentors/events/${eventId}`);
 
                 return loaded($firebaseObject(ref));
             },
 
-            getRanking: function (eventId) {
-                var ref = db.ref(`classMentors/eventRankings/${eventId}`);
+            getRanking: function(event, participants, rankedServices, sort) {
+                const defaultSort = ranking => ranking.sort((a, b) => a.$total > b.$total);
+                const assistants = event.assistants || {};
+                const asyncRanking = participants.filter(p => {
+                    const isAssistant = assistants[p.$id] !== undefined;
+                    const isOwner = event.owner.publicId === p.$id;
 
-                return loaded($firebaseObject(ref)).then(function (ranking) {
-                    setRankInSchool();
-                    ranking.$watch(setRankInSchool);
+                    return !isAssistant && !isOwner;
+                }).map(p => {
+                    const achievementsRef = clmServices.userAchievementsRef(p.$id);
 
-                    return ranking;
+                    return achievementsRef.once('value').then(snapshot => {
+                        const val = snapshot.val();
+                        const achievements = val && val.services || {};
+                        const stats = {$id: p.$id, $user: p.user, $total: 0};
 
-                    function setRankInSchool() {
+                        rankedServices.forEach(service => {
+                            const rawCount = (
+                                achievements[service.id] &&
+                                achievements[service.id].totalAchievements
+                            );
+                            const count = parseInt(rawCount, 10) || 0;
 
-                        // 1. sort participant by school
-                        var schoolRankings = Object.keys(ranking).filter(function (publicId) {
-                            return publicId.length > 0 && ranking[publicId] && ranking[publicId].user;
-                        }).reduce(function (all, publicId) {
-                            var participant = ranking[publicId];
-                            var schoolId;
-
-                            if (
-                                participant.user.school == null || !participant.user.school.name || !participant.user.school.type
-                            ) {
-                                return all;
-                            }
-
-                            schoolId = `${participant.user.school.type}/${participant.user.school.name}`;
-                            if (!all[schoolId]) {
-                                all[schoolId] = [];
-                            }
-
-                            all[schoolId].push(participant);
-
-                            return all;
-                        }, {});
-
-                        Object.keys(schoolRankings).map(function (schoolId) {
-
-                            // 2. Sort each school participants in their school
-                            schoolRankings[schoolId].sort(function (a, b) {
-
-                                //  sort on total by desc. order.
-                                if (a.total !== b.total) {
-                                    return b.total - a.total;
-                                }
-
-                                if (!a.user || a.user.displayName) {
-                                    return -1;
-                                }
-
-                                if (!b.user || b.user.displayName) {
-                                    return 1;
-                                }
-
-                                // sort by display name if total is equal (asc. order)
-                                return a.user.displayName.localeCompare(b.user.displayName);
-                            });
-
-                            return schoolRankings[schoolId];
-                        }).forEach(function (sortedParticipants) {
-
-                            // 3. add `$rankInSchool` property
-                            sortedParticipants.forEach(function (p, index) {
-                                p.$rankInSchool = index + 1;
-                            });
+                            stats[service.id] = count;
+                            stats.$total += count;
                         });
-                    }
+
+                        return stats;
+                    });
                 });
+
+                return $q.all(asyncRanking).then(sort || defaultSort);
             },
 
-            getProgress: function (eventId) {
+            getProgress: function(eventId) {
                 var ref = db.ref(`classMentors/eventProgress/${eventId}`);
 
                 return loaded($firebaseObject(ref));
             },
 
-            getTeam: function (eventId, taskId, teamId) {
+            getTeam: function(eventId, taskId, teamId) {
                 var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${teamId}`);
-                return loaded($firebaseObject(ref)).then(function (result) {
+
+                return loaded($firebaseObject(ref)).then(function(result) {
+                    console.log('result sissssss:', Object.keys(result));
                     return Object.keys(result);
                 });
             },
 
-            getUserProgress: function (eventId, publicId) {
+            getUserProgress: function(eventId, publicId) {
                 var ref = db.ref(`classMentors/eventProgress/${eventId}/${publicId}`);
 
                 return loaded($firebaseObject(ref));
             },
 
-            getSolutions: function (eventId) {
+            getSolutions: function(eventId) {
                 var ref = db.ref(`classMentors/eventSolutions/${eventId}`);
 
                 return loaded($firebaseObject(ref));
             },
 
-            getEventTaskSolutions: function (eventId, taskId) {
+            getEventTaskSolutions: function(eventId, taskId) {
                 var ref = db.ref(`classMentors/eventSolutions/${eventId}/${taskId}`);
+
                 return loaded($firebaseObject(ref));
             },
 
-            getScores: function (eventId) {
+            getScores: function(eventId) {
                 var ref = db.ref(`classMentors/eventScores/${eventId}`);
 
                 return loaded($firebaseObject(ref));
             },
 
-            getUserSolutions: function (eventId, publicId) {
+            getUserSolutions: function(eventId, publicId) {
                 var ref = db.ref(`classMentors/eventSolutions/${eventId}/${publicId}`);
 
                 return loaded($firebaseObject(ref));
             },
 
-            getTasks: function (eventId) {
+            getTasks: function(eventId) {
                 var ref = db.ref(`classMentors/eventTasks/${eventId}`);
                 var query = ref.orderByPriority();
 
                 return loaded($firebaseArray(query));
             },
 
-            getTask: function (eventId, taskId) {
+            getTask: function(eventId, taskId) {
                 var ref = db.ref(`classMentors/eventTasks/${eventId}/${taskId}`);
 
                 return loaded($firebaseObject(ref));
             },
 
-            addTask: function (eventId, task, isOpen) {
+            addTask: function(eventId, task, isOpen) {
                 var ref = db.ref(`classMentors/eventTasks/${eventId}`).push();
                 var priority = task.priority;
                 var promise;
@@ -1046,49 +1024,53 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
 
                 promise = priority ? ref.setWithPriority(task, priority) : ref.set(task);
 
-                return promise.then(function () {
+                return promise.then(function() {
                     return ref;
                 });
             },
 
-            setFeatured: function (eventId, featured) {
+            setFeatured: function(eventId, featured) {
                 var ref = db.ref(`classMentors/events/${eventId}/featured`);
+
                 ref.set(featured);
             },
 
-            getFeatured: function (eventId) {
+            getFeatured: function(eventId) {
                 var ref = db.ref(`classMentors/events/${eventId}/featured`);
                 var featured;
-                ref.on("value", function (snapshot) {
+
+                ref.on('value', function(snapshot) {
                     featured = snapshot.val();
                 });
                 return featured;
 
             },
 
-            updateTask: function (eventId, taskId, task) {
+            updateTask: function(eventId, taskId, task) {
                 var ref = db.ref(`classMentors/eventTasks/${eventId}/${taskId}`);
                 var priority = task.priority;
 
                 return ref.setWithPriority(task, priority);
             },
 
-            joinTeam: function (eventId, taskId, teamId, participantId, user) {
+            joinTeam: function(eventId, taskId, teamId, participantId, user) {
+
                 // console.log("jointeam user iss:", user);
                 var currentSize;
                 var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${teamId}`);
-                return ref.transaction(function (team) {
-                    team[participantId] = user
-                    team['currentSize'] = team.currentSize += 1
+
+                return ref.transaction(function(team) {
+                    team[participantId] = user;
+                    team.currentSize = team.currentSize += 1;
                     return team;
-                })
+                });
             },
-            openTask: function (eventId, taskId) {
+            openTask: function(eventId, taskId) {
                 var ref = db.ref(`classMentors/eventTasks/${eventId}/${taskId}`);
                 var abort;
 
-                return ref.transaction(function (task) {
-                    console.log("opentask task iss:", task);
+                return ref.transaction(function(task) {
+                    console.log('opentask task iss:', task);
                     if (!task.closedAt) {
                         return abort;
                     }
@@ -1101,11 +1083,11 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                     return task;
                 });
             },
-            closeTask: function (eventId, taskId) {
+            closeTask: function(eventId, taskId) {
                 var ref = db.ref(`classMentors/eventTasks/${eventId}/${taskId}`);
                 var abort;
 
-                return ref.transaction(function (task) {
+                return ref.transaction(function(task) {
                     if (!task.openedAt) {
                         return abort;
                     }
@@ -1119,19 +1101,19 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                 });
             },
 
-            showTask: function (eventId, taskId) {
+            showTask: function(eventId, taskId) {
                 var ref = db.ref(`classMentors/eventTasks/${eventId}/${taskId}/hidden`);
 
                 return ref.set(false);
             },
 
-            hideTask: function (eventId, taskId) {
+            hideTask: function(eventId, taskId) {
                 var ref = db.ref(`classMentors/eventTasks/${eventId}/${taskId}/hidden`);
 
                 return ref.set(true);
             },
 
-            archiveTask: function (eventId, taskId) {
+            archiveTask: function(eventId, taskId) {
                 var ref = db.ref(`classMentors/eventTasks/${eventId}/${taskId}/archived`);
 
                 return ref.set(true);
@@ -1139,7 +1121,7 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
 
             ParticipantsFirebaseArray,
 
-            participants: function (eventId) {
+            participants: function(eventId) {
                 return loaded(clmDataStore.events.ParticipantsFirebaseArray.create(eventId));
             },
 
@@ -1212,23 +1194,19 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                 });
             },
 
-            leave: function (eventId) {
-                return spfAuthData.user().then(function (authData) {
+            leave: function(eventId) {
+                return spfAuthData.user().then(function(authData) {
                     return clmDataStore.events.removeParticpants(eventId, authData.publicId);
                 });
             },
 
-            removeParticpants: function (eventId, publicId) {
+            removeParticpants: function(eventId, publicId) {
                 var profileRef = db.ref(`classMentors/userProfiles/${publicId}/joinedEvents/${eventId}`);
                 var particpantRef = db.ref(`classMentors/eventParticipants/${eventId}/${publicId}`);
-                var rankingRef = db.ref(`classMentors/eventRankings/${eventId}/${publicId}`);
 
-                return profileRef.remove().then(function () {
-                    return $q.all([
-                        particpantRef.remove(),
-                        rankingRef.remove()
-                    ]);
-                }).catch(function (err) {
+                return profileRef.remove().then(function() {
+                    return particpantRef.remove();
+                }).catch(function(err) {
                     $log.error(err);
 
                     return err;
@@ -1236,7 +1214,7 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
             },
 
             // to be true the task only need registration.
-            _hasRegistered: function (task, clmProfile, spfProfile) {
+            _hasRegistered: function(task, clmProfile, spfProfile) {
                 var serviceId = task.serviceId;
 
                 if (!task.serviceId || task.badge || task.singPathProblem) {
@@ -1255,7 +1233,7 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                 );
             },
 
-            _hasBadge: function (task, badges) {
+            _hasAchievement: function(task, achievements) {
                 if (
                     !task.badge || !task.badge.id
                 ) {
@@ -1267,12 +1245,14 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                 return (
                     task.badge &&
                     task.badge.id &&
-                    badges[serviceId] &&
-                    badges[serviceId][task.badge.id]
+                    achievements.services &&
+                    achievements.services[serviceId] &&
+                    achievements.services[serviceId].achievements &&
+                    achievements.services[serviceId].achievements[task.badge.id]
                 );
             },
 
-            _hasSolvedSingpathProblem: function (task, profile) {
+            _hasSolvedSingpathProblem: function(task, profile) {
 
                 if (
                     !task.singPathProblem || !task.singPathProblem.path || !task.singPathProblem.path.id || !task.singPathProblem.level || !task.singPathProblem.level.id || !task.singPathProblem.problem || !task.singPathProblem.problem.id
@@ -1291,7 +1271,7 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                 );
             },
 
-            _isSolutionLinkValid: function (task, solutions) {
+            _isSolutionLinkValid: function(task, solutions) {
                 return (
                     task.linkPattern &&
                     solutions &&
@@ -1301,7 +1281,7 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                 );
             },
 
-            _isResponseValid: function (task, solutions) {
+            _isResponseValid: function(task, solutions) {
                 return (
                     task.textResponse &&
                     solutions &&
@@ -1309,7 +1289,7 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                 );
             },
 
-            _hasDoneSurvey: function (task, solutions) {
+            _hasDoneSurvey: function(task, solutions) {
                 return (
                     task.survey &&
                     solutions &&
@@ -1317,14 +1297,15 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                 );
             },
 
-            _hasDoneMcq: function (task, solutions) {
+            _hasDoneMcq: function(task, solutions) {
                 return (
                     task.mcqQuestions &&
                     solutions &&
                     solutions[task.$id]
                 );
             },
-            _hasFormTeam: function (task, solutions) {
+
+            _hasFormTeam: function(task, solutions) {
                 return (
                     task.formationPattern &&
                     solutions &&
@@ -1332,24 +1313,9 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                 );
             },
 
-            _solvedProblems: function (singPathProfile) {
-                var queueId = 'default';
+            _getProgress: function(tasks, data) {
 
-                return clmDataStore.singPath.countSolvedSolution(singPathProfile, queueId);
-            },
-
-            _getProgress: function (tasks, data) {
-
-                // Transform array of badges to a collection of badges.
-                var badges = Object.keys(data.badges).reduce(function (serviceBadges, serviceId) {
-                    serviceBadges[serviceId] = data.badges[serviceId].reduce(function (results, badge) {
-                        results[badge.id] = badge;
-                        return results;
-                    }, {});
-                    return serviceBadges;
-                }, {});
-
-                return tasks.reduce(function (progress, task) {
+                return tasks.reduce(function(progress, task) {
 
                     // We never recheck archived task completeness
                     if (task.archived) {
@@ -1359,7 +1325,8 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                         return progress;
                     }
 
-                    // We recheck solved closed tasks in case requirements changed.
+                    // We skip unsolved closed tasks, but recheck solved ones in case of
+                    // requirements changed.
                     if (
                         task.closedAt && !(
                             data.progress &&
@@ -1374,7 +1341,7 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                         clmDataStore.events._isSolutionLinkValid(task, data.solutions) ||
                         clmDataStore.events._isResponseValid(task, data.solutions) ||
                         clmDataStore.events._hasRegistered(task, data.classMentors, data.singPath) ||
-                        clmDataStore.events._hasBadge(task, badges) ||
+                        clmDataStore.events._hasAchievement(task, data.userAchievements) ||
                         clmDataStore.events._hasSolvedSingpathProblem(task, data.singPath) ||
                         clmDataStore.events._hasDoneSurvey(task, data.solutions) ||
                         clmDataStore.events._hasDoneMcq(task, data.solutions) ||
@@ -1389,30 +1356,14 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                 }, {});
             },
 
-            _getRanking: function (data) {
-                var ranking = {
-                    singPath: clmDataStore.events._solvedProblems(data.singPath),
-                    codeCombat: data.badges.codeCombat.length,
-                    codeSchool: data.badges.codeSchool.length
-                };
-
-                ranking.total = Object.keys(ranking).reduce(function (sum, key) {
-                    return sum + ranking[key];
-                }, 0);
-
-                ranking.user = data.classMentors.user;
-
-                return ranking;
-            },
-
-            monitorEvent: function (event, tasks, participants, solutions, progress) {
+            monitorEvent: function(event, tasks, participants, solutions, progress) {
                 var tid;
                 var delay = 300;
                 var unWatchSolution = solutions.$watch(debouncedUpdate);
                 var unWatchParticipants = participants.$watch(debouncedUpdate);
 
                 function update() {
-                    return participants.map(function (participant) {
+                    return participants.map(function(participant) {
                         return clmDataStore.events.updateProgress(
                             event, tasks, solutions, participant.$id, progress[participant.$id]
                         );
@@ -1438,7 +1389,7 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                 };
             },
 
-            updateProgress: function (event, tasks, solutions, publicId, userProgress) {
+            updateProgress: function(event, tasks, solutions, publicId, userProgress) {
                 if (!publicId) {
                     return $q.reject('User public id is missing missing.');
                 }
@@ -1448,33 +1399,41 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                 }
 
                 var cmProfilePromise = clmDataStore.profile(publicId);
-                var badgesPromise = cmProfilePromise.then(function (profile) {
-                    return $q.all({
-                        codeCombat: clmDataStore.services.codeCombat.fetchBadges(profile),
-                        codeSchool: clmDataStore.services.codeSchool.fetchBadges(profile)
-                    });
-                });
+                var userAchievementsRef = clmDataStore.services.userAchievementsRef(publicId);
 
-                // 1. load profile, badges and current progress
+                // 1. load profile, userAchievements and current progress
                 return $q.all({
                     singPath: clmDataStore.singPath.profile(publicId),
                     classMentors: cmProfilePromise,
-                    badges: badgesPromise,
+                    userAchievements: userAchievementsRef.once('value'),
                     solutions: solutions[publicId] || {},
                     progress: userProgress
-                }).then(function (data) {
-                    var rankingRef = db.ref(`classMentors/eventRankings/${event.$id}/${data.classMentors.$id}`);
+                }).then(function(data) {
+                    const participationRef = db.ref(`classMentors/eventParticipants/${event.$id}/${data.classMentors.$id}`);
+                    const user = {
+                        displayName: data.classMentors.user.displayName,
+                        gravatar: data.classMentors.user.gravatar,
+                        school: data.classMentors.user.school || null
+                    };
+                    const services = {};
 
-                    // var detailsRef = db.ref(`classMentors/eventParticipants/${event.$id}/${data.classMentors.$id}/user`);
+                    clmServices.available().forEach(service => {
+                        const details = service.details(data.classMentors);
 
-                    // 4. save data
+                        if (!details) {
+                            return;
+                        }
 
+                        services[service.serviceId] = {details: {id: details.id}};
+                    });
+
+                    // 2. Update event data
                     return $q.all([
 
-                        // 2. check completness and update progress if needed.
-                        $q.resolve(clmDataStore.events._getProgress(tasks, data)).then(function (progress) {
+                        // 3. check completness and update progress if needed.
+                        $q.resolve(clmDataStore.events._getProgress(tasks, data)).then(function(progress) {
                             var ref = db.ref(`classMentors/eventProgress/${event.$id}/${data.classMentors.$id}`);
-                            var updated = Object.keys(progress).some(function (taskId) {
+                            var updated = Object.keys(progress).some(function(taskId) {
                                 var wasCompleted = data.progress && data.progress[taskId] && data.progress[taskId].completed;
                                 var isCompleted = progress && progress[taskId] && progress[taskId].completed;
 
@@ -1488,19 +1447,10 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                             return null;
                         }),
 
-                        // 3. get ranking - if we get the ranking we could check it needs an update
-                        rankingRef.set(clmDataStore.events._getRanking(data))
-
-                        // This was causing the endless loop of failed updates when viewing the ranking.
-                        // 5. update participants data
-                        // TODO: only update it if necessary.
-                        // detailsRef.set({
-                        //   displayName: data.classMentors.user.displayName,
-                        //   gravatar: data.classMentors.user.gravatar,
-                        //   school: data.classMentors.user.school || null
-                        // })
+                        // 4. update participants data
+                        participationRef.update({user, services})
                     ]);
-                }).catch(function (err) {
+                }).catch(function(err) {
                     $log.error(`Failed to update progress of ${publicId}: ${err.toString()}`);
                 });
             },
@@ -1511,7 +1461,7 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
              * Only admin and event onwer can save the progress and ranking.
              *
              */
-            updateCurrentUserProfile: function (event, tasks, userSolutions, profile) {
+            updateCurrentUserProfile: function(event, tasks, userSolutions, profile) {
                 if (!event || !event.$id || !userSolutions || !userSolutions.$id || !profile || !profile.$id) {
                     return $q.reject(new Error('Event, userSolutions or profile are not valid firebase object'));
                 }
@@ -1520,22 +1470,13 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                     return Boolean(solutions[task.$id]);
                 }
 
-                return $q.all({
+                var userAchievementsRef = clmDataStore.services.userAchievementsRef(profile.$id);
 
-                    // 1. Update user profile
-                    codeCombat: clmDataStore.services.codeCombat.updateProfile(profile),
-                    codeSchool: clmDataStore.services.codeSchool.updateProfile(profile),
+                return $q.all({
+                    userAchievements: userAchievementsRef.once('value'),
                     singPath: clmDataStore.singPath.profile(profile.$id)
-                }).then(function (data) {
-                    return $q.all({
-                        singPath: data.singPath,
-                        badges: {
-                            codeCombat: clmDataStore.services.codeCombat.badges(profile),
-                            codeSchool: clmDataStore.services.codeSchool.badges(profile)
-                        }
-                    });
-                }).then(function (data) {
-                    var updatedTasks = tasks.filter(function (task) {
+                }).then(function(data) {
+                    var updatedTasks = tasks.filter(function(task) {
                         if (solvedTask(task, userSolutions)) {
                             return false;
                         }
@@ -1543,9 +1484,9 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                         return (
                             clmDataStore.events._hasRegistered(task, profile, data.singPath) ||
                             clmDataStore.events._hasSolvedSingpathProblem(task, data.singPath) ||
-                            clmDataStore.events._hasBadge(task, data.badges)
+                            clmDataStore.events._hasAchievement(task, data.userAchievements)
                         );
-                    }).map(function (task) {
+                    }).map(function(task) {
                         userSolutions[task.$id] = true;
                         return task;
                     });
@@ -1555,13 +1496,13 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                     }
 
                     return updatedTasks;
-                }).catch(function (err) {
+                }).catch(function(err) {
                     $log.error(`Failed to update profile and soltuions of ${profile.$id}: ${err.toString()}`);
                 });
             },
 
             // newly added codes by ky
-            saveSurveyResponse: function (surveyResp, questionNumber, taskId, eventId, userId, surveyTask) {
+            saveSurveyResponse: function(surveyResp, questionNumber, taskId, eventId, userId, surveyTask) {
                 var ref;
 
                 if (!surveyResp) {
@@ -1585,13 +1526,13 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                 return ref.set(surveyResp);
             },
 
-            saveSurveyResponseOnSubmit: function (taskId, eventId, userId, surveyType, motiResp) {
+            saveSurveyResponseOnSubmit: function(taskId, eventId, userId, surveyType, motiResp) {
                 var ref = db.ref(`classMentors/surveyResponse/${eventId}/${taskId}/${surveyType}/${userId}`);
 
                 return ref.set(motiResp);
             },
 
-            saveSurveyEduDisResponse: function (surveyResp, questionNumber, taskId, eventId, userId, surveyTask, qnTitle) {
+            saveSurveyEduDisResponse: function(surveyResp, questionNumber, taskId, eventId, userId, surveyTask, qnTitle) {
                 var ref;
 
                 if (!surveyResp) {
@@ -1624,7 +1565,7 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                 return ref.set(surveyResp);
             },
 
-            saveSurveyEduDisMultiResponse: function (responses, questionNumber, taskId, eventId, userId, surveyTask, qnTitle) {
+            saveSurveyEduDisMultiResponse: function(responses, questionNumber, taskId, eventId, userId, surveyTask, qnTitle) {
                 var ref;
 
                 if (!responses) {
@@ -1656,7 +1597,7 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                 return ref.set(responses);
             },
 
-            submitSolution: function (eventId, taskId, publicId, link) {
+            submitSolution: function(eventId, taskId, publicId, link) {
                 var ref;
 
                 if (!eventId) {
@@ -1675,13 +1616,13 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                 return ref.set(link);
             },
 
-            setProgress: function (eventId, taskId, publicId, progress) {
+            setProgress: function(eventId, taskId, publicId, progress) {
                 var ref = db.ref(`classMentors/eventProgress/${eventId}/${publicId}/${taskId}`);
 
                 return ref.set(progress[publicId][taskId]);
             },
 
-            saveScore: function (eventId, publicId, taskId, score) {
+            saveScore: function(eventId, publicId, taskId, score) {
                 var ref;
 
                 if (!eventId) {
@@ -1701,49 +1642,49 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                 return ref.set(score);
             },
 
-            addAssistant: function (eventId, assistantId, assistant) {
+            addAssistant: function(eventId, assistantId, assistant) {
                 var ref = db.ref(`classMentors/events/${eventId}/assistants/${assistantId}`);
 
                 return ref.set(assistant);
             },
 
-            getAssistants: function (eventId) {
+            getAssistants: function(eventId) {
                 var ref = db.ref(`classMentors/events/${eventId}/assistants`);
 
                 return loaded($firebaseArray(ref));
             },
 
-            getAsstObj: function (eventId) {
+            getAsstObj: function(eventId) {
                 var ref = db.ref(`classMentors/events/${eventId}/assistants`);
 
                 return loaded($firebaseObject(ref));
             },
 
-            enableAssistantEditing: function (eventId, assistantId) {
+            enableAssistantEditing: function(eventId, assistantId) {
                 var ref = db.ref(`classMentors/events/${eventId}/assistants/${assistantId}/canEdit`);
 
                 return ref.set(true);
             },
 
-            disableAssistantEditing: function (eventId, assistantId) {
+            disableAssistantEditing: function(eventId, assistantId) {
                 var ref = db.ref(`classMentors/events/${eventId}/assistants/${assistantId}/canEdit`);
 
                 return ref.set(false);
             },
 
-            enableAssistantReviewing: function (eventId, assistantId) {
+            enableAssistantReviewing: function(eventId, assistantId) {
                 var ref = db.ref(`classMentors/events/${eventId}/assistants/${assistantId}/canReview`);
 
                 return ref.set(true);
             },
 
-            disableAssistantReviewing: function (eventId, assistantId) {
+            disableAssistantReviewing: function(eventId, assistantId) {
                 var ref = db.ref(`classMentors/events/${eventId}/assistants/${assistantId}/canReview`);
 
                 return ref.set(false);
             },
 
-            removeAssistant: function (eventId, assistantId) {
+            removeAssistant: function(eventId, assistantId) {
                 var ref = db.ref(`classMentors/events/${eventId}/assistants/${assistantId}`);
 
                 return ref.remove();
@@ -1869,7 +1810,7 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
              *
              * @return {array}
              */
-            get: function () {
+            get: function() {
                 return $firebaseArray(db.ref('classMentors/settings'));
             },
 
@@ -1880,7 +1821,7 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
              *
              * @return {object}
              */
-            getObj: function () {
+            getObj: function() {
                 return $firebaseObject(db.ref('classMentors/settings'));
             }
 
@@ -1892,23 +1833,23 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
              * Return user's singpath profile
              *
              */
-            profile: function (publicId) {
-                return $q.resolve(publicId).then(function (id) {
+            profile: function(publicId) {
+                return $q.resolve(publicId).then(function(id) {
                     var ref = db.ref(`singpath/userProfiles/${id}`);
 
                     return loaded($firebaseObject(ref));
                 });
             },
 
-            queuedSolutions: function (publicId) {
-                return $q.resolve(publicId).then(function (id) {
+            queuedSolutions: function(publicId) {
+                return $q.resolve(publicId).then(function(id) {
                     var ref = db.ref(`singpath/userProfiles/${id}/queuedSolutions`);
 
                     return loaded($firebaseObject(ref));
                 });
             },
 
-            hasSolved: function (profile, pathId, levelId, problemId, queueId) {
+            hasSolved: function(profile, pathId, levelId, problemId, queueId) {
                 return (
                     profile &&
                     profile.queuedSolutions &&
@@ -1920,7 +1861,7 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                 );
             },
 
-            countSolvedSolution: function (profile, queueId) {
+            countSolvedSolution: function(profile, queueId) {
                 var solutions = profile && profile.queuedSolutions;
 
                 if (!solutions) {
@@ -1928,33 +1869,34 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                 }
 
                 queueId = queueId || 'default';
-                return Object.keys(solutions).map(function (pathId) {
-                    return Object.keys(solutions[pathId]).map(function (levelId) {
-                        return Object.keys(solutions[pathId][levelId]).filter(function (problemId) {
+
+                return Object.keys(solutions).map(function(pathId) {
+                    return Object.keys(solutions[pathId]).map(function(levelId) {
+                        return Object.keys(solutions[pathId][levelId]).filter(function(problemId) {
                             return (
                                 solutions[pathId][levelId][problemId][queueId] &&
                                 solutions[pathId][levelId][problemId][queueId].solved === true
                             );
                         }).length;
-                    }).reduce(function (sum, count) {
+                    }).reduce(function(sum, count) {
                         return sum + count;
                     }, 0);
-                }).reduce(function (sum, count) {
+                }).reduce(function(sum, count) {
                     return sum + count;
                 }, 0);
             },
 
-            countSolvedSolutionPerLanguage: function (profile, queueId) {
+            countSolvedSolutionPerLanguage: function(profile, queueId) {
                 var paths = profile.queuedSolutions || {};
 
                 queueId = queueId || 'default';
-                return Object.keys(paths).reduce(function (result, pathKey) {
+                return Object.keys(paths).reduce(function(result, pathKey) {
                     var levels = paths[pathKey] || {};
 
-                    Object.keys(levels).forEach(function (levelKey) {
+                    Object.keys(levels).forEach(function(levelKey) {
                         var problems = levels[levelKey] || {};
 
-                        Object.keys(problems).forEach(function (problemKey) {
+                        Object.keys(problems).forEach(function(problemKey) {
                             var language = problems[problemKey][queueId].language;
 
                             if (
@@ -1973,13 +1915,13 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
              * Return a map of available paths at SingPath
              *
              */
-            paths: function () {
+            paths: function() {
                 var ref = db.ref('singpath/paths');
 
-                return ref.once('value').then(function (snapshot) {
+                return ref.once('value').then(function(snapshot) {
                     var paths = snapshot.val();
 
-                    return Object.keys(paths).reduce(function (all, id) {
+                    return Object.keys(paths).reduce(function(all, id) {
                         if (!id || id[0] === '$') {
                             return all;
                         }
@@ -1999,13 +1941,13 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
              * Return a map of available levels at SingPath for a specific path
              *
              */
-            levels: function (pathId) {
+            levels: function(pathId) {
                 var ref = db.ref(`singpath/levels/${pathId}`);
 
-                return ref.once('value').then(function (snapshot) {
+                return ref.once('value').then(function(snapshot) {
                     var levels = snapshot.val();
 
-                    return Object.keys(levels).reduce(function (all, id) {
+                    return Object.keys(levels).reduce(function(all, id) {
                         if (!id || id[0] === '$') {
                             return all;
                         }
@@ -2025,13 +1967,13 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
              * Return a map of available problems at SingPath for a specific level
              *
              */
-            problems: function (pathId, levelId) {
+            problems: function(pathId, levelId) {
                 var ref = db.ref(`singpath/problems/${pathId}/${levelId}`);
 
-                return ref.once('value').then(function (snapshot) {
+                return ref.once('value').then(function(snapshot) {
                     var problems = snapshot.val();
 
-                    return Object.keys(problems).reduce(function (all, id) {
+                    return Object.keys(problems).reduce(function(all, id) {
                         if (!id || id[0] === '$') {
                             return all;
                         }
@@ -2053,22 +1995,22 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
              *
              * @return {Promise}
              */
-            allProblems: function () {
+            allProblems: function() {
                 var ref = db.ref('singpath/problems');
 
-                return ref.once('value').then(function (snapshot) {
+                return ref.once('value').then(function(snapshot) {
                     return snapshot.val();
                 });
             },
 
-            countProblems: function (paths) {
-                return Object.keys(paths || {}).reduce(function (result, pathKey) {
+            countProblems: function(paths) {
+                return Object.keys(paths || {}).reduce(function(result, pathKey) {
                     var levels = paths[pathKey] || {};
 
-                    Object.keys(levels).forEach(function (levelKey) {
+                    Object.keys(levels).forEach(function(levelKey) {
                         var problems = levels[levelKey] || {};
 
-                        Object.keys(problems).forEach(function (problemKey) {
+                        Object.keys(problems).forEach(function(problemKey) {
                             var language = problems[problemKey].language;
 
                             result[language] = (result[language] || 0) + 1;
@@ -2083,8 +2025,8 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
 
     // TODO: rename.
     clmDataStore.badges = {
-        all: function () {
-            return $q.all(Object.keys(clmDataStore.services).reduce(function (all, serviceId) {
+        all: function() {
+            return $q.all(Object.keys(clmDataStore.services).reduce(function(all, serviceId) {
                 all[serviceId] = clmDataStore.services[serviceId].availableBadges();
                 return all;
             }, {}));
