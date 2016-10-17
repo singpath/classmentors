@@ -10,11 +10,11 @@
 
       <label><b>Select Activity Type</b></label><br>
       <div flex layout="column" layout-align="center stretch">
-        
+
         <!--Radio group for Activity Types-->
         <div>
           <md-input-container>
-        <md-radio-group ng-model='ctrl.activityType' ng-required="true">
+        <md-radio-group ng-model='ctrl.activityType' required>
               <md-radio-button value="gameShow">Game Show (IRAT,TRAT)</md-radio-button>
               <md-radio-button value="indexCards">Index Cards</md-radio-button>
               <md-radio-button value="collabSubmission">Collaborative Submission</md-radio-button>
@@ -59,7 +59,7 @@
             <label for='edit-teamFormationInput_${{index}}'>{{ctrl.teamFormationMethod === "teamSize" ? "Maximum number of students per team" : "Number of Teams"}}</label>
             <input type ="number" ng-model="ctrl.teamFormationParameter"
               name="teamFormationInput"
-              id='edit-teamFormationInput_${{index}}' ng-change="ctrl.calculateTeamMaximumStudent(ctrl.teamFormationParameter)"
+              id='edit-teamFormationInput_${{index}}' ng-change="ctrl.calculateTeamMaximumStudent(ctrl.teamFormationParameter)" required
               >
           </md-input-container>
 
@@ -94,7 +94,7 @@
           {{ctrl.selectedMCQ}}
           <md-input-container>
             <label for="q-timelimit">Time limit for each question (in minutes)</label>
-            <input type="number" ng-model="ctrl.questionTimeLimit" id="q-timelimit">
+            <input type="number" ng-model="ctrl.questionTimeLimit" id="q-timelimit" required>
           </md-input-container>
 
           <label>Select existing or create new multiple choice question</label>

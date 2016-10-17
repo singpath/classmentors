@@ -121,6 +121,7 @@ module.constant('routes', {
   startMcq: '/events/:eventId/challenges/:taskId/mcq/start',
   editMcq: '/challenges/mcq/edit',
   viewSurvey: '/challenges/survey',
+  editSurvey: '/challenges/survey/edit',
   createTeamActivity: '/challenges/team-activity/create',
   viewIRAT: '/challenges/IRAT',
   viewTRAT: '/events/:eventId/challenges/:taskId/TRAT/start',
@@ -138,9 +139,10 @@ export {module};
  * @param {{firebaseApp: string, singpathUrl: string, backendUrl: string}} options Application
  */
 export function bootstrap(options) {
-  const bootstrapModule = angular.module('classmentors.bootstrap', [module.name]);
-
   options = options || {};
+
+  const deps = options.extra ? [module.name, options.extra.name] : [module.name];
+  const bootstrapModule = angular.module('classmentors.bootstrap', deps);
 
   if (options.firebaseApp) {
     bootstrapModule.constant('firebaseApp', options.firebaseApp);

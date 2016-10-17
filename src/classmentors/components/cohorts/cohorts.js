@@ -915,7 +915,7 @@ function ClmCohortRankPageCtrl($q, $scope, $log, firebaseApp, $firebaseObject, $
     var unwatchers = [];
     this.cohortEventData = [];
     this.cohortTotalParticipants = [];
-    console.log(self.cohort);
+    // console.log(self.cohort);
 
     // *************************** Re-write code here ***************************
 
@@ -955,12 +955,18 @@ function ClmCohortRankPageCtrl($q, $scope, $log, firebaseApp, $firebaseObject, $
             for(let participantIndex = 0; participantIndex < participantsArray.length; participantIndex++) {
                 // console.log("User " + participantsArray[participantIndex].$id + " from event " + eventId);
                 $firebaseObject(db.ref(`classMentors/userProfiles/${participantsArray[participantIndex].$id}/services`)).$loaded().then(function (result) {
-                    if(result.freeCodeCamp && result.freeCodeCamp.totalAchievements >= 1) {
-                        self.cohortEventData.find(e => e.id == eventId).qualifiedParticipants.push({displayName: participantsArray[participantIndex].user.displayName, userId: participantsArray[participantIndex].$id, score: result.freeCodeCamp.totalAchievements});
-                        self.cohortEventData.find(e => e.id == eventId).qualifiedParticipants.sort(function(a,b) {
-                            return b.score - a.score;
-                        });
+                    if((result.freeCodeCamp && result.freeCodeCamp.totalAchievements >= 1) && (result.codeCombat && result.codeCombat.totalAchievements >= 1)) {
+                        self.cohortEventData.find(e => e.id == eventId).qualifiedParticipants.push({displayName: participantsArray[participantIndex].user.displayName, userId: participantsArray[participantIndex].$id, score: parseInt(result.freeCodeCamp.totalAchievements) + parseInt(result.codeCombat.totalAchievements)});
                     }
+                    if((result.freeCodeCamp && result.freeCodeCamp.totalAchievements >= 1) && (!result.codeCombat || result.codeCombat.totalAchievements < 1)) {
+                        self.cohortEventData.find(e => e.id == eventId).qualifiedParticipants.push({displayName: participantsArray[participantIndex].user.displayName, userId: participantsArray[participantIndex].$id, score: result.freeCodeCamp.totalAchievements});
+                    }
+                    if((!result.freeCodeCamp || result.freeCodeCamp.totalAchievements < 1) && (result.codeCombat && result.codeCombat.totalAchievements >= 1)) {
+                        self.cohortEventData.find(e => e.id == eventId).qualifiedParticipants.push({displayName: participantsArray[participantIndex].user.displayName, userId: participantsArray[participantIndex].$id, score: result.codeCombat.totalAchievements});
+                    }
+                    self.cohortEventData.find(e => e.id == eventId).qualifiedParticipants.sort(function(a,b) {
+                        return b.score - a.score;
+                    });
                 })
             }
         });

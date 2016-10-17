@@ -170,10 +170,10 @@ describe('events', function() {
 
   describe('joining', function() {
     const passwordHash = utils.fixtures('classMentors/eventPasswords/alice-event/hash');
-    let user;
+    let participation;
 
     beforeEach(function() {
-      user = utils.fixtures('classMentors/eventParticipants/alice-event/bob/user');
+      participation = utils.fixtures('classMentors/eventParticipants/alice-event/bob');
     });
 
     it('should let a user join an event if has the password', function() {
@@ -187,7 +187,8 @@ describe('events', function() {
 
       utils.setFirebaseData({classMentors: {eventParticipants: {'alice-event': {bob: undefined}}}});
       expect(auth.bob).can.patch({
-        user: user,
+        user: participation.user,
+        services: participation.services,
         joinedAt: utils.timestamp()
       }).path('classMentors/eventParticipants/alice-event/bob');
     });
@@ -195,24 +196,10 @@ describe('events', function() {
     it('should not let a user join an event without a timestamp', function() {
       utils.setFirebaseData({classMentors: {eventParticipants: {'alice-event': {bob: undefined}}}});
 
-      expect(auth.bob).cannot.patch({user})
-        .path('classMentors/eventParticipants/alice-event/bob');
-    });
-
-    it('should let a user edit details its details', function() {
-      utils.setFirebaseData({auth: {users: {'google:bob': {displayName: 'Just Bob'}}}});
-
-      expect(auth.bob).can.write(
-        'Just Bob'
-      ).path('classMentors/eventParticipants/alice-event/bob/user/displayName');
-    });
-
-    it.skip('should let a owner edit user details', function() {
-      utils.setFirebaseData({auth: {users: {'google:bob': {displayName: 'Just Bob'}}}});
-
-      expect(auth.alice).can.write(
-        'Just Bob'
-      ).path('classMentors/eventParticipants/alice-event/bob/user/displayName');
+      expect(auth.bob).cannot.patch({
+        user: participation.user,
+        services: participation.services
+      }).path('classMentors/eventParticipants/alice-event/bob');
     });
 
     it('should let the owner remove participants', function() {
@@ -221,6 +208,68 @@ describe('events', function() {
       expect(auth.alice).can.write(null)
         .path('classMentors/eventParticipants/alice-event/bob');
     });
+
+  });
+
+  describe('update', function() {
+
+    describe('participants', function() {
+      const path = 'classMentors/eventParticipants/alice-event/bob';
+      let participation;
+
+      beforeEach(function() {
+        participation = utils.fixtures(path);
+      });
+
+      it('should allow the owner to update the user data', function() {
+        utils.setFirebaseData(
+          {classMentors: {userProfiles: {bob: {services: {codeCombat: {details: {id: 'new-cc-id'}}}}}}}
+        );
+        participation.services.codeCombat.details.id = 'new-cc-id';
+
+        expect(auth.alice).can.patch({
+          user: participation.user,
+          services: participation.services
+        }).path(path);
+      });
+
+      it('should disallow the owner to update the user data with out of sync values', function() {
+        utils.setFirebaseData(
+          {classMentors: {userProfiles: {bob: {services: {codeCombat: {details: {id: 'new-cc-id'}}}}}}}
+        );
+
+        expect(auth.alice).cannot.patch({
+          user: participation.user,
+          services: participation.services
+        }).path(path);
+      });
+
+      it('should allow participant to update its own user data', function() {
+        utils.setFirebaseData(
+          {classMentors: {userProfiles: {bob: {services: {codeCombat: {details: {id: 'new-cc-id'}}}}}}}
+        );
+        participation.services.codeCombat.details.id = 'new-cc-id';
+
+        expect(auth.bob).can.patch({
+          user: participation.user,
+          services: participation.services
+        }).path(path);
+      });
+
+      it('should disallow other users to update some participant user data', function() {
+        utils.setFirebaseData(
+          {classMentors: {userProfiles: {bob: {services: {codeCombat: {details: {id: 'new-cc-id'}}}}}}}
+        );
+        participation.services.codeCombat.details.id = 'new-cc-id';
+
+        expect(auth.emma).cannot.patch({
+          user: participation.user,
+          services: participation.services
+        }).path(path);
+      });
+
+    });
+
 
   });
 

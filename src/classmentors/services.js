@@ -8,7 +8,7 @@ import camelCase from 'lodash.camelcase';
 const noop = () => undefined;
 
 function loaded(syncObjOrArray) {
-    return syncObjOrArray.$loaded().then(() => syncObjOrArray);
+  return syncObjOrArray.$loaded().then(() => syncObjOrArray);
 }
 
 /**
@@ -1732,7 +1732,7 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
 
                 return ref.remove();
             },
-            
+
             getAssistingEvents: function (publicId) {
                 var ref = db.ref(`classMentors/events`);
                 var query = ref.orderByChild(`assistants/${publicId}`).startAt(true);

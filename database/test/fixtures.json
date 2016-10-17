@@ -127,6 +127,23 @@
             "displayName": "Bob Smith",
             "gravatar": "//www.gravatar.com/avatar/bob00000000000000000000000000000"
           },
+          "services": {
+            "codeCombat": {
+              "details": {
+                "id": "codeCombat:bob"
+              }
+            },
+            "freeCodeCamp": {
+              "details": {
+                "id": "freeCodeCamp:bob"
+              }
+            },
+            "pivotalExpert": {
+              "details": {
+                "id": "pivotalExpert:bob"
+              }
+            }
+          },
           "joinedAt": 126000000000
         }
       }

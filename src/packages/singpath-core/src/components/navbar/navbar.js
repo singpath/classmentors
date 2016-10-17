@@ -4,31 +4,45 @@ import './navbar.css!';
 const noop = () => undefined;
 
 /**
- * Fill the template cache to the navbar template.
+ * Fill the template cache to the navbar template and listen for route change
+ * events to reset the navbar.
  *
- * @param  {object} $templateCache Angular template cache service.
+ * @param  {object} $templateCache   Angular template cache service.
+ * @param  {object} $rootScope       Angular rootScope service.
+ * @param  {object} spfNavBarService Singpath-core navbar service.
  */
-export function initNavBar($templateCache) {
+export function initNavBar($templateCache, $rootScope, spfNavBarService) {
   $templateCache.put('shared/navbar-view.html', tmpl);
+
+  $rootScope.$on('$routeChangeSuccess', (e, currentRoute) => {
+    const navBar = Object.assign({title: ''}, (
+      currentRoute &&
+      currentRoute.locals &&
+      currentRoute.locals.navBar ||
+      currentRoute.locals.navbar
+
+    ));
+
+    spfNavBarService.update(navBar.title, navBar.parent, navBar.section);
+  });
 }
-initNavBar.$inject = ['$templateCache'];
+initNavBar.$inject = ['$templateCache', '$rootScope', 'spfNavBarService'];
 
 /**
  * NavBarService factory.
  *
- * Registery to set section name and menu items
+ * Registery to set title name and menu items
  *
  * @return {function}
  */
 export function spfNavBarServiceFactory() {
   return {
-    title: 'Singpath',
-    section: undefined,
+    title: undefined,
     parent: [],
     menuItems: [],
 
-    update: function(section, parents, menuItems) {
-      this.section = section;
+    update: function(title, parents, menuItems) {
+      this.title = title;
       if (parents) {
         this.parents = Array.isArray(parents) ? parents : [parents];
       } else {
