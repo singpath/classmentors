@@ -1139,7 +1139,7 @@ export function clmDataStoreFactory(
         const eventId = event.$id;
         const publicId = profile.$id;
 
-        return db.ref(`auth/publicIds/${publicId}`).once('value', function(snapshot) {
+        return db.ref(`auth/usedPublicIds/${publicId}`).once('value', function(snapshot) {
           const uid = snapshot.val();
 
           if (!publicId) {
