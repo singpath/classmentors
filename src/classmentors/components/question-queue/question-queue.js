@@ -127,7 +127,7 @@ function eventQController(initialData, spfNavBarService, urlFor, firebaseApp, sp
 
     this.toggleVote = function (question, questionId) {
         var ref = db.ref(`classMentors/eventQuestions/${self.event.$id}/questions/${questionId}/upVotes/${self.currentUser.publicId}`);
-        if(false && question.owner.publicId == self.currentUser.publicId) {
+        if(question.owner.publicId == self.currentUser.publicId) {
             spfAlert.error("You cannot upvote your own question.");
         } else {
             if(question.upVotes && question.upVotes[self.currentUser.publicId]) {
@@ -162,7 +162,7 @@ function eventQController(initialData, spfNavBarService, urlFor, firebaseApp, sp
                 clmDataStore.events.questions.create(self.question, self.event.$id).then(
                     spfAlert.success('You have successfully posted a new question')
                 ).then($mdDialog.hide()).catch(function () {
-                    spfAlert.error('You failed to post your question. Please ensure that title and questions are at least 3 characters long')
+                    spfAlert.error('You failed to post your question.')
                 });
                 clmDataStore.logging.inputLog({
                     action: "askQuestion",
@@ -206,7 +206,7 @@ function oneQnController(initialData, spfNavBarService, urlFor, firebaseApp, spf
 
     this.toggleQnVote = function (question, questionId) {
         var ref = db.ref(`classMentors/eventQuestions/${self.event.$id}/questions/${questionId}/upVotes/${self.currentUser.publicId}`);
-        if(false && question.owner.publicId == self.currentUser.publicId) {
+        if(question.owner.publicId == self.currentUser.publicId) {
             spfAlert.error("You cannot upvote your own question.");
         } else {
             if(question.upVotes && question.upVotes[self.currentUser.publicId]) {
@@ -219,7 +219,7 @@ function oneQnController(initialData, spfNavBarService, urlFor, firebaseApp, spf
 
     this.toggleAnsVote = function (questionId, answer) {
         var ref = db.ref(`classMentors/eventQuestions/${self.event.$id}/answers/${questionId}/${answer.$id}/upVotes/${self.currentUser.publicId}`);
-        if(false && answer.owner.publicId == self.currentUser.publicId) {
+        if(answer.owner.publicId == self.currentUser.publicId) {
             spfAlert.error("You cannot upvote your own answer.");
         } else {
             if(answer.upVotes && answer.upVotes[self.currentUser.publicId]) {

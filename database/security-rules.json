@@ -171,7 +171,7 @@
         "$userActions": {
           ".write": "newData.hasChildren(['publicId','action','timestamp'])",
           "publicId": {
-            ".validate": "newData.isString() && root.child('auth/publicIds').child(newData.val()).val() === auth.uid"
+            ".validate": " true || newData.isString() && root.child('auth/publicIds').child(newData.val()).val() === auth.uid"
           }
         },
         ".write": "auth !== null",
