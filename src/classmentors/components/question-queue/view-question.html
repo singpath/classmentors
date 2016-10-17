@@ -3,7 +3,10 @@
 <md-content flex class="md-padding">
     <div layout="row">
         <div layout="column" layout-align="center center" flex="10">
-            <md-icon style="font-size: 35px">thumb_up</md-icon>
+            <md-button aria-label="Vote" ng-click="ctrl.toggleQnVote(ctrl.question, ctrl.question.$id)">
+                <md-icon ng-if="!ctrl.question.upVotes || !ctrl.question.upVotes[ctrl.currentUser.publicId]" style="font-size: 35px">thumb_up</md-icon>
+                <md-icon ng-if="ctrl.question.upVotes && ctrl.question.upVotes[ctrl.currentUser.publicId]" style="font-size: 35px">thumb_down</md-icon>
+            </md-button>
             <div style="font-size: 15px" >{{ctrl.question.upVotes | countObjKeys}} vote(s)</div>
         </div>
         <div layout="column" flex>
@@ -15,7 +18,7 @@
     </div>
 
     <md-list>
-        <md-list-item ng-repeat="answer in ctrl.answers | orderBy:'-'" layout="row">
+        <md-list-item ng-repeat="answer in ctrl.answers | orderBy:['acceptedAt', '-upVotes | countObjKeys', '-createdAt']" layout="row">
             <div layout="column" layout-align="center center" flex="10" ng-show="ctrl.question.owner.publicId == ctrl.currentUser.publicId">
                 <md-button ng-if="!answer.acceptedAt" ng-click="ctrl.toggleAskerChoice(answer.$id, false, answer)">
                     <md-icon ng-style="{'font-size': '30px'}">star_rate</md-icon>
@@ -32,7 +35,10 @@
                 <div style="font-size: 15px" >Choice</div>
             </div>
             <div layout="column" layout-align="center center" flex="10">
-                <md-icon style="font-size: 30px">thumb_up</md-icon>
+                <md-button aria-label="Vote" ng-click="ctrl.toggleAnsVote(ctrl.question.$id, answer)">
+                    <md-icon ng-if="!answer.upVotes || !answer.upVotes[ctrl.currentUser.publicId]" style="font-size: 35px">thumb_up</md-icon>
+                    <md-icon ng-if="answer.upVotes && answer.upVotes[ctrl.currentUser.publicId]" style="font-size: 35px">thumb_down</md-icon>
+                </md-button>
                 <div style="font-size: 15px" >{{answer.upVotes | countObjKeys}} vote(s)</div>
             </div>
             <div layout="column" flex>

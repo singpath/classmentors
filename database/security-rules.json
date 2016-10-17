@@ -121,12 +121,14 @@
                 "$participantId": {}
               },
               "respondedBy": {
-                "$participantId": {}
+                "$answerId": {}
               },
               "createdAt": {
                 ".validate": "true || data.exists() == false && newData.val() == now"
               },
-              "answeredBy": {},
+              "answeredBy": {
+                "$answerId": {}
+              },
               "$other": {
                 ".validate": false
               }

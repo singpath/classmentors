@@ -30,7 +30,8 @@
             <md-divider ng-if="!$last"></md-divider>
             <div ng-if="!$last"></div>
         </md-list-item>
-        <md-button class="md-accent" ng-click="ctrl.expandMyQns()">Show More</md-button>
+        <md-button class="md-raised" ng-click="ctrl.expandMyQns()">Show More</md-button>
+        <md-button ng-if="ctrl.myQnLimit > 1" class="md-accent" ng-click="ctrl.collapseMyQns()">Show Less</md-button>
     </md-list>
 
     <md-list>
@@ -53,6 +54,7 @@
             <md-divider ng-if="!$last"></md-divider>
             <div ng-if="!$last"></div>
         </md-list-item>
-        <md-button class="md-accent" ng-click="ctrl.expandVoteQns()">Show More</md-button>
+        <md-button class="md-raised" ng-click="ctrl.expandVoteQns()">Show More</md-button>
+        <md-button ng-if="ctrl.voteQnLimit > 1" class="md-accent" ng-click="ctrl.collapseVoteQns()">Show Less</md-button>
     </md-list>
 </md-content>

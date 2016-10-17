@@ -31,6 +31,15 @@ function qqController(initialData, spfNavBarService, urlFor, firebaseApp, spfAle
     this.profile = initialData.profile;
     this.createdEvents = initialData.createdEvents;
     this.joinedEvents = initialData.joinedEvents;
+    this.asstEvents = [];
+
+    console.log(self.joinedEvents);
+
+    clmDataStore.events.getAssistingEvents(self.currentUser.publicId)
+        .then(function (events) {
+            console.log(events);
+            self.asstEvents = events;
+        });
 
     for(let index in self.joinedEvents) {
         let eventId = self.joinedEvents[index].$id;
@@ -71,16 +80,42 @@ function eventQController(initialData, spfNavBarService, urlFor, firebaseApp, sp
     this.profile = initialData.profile;
     this.event = initialData.event;
     this.questions = initialData.questions;
-    this.myQuestions = [];
     this.myQnLimit = 3;
     this.voteQnLimit = 3;
 
     this.expandMyQns = function() {
-      self.myQnLimit += 3;
+        if(self.myQnLimit+3 > self.questions.filter(function (qn) {
+                return qn.owner.publicId == self.currentUser.publicId;
+            }).length) {
+            self.myQnLimit = self.questions.filter(function (qn) {
+                return qn.owner.publicId == self.currentUser.publicId;
+            }).length;
+        } else {
+            self.myQnLimit += 3;
+        }
+    };
+    this.collapseMyQns = function() {
+        if(self.myQnLimit-3 < 0) {
+            self.myQnLimit = 0;
+        } else {
+            self.myQnLimit -= 3;
+        }
     };
 
+
     this.expandVoteQns = function() {
-        self.voteQnLimit += 3;
+        if(self.voteQnLimit+3 > self.questions.length) {
+            self.voteQnLimit = self.questions.length;
+        } else {
+            self.voteQnLimit += 3;
+        }
+    };
+    this.collapseVoteQns = function() {
+        if(self.voteQnLimit-3 < 0) {
+            self.voteQnLimit = 0;
+        } else {
+            self.voteQnLimit -= 3;
+        }
     };
 
     spfNavBarService.update(
@@ -169,6 +204,32 @@ function oneQnController(initialData, spfNavBarService, urlFor, firebaseApp, spf
         }]
     );
 
+    this.toggleQnVote = function (question, questionId) {
+        var ref = db.ref(`classMentors/eventQuestions/${self.event.$id}/questions/${questionId}/upVotes/${self.currentUser.publicId}`);
+        if(false && question.owner.publicId == self.currentUser.publicId) {
+            spfAlert.error("You cannot upvote your own question.");
+        } else {
+            if(question.upVotes && question.upVotes[self.currentUser.publicId]) {
+                ref.remove()
+            } else {
+                return ref.set(Date.now());
+            }
+        }
+    };
+
+    this.toggleAnsVote = function (questionId, answer) {
+        var ref = db.ref(`classMentors/eventQuestions/${self.event.$id}/answers/${questionId}/${answer.$id}/upVotes/${self.currentUser.publicId}`);
+        if(false && answer.owner.publicId == self.currentUser.publicId) {
+            spfAlert.error("You cannot upvote your own answer.");
+        } else {
+            if(answer.upVotes && answer.upVotes[self.currentUser.publicId]) {
+                ref.remove()
+            } else {
+                return ref.set(Date.now());
+            }
+        }
+    };
+
     this.toggleAskerChoice = function (answerId, accepted, answer) {
         var ref1 = db.ref(`classMentors/eventQuestions/${self.event.$id}/answers/${self.question.$id}/${answerId}/acceptedAt`);
         var ref2 = db.ref(`classMentors/eventQuestions/${self.event.$id}/questions/${self.question.$id}/answeredBy`);
@@ -176,11 +237,14 @@ function oneQnController(initialData, spfNavBarService, urlFor, firebaseApp, spf
             ref1.remove();
             ref2.remove();
         } else {
+            if(self.question.answeredBy) {
+                let oldAns = self.question.answeredBy;
+                console.log(oldAns);
+                var ref3 = db.ref(`classMentors/eventQuestions/${self.event.$id}/answers/${self.question.$id}/${oldAns}/acceptedAt`);
+                ref3.remove();
+            }
             ref1.set(Date.now());
-            ref2.set({
-                publicId: answer.owner.publicId,
-                answeredAt: answer.createdAt
-            });
+            ref2.set(answer.$id);
         }
     };
 
@@ -204,13 +268,15 @@ function oneQnController(initialData, spfNavBarService, urlFor, firebaseApp, spf
                   displayName: currentUser.displayName
                 };
                 clmDataStore.events.questions.answers.postAnswer(eventId, questionId, self.answer)
+                    .then(function (answer) {
+                        var ref = db.ref(`classMentors/eventQuestions/${eventId}/questions/${questionId}/respondedBy/${answer.key}`);
+                        ref.set(self.answer.createdAt);
+                    })
                     .then(spfAlert.success("Successfully posted your response"))
                     .then($mdDialog.hide())
                     .catch(function () {
                         spfAlert.error("Failed to post your response");
                     });
-                var ref = db.ref(`classMentors/eventQuestions/${eventId}/questions/${questionId}/respondedBy/${currentUser.publicId}`);
-                ref.set(self.answer.createdAt);
                 clmDataStore.logging.inputLog({
                     action: "respondToQuestion",
                     questionId: questionId,

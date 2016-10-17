@@ -1732,6 +1732,12 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
 
                 return ref.remove();
             },
+            
+            getAssistingEvents: function (publicId) {
+                var ref = db.ref(`classMentors/events`);
+                var query = ref.orderByChild(`assistants/${publicId}`).startAt(true);
+                return loaded($firebaseArray(query));
+            },
 
             questions: {
 

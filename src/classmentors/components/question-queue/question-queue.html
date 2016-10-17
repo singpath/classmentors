@@ -7,9 +7,12 @@
             <md-button style="text-align:left" class="md-padding" ng-href="#{{ 'eventQueue' | urlFor:{'eventId': event.$id} }}" flex>
                 {{ event.title }}
             </md-button>
-            <div flex="10">{{(event.questions | countConditionally: ['answeredBy', false])}} open</div>
-            <div flex="10">{{(event.questions | countConditionally: ['answeredBy', true])}} closed</div>
-            <div flex="10">x instructor attention</div>
+            <div flex></div>
+            <md-chips>
+                <md-chip>{{(event.questions | countConditionally: ['answeredBy', false])}} open</md-chip>
+                <md-chip class="md-accent">{{(event.questions | countConditionally: ['answeredBy', true])}} closed</md-chip>
+                <md-chip class="md-raised md-primary">{{event.questions.length}} instructor attention</md-chip>
+            </md-chips>
         </md-list-item>
         <md-divider></md-divider>
         <md-subheader>Events that I created</md-subheader>
@@ -18,12 +21,24 @@
                 {{ event.title }}
             </md-button>
             <div flex></div>
-            <div flex="10">{{(event.questions | countConditionally: ['answeredBy', false])}} open</div>
-            <div flex="10">{{(event.questions | countConditionally: ['answeredBy', true])}} closed</div>
-            <div flex="10">x instructor attention</div>
+            <md-chips>
+                <md-chip>{{(event.questions | countConditionally: ['answeredBy', false])}} open</md-chip>
+                <md-chip class="md-accent">{{(event.questions | countConditionally: ['answeredBy', true])}} closed</md-chip>
+                <md-chip class="md-raised md-primary">{{event.questions.length}} instructor attention</md-chip>
+            </md-chips>
         </md-list-item>
         <md-divider></md-divider>
         <md-subheader>Events that I am an assistant of</md-subheader>
-        We'll work out how to access these later
+        <md-list-item ng-repeat="event in ctrl.asstEvents">
+            <md-button style="text-align:left" class="md-padding" ng-href="#{{ 'eventQueue' | urlFor:{'eventId': event.$id} }}" flex>
+                {{ event.title }}
+            </md-button>
+            <div flex></div>
+            <md-chips>
+                <md-chip>{{(event.questions | countConditionally: ['answeredBy', false])}} open</md-chip>
+                <md-chip class="md-accent">{{(event.questions | countConditionally: ['answeredBy', true])}} closed</md-chip>
+                <md-chip class="md-raised md-primary">{{event.questions.length}} instructor attention</md-chip>
+            </md-chips>
+        </md-list-item>
     </md-content>
 </md-content>
