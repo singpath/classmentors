@@ -163,7 +163,8 @@
                             <md-button class="md-raised md-primary"
                                         target="_blank"
                                         ng-disabled="task.closedAt"
-                                        aria-label="Vote Questions"
+                                        aria-label="Review Questions"
+                                        ng-click="ctrl.promptForReviewQuestion(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant, ctrl.currentUserSolutions)"
                             >
                             Review
                             </md-button>

@@ -1786,11 +1786,8 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                     }
                 })
             });
-    };
-
-    function currentTeams(){
-        
     }
+
 
     //Find superReviewUser rights
     // console.log(self.profile);
@@ -2227,14 +2224,15 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             };
         }
     };
+
     this.promptForReviewQuestion = function(eventId, taskId, task, participant, userSolution){
         $mdDialog.show({
             parent: $document.body,
-            template: "",
+            template: reviewQuestionTmpl,
             controller: DialogController,
             controllerAs: 'ctrl',
             resolve:{
-                initialData: voteQuestionIntitalData
+                initialData: reviewQuestionIntitalData
             }
         });
 
@@ -2243,10 +2241,12 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         }
     } 
 
+
     this.promptForVoteQuestion = function(eventId, taskId, task, participant, userSolution){
+        var db = firebaseApp.database();
         $mdDialog.show({
             parent: $document.body,
-            template: "",
+            template: voteQuestionTmpl,
             controller: DialogController,
             controllerAs: 'ctrl',
             resolve:{
@@ -2254,9 +2254,54 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             }
         });
 
-        function voteQuestionIntitalData(){
-            //TODO
+        function DialogController(initialData){
+            var self = this;
+            $log.info(`Code reaches here`);
+            console.log(initialData);
+            // $log.info(`InitialData contains: ${angular.toJson(initialData)}`);
         }
+        DialogController.$inject = ['initialData'];
+
+        function voteQuestionIntitalData (){
+            $log.info(`task is: ${angular.toJson(task)}`);
+            $log.info(`${angular.toJson(participant)}`);
+            var self = this;
+            var eventTeamsRef = db.ref(`classMentors/eventTeams/${eventId}/${task.taskFrom}`);
+            console.log(eventTeamsRef);
+            var team = $firebaseArray(eventTeamsRef).$loaded(function(teams){
+                return teams.reduce(function(team, nextTeam){
+                    if(nextTeam[participant.$id] != null){
+                        return nextTeam;
+                    }  
+                }, {});
+            });
+            var getMembers = team => Object.keys(team).filter(key => 
+                key != 'currentSize' && key != 'maxSize' && key != '$id' && key != '$priority'
+            );
+            
+
+            var eventTasksRef = db.ref(`classMentors/eventTasks/${eventId}/${task.taskFrom}`);
+            var teamMemberAnswers = team.then(function(team){
+                var fbObj = $firebaseObject(eventTasksRef).$loaded(function(task){
+                    var eventSolutionRef = db.ref(`classMentors/eventSolutions/${eventId}`);
+                    var getAnswerFromMember = function(member){
+                        return eventSolutionRef
+                                .child(`${member}`)
+                                .child(`${task.taskFrom}`)
+                                .on("value",snapshot => snapshot.val());
+                    }
+                    return getMembers(team).map(getAnswerFromMember);
+                });
+                return fbObj;  
+            });
+            var teamMembers = team.then(team => getMembers(team));
+            return $q.all({
+                team: team,
+                teamMembers:teamMembers,
+                teamMemberAnswers: teamMemberAnswers
+            });
+        }
+        
     }
 
     this.promptForTeamFormation = function (eventId, taskId, task, participant, userSolution) {
