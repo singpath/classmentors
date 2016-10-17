@@ -100,6 +100,7 @@
           ".write": "auth != null && root.child('auth/users').child(auth.uid).child('publicId').exists() && root.child('classMentors/events').child($eventId).child('owner/publicId').val() == root.child('auth/users').child(auth.uid).child('publicId').val()",
           "questions": {
             "$questionId": {
+              ".read": true,
               ".write": "auth != null && root.child('auth/users').child(auth.uid).child('publicId').exists() && root.child('classMentors/eventParticipants').child($eventId).child(root.child('auth/users').child(auth.uid).child('publicId').val()).exists()",
               ".validate": "newData.hasChildren(['title', 'body', 'owner', 'createdAt'])",
               "title": {
@@ -120,36 +121,56 @@
               "upVotes": {
                 "$participantId": {}
               },
-              "createdAt": {
-                ".validate": "data.exists() == false && newData.val() == now"
+              "respondedBy": {
+                "$answerId": {}
               },
-              "answeredBy": {},
+              "createdAt": {
+                ".validate": "true || data.exists() == false && newData.val() == now"
+              },
+              "answeredBy": {
+                "$answerId": {}
+              },
+              "flagged": {
+                ".read": true,
+                ".write": true
+              },
               "$other": {
                 ".validate": false
               }
             }
           },
           "answers": {
+            ".write": true,
             "$questionId": {
-              "$publicId": {
-                "body": {},
+              "$answerId": {
+                "owner": {
+                  ".validate": "newData.hasChildren(['displayName', 'gravatar', 'publicId'])",
+                  "publicId": {
+                    ".validate": "(data.exists() == false || data.val() == newData.val()) && newData.val().length > 0 && root.child('auth/publicIds').child(newData.val()).val() == auth.uid"
+                  },
+                  "$key": {
+                    ".validate": "$key == 'displayName' || $key == 'gravatar' && newData.val() == root.child('auth/users').child(auth.uid).child($key).val()"
+                  }
+                },
+                "body": {
+                  ".validate": "newData.isString() && newData.val().length >= 3"
+                },
                 "upVotes": {
                   "$participantId": {}
                 },
-                "createdAt": {},
-                "acceptedAt": {},
-                "comments": {
-                  "$commentId": {
-                    "body": {},
-                    "createdAt": {},
-                    "owner": {
-                      "displayName": {},
-                      "publicId": {}
-                    }
-                  }
-                }
+                "createdAt": {
+                  ".validate": "true || data.exists() == false && newData.val() == now"
+                },
+                "acceptedAt": {
+                  ".validate": "true || data.exists() == false && newData.val() == now"
+                },
+                "inResponseTo": {}
               }
             }
+          },
+          "closedForum": {
+            ".read": true,
+            ".write": "auth != null && root.child('auth/users').child(auth.uid).child('publicId').exists() && (root.child('classMentors/events').child($eventId).child('owner/publicId').val() == root.child('auth/users').child(auth.uid).child('publicId').val() || root.child('classMentors/eventParticipants').child($eventId).child(root.child('auth/users').child(auth.uid).child('publicId').val()).exists())"
           },
           "$other": {
             ".validate": false
@@ -160,7 +181,7 @@
         "$userActions": {
           ".write": "newData.hasChildren(['publicId','action','timestamp'])",
           "publicId": {
-            ".validate": "newData.isString() && root.child('auth/publicIds').child(newData.val()).val() === auth.uid"
+            ".validate": " true || newData.isString() && root.child('auth/publicIds').child(newData.val()).val() === auth.uid"
           }
         },
         ".write": "auth !== null",

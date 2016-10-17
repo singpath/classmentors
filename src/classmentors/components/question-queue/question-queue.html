@@ -1,10 +1,44 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-    HELLO MATE! ASK AWAYYYYY
-</body>
-</html>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
+<md-content flex class="md-padding">
+    <md-content layout-align="center">
+        <md-subheader>Events that I joined</md-subheader>
+        <md-list-item ng-repeat="event in ctrl.joinedEvents">
+            <md-button style="text-align:left" class="md-padding" ng-href="#{{ 'eventQueue' | urlFor:{'eventId': event.$id} }}" flex>
+                {{ event.title }} <i ng-if="event.closedForum">(Closed)</i><i ng-if="!event.closedForum">(Open)</i>
+            </md-button>
+            <div flex></div>
+            <md-chips>
+                <md-chip>{{(event.questions | countConditionally: ['answeredBy', false])}} open</md-chip>
+                <md-chip class="md-accent">{{(event.questions | countConditionally: ['answeredBy', true])}} closed</md-chip>
+                <md-chip class="md-raised md-primary">{{event.questions | countConditionally: ['flagged', true]}} instructor attention</md-chip>
+            </md-chips>
+        </md-list-item>
+        <md-divider></md-divider>
+        <md-subheader>Events that I created</md-subheader>
+        <md-list-item ng-repeat="event in ctrl.createdEvents">
+            <md-button style="text-align:left" class="md-padding" ng-href="#{{ 'eventQueue' | urlFor:{'eventId': event.$id} }}" flex>
+                {{ event.title }} <i ng-if="event.closedForum">(Closed)</i><i ng-if="!event.closedForum">(Open)</i>
+            </md-button>
+            <div flex></div>
+            <md-chips>
+                <md-chip>{{(event.questions | countConditionally: ['answeredBy', false])}} open</md-chip>
+                <md-chip class="md-accent">{{(event.questions | countConditionally: ['answeredBy', true])}} closed</md-chip>
+                <md-chip class="md-raised md-primary">{{event.questions | countConditionally: ['flagged', true]}} instructor attention</md-chip>
+            </md-chips>
+        </md-list-item>
+        <md-divider></md-divider>
+        <md-subheader>Events that I am an assistant of</md-subheader>
+        <md-list-item ng-repeat="event in ctrl.asstEvents">
+            <md-button style="text-align:left" class="md-padding" ng-href="#{{ 'eventQueue' | urlFor:{'eventId': event.$id} }}" flex>
+                {{ event.title }} <i ng-if="event.closedForum">(Closed)</i><i ng-if="!event.closedForum">(Open)</i>
+            </md-button>
+            <div flex></div>
+            <md-chips>
+                <md-chip>{{(event.questions | countConditionally: ['answeredBy', false])}} open</md-chip>
+                <md-chip class="md-accent">{{(event.questions | countConditionally: ['answeredBy', true])}} closed</md-chip>
+                <md-chip class="md-raised md-primary">{{event.questions | countConditionally: ['flagged', true]}} instructor attention</md-chip>
+            </md-chips>
+        </md-list-item>
+    </md-content>
+</md-content>

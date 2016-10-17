@@ -1,0 +1,79 @@
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
+<md-content flex class="md-padding">
+    <div layout="row">
+        <md-chips>
+            <md-chip>{{(ctrl.questions | countConditionally: ['answeredBy', false])}} open</md-chip>
+            <md-chip class="md-accent">{{(ctrl.questions | countConditionally: ['answeredBy', true])}} closed</md-chip>
+            <md-chip class="md-raised md-primary">{{ctrl.questions | countConditionally: ['flagged', true]}} instructor attention</md-chip>
+        </md-chips>
+    </div>
+    <md-button ng-if="ctrl.event.owner.publicId != ctrl.currentUser.publicId && !ctrl.event.closedForum" class="md-raised md-primary" ng-click="ctrl.askNewQuestion(ctrl.event, ctrl.currentUser)">Ask New Question</md-button>
+    <md-button disabled="" ng-if="ctrl.event.owner.publicId != ctrl.currentUser.publicId && ctrl.event.closedForum" class="md-raised md-primary">Questions Disabled</md-button>
+    <md-checkbox ng-if="ctrl.event.owner.publicId == ctrl.currentUser.publicId" ng-model="ctrl.event.closedForum" ng-change="ctrl.toggleForumStatus()">Close Event Questions</md-checkbox>
+    <md-list>
+        <md-subheader class="md-no-sticky">My recently posted questions</md-subheader>
+        <md-list-item ng-repeat="question in ctrl.questions | orderBy:'-' | limitTo:ctrl.myQnLimit" ng-if="question.owner.publicId == ctrl.currentUser.publicId">
+            <div layout="column" layout-align="end center">
+                <md-button class="md-icon-button launch" aria-label="Flag">
+                    <md-icon ng-if="!question.flagged && question.owner.publicId == ctrl.currentUser.publicId" style="font-size: 30px" ng-click="ctrl.toggleQnFlag(question)">error_outline</md-icon>
+                    <md-icon ng-if="question.flagged && question.owner.publicId == ctrl.currentUser.publicId" style="font-size: 30px; color: red" ng-click="ctrl.toggleQnFlag(question)">error_outline</md-icon>
+                </md-button>
+                <div style="font-size: 12px" >Alert</div>
+                <div style="font-size: 12px" >Educator</div>
+            </div>
+            <div layout="column" layout-align="end center">
+                <md-button class="md-icon-button launch" aria-label="Vote" ng-click="ctrl.toggleVote(question, question.$id)">
+                    <md-icon ng-if="!question.upVotes || !question.upVotes[ctrl.currentUser.publicId]" style="font-size: 30px">thumb_up</md-icon>
+                    <md-icon ng-if="question.upVotes && question.upVotes[ctrl.currentUser.publicId]" style="font-size: 30px">thumb_down</md-icon>
+                </md-button><div style="font-size: 12px" >{{question.upVotes | countObjKeys}} vote(s)</div>
+            </div>
+            <div layout="column" layout-align="end start" class="md-list-item-text" flex>
+                <div style="font-size: 20px">{{question.title}}</div>
+                <div style="font-size: 10px; color:grey;" ng-if="question.answeredBy">Posted by {{question.owner.displayName}} ({{question.createdAt | date:'dd/MM/yy hh:mma'}}) (closed)</div>
+                <div style="font-size: 10px; color:grey;" ng-if="!question.answeredBy">Posted by {{question.owner.displayName}} ({{question.createdAt | date:'dd/MM/yy hh:mma'}}) (open)</div>
+            </div>
+            <md-button class="md-padding" ng-href="#{{ 'oneQuestion' | urlFor:{'eventId': ctrl.event.$id, 'questionId': question.$id} }}">
+                <md-icon style="font-size: 30px">sms</md-icon>
+                <div>View {{question.respondedBy | countObjKeys}} answer(s)</div>
+            </md-button>
+            <md-divider ng-if="!$last"></md-divider>
+            <div ng-if="!$last"></div>
+        </md-list-item>
+        <md-button class="md-raised" ng-click="ctrl.expandMyQns()">Show More</md-button>
+        <md-button ng-if="ctrl.myQnLimit > 1" class="md-accent" ng-click="ctrl.collapseMyQns()">Show Less</md-button>
+    </md-list>
+
+    <md-list>
+        <md-subheader class="md-no-sticky">Most voted questions</md-subheader>
+        <md-list-item ng-repeat="question in ctrl.questions | orderBy:['-upVotes | countObjKeys', '-createdAt'] | limitTo:ctrl.voteQnLimit">
+            <div layout="column" layout-align="end center">
+                <md-button class="md-icon-button launch" aria-label="Flag">
+                    <md-icon ng-if="!question.flagged && question.owner.publicId == ctrl.currentUser.publicId" style="font-size: 30px" ng-click="ctrl.toggleQnFlag(question)">error_outline</md-icon>
+                    <md-icon ng-if="question.flagged && question.owner.publicId == ctrl.currentUser.publicId" style="font-size: 30px; color: red" ng-click="ctrl.toggleQnFlag(question)">error_outline</md-icon>
+                </md-button>
+                <div style="font-size: 12px" >Alert</div>
+                <div style="font-size: 12px" >Educator</div>
+            </div>
+            <div layout="column" layout-align="end center">
+                <md-button class="md-icon-button launch" aria-label="Vote" ng-click="ctrl.toggleVote(question, question.$id)">
+                    <md-icon ng-if="!question.upVotes || !question.upVotes[ctrl.currentUser.publicId]" style="font-size: 30px">thumb_up</md-icon>
+                    <md-icon ng-if="question.upVotes && question.upVotes[ctrl.currentUser.publicId]" style="font-size: 30px">thumb_down</md-icon>
+                </md-button><div style="font-size: 12px" >{{question.upVotes | countObjKeys}} vote(s)</div>
+            </div>
+            <div layout="column" layout-align="end start" class="md-list-item-text" flex>
+                <div style="font-size: 20px">{{question.title}}</div>
+                <div style="font-size: 10px; color:grey;" ng-if="question.answeredBy">Posted by {{question.owner.displayName}} ({{question.createdAt | date:'dd/MM/yy hh:mma'}}) (closed)</div>
+                <div style="font-size: 10px; color:grey;" ng-if="!question.answeredBy">Posted by {{question.owner.displayName}} ({{question.createdAt | date:'dd/MM/yy hh:mma'}}) (open)</div>
+            </div>
+            <md-button class="md-padding" ng-href="#{{ 'oneQuestion' | urlFor:{'eventId': ctrl.event.$id, 'questionId': question.$id} }}">
+                <md-icon style="font-size: 30px">sms</md-icon>
+                <div>View {{question.respondedBy | countObjKeys}} answer(s)</div>
+            </md-button>
+            <md-divider ng-if="!$last"></md-divider>
+            <div ng-if="!$last"></div>
+        </md-list-item>
+        <md-button class="md-raised" ng-click="ctrl.expandVoteQns()">Show More</md-button>
+        <md-button ng-if="ctrl.voteQnLimit > 1" class="md-accent" ng-click="ctrl.collapseVoteQns()">Show Less</md-button>
+    </md-list>
+</md-content>

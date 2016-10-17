@@ -73,6 +73,8 @@ module.filter('cmTruncate', filters.cmTruncateFilterFactory);
 module.filter('cmTruncated', filters.cmTruncateFilterBooleanFactory);
 module.filter('showSchool', filters.showSchoolFilterFactory);
 module.filter('showTeamMembers', filters.showTeamMembersFilterFactory);
+module.filter('countObjKeys', filters.countObjKeysFactory);
+module.filter('countConditionally', filters.countConditionallyFilterFactory);
 // module.filter('reverseArray', filters.reverseArray);
 //for page controls in trat
 module.run(components.profiles.configServices);
@@ -124,7 +126,9 @@ module.constant('routes', {
   viewIRAT: '/challenges/IRAT',
   viewTRAT: '/events/:eventId/challenges/:taskId/TRAT/start',
   feedback: '/feedback',
-  questionQueue: '/question-queue'
+  questionQueue: '/question-queue',
+  eventQueue: '/question-queue/:eventId',
+  oneQuestion: '/question-queue/:eventId/questions/:questionId'
 });
 
 export {module};
