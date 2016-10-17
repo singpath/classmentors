@@ -392,7 +392,7 @@ clmServicesFactory.$inject = ['$firebaseObject', '$log', '$q', '$timeout', 'fire
 export function clmDataStoreFactory(
   $window, $location, $q, $log, $http, $timeout,
   firebaseApp, $firebaseObject, $firebaseArray, spfSchools,
-  routes, spfAuth, spfAuthData, spfCrypto, clmServices, clmServicesUrl
+  routes, spfAuth, spfAuthData, spfCurrentUser, spfCrypto, clmServices, clmServicesUrl
 ) {
   var clmDataStore;
   var db = firebaseApp.database();
@@ -1125,22 +1125,18 @@ export function clmDataStoreFactory(
         return loaded(clmDataStore.events.ParticipantsFirebaseArray.create(eventId));
       },
 
-      join: function(event, profile, pw) {
+      join: function(event, pw) {
         let refs;
 
         if (!event || !event.$id) {
           return $q.reject('Event was not provided');
         }
 
-        if (!profile || !profile.$id) {
-          return $q.reject('Participant profile not provided');
-        }
-
         const eventId = event.$id;
-        const publicId = profile.$id;
 
-        return db.ref(`auth/usedPublicIds/${publicId}`).once('value', function(snapshot) {
-          const uid = snapshot.val();
+        return spfCurrentUser.$loaded().then(function() {
+          const publicId = spfCurrentUser.publicId;
+          const uid = spfCurrentUser.uid;
 
           if (!publicId) {
             return $q.reject(clmDataStore.events.errNoPublicId);
@@ -1150,7 +1146,8 @@ export function clmDataStoreFactory(
             hashOptions: db.ref(`classMentors/eventPasswords/${eventId}/options`),
             application: db.ref(`classMentors/eventApplications/${eventId}/${uid}`),
             participation: db.ref(`classMentors/eventParticipants/${eventId}/${publicId}`),
-            profile: db.ref(`classMentors/userProfiles/${publicId}/joinedEvents/${eventId}`)
+            joinedEvent: db.ref(`classMentors/userProfiles/${publicId}/joinedEvents/${eventId}`),
+            services: db.ref(`classMentors/userProfiles/${publicId}/services`)
           };
 
           return refs;
@@ -1162,30 +1159,34 @@ export function clmDataStoreFactory(
 
           return refs.application.set(hash);
         }).then(function() {
+          return refs.services.once('value');
+        }).then(function(snapshot) {
+          const services = snapshot.val() || {};
           const user = {
-            displayName: profile.user.displayName,
-            gravatar: profile.user.gravatar,
-            school: cleanObj(profile.user.school) || null
+            displayName: spfCurrentUser.profile.displayName,
+            gravatar: spfCurrentUser.profile.gravatar,
+            school: cleanObj(spfCurrentUser.profile.school) || null
           };
-          const services = {};
+          const partialServices = {};
 
           clmServices.available().forEach(service => {
-            const details = service.details(profile);
+            const details = service.details({services});
 
             if (!details) {
               return;
             }
 
-            services[service.serviceId] = {details: {id: details.id}};
+            // we only copy the service id
+            partialServices[service.serviceId] = {details: {id: details.id}};
           });
 
           return refs.participation.set({
             user,
-            services,
+            services: partialServices,
             joinedAt: {'.sv': 'timestamp'}
           });
         }).then(function() {
-          return refs.profile.set({
+          return refs.joinedEvent.set({
             createdAt: event.createdAt,
             featured: event.featured || false,
             owner: event.owner,
@@ -2033,6 +2034,7 @@ clmDataStoreFactory.$inject = [
   'routes',
   'spfAuth',
   'spfAuthData',
+  'spfCurrentUser',
   'spfCrypto',
   'clmServices',
   'clmServicesUrl'

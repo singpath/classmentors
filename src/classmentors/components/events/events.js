@@ -654,7 +654,7 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
             this.pw = '';
 
             this.join = function (pw) {
-                clmDataStore.events.join(self.event, self.profile, pw).then(function () {
+                clmDataStore.events.join(self.event, pw).then(function () {
                     spfAlert.success('You joined this event.');
                     $mdDialog.hide();
                     $route.reload();
