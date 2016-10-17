@@ -1739,6 +1739,11 @@ export function clmDataStoreFactory($window, $location, $q, $log, $http, $timeou
                 return loaded($firebaseArray(query));
             },
 
+            getForumStatus: function (eventId) {
+                var ref = db.ref(`classMentors/eventQuestions/${eventId}/closedForum`);
+                return loaded($firebaseObject(ref));
+            },
+
             questions: {
 
                 /**

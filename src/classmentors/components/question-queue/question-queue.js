@@ -33,12 +33,18 @@ function qqController(initialData, spfNavBarService, urlFor, firebaseApp, spfAle
     this.joinedEvents = initialData.joinedEvents;
     this.asstEvents = [];
 
-    console.log(self.joinedEvents);
-
     clmDataStore.events.getAssistingEvents(self.currentUser.publicId)
         .then(function (events) {
-            console.log(events);
+            // console.log(events);
             self.asstEvents = events;
+        })
+        .then(function () {
+            for(let index in self.asstEvents) {
+                let eventId = self.asstEvents[index].$id;
+                if(eventId) {
+                    resolveEventQuestions('asst', eventId);
+                }
+            }
         });
 
     for(let index in self.joinedEvents) {
@@ -63,7 +69,22 @@ function qqController(initialData, spfNavBarService, urlFor, firebaseApp, spfAle
             if(type=='created') {
                 self.createdEvents.find(e => e.$id == eventId).questions = questions;
             }
+            if(type=='asst') {
+                self.asstEvents.find(e => e.$id == eventId).questions = questions;
+            }
         });
+        clmDataStore.events.getForumStatus(eventId).then(function (status) {
+            // console.log(status.$value);
+            if(type=='joined') {
+                self.joinedEvents.find(e => e.$id == eventId).closedForum = status.$value;
+            }
+            if(type=='created') {
+                self.createdEvents.find(e => e.$id == eventId).closedForum = status.$value;
+            }
+            if(type=='asst') {
+                self.asstEvents.find(e => e.$id == eventId).closedForum = status.$value;
+            }
+        })
     }
 
     spfNavBarService.update('Question Queues');
@@ -118,6 +139,22 @@ function eventQController(initialData, spfNavBarService, urlFor, firebaseApp, sp
         }
     };
 
+    clmDataStore.events.getForumStatus(self.event.$id).then(function (status) {
+       self.event.closedForum = status.$value;
+    });
+
+    this.toggleForumStatus = function () {
+        if(self.event.closedForum) {
+            console.log('forum is now closed');
+            db.ref(`classMentors/events/${self.event.$id}/closedForum`).set(true);
+            db.ref(`classMentors/eventQuestions/${self.event.$id}/closedForum`).set(true);
+        } else {
+            console.log('forum is now open');
+            db.ref(`classMentors/events/${self.event.$id}/closedForum`).remove();
+            db.ref(`classMentors/eventQuestions/${self.event.$id}/closedForum`).remove();
+        }
+    };
+
     spfNavBarService.update(
         self.event.title,
     {
@@ -134,6 +171,18 @@ function eventQController(initialData, spfNavBarService, urlFor, firebaseApp, sp
                 ref.remove()
             } else {
                 return ref.set(Date.now());
+            }
+        }
+    };
+
+    this.toggleQnFlag = function (question) {
+        if(question.flagged) {
+            db.ref(`classMentors/eventQuestions/${self.event.$id}/questions/${question.$id}/flagged`).remove();
+        } else {
+            if(question.answeredBy) {
+                spfAlert.error('You cannot flag a question that has already been resolved!');
+            } else {
+                db.ref(`classMentors/eventQuestions/${self.event.$id}/questions/${question.$id}/flagged`).set(true);
             }
         }
     };
@@ -166,8 +215,8 @@ function eventQController(initialData, spfNavBarService, urlFor, firebaseApp, sp
                 });
                 clmDataStore.logging.inputLog({
                     action: "askQuestion",
-                    publicId: self.currentUser.publicId,
-                    eventId: self.event.$id,
+                    publicId: currentUser.publicId,
+                    eventId: event.$id,
                     timestamp: self.question.createdAt
                 });
             };
@@ -230,12 +279,25 @@ function oneQnController(initialData, spfNavBarService, urlFor, firebaseApp, spf
         }
     };
 
+    this.toggleQnFlag = function () {
+        if(self.question.flagged) {
+            db.ref(`classMentors/eventQuestions/${self.event.$id}/questions/${self.question.$id}/flagged`).remove();
+        } else {
+            if(self.question.answeredBy) {
+                spfAlert.error('You cannot flag a question that has already been resolved!');
+            } else {
+                db.ref(`classMentors/eventQuestions/${self.event.$id}/questions/${self.question.$id}/flagged`).set(true);
+            }
+        }
+    };
+
     this.toggleAskerChoice = function (answerId, accepted, answer) {
         var ref1 = db.ref(`classMentors/eventQuestions/${self.event.$id}/answers/${self.question.$id}/${answerId}/acceptedAt`);
         var ref2 = db.ref(`classMentors/eventQuestions/${self.event.$id}/questions/${self.question.$id}/answeredBy`);
         if(accepted) {
             ref1.remove();
             ref2.remove();
+            spfAlert.success('You have re-opened this question');
         } else {
             if(self.question.answeredBy) {
                 let oldAns = self.question.answeredBy;
@@ -245,6 +307,8 @@ function oneQnController(initialData, spfNavBarService, urlFor, firebaseApp, spf
             }
             ref1.set(Date.now());
             ref2.set(answer.$id);
+            db.ref(`classMentors/eventQuestions/${self.event.$id}/questions/${self.question.$id}/flagged`).remove();
+            spfAlert.success('You have marked this question as resolved');
         }
     };
 

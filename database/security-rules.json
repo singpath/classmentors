@@ -100,6 +100,7 @@
           ".write": "auth != null && root.child('auth/users').child(auth.uid).child('publicId').exists() && root.child('classMentors/events').child($eventId).child('owner/publicId').val() == root.child('auth/users').child(auth.uid).child('publicId').val()",
           "questions": {
             "$questionId": {
+              ".read": true,
               ".write": "auth != null && root.child('auth/users').child(auth.uid).child('publicId').exists() && root.child('classMentors/eventParticipants').child($eventId).child(root.child('auth/users').child(auth.uid).child('publicId').val()).exists()",
               ".validate": "newData.hasChildren(['title', 'body', 'owner', 'createdAt'])",
               "title": {
@@ -129,12 +130,17 @@
               "answeredBy": {
                 "$answerId": {}
               },
+              "flagged": {
+                ".read": true,
+                ".write": true
+              },
               "$other": {
                 ".validate": false
               }
             }
           },
           "answers": {
+            ".write": true,
             "$questionId": {
               "$answerId": {
                 "owner": {
@@ -161,6 +167,10 @@
                 "inResponseTo": {}
               }
             }
+          },
+          "closedForum": {
+            ".read": true,
+            ".write": "auth != null && root.child('auth/users').child(auth.uid).child('publicId').exists() && (root.child('classMentors/events').child($eventId).child('owner/publicId').val() == root.child('auth/users').child(auth.uid).child('publicId').val() || root.child('classMentors/eventParticipants').child($eventId).child(root.child('auth/users').child(auth.uid).child('publicId').val()).exists())"
           },
           "$other": {
             ".validate": false
