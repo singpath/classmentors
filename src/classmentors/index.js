@@ -132,9 +132,10 @@ export {module};
  * @param {{firebaseApp: string, singpathUrl: string, backendUrl: string}} options Application
  */
 export function bootstrap(options) {
-  const bootstrapModule = angular.module('classmentors.bootstrap', [module.name]);
-
   options = options || {};
+
+  const deps = options.extra ? [module.name, options.extra.name] : [module.name];
+  const bootstrapModule = angular.module('classmentors.bootstrap', deps);
 
   if (options.firebaseApp) {
     bootstrapModule.constant('firebaseApp', options.firebaseApp);

@@ -1,0 +1,5 @@
+0, 8
+Fork github https://github.com/singpath/classmentors
+
+10, 20
+Set the default branch to "gh-pages"
