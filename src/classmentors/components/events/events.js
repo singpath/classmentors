@@ -127,6 +127,7 @@ export function configRoute($routeProvider, routes) {
 
 
         })
+
         .when('/events/:eventId/:taskId/survey2/:surveyTask', {
 
             template: motiStratLearnTmpl,
@@ -218,8 +219,8 @@ function classMentorsEventResolver($q, spfAuth, spfAuthData, clmDataStore) {
     return $q.all({
         events: clmDataStore.events.list(),
         auth: spfAuth.$loaded(),
-        currentUser: spfAuthData.user().catch(function () {
-            return;
+        currentUser: spfAuthData.user().catch(function (error) {
+            return error;
         }),
         profile: clmDataStore.currentUserProfile(),
         createdEvents: clmDataStore.events.listCreatedEvents(),
@@ -590,7 +591,7 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
             self.participants.$indexFor(self.currentUser.publicId) > -1
         ) {
             options.push({
-                title: 'Leave',
+                title: 'Leave Event',
                 onClick: function () {
                     clmDataStore.events.leave(self.event.$id).then(function () {
                         $route.reload();
@@ -804,6 +805,7 @@ editEventCtrllInitialData.$inject = ['$q', '$route', 'spfAuthData', 'clmDataStor
  * EditEventCtrl
  *
  */
+
 function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataStore, firebaseApp, $firebaseArray) {
     var self = this;
 
@@ -820,7 +822,7 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
             this.nonArchivedTask.push(this.tasks[i]);
         }
     }
-    console.log("this event id isss:", this.event.$id);
+    // console.log("this event id isss:", this.event.$id);
     this.assistants = initialData.assistants;
     this.newPassword = '';
     this.isOwner = false;
@@ -829,7 +831,7 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
     //allow users to feature their events
     //retrieve the current featured status
     this.featureEvent = clmDataStore.events.getFeatured(this.event.$id);
-    
+
     //set the selection by user
     this.toggle = function () {
         if (this.featureEvent) {
@@ -840,9 +842,9 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
         }
         clmDataStore.events.setFeatured(this.event.$id, this.featureEvent);
         if (this.featureEvent) {
-            spfAlert.success("You have featured your event");
+            spfAlert.success("You have featured your event.");
         } else {
-            spfAlert.success("You have removed your event from being featured");
+            spfAlert.success("You have unfeatured your event.");
         }
 
     };
@@ -942,7 +944,7 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
         }
     };
 
-    self.eventChallengeBttnText = "Hide Challenges"
+    self.eventChallengeBttnText = "Hide Challenges";
     this.toggleTaskEditView = function () {
         if (self.showingTasks) {
             self.showingTasks = false;
@@ -969,7 +971,7 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
         clmDataStore.events.enableAssistantReviewing(eventId, assistantId).then(function () {
             spfAlert.success(assistantName + ' can now review event challenge submissions.');
         }).catch(function () {
-            spfAlert.error('Failed to change assistant rights');
+            spfAlert.error('Failed to change assistant rights.');
         });
     };
 
@@ -1050,7 +1052,7 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
 
     this.openTask = function (eventId, task) {
         var taskId = task.$id;
-        console.log('The task id is : ',taskId);
+        // console.log('The task id is : ',taskId);
         clmDataStore.events.openTask(eventId, taskId).then(function () {
             assignTeamLeaders(eventId, task);
             spfAlert.success('Challenge opened.');
@@ -1130,7 +1132,7 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
         });
     };
 }
-EditEventCtrl.$inject = ['initialData', 'spfNavBarService', 'urlFor', 'spfAlert', 'clmDataStore', 'firebaseApp', '$firebaseArray'];
+EditEventCtrl.$inject = ['initialData', 'spfNavBarService', 'urlFor', 'spfAlert', 'clmDataStore', 'firebaseApp', '$firebaseArray','$mdDialog','$location'];
 
 /**
  * AddEventTaskCtrl initial data
@@ -1234,10 +1236,6 @@ function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNav
             console.log('code is clicked');
             return 'Save';
 
-        } else if (tasktype == 'video') {
-            console.log('video is clicked');
-            return 'Continue';
-
         } else if (tasktype == 'teamActivity') {
             console.log('teamActivity is clicked');
             location = '/challenges/team-activity/create';
@@ -1267,12 +1265,12 @@ function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNav
     //this function double checks with user if he wishes to go back and discard all changes thus far
     this.discardChanges = function (ev) {
         var confirm = $mdDialog.confirm()
-            .title('You have not saved your input information')
+            .title('You have not save your challenge information')
             .textContent('All of the information input will be discarded. Are you sure you want to continue?')
-            .ariaLabel('Discard all')
+            .ariaLabel('Discard changes')
             .targetEvent(ev)
-            .ok('Discard All')
-            .cancel('Continue editing');
+            .ok('Discard Challenge')
+            .cancel('Continue Editing');
         $mdDialog.show(confirm).then(function () {
             // decided to discard data, bring user to previous page
             $location.path(urlFor('editEvent', {eventId: self.event.$id}));
@@ -1287,15 +1285,6 @@ function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNav
 
         var copy = cleanObj(task);
 
-        //check if user keys in http inside Link Pattern
-        var checkLinkPattern = copy.linkPattern;
-        if (checkLinkPattern != null) {
-            if (checkLinkPattern.indexOf("http:") > -1) {
-                checkLinkPattern = checkLinkPattern.replace("http:", "https:");
-            }
-            copy.linkPattern = checkLinkPattern;
-        }
-
         var data = {
             taskType: taskType,
             isOpen: isOpen,
@@ -1307,6 +1296,18 @@ function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNav
             delete copy.badge;
             delete copy.serviceId;
             delete copy.singPathProblem;
+
+            // console.log("it went here when create");
+            //check if user keys in http inside Link Pattern
+            var checkLinkPattern = copy.linkPattern;
+            if (checkLinkPattern != null) {
+                if (checkLinkPattern.indexOf("http:") > -1) {
+                    checkLinkPattern = checkLinkPattern.replace("http:", "https:");
+                }
+                copy.linkPattern = checkLinkPattern;
+            }
+
+
         } else if (copy.serviceId === 'singPath') {
             delete copy.badge;
             if (copy.singPathProblem) {
@@ -1326,7 +1327,7 @@ function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNav
 
 
         self.creatingTask = true;
-        if (taskType === 'multipleChoice' || taskType === 'journalling' || taskType === 'video' || taskType === 'survey' || taskType === 'teamActivity') {
+        if (taskType === 'multipleChoice' || taskType === 'journalling' || taskType === 'survey' || taskType === 'teamActivity') {
             var data = {
                 taskType: taskType,
                 isOpen: isOpen,
@@ -1462,13 +1463,17 @@ editEventTaskCtrlInitialData.$inject = ['$q', '$route', 'spfAuthData', 'clmDataS
 
 
 /**Todo: enable edit to multiple choice, index card, etc. **/
-function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmDataStore, eventService, $mdDialog, $location) {
+function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmDataStore, eventService, $mdDialog, $location, clmSurvey){
     var self = this;
 
+    // console.log("the initialdata looks like this:", initialData);
     this.event = initialData.event;
     this.badges = initialData.badges;
     this.taskId = initialData.taskId;
     this.task = initialData.task;
+
+    this.taskTitle = initialData.task.title;
+    // console.log(this.taskTitle);
 
     this.isOpen = Boolean(this.task.openedAt);
     this.savingTask = false;
@@ -1481,20 +1486,35 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
 
     if (this.task.serviceId) {
         this.taskType = 'service';
-
     } else if (this.task.linkPattern) {
         this.taskType = 'linkPattern';
-
     } else if (this.task.lang) {
         this.taskType = 'code';
-
+    } else if(this.task.toEdit) {
+        this.taskType = 'profileEdit';
+        this.selectedMetaData = this.task.toEdit;
+        // console.log(this.task.toEdit);
     } else if (this.task.textResponse) {
         this.taskType = 'textResponse';
-
     } else if (this.task.mcqQuestions) {
         this.taskType = 'multipleChoice';
-
+    } else if (this.task.survey){
+        this.taskType = 'survey';
     }
+
+    this.toggle = function (item, list) {
+        var idx = list.indexOf(item);
+        if (idx > -1) {
+            list.splice(idx, 1);
+        }
+        else {
+            list.push(item);
+        }
+    };
+
+    this.exists = function (item, list) {
+        return list.indexOf(item) > -1;
+    };
     // else if (this.task.profileEdit) {
     //     return 'Save';
     // }
@@ -1511,7 +1531,7 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
     }
 
     spfNavBarService.update(
-        this.task.title, [{
+      this.taskTitle, [{
             title: 'Events',
             url: `#${urlFor('events')}`
         }, {
@@ -1553,10 +1573,6 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
             console.log('code is clicked');
             return 'Save';
 
-        } else if (this.taskType == 'video') {
-            console.log('video is clicked');
-            return 'Continue';
-
         } else if (this.taskType == 'journalling') {
             console.log('journalling is clicked');
             return 'Continue';
@@ -1569,10 +1585,18 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
         } else if (this.tasktype === 'profileEdit') {
             return 'Save';
 
+        } else if (this.taskType == 'survey'){
+            clmSurvey.set(this.event.$id, this.event, this.task, this.taskType, this.isOpen);
+            var obj = clmSurvey.get();
+
+            location = 'challenges/survey/edit';
+            return 'Continue';
+
         } else {
             return 'Save';
         }
     };
+
 
     //this function double checks with user if he wishes to go back and discard all changes thus far
     this.discardChanges = function (ev) {
@@ -1593,15 +1617,6 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
     this.saveTask = function (event, taskId, task, taskType, isOpen) {
         var copy = cleanObj(task);
 
-        //check if user keys in http inside Link Pattern
-        var checkLinkPattern = copy.linkPattern;
-        if (checkLinkPattern != null) {
-            if (checkLinkPattern.indexOf("http:") > -1) {
-                checkLinkPattern = checkLinkPattern.replace("http:", "https:");
-            }
-            copy.linkPattern = checkLinkPattern;
-        }
-
         var data = {
             taskType: taskType,
             isOpen: isOpen,
@@ -1613,6 +1628,18 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
             delete copy.badge;
             delete copy.serviceId;
             delete copy.singPathProblem;
+
+            // console.log("it went here in edit");
+            //check if user keys in http inside Link Pattern
+            var checkLinkPattern = copy.linkPattern;
+            if (checkLinkPattern != null) {
+                if (checkLinkPattern.indexOf("http:") > -1) {
+                    checkLinkPattern = checkLinkPattern.replace("http:", "https:");
+                }
+                copy.linkPattern = checkLinkPattern;
+            }
+
+
         } else if (copy.serviceId === 'singPath') {
             delete copy.badge;
             if (copy.singPathProblem) {
@@ -1631,7 +1658,7 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
         }
 
         self.creatingTask = true;
-        if (taskType === 'multipleChoice' || taskType === 'journalling' || taskType === 'video' || taskType === 'survey') {
+        if (taskType === 'multipleChoice' || taskType === 'journalling' || taskType === 'survey') {
             var data = {
                 taskType: taskType,
                 isOpen: isOpen,
@@ -1640,7 +1667,11 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
             };
 
             spfNavBarService.update(
-                'New Challenge Details', [{
+                {
+                    title: this.event.title,
+                    url: `#${urlFor('oneEvent', {eventId: this.event.$id})}`
+                },
+                [{
                     title: 'Events',
                     url: `#${urlFor('events')}`
                 }, {
@@ -1671,6 +1702,7 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
                 return clmDataStore.events.closeTask(event.$id, taskId);
             }).then(function () {
                 spfAlert.success('Challenge saved.');
+                $location.path(urlFor('editEvent', {eventId: self.event.$id}));
             }).catch(function () {
                 spfAlert.error('Failed to save the challenge.');
             }).then(function () {
@@ -1687,10 +1719,9 @@ EditEventTaskCtrl.$inject = [
     'spfNavBarService',
     'clmDataStore',
     'eventService',
-    '$location',
     '$mdDialog',
     '$location',
-    'eventService'
+    'clmSurvey'
 ];
 
 
@@ -1755,14 +1786,14 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                         self.team = team;
                         self.teamLeader = team.teamLeader;
                         // Break execution.
-                        return true;                    
+                        return true;
                     }
                 })
             });
     };
 
     function currentTeams(){
-        
+
     }
 
     //Find superReviewUser rights
@@ -2025,7 +2056,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
 
 
     this.startMCQ = function (eventId, taskId, task, participant, userSolution) {
-        console.log("participant isss:", participant);
+        // console.log("participant isss:", participant);
         $location.path('/events/' + eventId + '/challenges/' + taskId + '/mcq/start');
     }
 
@@ -2076,7 +2107,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                 return promise;
             }).then(function (data) {
                 self.participantInfo = data;
-                console.log(self.participantInfo);
+                // console.log(self.participantInfo);
                 if (self.participantInfo.yearOfBirth) {
                     self.userData.yearOfBirth = self.participantInfo.yearOfBirth;
                 }
@@ -2223,7 +2254,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                     return result;
                 }),
                 selectedTeam: teamEventPromise.$loaded().then(function (result) {
-                    console.log(result);
+                    // console.log(result);
                     var teams = result;
                     for (var i = 0; i < teams.length; i++) {
                         var team = teams[i];
@@ -2245,7 +2276,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             self.selectedTeam = initialData.selectedTeam;
             self.teams = {};
             self.teams = initialData.teams;
-            console.log("self teams iss:", self.teams);
+
             // var teamMembers = [];
             //separate the names to be populated
             // for (var i = 0; i < self.teams.length; i++) {
@@ -2328,6 +2359,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             }
 
             function joinTeam(index) {
+                // console.log("index isss:", index);
                 var team = self.teams[index];
                 var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${team.$id}/${participant.$id}`);
                 // var currentSize = 0;
@@ -2366,6 +2398,9 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                             taskId: taskId
                         }
                     );
+                }).then(function(){
+                    //update progress asynchronously
+                    clmDataStore.events.submitSolution(eventId, taskId, participant.$id, "Team " + (index+1));
                 });
 
                 // console.log("self teams isss:", self.teams);
@@ -2446,7 +2481,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             }
 
             this.save = function (response) {
-                console.log("this response is: ", response);
+                // console.log("this response is: ", response);
                 //this line adds solution to firebase
                 clmDataStore.events.submitSolution(eventId, taskId, participant.$id, response).then(function () {
                     $mdDialog.hide();
@@ -2689,7 +2724,7 @@ function addSurveyEventTaskCtrlInitialData($q, $route, firebaseApp, $firebaseArr
     // var eventId = $route.current.params.eventId
     // var eventPromise = clmDataStore.events.get(eventId);
     var db = firebaseApp.database();
-    console.log("this firebaseapp database is", db);
+    // console.log("this firebaseapp database is", db);
     var errNoEvent = new Error('Event not found');
     var eventId = $route.current.params.eventId;
 
@@ -2857,7 +2892,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
 
         this.eduDissResp = {};
         this.questionJson = {};
-        console.log("this initialdata is", initialData.survey2[0]);
+        // console.log("this initialdata is", initialData.survey2[0]);
         //console.log("initial data before: ", initialData.survey2[0]);
         for (let i = 1; i < Object.keys(initialData.survey2[0]).length - 1; i++) {
 
@@ -2874,7 +2909,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
     var eduDissInvalid = true;
     $scope.$on("$routeChangeStart", function (event, next, current) {
         if (schEngageInvalid && motiStratInvalid && eduDissInvalid) {
-            if (!confirm("You have not finished this survey. Are you sure you want to continue? All data will be lost")) {
+            if (!confirm("You have not finish this survey. Are you sure you want to continue? All data will be lost")) {
                 event.preventDefault();
             }
         }
@@ -3043,7 +3078,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
         schEngageInvalid = true;
 
         var allResponses = true;
-        console.log("trying ", motiResp);
+        // console.log("trying ", motiResp);
         for (var i = 1; i < motiResp.length; i++) {
             if (motiResp[i][i + 1] === 0) {
                 allResponses = false;
@@ -3072,7 +3107,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             });
 
 
-            spfAlert.success('Survey response has been submitted.');
+            spfAlert.success('Survey responses have been submitted.');
             clmDataStore.events.saveSurveyResponseOnSubmit(taskId, eventId, userId, surveyType, motiResp);
             clmDataStore.events.submitSolution(eventId, taskId, userId, "Completed");
 
@@ -3134,7 +3169,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             });
 
 
-            spfAlert.success('Survey response has been submitted.');
+            spfAlert.success('Survey responses have been submitted.');
             //add into firebase
             clmDataStore.events.saveSurveyResponseOnSubmit(taskId, eventId, userId, surveyType, eduDissResp);
             clmDataStore.events.submitSolution(eventId, taskId, userId, "Completed");
@@ -3752,7 +3787,7 @@ function ClmEventResultsTableCtrl($scope, $q, $log, $mdDialog, $document,
             this.save = function () {
                 var editor = ace.edit(document.querySelector('#editor'));
                 var response = editor.getValue();
-                console.log("Function submitted for answer " + response);
+                // console.log("Function submitted for answer " + response);
                 clmDataStore.events.submitSolution(eventId, taskId, participant.$id, response).then(function () {
                     $mdDialog.hide();
                     spfAlert.success('Response is saved.');

@@ -54,70 +54,62 @@
 
         <div>
             <md-input-container>
+                <!--pattern="^((https|http)?://.+|#/).+$"-->
                 <label for="edit-task-link">Help Link</label>
                 <input type="text" name="editTaskLink" id="edit-task-link"
 
                     ng-model="ctrl.task.link"
-                    pattern="^(https?://.+|#/).+$"
+                    pattern ="^(((https|http)://|www.).+|#/).+$"
                     placeholder="URL to a challenge help page"
 
                 />
                 <div ng-messages="editTask.editTaskLink.$error">
-                    <div ng-message="pattern">Wrong format for an absolute or relative URL.</div>
+                    <div ng-message="pattern">Wrong format for an absolute or relative URL. Enter URL that starts with https://, http:// or www.</div>
                 </div>
             </md-input-container>
         </div>
-            <!--<md-switch class="md-primary" ng-model="ctrl.enableBeta" aria-label="closed?">-->
-                <!--*Enable BETA functions (WARNING: MAY BREAK STUFF)-->
-            <!--</md-switch>-->
         <div>
-            <h3>options</h3>
-            <p>
+            <h3>Challenge Options</h3>
                 <md-switch class="md-primary" ng-model="ctrl.isOpen" aria-label="closed?">
-                    Open
+                    <span ng-hide="!ctrl.isOpen">Challenge Open</span>
+                    <span ng-hide="ctrl.isOpen">Challenge Close</span>
                 </md-switch>
-            </p>
-            <p>
+
                 <md-switch class="md-primary" ng-model="ctrl.task.hidden" aria-label="hidden?">
-                    Hide
+                    <span ng-hide="!ctrl.task.hidden">Challenge Hidden</span>
+                    <span ng-hide="ctrl.task.hidden">Challenge Shown</span>
                 </md-switch>
-            </p>
 
-            <p>
                 <md-switch class="md-primary" ng-model="ctrl.task.archived" aria-label="Archived?">
-                    Archived
+                    <span ng-hide="!ctrl.task.archived">Challenge Archive</span>
+                    <span ng-hide="ctrl.task.archived">Challenge Available</span>
                 </md-switch>
-            </p>
 
-            <p>
                 <md-switch class="md-primary" ng-model="ctrl.task.showProgress" aria-label="show progress?">
-                    Show all participant progress.
+                    <span ng-hide="!ctrl.task.showProgress">Participants' Progress Shown to All</span>
+                    <span ng-hide="ctrl.task.showProgress">Participants' Progress Hidden to All</span>
                 </md-switch>
-            </p>
 
-            <p>
                 <md-switch class="md-primary" ng-model="ctrl.task.showLinks" aria-label="closed?">
-                    Show all participant solutions.
+                    <span ng-hide="!ctrl.task.showLinks">Participants' Solutions Shown to All</span>
+                    <span ng-hide="ctrl.task.showLinks">Participants' Solutions Hidden to All</span>
                 </md-switch>
-            </p>
-
         </div>
 
         <div>
-            <h3>Task type <small ng-if="!ctrl.taskType">(Required)</small></h3>
+            <h3>Task Type</h3>
             <md-radio-group ng-model="ctrl.taskType">
                 <table>
                     <tr>
                         <td style=' padding-bottom:80px;'>
                             <md-radio-button value="service" class="md-primary">Service / Badge / Problem</md-radio-button>
-                            <md-radio-button value="linkPattern" class="md-primary">Link pattern</md-radio-button>
+                            <md-radio-button value="linkPattern" class="md-primary">Link Pattern</md-radio-button>
                             <md-radio-button value="textResponse" class="md-primary">Text Response</md-radio-button>
                             <md-radio-button ng-disabled="!ctrl.enableBeta" value="multipleChoice" class="md-primary">Multiple Choice*</md-radio-button>
                             <md-radio-button value="code" class="md-primary">Code</md-radio-button>
                         </td>
-                        <td style='padding-left:30px; padding-bottom:80px;'>
+                        <td style='padding-left:30px; padding-bottom:120px;'>
                             <md-radio-button value="profileEdit" class="md-primary">Profile Update</md-radio-button>
-                            <md-radio-button ng-disabled="!ctrl.enableBeta" value="video" class="md-primary">Video*</md-radio-button>
                             <md-radio-button ng-disabled="!ctrl.enableBeta" value="journalling" class="md-primary">Journalling*</md-radio-button>
                             <md-radio-button ng-disabled="!ctrl.enableBeta" value="survey" class="md-primary">Survey*</md-radio-button>
                             <md-radio-button ng-disabled="!ctrl.enableBeta" value="teamActivity" class="md-primary">Team Activity*</md-radio-button>
@@ -195,14 +187,14 @@
 
         <div ng-if="ctrl.taskType == 'linkPattern'">
             <md-input-container>
-                <label for="edit-link-pattern">Link pattern</label>
+                <label for="edit-link-pattern">Link Pattern for Link Submissions</label>
                 <input type="text" name="editTaskLink" id="edit-link-pattern"
-
+                    ng-value="ctrl.task.linkPattern"
                     ng-model="ctrl.task.linkPattern"
                     required="true"
                     placeholer="Pattern"
-
                 />
+                <span><font color="red" size="2">E.g. Only google doc submission, link pattern is: "https://docs.google.com/"</font></span>
 
                 <div ng-messages="editTask.editTaskLink.$error">
                     <div ng-message="required">Required.</div>
@@ -214,29 +206,15 @@
             <md-input-container>
 
                 <label for="edit-text-response">Question</label>
-                <input type="text" name="editTextResponse" id="edit-text-response"
+                <textarea name="editTextResponse" id="edit-text-response"
                     ng-model="ctrl.task.textResponse"
-                    required="true"
-                    placeholer="Question"
-
-                />
+                    required
+                    placeholder="Question"
+                    rows="2" md-select-on-focus
+                ></textarea>
 
                 <div ng-messages="editTask.editTextResponse.$error">
                     <div ng-message="required">Required.</div>
-                </div>
-            </md-input-container>
-        </div>
-
-        <div ng-if="ctrl.taskType == 'indexCard'">
-            <md-input-container flex>
-                <label for="edit-max-cards">Maximum cards allowed</label>
-                <input type="number" name="editMaxCards" id="edit-max-cards"
-                       ng-model="ctrl.task.cards"
-                       min="0" step="1"
-                       placeholer="index Cards"
-                />
-                <div ng-messages="editTask.editTaskPriority.$error">
-                    <div ng-message="number">The max cards allowed should be a positive number.</div>
                 </div>
             </md-input-container>
         </div>
@@ -245,11 +223,12 @@
         <div ng-if="ctrl.taskType == 'code'">
             <md-input-container>
                 <label for="edit-text-response">Question</label>
-                <input type="text" name="editCodeQuestion" id="edit-code-question"
+                <textarea name="editCodeQuestion" id="edit-code-question"
                        ng-model="ctrl.task.textResponse"
                        required
                        placeholder="Question"
-                />
+                       rows="2" md-select-on-focus
+                ></textarea>
 
                 <div ng-messages="editTask.editCodeQuestion.$error">
                     <div ng-message="required">Required.</div>
@@ -262,12 +241,6 @@
                         {{opt}}
                     </md-option>
                 </md-select>
-            </md-input-container>
-        </div>
-
-        <div ng-if="ctrl.taskType == 'video'">
-            <md-input-container>
-                Video
             </md-input-container>
         </div>
 
@@ -290,7 +263,7 @@
             <!--TODO: 1. Create continue button controller to route to other views depending on challenge type-->
 
             <md-button type="submit" class="md-raised md-primary" ng-disabled="editTask.$invalid || !ctrl.taskType ||ctrl.savingTask">{{ ctrl.challengeRouteProvider(ctrl.taskType, ctrl.task, ctrl.isOpen)}}</md-button>
-            <md-button type="reset" class="md-raised" ng-click="ctrl.discardChanges($event)">Back</md-button>
+            <md-button type="button" class="md-accent" ng-click="ctrl.discardChanges($event)">Back</md-button>
 
         </div>
     </form>

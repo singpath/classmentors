@@ -14,7 +14,7 @@
                     >
                     <div ng-messages="provideLinkForm.linkSolution.$error">
                         <div ng-message="required">Required.</div>
-                        <div ng-message="cmContains">Invalid pattern.</div>
+                        <div ng-message="cmContains">Invalid pattern. Submit link that starts with <b>{{ctrl.task.linkPattern}}</b></div>
                     </div>
                 </md-input-container>
             </div>
@@ -25,7 +25,7 @@
                 <iframe ng-src="{{ctrl.solution}}" target="_parent" width = "800px" height = "700px"></iframe>
                 </div>
             </div>
-            <div class="md-dialog-actions" layout="row">
+            <div class="md-dialog-actions" align="center">
                 <md-button type="submit" class="md-primary md-raised" ng-if="!ctrl.review" ng-disabled="!provideLinkForm.$valid">
                     Save
                 </md-button>

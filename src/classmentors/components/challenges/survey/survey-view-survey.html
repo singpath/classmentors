@@ -1,32 +1,31 @@
 <md-content flex class="md-padding">
     <form name="surveyTask" ng-submit="ctrl.saveSurveyTask(ctrl.surveyType.name)">
         <div align="center">
-            <h2>Survey Challenge</h2>
+            <h3>Survey Challenge</h3>
         </div>
         <div align="center">
-            <h3>End of class survey</h3>
-        </div>
-        <div align="center">
-            <h3><i>How did you find this class? Take the following survey and provide feedback about what you liked
-                or</i>
-            </h3>
-            <h3><i>disliked about the class and classmentors as an in-class tool</i></h3>
+            <p>
+                Choose the appropriate survey to be administered as your end of class survey.
+                <span ng-hide="ctrl.currentSelected == 0 || ctrl.currentSelected == undefined"><br><br> Your previously selected survey is <b>{{ctrl.currentSelected}}</b></span>
+            </p>
         </div>
         <br>
         <div align="center" class="md-padding">
             <md-input-container align="center">
-                <md-select ng-model="ctrl.surveyType" style="width: 500px" placeholder="Please select a form">
+                <md-select ng-model="ctrl.surveyType" style="width: 500px" placeholder="Please select a survey template" ng-change="ctrl.checkSurveyValid()">
                     <md-optgroup label="Upload Standard Template">
                         <md-option ng-value="survey"
-                           ng-repeat="survey in ctrl.surveys">{{survey.name}}
+                           ng-repeat="survey in ctrl.surveys"
+                        >{{survey.name}}
                         </md-option>
                     </md-optgroup>
                 </md-select>
             </md-input-container>
         </div>
-        <!--ng-disabled="survey.name == 'Education vs Dissatisfaction with learning'"-->
+
         <div layout="row" layout-align="center center">
-            <md-button type="submit" class="md-raised">Submit</md-button>
+            <md-button type="submit" class="md-raised md-primary" ng-disabled="!ctrl.hasSurveyTitle">Save</md-button>
+            <md-button type="button" class="md-accent" ng-click="ctrl.discardChanges($event)">Cancel</md-button>
         </div>
     </form>
 </md-content>

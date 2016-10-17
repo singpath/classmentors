@@ -19,7 +19,7 @@ function loaded(syncObjOrArray) {
 export function tratQuestionFactory($q, spfAuthData, eventService, clmDataStore) {
     var self = this;
     self.data = eventService.get();
-    console.log("my data is:", self.data);
+    // console.log("my data is:", self.data);
     // var question = $q.all ({
     //     questions: angular.fromJson(data.task.mcqQuestions)
     // }).then (function (result){
@@ -84,6 +84,15 @@ export function configRoute($routeProvider, routes) {
             }
         })
 
+        .when(routes.editSurvey, {
+            template: survey.showSurveyTmpl,
+            controller: editsurveyFormEvent,
+            controllerAs: 'ctrl',
+            resolve: {
+                initialData: getTaskSurveyValues
+            }
+        })
+
         .when(routes.startMcq, {
             template: mcq.starMcqTmpl,
             controller: mcq.startMcqController,
@@ -125,7 +134,7 @@ configRoute.$inject = ['$routeProvider', 'routes'];
 
 function editMCQInitialData($q, eventService, clmDataStore) {
     var data = eventService.get();
-    console.log(data);
+    // console.log(data);
     return clmDataStore.events.getTaskAnswers(data.event.$id, data.task.$id).then(
         function (result) {
             return {
@@ -158,11 +167,13 @@ function startMCQInitialData($q, spfAuthData, eventService, clmDataStore, $route
         currentUser: spfAuthData.user(),
         answers: clmDataStore.events.getTaskAnswers(eventId, taskId),
         getProgress: clmDataStore.events.getProgress(eventId),
-        task: clmDataStore.events.getTask(eventId, taskId)
+        task: clmDataStore.events.getTask(eventId, taskId),
+        event: clmDataStore.events.get(eventId)
 
     }).then(function (result) {
-        console.log("result isss:", result);
+        // console.log("result isss:", result);
         return {
+            eventTitle: result.event.title,
             eventId: eventId,
             taskId: taskId,
             task: result.task,
@@ -229,9 +240,9 @@ export function challengeServiceFactory
             var db = firebaseApp.database();
             var copy = cleanObj(task);
             var answers = copy.answers;
-            console.log('COPY IS ... ', copy);
-
-            console.log('COPY IS!! ', copy);
+            // console.log('COPY IS ... ', copy);
+            //
+            // console.log('COPY IS!! ', copy);
             self.creatingTask = true;
             if (taskType === 'multipleChoice') {
                 delete copy.singPathProblem;
@@ -240,11 +251,11 @@ export function challengeServiceFactory
 
                 var ref = clmDataStore.events.addTaskWithAns(event.$id, copy, isOpen, answers);
                 ref.then(function () {
-                    spfAlert.success('Task created');
+                    spfAlert.success('Challenge created.');
                     $location.path(urlFor('editEvent', {eventId: event.$id}));
                 }).catch(function (err) {
                     $log.error(err);
-                    spfAlert.error('Failed to created new task');
+                    spfAlert.error('Failed to created new challenge.');
                 }).finally(function () {
                     self.creatingTask = false;
                 });
@@ -256,7 +267,7 @@ export function challengeServiceFactory
                 if (copy.link == "") {
                     delete copy.link;
                 }
-                console.log(copy);
+                // console.log(copy);
                 /*TODO:
                  1. Modify 'addTaskWithAns' to return firebase reference too? hmm.
                  2. Refactor once (1) is agreed upon.
@@ -269,11 +280,11 @@ export function challengeServiceFactory
                 var taskAnsRef = db.ref(`classMentors/eventAnswers/${event.$id}/${ref.key}`);
                 var teamFormationTaskRef = db.ref(`classMentors/eventTasks/${event.$id}`).push();
                 var tratTaskRef = db.ref(`classMentors/eventTasks/${event.$id}`).push();
-                console.log('Team Formation key: ', taskAnsRef.key)
+                // console.log('Team Formation key: ', taskAnsRef.key)
                 var eventTeamsRef = db.ref(`classMentors/eventTeams/${event.$id}/${teamFormationTaskRef.key}`);
-                console.log(event.$id);
+                // console.log(event.$id);
                 // Check If key
-                console.log(teamFormationTaskRef.key);
+                // console.log(teamFormationTaskRef.key);
                 var priority = copy.priority;
                 // Set openedAt, closedAt timestamp.
                 if (isOpen) {
@@ -288,7 +299,7 @@ export function challengeServiceFactory
                 promise.then(function () {
                     // Save answers.
                     console.log('Task answers set.');
-                    console.log(taskAnsRef);
+                    // console.log(taskAnsRef);
                     return taskAnsRef.set(answers);
                 }).then(function () {
                     // Define 'teamFormationTask'.
@@ -340,7 +351,7 @@ export function challengeServiceFactory
                 }).then(function () {
                     console.log('TRAT set.');
                     console.log('Events Created');
-                    spfAlert.success('Task saved');
+                    spfAlert.success('Challenge saved');
                     $location.path(urlFor('editEvent', {eventId: event.$id}));
                 });
             }
@@ -387,10 +398,10 @@ export function challengeServiceFactory
 
                 return clmDataStore.events.closeTask(event.$id, taskId);
             }).then(function () {
-                spfAlert.success('Task saved');
+                spfAlert.success('Challenge saved.');
                 $location.path(urlFor('editEvent', {eventId: event.$id}));
             }).catch(function () {
-                spfAlert.error('Failed to save the task.');
+                spfAlert.error('Failed to save the challenge.');
             }).finally(function () {
                 self.savingTask = false;
             });
@@ -406,7 +417,7 @@ challengeServiceFactory.$inject =
 //
 // }
 
-function surveyFormEvent($scope, clmSurvey, clmDataStore, $log, spfAlert, $location, urlFor) {
+function surveyFormEvent($scope, clmSurvey, clmDataStore, $log, spfAlert, $location, urlFor,$mdDialog) {
 
     this.surveys = [
         {id: 1, name: 'Education vs Dissatisfaction with learning'},
@@ -416,13 +427,27 @@ function surveyFormEvent($scope, clmSurvey, clmDataStore, $log, spfAlert, $locat
     ];
     //TODO: retrieve selected value, add task into firebase
     var sharedData = clmSurvey.get();
-    //console.log("surveyFormEvent eventId : " + sharedData.taskType);
     var getTask = sharedData.task;
     var self = this;
 
+    // console.log("my survey temp is ", self.surveyType);
+
+    self.hasSurveyTitle = false;
+
+    //check if survey template has been selected.
+    this.checkSurveyValid = function(){
+        if(self.surveyType == 0 || self.surveyType == undefined){
+            self.hasSurveyTitle = false;
+        }else{
+            self.hasSurveyTitle = true;
+        }
+    };
+
+    // console.log("the survey t/f is", self.hasSurveyTitle);
+
     this.saveSurveyTask = function (surveyType) {
         var copy = cleanObj(getTask);
-        console.log('my copy is ', copy);
+        // console.log('my copy is ', copy);
         if (sharedData.taskType === 'linkPattern') {
             delete copy.badge;
             delete copy.serviceId;
@@ -445,10 +470,10 @@ function surveyFormEvent($scope, clmSurvey, clmDataStore, $log, spfAlert, $locat
         }
 
         self.creatingTask = true;
-        console.log("survey type is " + surveyType);
+        // console.log("survey type is " + surveyType);
         copy.survey = surveyType;
         clmDataStore.events.addTask(sharedData.eventId, copy, sharedData.isOpen).then(function () {
-            spfAlert.success('Challenge created');
+            spfAlert.success('Challenge created.');
             $location.path(urlFor('editEvent', {eventId: sharedData.eventId}));
         }).catch(function (err) {
             $log.error(err);
@@ -458,6 +483,20 @@ function surveyFormEvent($scope, clmSurvey, clmDataStore, $log, spfAlert, $locat
         });
     };
 
+    this.discardChanges = function (ev){
+        var confirm = $mdDialog.confirm()
+            .title('Would you like to discard your changes?')
+            .textContent('All of the information input will be discarded. Are you sure you want to continue?')
+            .ariaLabel('Discard changes')
+            .targetEvent(ev)
+            .ok('Cancel Editing')
+            .cancel('Continue Editing');
+        $mdDialog.show(confirm).then(function() {
+            // decided to discard data, bring user to previous page
+            $location.path(urlFor('editEvent', {eventId: sharedData.event.$id}));
+        })
+    }
+
 }
 surveyFormEvent.$inject = [
     '$scope',
@@ -466,7 +505,144 @@ surveyFormEvent.$inject = [
     '$log',
     'spfAlert',
     '$location',
-    'urlFor'
+    'urlFor',
+    '$mdDialog'
+];
+
+function editsurveyFormEvent($scope, clmSurvey, clmDataStore, $log, spfAlert, $location, urlFor,spfNavBarService,eventService, $mdDialog) {
+
+    //todo: sheryl comment to add corner cases checking; only allow edit when 1. there are no submission for the challenge 2. the challenge is closed (avoid race conditions)
+    this.surveys = [
+        {id: 1, name: 'Education vs Dissatisfaction with learning'},
+        {id: 2, name: 'Motivated strategies for learning'},
+        {id: 3, name: 'School engagement scale'}
+
+    ];
+    //TODO: retrieve selected value, add task into firebase
+    var sharedData = clmSurvey.get();
+    var getTask = sharedData.task;
+    var self = this;
+
+    self.currentSelected = sharedData.task.survey;
+
+    console.log(self.currentSelected);
+
+    //NOTE: no need to check for valid cause you cannot deselect your previous option.
+    self.hasSurveyTitle = false;
+
+    //check if survey template has been selected.
+    this.checkSurveyValid = function(){
+        // self.currentSelected = self.surveyType.name;
+
+        if(self.surveyType == 0 || self.surveyType == undefined){
+            self.hasSurveyTitle = false;
+        }else{
+            self.hasSurveyTitle = true;
+        }
+    };
+
+    spfNavBarService.update(
+        sharedData.task.title, [{
+            title: 'Events',
+            url: `#${urlFor('events')}`
+        }, {
+            title: sharedData.event.title,
+            url: `#${urlFor('oneEvent', {eventId: sharedData.event.$id})}`
+        }, {
+            title: 'Challenges',
+            url: `#${urlFor('editEvent', {eventId: sharedData.event.$id})}`
+        }]
+    );
+
+    this.saveSurveyTask = function (surveyType) {
+        var copy = cleanObj(getTask);
+
+        // console.log('my copy is ', copy);
+        if (sharedData.taskType === 'linkPattern') {
+            delete copy.badge;
+            delete copy.serviceId;
+            delete copy.singPathProblem;
+        } else if (copy.serviceId === 'singPath') {
+            delete copy.badge;
+            if (copy.singPathProblem) {
+                copy.singPathProblem.path = cleanObj(getTask.singPathProblem.path);
+                copy.singPathProblem.level = cleanObj(getTask.singPathProblem.level);
+                copy.singPathProblem.problem = cleanObj(getTask.singPathProblem.problem);
+            }
+        } else {
+            delete copy.singPathProblem;
+            copy.badge = cleanObj(getTask.badge);
+        }
+
+        if (!copy.link) {
+            // delete empty link. Can't be empty string
+            delete copy.link;
+        }
+
+
+        //copied & pasted
+        self.creatingTask = true;
+        copy.survey = surveyType;
+        var data = {
+            taskType: copy.survey,
+            isOpen: sharedData.isOpen,
+            event: sharedData.event,
+            task: getTask
+        };
+
+            eventService.set(data);
+
+            $location.path(location);
+
+            self.savingTask = true;
+            clmDataStore.events.updateTask(sharedData.eventId, sharedData.task.$id, copy).then(function () {
+                if (
+                    (sharedData.isOpen && sharedData.task.openedAt) ||
+                    (!sharedData.isOpen && sharedData.task.closedAt)
+                ) {
+                    return;
+                } else if (sharedData.isOpen) {
+                    return clmDataStore.events.openTask(sharedData.eventId, sharedData.task.$id);
+                }
+
+                return clmDataStore.events.closeTask(sharedData.eventId, sharedData.task.$id);
+            }).then(function () {
+                $location.path(urlFor('editEvent', {eventId: sharedData.event.$id}));
+                spfAlert.success('Challenge saved.');
+            }).catch(function () {
+                spfAlert.error('Failed to save the challenge.');
+            }).then(function () {
+                self.savingTask = false;
+            });
+
+    };
+
+    this.discardChanges = function (ev){
+        var confirm = $mdDialog.confirm()
+            .title('Would you like to discard your changes?')
+            .textContent('All of the information input will be discarded. Are you sure you want to continue?')
+            .ariaLabel('Discard changes')
+            .targetEvent(ev)
+            .ok('Cancel Editing')
+            .cancel('Continue Editing');
+        $mdDialog.show(confirm).then(function() {
+            // decided to discard data, bring user to previous page
+            $location.path(urlFor('editEvent', {eventId: sharedData.event.$id}));
+        })
+    }
+
+}
+editsurveyFormEvent.$inject = [
+    '$scope',
+    'clmSurvey',
+    'clmDataStore',
+    '$log',
+    'spfAlert',
+    '$location',
+    'urlFor',
+    'spfNavBarService',
+    'eventService',
+    '$mdDialog'
 ];
 
 
