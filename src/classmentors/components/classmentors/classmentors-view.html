@@ -39,7 +39,9 @@
                 </md-button>
             </md-item-content>
             <md-item-content>
-                <md-button class="md-padding" href="#{{ 'questionQueue' | urlFor }}">
+                <md-button ng-model="navQQ"
+                           ng-click="ctrl.navClick('navQQ')"
+                           ng-style="ctrl.navQQ" class="md-padding" href="#{{ 'questionQueue' | urlFor }}">
                     <md-icon class="material-icons">whatshot</md-icon>
                     Question Queue
                 </md-button>
