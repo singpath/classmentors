@@ -319,7 +319,7 @@ function oneQnController(initialData, spfNavBarService, urlFor, firebaseApp, spf
             } else {
                 action = 'questionResolvedByPeers';
             }
-            clmDataStore.logging({
+            clmDataStore.logging.inputLog({
                 publicId: self.currentUser.publicId,
                 action: action,
                 timestamp: Date.now(),
