@@ -41,6 +41,8 @@ import responseTmpl from './events-view-provide-response.html!text';
 import editProfileTmpl from './events-view-edit-profile.html!text';
 import codeTmpl from './events-view-provide-code.html!text';
 import mcqTmpl from './events-view-provide-mcq.html!text';
+import voteQuestionTmpl from './events-view-provide-voteQuestion.html!text';
+import reviewQuestionTmpl from './events-view-provide-reviewQuestion.html!text';
 import './events.css!';
 import ace from 'ace';
 import 'ace/theme-monokai.js';
