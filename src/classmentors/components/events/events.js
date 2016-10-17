@@ -1052,7 +1052,7 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
 
     this.openTask = function (eventId, task) {
         var taskId = task.$id;
-        console.log('The task id is : ',taskId);
+        // console.log('The task id is : ',taskId);
         clmDataStore.events.openTask(eventId, taskId).then(function () {
             assignTeamLeaders(eventId, task);
             spfAlert.success('Challenge opened.');
@@ -1297,7 +1297,7 @@ function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNav
             delete copy.serviceId;
             delete copy.singPathProblem;
 
-            console.log("it went here when create");
+            // console.log("it went here when create");
             //check if user keys in http inside Link Pattern
             var checkLinkPattern = copy.linkPattern;
             if (checkLinkPattern != null) {
@@ -1334,7 +1334,7 @@ function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNav
                 event: event,
                 task: task
             };
-            console.log('Data shows... ', data);
+            // console.log('Data shows... ', data);
             spfNavBarService.update(
                 'Challenge Details', [{
                     title: 'Events',
@@ -1473,7 +1473,7 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
     this.task = initialData.task;
 
     this.taskTitle = initialData.task.title;
-    console.log(this.taskTitle);
+    // console.log(this.taskTitle);
 
     this.isOpen = Boolean(this.task.openedAt);
     this.savingTask = false;
@@ -1493,7 +1493,7 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
     } else if(this.task.toEdit) {
         this.taskType = 'profileEdit';
         this.selectedMetaData = this.task.toEdit;
-        console.log(this.task.toEdit);
+        // console.log(this.task.toEdit);
     } else if (this.task.textResponse) {
         this.taskType = 'textResponse';
     } else if (this.task.mcqQuestions) {
@@ -1629,7 +1629,7 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
             delete copy.serviceId;
             delete copy.singPathProblem;
 
-            console.log("it went here in edit");
+            // console.log("it went here in edit");
             //check if user keys in http inside Link Pattern
             var checkLinkPattern = copy.linkPattern;
             if (checkLinkPattern != null) {
@@ -2056,7 +2056,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
 
 
     this.startMCQ = function (eventId, taskId, task, participant, userSolution) {
-        console.log("participant isss:", participant);
+        // console.log("participant isss:", participant);
         $location.path('/events/' + eventId + '/challenges/' + taskId + '/mcq/start');
     }
 
@@ -2107,7 +2107,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                 return promise;
             }).then(function (data) {
                 self.participantInfo = data;
-                console.log(self.participantInfo);
+                // console.log(self.participantInfo);
                 if (self.participantInfo.yearOfBirth) {
                     self.userData.yearOfBirth = self.participantInfo.yearOfBirth;
                 }
@@ -2254,7 +2254,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                     return result;
                 }),
                 selectedTeam: teamEventPromise.$loaded().then(function (result) {
-                    console.log(result);
+                    // console.log(result);
                     var teams = result;
                     for (var i = 0; i < teams.length; i++) {
                         var team = teams[i];
@@ -2359,7 +2359,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             }
 
             function joinTeam(index) {
-                console.log("index isss:", index);
+                // console.log("index isss:", index);
                 var team = self.teams[index];
                 var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${team.$id}/${participant.$id}`);
                 // var currentSize = 0;
@@ -2481,7 +2481,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             }
 
             this.save = function (response) {
-                console.log("this response is: ", response);
+                // console.log("this response is: ", response);
                 //this line adds solution to firebase
                 clmDataStore.events.submitSolution(eventId, taskId, participant.$id, response).then(function () {
                     $mdDialog.hide();
@@ -2724,7 +2724,7 @@ function addSurveyEventTaskCtrlInitialData($q, $route, firebaseApp, $firebaseArr
     // var eventId = $route.current.params.eventId
     // var eventPromise = clmDataStore.events.get(eventId);
     var db = firebaseApp.database();
-    console.log("this firebaseapp database is", db);
+    // console.log("this firebaseapp database is", db);
     var errNoEvent = new Error('Event not found');
     var eventId = $route.current.params.eventId;
 
@@ -2892,7 +2892,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
 
         this.eduDissResp = {};
         this.questionJson = {};
-        console.log("this initialdata is", initialData.survey2[0]);
+        // console.log("this initialdata is", initialData.survey2[0]);
         //console.log("initial data before: ", initialData.survey2[0]);
         for (let i = 1; i < Object.keys(initialData.survey2[0]).length - 1; i++) {
 
@@ -3078,7 +3078,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
         schEngageInvalid = true;
 
         var allResponses = true;
-        console.log("trying ", motiResp);
+        // console.log("trying ", motiResp);
         for (var i = 1; i < motiResp.length; i++) {
             if (motiResp[i][i + 1] === 0) {
                 allResponses = false;
@@ -3787,7 +3787,7 @@ function ClmEventResultsTableCtrl($scope, $q, $log, $mdDialog, $document,
             this.save = function () {
                 var editor = ace.edit(document.querySelector('#editor'));
                 var response = editor.getValue();
-                console.log("Function submitted for answer " + response);
+                // console.log("Function submitted for answer " + response);
                 clmDataStore.events.submitSolution(eventId, taskId, participant.$id, response).then(function () {
                     $mdDialog.hide();
                     spfAlert.success('Response is saved.');
