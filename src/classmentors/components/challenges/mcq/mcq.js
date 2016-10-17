@@ -233,7 +233,7 @@ editMcqController.$inject = [
     '$location'
 ];
 
-export function startMcqController(initialData, challengeService, clmDataStore, $location, $mdDialog,urlFor, spfAlert, $scope ){
+export function startMcqController(initialData, challengeService, clmDataStore, $location, $mdDialog,urlFor, spfAlert, $scope,spfNavBarService ){
   var self = this;
 
   var mcqInvalid = true;
@@ -254,7 +254,7 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
   var userId = data.currentUser.publicId;
 
   var correctAnswers = angular.fromJson(data.correctAnswers.$value);
-  console.log('correctans:',correctAnswers);
+  // console.log('correctans:',correctAnswers);
   self.task = data.task;
   var quesFromJson = angular.fromJson(self.task.mcqQuestions);
   self.questions = quesFromJson;
@@ -264,6 +264,21 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
 
   // what is dah output?
   //console.log(self.multipleAns);
+
+  //update navbar herrre. 5566
+
+  // console.log("all the data is ",data);
+
+  spfNavBarService.update(
+      data.task.title, [{
+        title: 'Events',
+        url: `#${urlFor('events')}`
+      }, {
+        title: data.eventTitle,// modify initialdata
+        url: `#${urlFor('oneEvent', {eventId: eventId})}`
+      }]
+  );
+
 
   function initMultipleAns(correctAnswers){
     var multipleAnsList = [];
@@ -381,7 +396,8 @@ startMcqController.$inject = [
     '$mdDialog',
     'urlFor',
     'spfAlert',
-    '$scope'
+    '$scope',
+    'spfNavBarService'
 ];
 
 export function newMcqController(initialData, challengeService, $filter,$mdDialog,urlFor,$location){

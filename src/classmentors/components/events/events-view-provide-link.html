@@ -14,7 +14,7 @@
                     >
                     <div ng-messages="provideLinkForm.linkSolution.$error">
                         <div ng-message="required">Required.</div>
-                        <div ng-message="cmContains">Invalid pattern.</div>
+                        <div ng-message="cmContains">Invalid pattern. Submit link that starts with <b>{{ctrl.task.linkPattern}}</b></div>
                     </div>
                 </md-input-container>
             </div>

@@ -1285,15 +1285,6 @@ function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNav
 
         var copy = cleanObj(task);
 
-        //check if user keys in http inside Link Pattern
-        var checkLinkPattern = copy.linkPattern;
-        if (checkLinkPattern != null) {
-            if (checkLinkPattern.indexOf("http:") > -1) {
-                checkLinkPattern = checkLinkPattern.replace("http:", "https:");
-            }
-            copy.linkPattern = checkLinkPattern;
-        }
-
         var data = {
             taskType: taskType,
             isOpen: isOpen,
@@ -1305,6 +1296,18 @@ function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNav
             delete copy.badge;
             delete copy.serviceId;
             delete copy.singPathProblem;
+
+            console.log("it went here when create");
+            //check if user keys in http inside Link Pattern
+            var checkLinkPattern = copy.linkPattern;
+            if (checkLinkPattern != null) {
+                if (checkLinkPattern.indexOf("http:") > -1) {
+                    checkLinkPattern = checkLinkPattern.replace("http:", "https:");
+                }
+                copy.linkPattern = checkLinkPattern;
+            }
+
+
         } else if (copy.serviceId === 'singPath') {
             delete copy.badge;
             if (copy.singPathProblem) {
@@ -1614,15 +1617,6 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
     this.saveTask = function (event, taskId, task, taskType, isOpen) {
         var copy = cleanObj(task);
 
-        //check if user keys in http inside Link Pattern
-        var checkLinkPattern = copy.linkPattern;
-        if (checkLinkPattern != null) {
-            if (checkLinkPattern.indexOf("http:") > -1) {
-                checkLinkPattern = checkLinkPattern.replace("http:", "https:");
-            }
-            copy.linkPattern = checkLinkPattern;
-        }
-
         var data = {
             taskType: taskType,
             isOpen: isOpen,
@@ -1634,6 +1628,18 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
             delete copy.badge;
             delete copy.serviceId;
             delete copy.singPathProblem;
+
+            console.log("it went here in edit");
+            //check if user keys in http inside Link Pattern
+            var checkLinkPattern = copy.linkPattern;
+            if (checkLinkPattern != null) {
+                if (checkLinkPattern.indexOf("http:") > -1) {
+                    checkLinkPattern = checkLinkPattern.replace("http:", "https:");
+                }
+                copy.linkPattern = checkLinkPattern;
+            }
+
+
         } else if (copy.serviceId === 'singPath') {
             delete copy.badge;
             if (copy.singPathProblem) {
