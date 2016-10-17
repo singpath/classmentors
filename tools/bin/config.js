@@ -12,27 +12,27 @@ const config = Object.assign({}, {
 });
 const externals = [{
   name: 'angular',
-  entry: 'angular/angular.js',
+  entry: 'angular',
   globalName: 'angular'
 }, {
   name: 'angular-route',
-  entry: 'angular-route/angular-route.js',
+  entry: 'angular-route',
   globalName: 'angular'
 }, {
   name: 'angular-messages',
-  entry: 'angular-messages/angular-messages.js',
+  entry: 'angular-messages',
   globalName: 'angular'
 }, {
   name: 'angular-aria',
-  entry: 'angular-aria/angular-aria.js',
+  entry: 'angular-aria',
   globalName: 'angular'
 }, {
   name: 'angular-animate',
-  entry: 'angular-animate/angular-animate.js',
+  entry: 'angular-animate',
   globalName: 'angular'
 }, {
   name: 'angular-material',
-  entry: 'angular-material/angular-material.js',
+  entry: 'angular-material',
   globalName: 'angular'
 }, {
   name: 'firebase',
