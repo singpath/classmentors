@@ -316,6 +316,8 @@ function oneQnController(initialData, spfNavBarService, urlFor, firebaseApp, spf
                 action = 'questionResolvedByEducator';
             } else if(self.event.assistants[answer.owner.publicId]) {
                 action = 'questionResolvedByAssistant';
+            } else if(answer.owner.publicId == self.question.owner.publicId) {
+                action = 'questionResolvedBySelf';
             } else {
                 action = 'questionResolvedByPeers';
             }
