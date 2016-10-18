@@ -263,6 +263,7 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
     self.totalScore = 0;
     //Init team log
     self.teamLog = null;
+    //print out question number and number of attempts first
 
     function refreshLog() {
         $firebaseArray(teamLogRef.orderByKey()).$loaded(function (data) {
@@ -278,6 +279,8 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
             refreshLog();
         });
     };
+
+    updateLog(buildMessage("Question " + (self.index + 1), 'Remaining attempts: ' + self.noOfTries, 'black'));
 
     self.submitTrat = function () {
         $location.path(urlFor('oneEvent'));
@@ -322,9 +325,6 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
 
     var attempts = [];
     self.nextQuestion = function(){
-        // console.log(userAnswers);
-        // console.log('Curr index ', self.index);
-        // console.log(self.questions.length);
         // For Single answer MCQ
         if (self.selected != null) {
             var tempArray = [];
@@ -332,13 +332,13 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
             var result = markQuestions(tempArray, self.index);
             if(result == 0){
                 self.noOfTries -= 1;
-                updateLog(buildMessage("Incorrect", 'Remaining attempts: ' + self.noOfTries, '#A9241C'));
+                updateLog(buildMessage("Question " + (self.index + 1) + ": " + "Incorrect", 'Remaining attempts: ' + self.noOfTries, '#A9241C'));
                 console.log(self.team);
                 // Store reccord
                 attempts.push(tempArray);
                 // console.log('Current attempts: ', attempts);
                 if(self.noOfTries == 0){
-                    updateLog(buildMessage("Incorrect", 'No attempts remaining', '#A9241C'));
+                    updateLog(buildMessage("Question " + (self.index + 1) + ": " + "Incorrect", 'No attempts remaining', '#A9241C'));
                     self.totalScore += 0;
                     if(self.index == self.questions.length - 1){
                         userAnswers.push(attempts);
@@ -351,29 +351,27 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
                         self.noOfTries = 3;
                         userAnswers.push(attempts);
                         attempts = [];
-                        updateLog(buildMessage("New Question ", 'Remaining attempts: ' + self.noOfTries, 'black'));
                         self.question = loadQuestion(self.index += 1, self.questions);
+                        updateLog(buildMessage("Question " + (self.index + 1), 'Remaining attempts: ' + self.noOfTries, 'black'));
                         self.options = loadOptions(self.question);
                     }
                 }
-                for(var member in self.team) {
-                    let publicId = self.team[member].$id;
-                    if(publicId.indexOf("teamLeader") < 0) {
-                        clmDataStore.logging.inputLog(
-                            {
-                                publicId: publicId,
-                                timestamp: TIMESTAMP,
-                                action: "wrongTeamSubmission",
-                                taskId: self.tratId,
-                                eventId: self.eventId
-                            }
-                        )
+                clmDataStore.logging.inputLog(
+                    {
+                        publicId: publicId,
+                        timestamp: TIMESTAMP,
+                        action: "wrongTeamSubmission",
+                        taskId: self.tratId,
+                        eventId: self.eventId,
+                        members: self.team.map(function (member) {
+                            return member.$id;
+                        })
                     }
-                }
+                )
             }else{
                 // Add score if correct
                 self.totalScore += addScore(self.noOfTries, 1);
-                updateLog(buildMessage("Correct!", 'Remaining attempts: ' + self.noOfTries, '#259b24'));
+                updateLog(buildMessage("Question " + (self.index + 1) + ": " + "Correct!", 'Remaining attempts: ' + self.noOfTries, '#259b24'));
                 attempts.push(tempArray);
                 if(self.index == self.questions.length - 1){
                         userAnswers.push(attempts);
@@ -386,24 +384,22 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
                     self.noOfTries = 3;
                     userAnswers.push(attempts);
                     attempts = [];
-                    updateLog(buildMessage("New Question ", 'Remaining attempts: ' + self.noOfTries, 'black'));
                     self.question = loadQuestion(self.index += 1, self.questions);
+                    updateLog(buildMessage("Question " + (self.index + 1), 'Remaining attempts: ' + self.noOfTries, 'black'));
                     self.options = loadOptions(self.question);
                 }
-                for(var member in self.team) {
-                    let publicId = self.team[member].$id;
-                    if(publicId.indexOf("teamLeader") < 0) {
-                        clmDataStore.logging.inputLog(
-                            {
-                                publicId: publicId,
-                                timestamp: TIMESTAMP,
-                                action: "correctTeamSubmission",
-                                taskId: self.tratId,
-                                eventId: self.eventId
-                            }
-                        )
+                clmDataStore.logging.inputLog(
+                    {
+                        publicId: publicId,
+                        timestamp: TIMESTAMP,
+                        action: "wrongTeamSubmission",
+                        taskId: self.tratId,
+                        eventId: self.eventId,
+                        members: self.team.map(function (member) {
+                            return member.$id;
+                        })
                     }
-                }
+                )
             }
             // console.log(self.totalScore);
             // teamAns(tempArray);
@@ -414,8 +410,7 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
                 self.noOfTries -= 1;
                 // Store reccord
                 attempts.push(self.multiAns);
-                console.log('Current attempts: ', attempts);
-                updateLog(buildMessage("Incorrect", 'Remaining attempts: ' + self.noOfTries, '#A9241C'));
+                updateLog(buildMessage("Question " + (self.index + 1) + ": " + "Incorrect", 'Remaining attempts: ' + self.noOfTries, '#A9241C'));
                 if(self.noOfTries == 0){
                     self.totalScore += 0;
                     if(self.index == self.questions.length - 1){
@@ -428,8 +423,8 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
                         self.noOfTries = 3;
                         userAnswers.push(attempts);
                         attempts = [];
-                        updateLog(buildMessage("New Question ", 'Remaining attempts: ' + self.noOfTries, 'black'));
                         self.question = loadQuestion(self.index += 1, self.questions);
+                        updateLog(buildMessage("Question " + (self.index + 1), 'Remaining attempts: ' + self.noOfTries, 'black'));
                         self.options = loadOptions(self.question);
                     }
                 }
@@ -458,7 +453,7 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
                 // console.log('index is : ',self.index);
                 attempts.push(self.multiAns);
                 self.totalScore += addScore(self.noOfTries, 1);
-                updateLog(buildMessage("Correct!", 'Remaining attempts: ' + self.noOfTries, '#259b24'));
+                updateLog(buildMessage("Question " + (self.index + 1) + ": " + "Correct!", 'Remaining attempts: ' + self.noOfTries, '#259b24'));
                 if(self.index == self.questions.length - 1){
                     userAnswers.push(attempts);
                     attempts = [];
@@ -471,8 +466,8 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
                     self.noOfTries = 3;
                     userAnswers.push(attempts);
                     attempts = [];
-                    updateLog(buildMessage("New Question ", 'Remaining attempts: ' + self.noOfTries, 'black'));
                     self.question = loadQuestion(self.index += 1, self.questions);
+                    updateLog(buildMessage("Question " + (self.index + 1), 'Remaining attempts: ' + self.noOfTries, 'black'));
                     self.options = loadOptions(self.question);
                 }
                 for(var member in self.team) {

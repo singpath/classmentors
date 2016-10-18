@@ -1,7 +1,12 @@
 /**
  * classmentors/services.js
  */
-/* eslint no-underscore-dangle: "off" */
+/* eslint
+ no-underscore-dangle: "off",
+ no-unused-vars: "off",
+ max-len: "off",
+ valid-jsdoc: "off"
+*/
 import {cleanObj} from 'singpath-core/services/firebase.js';
 import camelCase from 'lodash.camelcase';
 
@@ -409,6 +414,7 @@ export function clmDataStoreFactory(
       }
 
       if (obj.assistants && obj.assistants[this.$id]) {
+
         // $log.info(obj.assistants );
         return true;
       }
@@ -725,21 +731,6 @@ export function clmDataStoreFactory(
         var ref = db.ref(`classMentors/eventAnswers/${eventId}/${taskId}`);
 
         return loaded($firebaseObject(ref));
-      },
-
-      addTeamFormation: function(eventId, task, priority) {
-        return spfFirebase.push(['classMentors/eventTasks', eventId], task).then(function(ref) {
-          ref.setPriority(priority);
-          return ref;
-        });
-      },
-
-      addTrat: function(eventId, task, priority) {
-        return spfFirebase.push(['classMentors/eventTasks', eventId], task).then(function(ref) {
-          ref.setPriority(priority);
-          var taskId = ref.key();
-          return ref;
-        });
       },
 
       updateTaskWithAns: function(eventId, taskId, task, answers) {
@@ -1691,6 +1682,20 @@ export function clmDataStoreFactory(
         return ref.remove();
       },
 
+      getAssistingEvents: function(publicId) {
+        var ref = db.ref('classMentors/events');
+
+        var query = ref.orderByChild(`assistants/${publicId}`).startAt(true);
+
+        return loaded($firebaseArray(query));
+      },
+
+      getForumStatus: function(eventId) {
+        var ref = db.ref(`classMentors/eventQuestions/${eventId}/closedForum`);
+
+        return loaded($firebaseObject(ref));
+      },
+
       questions: {
 
         /**
@@ -1699,27 +1704,31 @@ export function clmDataStoreFactory(
          * @param  {string}   eventId The event id to query question for.
          * @return {firebase.database.Reference}
          */
-        allRef() {
+        allRef(eventId) {
+          var ref = db.ref(`classMentors/eventQuestions/${eventId}/questions`);
+
+          var query = ref.orderByChild('createdAt');
+
+          return loaded($firebaseArray(query));
         },
 
         /**
-         * Create a question on behave of the current user.
+         * Create a question on behalf of the current user.
          *
          * @param  {string}   eventId The event id to submit the question for.
-         * @param  {{title: string, body: string}} details Question details
+         * @param  {{title: string, body: string}} question Question details
          * @return {Promise<firebase.database.Reference,Error>}
          */
-        create() {
+        create(question, eventId) {
+          var ref = db.ref(`classMentors/eventQuestions/${eventId}/questions`);
+
+          return ref.push(question);
         },
 
-        /**
-         * Upvote a question.
-         *
-         * @param  {string}   eventId    The event id of the question.
-         * @param  {string}   questionId The question id to upvote.
-         * @return {Promise<void,Error>}
-         */
-        upVote() {
+        getQuestion(eventId, questionId) {
+          var ref = db.ref(`classMentors/eventQuestions/${eventId}/questions/${questionId}`);
+
+          return loaded($firebaseObject(ref));
         },
 
         answers: {
@@ -1731,7 +1740,12 @@ export function clmDataStoreFactory(
            * @param  {string}   questionId The question id to query comments for.
            * @return {firebase.database.Reference}
            */
-          allRef() {
+          allRef(eventId, questionId) {
+            var ref = db.ref(`classMentors/eventQuestions/${eventId}/answers/${questionId}`);
+
+            var query = ref.orderByChild('createdAt');
+
+            return loaded($firebaseArray(query));
           },
 
           /**
@@ -1742,7 +1756,10 @@ export function clmDataStoreFactory(
            * @param  {string} body       The answer body.
            * @return {Promise<firebase.database.Reference,Error>}
            */
-          create() {
+          postAnswer(eventId, questionId, answer) {
+            var ref = db.ref(`classMentors/eventQuestions/${eventId}/answers/${questionId}`);
+
+            return ref.push(answer);
           },
 
           /**

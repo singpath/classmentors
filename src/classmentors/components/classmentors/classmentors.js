@@ -13,6 +13,7 @@ function sideNavController() {
     this.navEvents = {};
     this.navProfile = {};
     this.navFeedback = {};
+    this.navQQ = {};
 
 
     this.navClick = function (navStyle) {
@@ -24,6 +25,7 @@ function sideNavController() {
             this.navEvents = {};
             this.navProfile = {};
             this.navFeedback = {};
+            this.navQQ = {};
         } else if (navStyle == 'navCohorts') {
             this.navAceOfCoders = {};
             this.navCohorts = {
@@ -32,6 +34,7 @@ function sideNavController() {
             this.navEvents = {};
             this.navProfile = {};
             this.navFeedback = {};
+            this.navQQ = {};
         } else if (navStyle == 'navEvents') {
             this.navEvents = {
                 'background-color': '#CDCDCD'
@@ -40,6 +43,7 @@ function sideNavController() {
             this.navAceOfCoders = {};
             this.navProfile = {};
             this.navFeedback = {};
+            this.navQQ = {};
         } else if (navStyle == 'navProfile') {
             this.navProfile = {
                 'background-color': '#CDCDCD'
@@ -48,10 +52,21 @@ function sideNavController() {
             this.navCohorts = {};
             this.navAceOfCoders = {};
             this.navFeedback = {};
+            this.navQQ = {};
         } else if (navStyle == 'navFeedback') {
             this.navFeedback = {
                 'background-color': '#CDCDCD'
             };
+            this.navProfile = {};
+            this.navEvents = {};
+            this.navCohorts = {};
+            this.navAceOfCoders = {};
+            this.navQQ = {};
+        } else if (navStyle == 'navQQ') {
+            this.navQQ = {
+                'background-color': '#CDCDCD'
+            };
+            this.navFeedback = {};
             this.navProfile = {};
             this.navEvents = {};
             this.navCohorts = {};

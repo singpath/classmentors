@@ -17,6 +17,31 @@ export function cmTruncateFilterFactory() {
 }
 cmTruncateFilterFactory.$inject = [];
 
+export function countConditionallyFilterFactory() {
+    return function countConditionally(objArr, inputs) {
+        var field = inputs[0];
+        var bool = inputs[1];
+        var count = 0;
+
+        for(var index in objArr) {
+            let obj = objArr[index];
+            if(obj[field] && obj.hasOwnProperty('createdAt')) {
+                if(bool) {
+                    count++;
+                }
+            }
+            if(!obj[field] && obj.hasOwnProperty('createdAt')) {
+                if(!bool) {
+                    count++;
+                }
+            }
+        }
+
+        return `${count}`;
+    };
+}
+countConditionallyFilterFactory.$inject = [];
+
 export function cmTruncateFilterBooleanFactory() {
   return function cmTruncateBoolean(s, limit) {
     if (!s || !s.length || !limit) {
@@ -62,6 +87,17 @@ export function showTeamMembersFilterFactory() {
       return output.filter(filterUserID);
     }
 }
+
+export function countObjKeysFactory() {
+    return function countObjKeys(obj) {
+        if(obj) {
+            return `${Object.keys(obj).length}`;
+        }
+        return 0;
+    }
+}
+
+countObjKeysFactory.$inject = [];
 
 // export function reverseArray (){
 //   return function(items) {

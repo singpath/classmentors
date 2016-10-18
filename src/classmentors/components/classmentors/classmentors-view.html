@@ -39,6 +39,14 @@
                 </md-button>
             </md-item-content>
             <md-item-content>
+                <md-button ng-model="navQQ"
+                           ng-click="ctrl.navClick('navQQ')"
+                           ng-style="ctrl.navQQ" class="md-padding" href="#{{ 'questionQueue' | urlFor }}">
+                    <md-icon class="material-icons">whatshot</md-icon>
+                    Questions
+                </md-button>
+            </md-item-content>
+            <md-item-content>
                 <md-button ng-model="navProfile"
                         ng-click="ctrl.navClick('navProfile')"
                            ng-style="ctrl.navProfile"
