@@ -45,6 +45,9 @@ function qqController(initialData, spfNavBarService, urlFor, firebaseApp, spfAle
                     resolveEventQuestions('asst', eventId);
                 }
             }
+        })
+        .catch(function (error) {
+            spfAlert.error(error);
         });
 
     for(let index in self.joinedEvents) {
