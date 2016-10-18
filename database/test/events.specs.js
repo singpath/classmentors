@@ -233,10 +233,81 @@ describe('events', function() {
         }).path(path);
       });
 
-      it('should disallow the owner to update the user data with out of sync values', function() {
+      it('should allow the owner to update the user data with new school data', function() {
+        const school = utils.fixtures('classMentors/schools/Admiralty Secondary School');
+
+        utils.setFirebaseData({
+          auth: {users: {'google:bob': {school}}},
+          classMentors: {
+            userProfiles: {
+              bob: {
+                user: {school},
+                services: {codeCombat: {details: {id: 'new-cc-id'}}}
+              }
+            }
+          }
+        });
+        participation.services.codeCombat.details.id = 'new-cc-id';
+        participation.user.school = school;
+
+        expect(auth.alice).can.patch({
+          user: participation.user,
+          services: participation.services
+        }).path(path);
+      });
+
+      it('should allow the owner to update the user data with out of sync school data', function() {
+        const newSchool = utils.fixtures('classMentors/schools/Admiralty Secondary School');
+        const oldSchool = utils.fixtures('classMentors/schools/Anderson Junior College');
+
+        utils.setFirebaseData({
+          auth: {users: {'google:bob': {school: newSchool}}},
+          classMentors: {
+            userProfiles: {
+              bob: {
+                user: {school: oldSchool},
+                services: {codeCombat: {details: {id: 'new-cc-id'}}}
+              }
+            }
+          }
+        });
+        participation.services.codeCombat.details.id = 'new-cc-id';
+        participation.user.school = oldSchool;
+
+        expect(auth.alice).can.patch({
+          user: participation.user,
+          services: participation.services
+        }).path(path);
+      });
+
+      it('should disallow the owner to update with wrong user data', function() {
         utils.setFirebaseData(
           {classMentors: {userProfiles: {bob: {services: {codeCombat: {details: {id: 'new-cc-id'}}}}}}}
         );
+
+        expect(auth.alice).cannot.patch({
+          user: participation.user,
+          services: participation.services
+        }).path(path);
+      });
+
+      it('should disallow the owner to update with wrong user school', function() {
+        const school = utils.fixtures('classMentors/schools/Admiralty Secondary School');
+        const wrongSchool = utils.fixtures('classMentors/schools/Anderson Junior College');
+
+        utils.setFirebaseData({
+          auth: {users: {'google:bob': {school}}},
+          classMentors: {
+            userProfiles: {
+              bob: {
+                user: {school},
+                services: {codeCombat: {details: {id: 'new-cc-id'}}}
+              }
+            }
+          }
+        });
+        participation.services.codeCombat.details.id = 'new-cc-id';
+        participation.user.school = wrongSchool;
 
         expect(auth.alice).cannot.patch({
           user: participation.user,

@@ -285,11 +285,11 @@
               "school": {
                 ".validate": "newData.hasChildren(['name', 'type'])",
                 "$key": {
-                  ".validate": "($key == 'name' || $key == 'type' || $key == 'id' || $key == 'iconUrl') && newData.val() == root.child('auth/users').child(auth.uid).child('school').child($key).val()"
+                  ".validate": "($key == 'name' || $key == 'type' || $key == 'id' || $key == 'iconUrl') && newData.val() == root.child('classMentors/userProfiles').child($publicId).child('user/school').child($key).val()"
                 }
               },
               "$key": {
-                ".validate": "($key == 'displayName' || $key == 'gravatar') && newData.val() == root.child('auth/users').child(root.child('auth/publicIds').child($publicId).val()).child($key).val()"
+                ".validate": "($key == 'displayName' || $key == 'gravatar') && newData.val() == root.child('classMentors/userProfiles').child($publicId).child('user').child($key).val()"
               }
             },
             "services": {
