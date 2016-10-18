@@ -6,7 +6,8 @@
       "publicIds": {
         "$publicId": {
           ".validate": "newData.isString() && newData.val().matches(/^[-:a-zA-Z0-9]+$/) && $publicId.matches(/^[-a-z0-9]{3,20}$/) && ($publicId == null || newData.parent().parent().parent().child('auth').child('publicIds').child($publicId).val() == newData.val() && newData.parent().parent().parent().child('auth').child('usedPublicIds').child($publicId).val() == true && newData.parent().parent().parent().child('auth').child('users').child(newData.val()).child('publicId').val() == $publicId)",
-          ".write": "auth != null && auth.uid == newData.val() && (newData.val() != null && data.val() == null)"
+          ".write": "auth != null && auth.uid == newData.val() && (newData.val() != null && data.val() == null)",
+          ".read": "auth != null"
         }
       },
       "usedPublicIds": {
