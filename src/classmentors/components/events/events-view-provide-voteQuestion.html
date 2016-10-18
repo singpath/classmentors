@@ -7,7 +7,24 @@
         <div name='voting'>
             <h4>Your question ranking:</h4>
             <md-content class='md-padding autocomplete' layout='column'>
-
+                <md-contact-chips
+                    ng-model='ctrl.ranking'
+                    md-contacts='ctrl.queryMembers($query)'
+                    placeholder='Ranking'
+                    md-require-match="true"
+                    md-highlight-flags="i"
+                    md-contact-name="member"
+                >   
+                </md-contact-chips>
+            </md-content>
+            <md-content>
+                <md-list>
+                    <md-list-item class="md-3-line" ng-repeat="item in ctrl.allMemberAnswers" ng-click="null">
+                        {{item}}
+                        <h3>{{item.member}}</h3>
+                        <h4>{{item.answer}}</h4>
+                    </md-list-item>
+                </md-list>
             </md-content>
         </div>
     </div>

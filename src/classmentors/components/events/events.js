@@ -2258,6 +2258,14 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             var self = this;
             $log.info(`Code reaches here`);
             console.log(initialData);
+            self.title = task.title;
+            self.desc = task.description;
+            self.allMembers = initialData.teamMembers;
+            self.allMemberAnswers = initialData.teamMemberAnswers;
+
+            self.queryMembers = function(query){
+
+            }
             // $log.info(`InitialData contains: ${angular.toJson(initialData)}`);
         }
         DialogController.$inject = ['initialData'];
@@ -2267,7 +2275,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             $log.info(`${angular.toJson(participant)}`);
             var self = this;
             var eventTeamsRef = db.ref(`classMentors/eventTeams/${eventId}/${task.taskFrom}`);
-            console.log(eventTeamsRef);
+            
             var team = $firebaseArray(eventTeamsRef).$loaded(function(teams){
                 return teams.reduce(function(team, nextTeam){
                     if(nextTeam[participant.$id] != null){
@@ -2285,10 +2293,16 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                 var fbObj = $firebaseObject(eventTasksRef).$loaded(function(task){
                     var eventSolutionRef = db.ref(`classMentors/eventSolutions/${eventId}`);
                     var getAnswerFromMember = function(member){
-                        return eventSolutionRef
+                        var answerRef = eventSolutionRef
                                 .child(`${member}`)
-                                .child(`${task.taskFrom}`)
-                                .on("value",snapshot => snapshot.val());
+                                .child(`${task.taskFrom}`);
+                        $firebaseObject(answerRef).$loaded(function(promise){
+                            console.log(promise.$value);
+                        });
+                        return {
+                            answer: $firebaseObject(answerRef).$loaded(promise => promise.$value),
+                            member: member
+                        };
                     }
                     return getMembers(team).map(getAnswerFromMember);
                 });
