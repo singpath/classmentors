@@ -99,7 +99,7 @@
                                 <md-icon md-svg-icon="create"></md-icon>
                             </md-button>
                         </div>
-                        <!--What's this for?-->
+                        <!--method to generate text on who the team leader is-->
                         {{ctrl.isTeamLeader(ctrl.event.$id, task.teamFormationRef, ctrl.currentUserParticipant)}}
                         <span ng-if="!ctrl.currentUserSolutions[task.$id]">
                             <md-button class="md-raised md-primary" ng-if="task.startTRAT"
