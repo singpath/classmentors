@@ -1,7 +1,12 @@
 /**
  * classmentors/services.js
  */
-/* eslint no-underscore-dangle: "off" */
+/* eslint
+ no-underscore-dangle: "off",
+ no-unused-vars: "off",
+ max-len: "off",
+ valid-jsdoc: "off"
+*/
 import {cleanObj} from 'singpath-core/services/firebase.js';
 import camelCase from 'lodash.camelcase';
 
@@ -409,6 +414,7 @@ export function clmDataStoreFactory(
       }
 
       if (obj.assistants && obj.assistants[this.$id]) {
+
         // $log.info(obj.assistants );
         return true;
       }
@@ -738,6 +744,7 @@ export function clmDataStoreFactory(
         return spfFirebase.push(['classMentors/eventTasks', eventId], task).then(function(ref) {
           ref.setPriority(priority);
           var taskId = ref.key();
+
           return ref;
         });
       },
@@ -1691,114 +1698,124 @@ export function clmDataStoreFactory(
         return ref.remove();
       },
 
-            getAssistingEvents: function (publicId) {
-                var ref = db.ref(`classMentors/events`);
-                var query = ref.orderByChild(`assistants/${publicId}`).startAt(true);
-                return loaded($firebaseArray(query));
-            },
+      getAssistingEvents: function(publicId) {
+        var ref = db.ref('classMentors/events');
 
-            getForumStatus: function (eventId) {
-                var ref = db.ref(`classMentors/eventQuestions/${eventId}/closedForum`);
-                return loaded($firebaseObject(ref));
-            },
+        var query = ref.orderByChild(`assistants/${publicId}`).startAt(true);
 
-            questions: {
+        return loaded($firebaseArray(query));
+      },
 
-                /**
-                 * Return query to all event questions sorted by upvote.
-                 *
-                 * @param  {string}   eventId The event id to query question for.
-                 * @return {firebase.database.Reference}
-                 */
-                allRef(eventId) {
-                    var ref = db.ref(`classMentors/eventQuestions/${eventId}/questions`);
-                    var query = ref.orderByChild('createdAt');
-                    return loaded($firebaseArray(query));
-                },
+      getForumStatus: function(eventId) {
+        var ref = db.ref(`classMentors/eventQuestions/${eventId}/closedForum`);
 
-                /**
-                 * Create a question on behalf of the current user.
-                 *
-                 * @param  {string}   eventId The event id to submit the question for.
-                 * @param  {{title: string, body: string}} question Question details
-                 * @return {Promise<firebase.database.Reference,Error>}
-                 */
-                create(question, eventId) {
-                    var ref = db.ref(`classMentors/eventQuestions/${eventId}/questions`);
-                    return ref.push(question);
-                },
+        return loaded($firebaseObject(ref));
+      },
 
-                getQuestion(eventId, questionId) {
-                    var ref = db.ref(`classMentors/eventQuestions/${eventId}/questions/${questionId}`);
-                    return loaded($firebaseObject(ref));
-                },
+      questions: {
 
-                answers: {
+        /**
+         * Return query to all event questions sorted by upvote.
+         *
+         * @param  {string}   eventId The event id to query question for.
+         * @return {firebase.database.Reference}
+         */
+        allRef(eventId) {
+          var ref = db.ref(`classMentors/eventQuestions/${eventId}/questions`);
 
-                    /**
-                     * Return query to all the answer of a question sorted by upvote.
-                     *
-                     * @param  {string}   eventId    The event id of the question.
-                     * @param  {string}   questionId The question id to query comments for.
-                     * @return {firebase.database.Reference}
-                     */
-                    allRef(eventId, questionId) {
-                        var ref = db.ref(`classMentors/eventQuestions/${eventId}/answers/${questionId}`);
-                        var query = ref.orderByChild('createdAt');
-                        return loaded($firebaseArray(query));
-                    },
+          var query = ref.orderByChild('createdAt');
 
-                    /**
-                     * Create an answer on behave of the current user.
-                     *
-                     * @param  {string} eventId    The event id to submit the answer for.
-                     * @param  {string} questionId The question id to submit the answer for.
-                     * @param  {string} body       The answer body.
-                     * @return {Promise<firebase.database.Reference,Error>}
-                     */
-                    postAnswer(eventId, questionId, answer) {
-                        var ref = db.ref(`classMentors/eventQuestions/${eventId}/answers/${questionId}`);
-                        return ref.push(answer);
-                    },
-
-                    /**
-                     * Mark an answer as the accepted answer to the question.
-                     *
-                     * @param  {string} eventId    The event id to mark the answer for.
-                     * @param  {string} questionId The question id to mark the answer for.
-                     * @param  {string} answerId   The answer id to mark as accepted.
-                     * @return {Promise<void,Error>}
-                     */
-                    accept() {
-                    },
-
-                    /**
-                     * Upvote a comment.
-                     *
-                     * @param  {string}   eventId    The event id of the question.
-                     * @param  {string}   questionId The question id of the answer.
-                     * @param  {string}   answerId   The answer id to upvote.
-                     * @return {Promise<void,Error>}
-                     */
-                    upVote() {
-                    },
-
-                    /**
-                     * Add a comment to a question.
-                     *
-                     * @param  {string} eventId    The event id to add comment for.
-                     * @param  {string} questionId The question id to add comment for.
-                     * @param  {string} answerId   The answer id to add comment for.
-                     * @param  {string} body       The comment body.
-                     * @return {Promise<void,Error>}
-                     */
-                    comment() {
-                    }
-
-                }
-
-            }
+          return loaded($firebaseArray(query));
         },
+
+        /**
+         * Create a question on behalf of the current user.
+         *
+         * @param  {string}   eventId The event id to submit the question for.
+         * @param  {{title: string, body: string}} question Question details
+         * @return {Promise<firebase.database.Reference,Error>}
+         */
+        create(question, eventId) {
+          var ref = db.ref(`classMentors/eventQuestions/${eventId}/questions`);
+
+          return ref.push(question);
+        },
+
+        getQuestion(eventId, questionId) {
+          var ref = db.ref(`classMentors/eventQuestions/${eventId}/questions/${questionId}`);
+
+          return loaded($firebaseObject(ref));
+        },
+
+        answers: {
+
+          /**
+           * Return query to all the answer of a question sorted by upvote.
+           *
+           * @param  {string}   eventId    The event id of the question.
+           * @param  {string}   questionId The question id to query comments for.
+           * @return {firebase.database.Reference}
+           */
+          allRef(eventId, questionId) {
+            var ref = db.ref(`classMentors/eventQuestions/${eventId}/answers/${questionId}`);
+
+            var query = ref.orderByChild('createdAt');
+
+            return loaded($firebaseArray(query));
+          },
+
+          /**
+           * Create an answer on behave of the current user.
+           *
+           * @param  {string} eventId    The event id to submit the answer for.
+           * @param  {string} questionId The question id to submit the answer for.
+           * @param  {string} body       The answer body.
+           * @return {Promise<firebase.database.Reference,Error>}
+           */
+          postAnswer(eventId, questionId, answer) {
+            var ref = db.ref(`classMentors/eventQuestions/${eventId}/answers/${questionId}`);
+
+            return ref.push(answer);
+          },
+
+          /**
+           * Mark an answer as the accepted answer to the question.
+           *
+           * @param  {string} eventId    The event id to mark the answer for.
+           * @param  {string} questionId The question id to mark the answer for.
+           * @param  {string} answerId   The answer id to mark as accepted.
+           * @return {Promise<void,Error>}
+           */
+          accept() {
+          },
+
+          /**
+           * Upvote a comment.
+           *
+           * @param  {string}   eventId    The event id of the question.
+           * @param  {string}   questionId The question id of the answer.
+           * @param  {string}   answerId   The answer id to upvote.
+           * @return {Promise<void,Error>}
+           */
+          upVote() {
+          },
+
+          /**
+           * Add a comment to a question.
+           *
+           * @param  {string} eventId    The event id to add comment for.
+           * @param  {string} questionId The question id to add comment for.
+           * @param  {string} answerId   The answer id to add comment for.
+           * @param  {string} body       The comment body.
+           * @return {Promise<void,Error>}
+           */
+          comment() {
+          }
+
+        }
+
+      }
+    },
 
     services: clmServices,
 
