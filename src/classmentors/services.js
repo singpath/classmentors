@@ -1350,7 +1350,7 @@ export function clmDataStoreFactory(
 
       monitorEvent: function(event, tasks, participants, solutions, progress) {
         var tid;
-        var delay = 300000; //TODO: Extending delay due to continual error issue.
+        var delay = 300; //TODO: Extending delay due to continual error issue.
         var unWatchSolution = solutions.$watch(debouncedUpdate);
         var unWatchParticipants = participants.$watch(debouncedUpdate);
 
