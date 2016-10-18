@@ -87,7 +87,7 @@ function qqController(initialData, spfNavBarService, urlFor, firebaseApp, spfAle
         })
     }
 
-    spfNavBarService.update('Question Queues');
+    spfNavBarService.update('Questions');
 
 }
 
@@ -158,7 +158,7 @@ function eventQController(initialData, spfNavBarService, urlFor, firebaseApp, sp
     spfNavBarService.update(
         self.event.title,
     {
-        title: 'Question Queues',
+        title: 'Questions',
         url: `#${urlFor('questionQueue')}`
     });
 
@@ -243,7 +243,7 @@ function oneQnController(initialData, spfNavBarService, urlFor, firebaseApp, spf
 
     spfNavBarService.update(
         'View Question', [{
-            title: 'Question Queues',
+            title: 'Questions',
             url: `#${urlFor('questionQueue')}`
         }, {
             title: self.event.title,
