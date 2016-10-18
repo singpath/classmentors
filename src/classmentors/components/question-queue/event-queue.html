@@ -14,10 +14,10 @@
     <md-list>
         <md-subheader class="md-no-sticky">My recently posted questions</md-subheader>
         <md-list-item ng-repeat="question in ctrl.questions | orderBy:'-' | limitTo:ctrl.myQnLimit" ng-if="question.owner.publicId == ctrl.currentUser.publicId">
-            <div layout="column" layout-align="end center" ng-show="question.owner.publicId == ctrl.currentUser.publicId">
-                <md-button class="md-icon-button launch" aria-label="Flag">
-                    <md-icon ng-if="!question.flagged" style="font-size: 30px" ng-click="ctrl.toggleQnFlag(question)">error_outline</md-icon>
-                    <md-icon ng-if="question.flagged" style="font-size: 30px; color: red" ng-click="ctrl.toggleQnFlag(question)">error_outline</md-icon>
+            <div layout="column" layout-align="end center">
+                <md-button class="md-icon-button launch" aria-label="Flag" ng-disabled="question.owner.publicId != ctrl.currentUser.publicId" ng-click="ctrl.toggleQnFlag(question)">
+                    <md-icon ng-if="!question.flagged" style="font-size: 30px">error_outline</md-icon>
+                    <md-icon ng-if="question.flagged" style="font-size: 30px; color: red">error_outline</md-icon>
                 </md-button>
                 <div style="font-size: 12px" >Alert</div>
                 <div style="font-size: 12px" >Educator</div>
@@ -47,10 +47,10 @@
     <md-list>
         <md-subheader class="md-no-sticky">Most voted questions</md-subheader>
         <md-list-item ng-repeat="question in ctrl.questions | orderBy:['-upVotes | countObjKeys', '-createdAt'] | limitTo:ctrl.voteQnLimit">
-            <div layout="column" layout-align="end center" ng-show="question.owner.publicId == ctrl.currentUser.publicId">
-                <md-button class="md-icon-button launch" aria-label="Flag">
-                    <md-icon ng-if="!question.flagged" style="font-size: 30px" ng-click="ctrl.toggleQnFlag(question)">error_outline</md-icon>
-                    <md-icon ng-if="question.flagged" style="font-size: 30px; color: red" ng-click="ctrl.toggleQnFlag(question)">error_outline</md-icon>
+            <div layout="column" layout-align="end center">
+                <md-button class="md-icon-button launch" aria-label="Flag" ng-disabled="question.owner.publicId != ctrl.currentUser.publicId" ng-click="ctrl.toggleQnFlag(question)">
+                    <md-icon ng-if="!question.flagged" style="font-size: 30px">error_outline</md-icon>
+                    <md-icon ng-if="question.flagged" style="font-size: 30px; color: red">error_outline</md-icon>
                 </md-button>
                 <div style="font-size: 12px" >Alert</div>
                 <div style="font-size: 12px" >Educator</div>

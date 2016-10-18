@@ -356,20 +356,18 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
                         self.options = loadOptions(self.question);
                     }
                 }
-                for(var member in self.team) {
-                    let publicId = self.team[member].$id;
-                    if(publicId.indexOf("teamLeader") < 0) {
-                        clmDataStore.logging.inputLog(
-                            {
-                                publicId: publicId,
-                                timestamp: TIMESTAMP,
-                                action: "wrongTeamSubmission",
-                                taskId: self.tratId,
-                                eventId: self.eventId
-                            }
-                        )
+                clmDataStore.logging.inputLog(
+                    {
+                        publicId: publicId,
+                        timestamp: TIMESTAMP,
+                        action: "wrongTeamSubmission",
+                        taskId: self.tratId,
+                        eventId: self.eventId,
+                        members: self.team.map(function (member) {
+                            return member.$id;
+                        })
                     }
-                }
+                )
             }else{
                 // Add score if correct
                 self.totalScore += addScore(self.noOfTries, 1);
@@ -390,20 +388,18 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
                     updateLog(buildMessage("Question " + (self.index + 1), 'Remaining attempts: ' + self.noOfTries, 'black'));
                     self.options = loadOptions(self.question);
                 }
-                for(var member in self.team) {
-                    let publicId = self.team[member].$id;
-                    if(publicId.indexOf("teamLeader") < 0) {
-                        clmDataStore.logging.inputLog(
-                            {
-                                publicId: publicId,
-                                timestamp: TIMESTAMP,
-                                action: "correctTeamSubmission",
-                                taskId: self.tratId,
-                                eventId: self.eventId
-                            }
-                        )
+                clmDataStore.logging.inputLog(
+                    {
+                        publicId: publicId,
+                        timestamp: TIMESTAMP,
+                        action: "wrongTeamSubmission",
+                        taskId: self.tratId,
+                        eventId: self.eventId,
+                        members: self.team.map(function (member) {
+                            return member.$id;
+                        })
                     }
-                }
+                )
             }
             // console.log(self.totalScore);
             // teamAns(tempArray);
