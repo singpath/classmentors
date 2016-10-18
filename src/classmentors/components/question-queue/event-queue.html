@@ -29,9 +29,9 @@
                 </md-button><div style="font-size: 12px" >{{question.upVotes | countObjKeys}} vote(s)</div>
             </div>
             <div layout="column" layout-align="end start" class="md-list-item-text" flex>
-                <div style="font-size: 20px">{{question.title}}</div>
-                <div style="font-size: 10px; color:grey;" ng-if="question.answeredBy">Posted by {{question.owner.displayName}} ({{question.createdAt | date:'dd/MM/yy hh:mma'}}) (closed)</div>
-                <div style="font-size: 10px; color:grey;" ng-if="!question.answeredBy">Posted by {{question.owner.displayName}} ({{question.createdAt | date:'dd/MM/yy hh:mma'}}) (open)</div>
+                <div style="font-size: 20px" ng-if="question.answeredBy">{{question.title}} (Closed)</div>
+                <div style="font-size: 20px" ng-if="!question.answeredBy">{{question.title}} (Open)</div>
+                <div style="font-size: 10px; color:grey;">Posted by {{question.owner.displayName}} ({{question.createdAt | date:'dd/MM/yy hh:mma'}})</div>
             </div>
             <md-button class="md-padding" ng-href="#{{ 'oneQuestion' | urlFor:{'eventId': ctrl.event.$id, 'questionId': question.$id} }}">
                 <md-icon style="font-size: 30px">sms</md-icon>
@@ -62,9 +62,9 @@
                 </md-button><div style="font-size: 12px" >{{question.upVotes | countObjKeys}} vote(s)</div>
             </div>
             <div layout="column" layout-align="end start" class="md-list-item-text" flex>
-                <div style="font-size: 20px">{{question.title}}</div>
-                <div style="font-size: 10px; color:grey;" ng-if="question.answeredBy">Posted by {{question.owner.displayName}} ({{question.createdAt | date:'dd/MM/yy hh:mma'}}) (closed)</div>
-                <div style="font-size: 10px; color:grey;" ng-if="!question.answeredBy">Posted by {{question.owner.displayName}} ({{question.createdAt | date:'dd/MM/yy hh:mma'}}) (open)</div>
+                <div style="font-size: 20px" ng-if="question.answeredBy">{{question.title}} (Closed)</div>
+                <div style="font-size: 20px" ng-if="!question.answeredBy">{{question.title}} (Open)</div>
+                <div style="font-size: 10px; color:grey;">Posted by {{question.owner.displayName}} ({{question.createdAt | date:'dd/MM/yy hh:mma'}})</div>
             </div>
             <md-button class="md-padding" ng-href="#{{ 'oneQuestion' | urlFor:{'eventId': ctrl.event.$id, 'questionId': question.$id} }}">
                 <md-icon style="font-size: 30px">sms</md-icon>

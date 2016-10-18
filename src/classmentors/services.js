@@ -733,22 +733,6 @@ export function clmDataStoreFactory(
         return loaded($firebaseObject(ref));
       },
 
-      addTeamFormation: function(eventId, task, priority) {
-        return spfFirebase.push(['classMentors/eventTasks', eventId], task).then(function(ref) {
-          ref.setPriority(priority);
-          return ref;
-        });
-      },
-
-      addTrat: function(eventId, task, priority) {
-        return spfFirebase.push(['classMentors/eventTasks', eventId], task).then(function(ref) {
-          ref.setPriority(priority);
-          var taskId = ref.key();
-
-          return ref;
-        });
-      },
-
       updateTaskWithAns: function(eventId, taskId, task, answers) {
         var ref = db.ref(`classMentors/eventTasks/${eventId}/${taskId}`);
         var ansRef = db.ref(`classMentors/eventAnswers/${eventId}/${taskId}`);
