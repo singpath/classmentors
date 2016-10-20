@@ -1056,6 +1056,12 @@ export function clmDataStoreFactory(
           return team;
         });
       },
+
+      getEventTeams: function (eventId){
+        var ref = db.ref(`classMentors/eventTeams/${eventId}`);
+
+        return loaded($firebaseArray(ref));
+      },
       openTask: function(eventId, taskId) {
         var ref = db.ref(`classMentors/eventTasks/${eventId}/${taskId}`);
         var abort;

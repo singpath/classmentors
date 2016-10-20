@@ -227,7 +227,6 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
     self.question = self.questions[self.index];
     self.options = self.question.options;
     var userPublicId = initialData.currentUser.publicId;
-    // console.log(initialData.currentUser);
     self.eventId = initialData.eventId;
     var teamAndteamId = initialData.teamAndteamId;
     // console.log(initialData.teamAndteamId);
@@ -358,7 +357,7 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
                 }
                 clmDataStore.logging.inputLog(
                     {
-                        publicId: publicId,
+                        publicId: userPublicId,
                         timestamp: TIMESTAMP,
                         action: "wrongTeamSubmission",
                         taskId: self.tratId,
@@ -390,7 +389,7 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
                 }
                 clmDataStore.logging.inputLog(
                     {
-                        publicId: publicId,
+                        publicId: userPublicId,
                         timestamp: TIMESTAMP,
                         action: "wrongTeamSubmission",
                         taskId: self.tratId,

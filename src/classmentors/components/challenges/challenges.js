@@ -282,7 +282,7 @@ export function challengeServiceFactory
                 var tratTaskRef = db.ref(`classMentors/eventTasks/${event.$id}`).push();
                 // console.log('Team Formation key: ', taskAnsRef.key)
                 var eventTeamsRef = db.ref(`classMentors/eventTeams/${event.$id}/${teamFormationTaskRef.key}`);
-                // console.log(event.$id);
+                console.log("eventteamsRef iss:", eventTeamsRef);
                 // Check If key
                 // console.log(teamFormationTaskRef.key);
                 var priority = copy.priority;
@@ -320,12 +320,12 @@ export function challengeServiceFactory
                         // console.log('Team here is: ', team);
                         console.log('Team is: ', team);
                         eventTeamsRef.push(team).then(function (thenableRef) {
-                            console.log('Team reccorded at: ', thenableRef.key);
+                            // console.log('Team reccorded at: ', thenableRef.key);
                             // var teamLog = {
                             //     init: {'.sv': 'timestamp'}
                             // }
                             var eventTeamsLogRef = db.ref(`classMentors/eventTeamsLog/${teamFormationTaskRef.key}/${thenableRef.key}`);
-                            eventTeamsLogRef.set(teamLog);
+                            // eventTeamsLogRef.set(teamLog);
                         });
                     }
                     console.log('Team answers set.');
