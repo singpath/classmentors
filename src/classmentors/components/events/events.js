@@ -2359,9 +2359,11 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
 
             self.leave = function (index) {
                 console.log("leave index is:", index);
-                leaveTeam(index);
-                self.selectedTeam = undefined;
-                previousSelectedTeam = undefined;
+                db.ref(`classMentors/eventSolutions/${eventId}/${participant.$id}/${taskId}`).remove().then(function () {
+                    leaveTeam(index);
+                    self.selectedTeam = undefined;
+                    previousSelectedTeam = undefined;
+                });
             };
 
             self.onChange = function (index) {

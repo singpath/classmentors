@@ -113,17 +113,17 @@
                             <md-button class="md-raised md-primary" ng-if="task.type == 'code' && ctrl.team[task.teamFormationRef].teamLeader && ctrl.team[task.teamFormationRef].teamLeader == ctrl.currentUserParticipant.$id"
                                        ng-click="ctrl.promptForCodeResponse(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant, ctrl.currentUserSolutions)"
                                        ng-disabled="task.closedAt"
-                                       aria-label="Collab Text Response"
+                                       aria-label="Collab Code Challenge"
                             >Submit Code
                             </md-button>
                             <md-button class="md-raised md-primary" ng-if="task.type == 'linkPattern' && ctrl.team[task.teamFormationRef].teamLeader && ctrl.team[task.teamFormationRef].teamLeader == ctrl.currentUserParticipant.$id"
                                        ng-click="ctrl.promptForLink(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant, ctrl.currentUserSolutions)"
                                        ng-disabled="task.closedAt"
-                                       aria-label="Collab Text Response"
+                                       aria-label="Collab Link Pattern"
                             >Submit Link
                             </md-button>
                             <label ng-show="task.teamFormationRef && ctrl.checkUser(task.teamFormationRef, ctrl.currentUserParticipant.$id) && ctrl.team[task.teamFormationRef].teamLeader != ctrl.currentUserParticipant.$id">
-                                Your team leader is: {{ctrl.team[task.teamFormationRef].teamLeader}}
+                                Your team leader is: {{ctrl.team[task.teamFormationRef][ctrl.team[task.teamFormationRef].teamLeader].displayName}}
                              </label>
                         </span>
 
@@ -140,13 +140,9 @@
                                        aria-label="Start trat"
                             >Start
                             </md-button>
-                            <!--<label ng-show="ctrl.teamLeader != ctrl.currentUserParticipant.$id && task.startTRAT && ctrl.teamLeader">-->
-                            <!--Your team leader is: {{ctrl.team[ctrl.teamLeader].displayName}}-->
-                            <!--</label>-->
                             <label ng-show="task.startTRAT && task.teamFormationRef && ctrl.checkUser(task.teamFormationRef, ctrl.currentUserParticipant.$id) && ctrl.team[task.teamFormationRef].teamLeader != ctrl.currentUserParticipant.$id">
-                                Your team leader is: {{ctrl.team[task.teamFormationRef].teamLeader}}
+                                Your team leader is: {{ctrl.team[task.teamFormationRef][ctrl.team[task.teamFormationRef].teamLeader].displayName}}
                              </label>
-
                         </span>
                         <span ng-if="ctrl.currentUserSolutions[task.$id] && !task.formationPattern">
                             Completed<span ng-if="!ctrl.currentUserProgress[task.$id].completed"></span>
