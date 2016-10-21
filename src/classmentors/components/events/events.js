@@ -2098,12 +2098,12 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             task: task,
             participant: participant
 
-        }
+        };
         // Store data in eventService
         eventService.set(data);
 
         $location.path('/events/' + eventId + '/challenges/' + taskId + '/TRAT/start');
-    }
+    };
 
     this.mustRegister = function (task, profile) {
         return Boolean(
@@ -2483,7 +2483,6 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
 
         DialogController.$inject = ['initialData'];
     };
-
 
     this.promptForSurvey = function (eventId, taskId, task, participant, userSolution) {
 
