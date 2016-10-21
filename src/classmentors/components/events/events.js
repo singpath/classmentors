@@ -1796,12 +1796,9 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                             }
                         }
                     }
-
                 }
-
             }
         }
-
 
         if (Object.keys(self.team).length != 0) {
             return true;
@@ -1809,7 +1806,9 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             return false;
         }
 
-    }
+        // return Object.keys(self.team).length != 0;
+
+    };
 
     // self.isTeamLeader = function (eventId, teamFormationId, currentUserId) {
 
