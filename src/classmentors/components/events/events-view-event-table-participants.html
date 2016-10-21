@@ -118,10 +118,9 @@
                             <!--<label ng-show="ctrl.teamLeader != ctrl.currentUserParticipant.$id && task.startTRAT && ctrl.teamLeader">-->
                             <!--Your team leader is: {{ctrl.team[ctrl.teamLeader].displayName}}-->
                             <!--</label>-->
-                            <label ng-show="task.startTRAT && task.teamFormationRef && ctrl.checkUser(task.teamFormationRef, ctrl.currentUserParticipant.$id) && ctrl.team[task.teamFormationRef].teamLeader != ctrl.currentUserParticipant.$id">
+                            <label ng-show="ctrl.team[task.teamFormationRef].teamLeader && ctrl.team[task.teamFormationRef].teamLeader != ctrl.currentUserParticipant.$id">
                                 Your team leader is: {{ctrl.team[task.teamFormationRef].teamLeader}}
                              </label>
-
                         </span>
                         <span ng-if="ctrl.currentUserSolutions[task.$id] && !task.formationPattern">
                             Completed<span ng-if="!ctrl.currentUserProgress[task.$id].completed"></span>
