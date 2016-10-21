@@ -345,7 +345,7 @@ export function challengeServiceFactory
                         type: "TRAT",
                         teamFormationMethod: copy.teamFormationMethod,
                         mcqQuestions: copy.mcqQuestions
-                    }
+                    };
                     return priority ? tratTaskRef.setWithPriority(tratTask, priority)
                         : tratTaskRef.set(tratTask);
                 }).then(function () {

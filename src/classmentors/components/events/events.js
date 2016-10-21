@@ -2336,9 +2336,8 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                 console.log("leave index is:", index);
                 leaveTeam(index);
                 self.selectedTeam = undefined;
-
-
-            }
+                previousSelectedTeam = undefined;
+            };
 
             self.onChange = function (index) {
                 console.log("on change index is:", index);
