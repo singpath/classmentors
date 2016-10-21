@@ -128,7 +128,7 @@
                         </span>
                     </div>
 
-                    <div ng-if="task.serviceId">
+                    <div ng-if="task.serviceId && !task.teamFormationMethod">
                             <span ng-if="ctrl.currentUserSolutions[task.$id]">
                                 Completed<span ng-if="!ctrl.currentUserProgress[task.$id].completed"></span>
                             </span>
@@ -147,7 +147,7 @@
                             </span>
                     </div>
 
-                    <div ng-if="task.textResponse && !task.lang && !task.toEdit">
+                    <div ng-if="task.textResponse && !task.lang && !task.toEdit && !task.teamFormationMethod">
                             <span ng-if="ctrl.currentUserSolutions[task.$id]">
                                 {{ ctrl.currentUserSolutions[task.$id] | cmTruncate: 10 }}<span
                                     ng-if="!ctrl.currentUserProgress[task.$id].completed"></span>
@@ -171,7 +171,7 @@
                             </span>
                     </div>
 
-                    <div ng-if="task.textResponse && task.lang">
+                    <div ng-if="task.textResponse && task.lang && !task.teamFormationMethod">
                             <span ng-if="ctrl.currentUserSolutions[task.$id]">
                                 {{ ctrl.currentUserSolutions[task.$id] | cmTruncate: 10 }}<span
                                     ng-if="!ctrl.currentUserProgress[task.$id].completed"></span>
@@ -195,7 +195,7 @@
                             </span>
                     </div>
 
-                    <div ng-if="task.linkPattern">
+                    <div ng-if="task.linkPattern && !task.teamFormationMethod">
                             <span ng-if="ctrl.currentUserSolutions[task.$id]">
                                 <a ng-href="{{ctrl.currentUserSolutions[task.$id]}}" target="_blank">Completed<span
                                         ng-if="!ctrl.currentUserProgress[task.$id].completed"></span></a>
@@ -219,7 +219,7 @@
                             </span>
                     </div>
 
-                    <div ng-if="task.survey">
+                    <div ng-if="task.survey && !task.teamFormationMethod">
                                 <span ng-if="ctrl.currentUserSolutions[task.$id]">
                                     Completed
                                     <span ng-if="!ctrl.currentUserProgress[task.$id].completed"></span>
@@ -232,7 +232,7 @@
                             Start Survey
                         </md-button>
                     </div>
-                    <div ng-if="task.toEdit">
+                    <div ng-if="task.toEdit && !task.teamFormationMethod">
                         <div ng-if="ctrl.profile.user.school">
                             {{ctrl.profile.user.school.name | cmTruncate: 10}}
                             <md-button class="md-icon-button md-primary small-icon"
