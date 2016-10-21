@@ -61,7 +61,7 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
     function formTeams(method, methodParameter, participants) {
         var teams = [];
         var teamStructure = [];
-        participants = participants + 1;
+        // participants = participants + 1;
         console.log('Total participants :', participants);
         if (method == 'noOfTeams') {
             //initialze teamStructure with team size of 0 each

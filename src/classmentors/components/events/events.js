@@ -2308,7 +2308,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             self.selectedTeam = initialData.selectedTeam;
             self.teams = {};
             self.teams = initialData.teams;
-
+            console.log("selected Team isss:", self.selectedTeam);
             // var teamMembers = [];
             //separate the names to be populated
             // for (var i = 0; i < self.teams.length; i++) {
@@ -2332,7 +2332,16 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                 }
             }
 
+            self.leave = function (index) {
+                console.log("leave index is:", index);
+                leaveTeam(index);
+                self.selectedTeam = undefined;
+
+
+            }
+
             self.onChange = function (index) {
+                console.log("on change index is:", index);
                 // If user has not joined any team before
                 if (previousSelectedTeam == undefined) {
                     if (index2 != undefined) {
@@ -2347,6 +2356,8 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                     // Join new team.
                     joinTeam(index);
                     previousSelectedTeam = index;
+                }else{
+                    joinTeam(index);
                 }
             };
 
