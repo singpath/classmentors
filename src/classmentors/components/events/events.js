@@ -2371,21 +2371,71 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                 // If user has not joined any team before
                 if (previousSelectedTeam == undefined) {
                     if (index2 != undefined) {
-                        leaveTeam(index2);
+                        switchTeam(index2, index);
+                    } else {
+                        joinTeam(index);
                     }
-                    joinTeam(index);
                     previousSelectedTeam = index;
                 } else if (index != previousSelectedTeam) { //Check if selected index has changed, else do nothing.
                     // Leave previous team.
 
-                    leaveTeam(previousSelectedTeam);
-                    // Join new team.
-                    joinTeam(index);
+                    // leaveTeam(previousSelectedTeam);
+                    // // Join new team.
+                    // joinTeam(index);
+                    switchTeam(previousSelectedTeam, index);
                     previousSelectedTeam = index;
                 }else{
                     joinTeam(index);
                 }
             };
+
+            function switchTeam(oldIndex, newIndex) {
+                var team = self.teams[oldIndex];
+                var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${team.$id}/${participant.$id}`);
+                var currentSize;
+                ref.remove().then(function () {
+                    //do nothing
+                    var refCurrentSize = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${team.$id}/currentSize`);
+                    refCurrentSize.on("value", function (snapshot) {
+                        currentSize = snapshot.val();
+                        currentSize--;
+                    });
+                    //update currentsize in firebase, then assign to self.teams
+                    refCurrentSize.set(currentSize).then(function () {
+                        //retrieve the newly updated team promise and assign to this.teams
+                        var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}`);
+                        var teamEventPromise = $firebaseArray(ref);
+                        teamEventPromise.$loaded().then(function (result) {
+                            self.teams = result;
+                        })
+                    }).then(function () {
+                        var team = self.teams[newIndex];
+                        var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${team.$id}/${participant.$id}`);
+                        // var currentSize = 0;
+                        var currentSize;
+
+                        clmDataStore.events.joinTeam(eventId, taskId, team.$id, participant.$id, participant.user).then(function () {
+                            var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}`);
+                            var teamEventPromise = $firebaseArray(ref);
+                            teamEventPromise.$loaded().then(function (result) {
+                                self.teams = result;
+                            });
+                            clmDataStore.logging.inputLog(
+                                {
+                                    action: "formTeam",
+                                    eventId: eventId,
+                                    publicId: participant.$id,
+                                    timestamp: Date.now(),
+                                    taskId: taskId
+                                }
+                            );
+                        }).then(function () {
+                            //update progress asynchronously
+                            clmDataStore.events.submitSolution(eventId, taskId, participant.$id, "Team " + (newIndex + 1));
+                        });
+                    })
+                });
+            }
 
             function leaveTeam(index) {
                 var team = self.teams[index];
@@ -2408,7 +2458,6 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                         teamEventPromise.$loaded().then(function (result) {
                             self.teams = result;
                         })
-
                     });
 
                     // var refCurrentSize = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${team.$id}/currentSize`);
