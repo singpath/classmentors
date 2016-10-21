@@ -20,7 +20,7 @@ function createTeamActivityInitialData($q, eventService, clmDataStore) {
 }
 createTeamActivityInitialData.$inject = ['$q', 'eventService', 'clmDataStore'];
 
-function createTeamActivityController($q, initialData, clmDataStore, $location, urlFor, eventService, $mdDialog, spfAlert) {
+function createTeamActivityController($q, initialData, clmDataStore, $location, urlFor, eventService, $mdDialog, spfAlert, firebaseApp, $firebaseObject) {
     var self = this;
 
     // console.log("initialdata for teamform are", initialData);
@@ -68,87 +68,77 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
         console.log("Event: ",event);
         console.log("Task: ",task);
         console.log("isOpen: ",isOpen);
-        return;
+
+        var timestamp = Date.now();
+
         // Get firebase database object.
         var db = firebaseApp.database();
 
         self.creatingTask = true;
 
-        var eventTaskRef = db.ref(`classMentors/eventTasks/${event.$id}`);
+        // Get firebase task reference.
+        var taskRef = db.ref(`classMentors/eventTasks/${event.$id}`);
+
         var ref = taskRef.push();
-        var taskAnsRef = db.ref(`classMentors/eventAnswers/${event.$id}/${ref.key}`);
+
         var teamFormationTaskRef = db.ref(`classMentors/eventTasks/${event.$id}`).push();
-        var tratTaskRef = db.ref(`classMentors/eventTasks/${event.$id}`).push();
-        // console.log('Team Formation key: ', taskAnsRef.key)
+
         var eventTeamsRef = db.ref(`classMentors/eventTeams/${event.$id}/${teamFormationTaskRef.key}`);
-        var priority = copy.priority;
-        if (isOpen) {
-            copy.openedAt = {'.sv': 'timestamp'};
-            copy.closedAt = null;
+        var settableRef = db.ref(`classMentors/eventTasks/${event.$id}/${teamFormationTaskRef.key}`);
+
+        // Define 'teamFormationTask'.
+        var teamFormationTask = {
+            title: task.title,
+            description: "Join a team to submit undertake a challenge together!",
+            taskFrom: teamFormationTaskRef.key,
+            formationPattern: true,
+            openedAt: {'.sv': 'timestamp'},
+            showProgress: task.showProgress,
+            archived: false,
+            type: "formTeam",
+            teamFormationMethod: task.teamFormationMethod
+        };
+
+        var collabTask = {
+            teamFormationRef: teamFormationTaskRef.key,
+            title: task.title,
+            description: task.description,
+            closedAt: {'.sv': 'timestamp'},
+            showProgress: task.showProgress,
+            archived: false,
+            type: task.collabChallengeType,
+            teamFormationMethod: task.teamFormationMethod
+        };
+
+        if(task.linkPattern) {
+            collabTask.linkPattern = task.linkPattern;
+        } else if (task.lang) {
+            collabTask.lang = task.lang;
+            collabTask.textResponse = task.textResponse;
         } else {
-            copy.closedAt = {'.sv': 'timestamp'};
-            copy.openedAt = null;
+            collabTask.textResponse = task.textResponse;
         }
-        // Save IRAT.
-        var promise = priority ? ref.setWithPriority(copy, priority) : ref.set(copy);
-        promise.then(function () {
-                // Save answers.
-                console.log('Task answers set.');
-                // console.log(taskAnsRef);
-                return taskAnsRef.set(answers);
-            }).then(function () {
-                // Define 'teamFormationTask'.
-                var teamFormationTask = {
-                    taskFrom: ref.key,
-                    title: copy.title,
-                    description: "Click Below To Join Team",
-                    formationPattern: true,
-                    closedAt: {'.sv': 'timestamp'},
-                    showProgress: copy.showProgress,
-                    archived: false,
-                    type: "formTeam",
-                    teamFormationMethod: copy.teamFormationMethod
-                };
-                // Create 'teams' in 'eventTeams'.
-                for (var i = 0; i < event.teams.length; i++) {
-                    var team = event.teams[i];
-                    // console.log('Team here is: ', team);
-                    console.log('Team is: ', team);
-                    eventTeamsRef.push(team).then(function (thenableRef) {
-                        // console.log('Team reccorded at: ', thenableRef.key);
-                        // var teamLog = {
-                        //     init: {'.sv': 'timestamp'}
-                        // }
-                        var eventTeamsLogRef = db.ref(`classMentors/eventTeamsLog/${teamFormationTaskRef.key}/${thenableRef.key}`);
-                        // eventTeamsLogRef.set(teamLog);
-                    });
-                }
-                console.log('Team answers set.');
-                return priority ? teamFormationTaskRef.setWithPriority(teamFormationTask, priority)
-                    : teamFormationTaskRef.set(teamFormationTask);
-            }).then(function () {
-                console.log('TeamFormationTask set.');
-                var tratTask = {
-                    taskFrom: ref.key,
-                    teamFormationRef: teamFormationTaskRef.key,
-                    title: copy.title,
-                    description: "Click Below to Start TRAT",
-                    startTRAT: true,
-                    closedAt: {'.sv': 'timestamp'},
-                    showProgress: copy.showProgress,
-                    archived: false,
-                    type: "TRAT",
-                    teamFormationMethod: copy.teamFormationMethod,
-                    mcqQuestions: copy.mcqQuestions
-                };
-                return priority ? tratTaskRef.setWithPriority(tratTask, priority)
-                    : tratTaskRef.set(tratTask);
-            }).then(function () {
-                console.log('TRAT set.');
-                console.log('Events Created');
-                spfAlert.success('Challenge saved');
-                $location.path(urlFor('editEvent', {eventId: event.$id}));
-            });
+
+        console.log('TeamFormationTask: ', teamFormationTask);
+        console.log('collabTask: ', collabTask);
+
+        settableRef.set(teamFormationTask).then(function () {
+
+        }).catch(function (error) {
+            console.log('FAILED AT SETTING TEAM FORMATION TASK')
+        });
+
+        taskRef.push(collabTask).then(function () {
+            // Create 'teams' in 'eventTeams'.
+            for (let i = 0; i < event.teams.length; i++) {
+                let team = event.teams[i];
+                eventTeamsRef.push(team);
+            }
+            spfAlert.success('Challenge saved');
+            $location.path(urlFor('editEvent', {eventId: event.$id}));
+        }).catch(function (error) {
+            console.log('FAILED AT SETTING COLLAB TASK');
+        });
     }
 
     function formTeams(method, methodParameter, participants) {
@@ -240,7 +230,9 @@ createTeamActivityController.$inject = [
     'urlFor',
     'eventService',
     '$mdDialog',
-    'spfAlert'
+    'spfAlert',
+    'firebaseApp',
+    '$firebaseObject'
 ];
 
 function startTRATInitialData($q, spfAuthData, eventService, clmDataStore, firebaseApp, $firebaseObject, $firebaseArray, $route) {
