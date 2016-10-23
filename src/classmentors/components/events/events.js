@@ -1792,16 +1792,13 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
 
                             if (teamByTask[i][name][currentUserId] != null) {
                                 self.team[taskId] = teamByTask[i][name];
-                                console.log("team leader is:", self.team[taskId].teamLeader);
+                                // console.log("team leader is:", self.team[taskId].teamLeader);
                             }
                         }
                     }
-
                 }
-
             }
         }
-
 
         if (Object.keys(self.team).length != 0) {
             return true;
@@ -1809,7 +1806,9 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             return false;
         }
 
-    }
+        // return Object.keys(self.team).length != 0;
+
+    };
 
     // self.isTeamLeader = function (eventId, teamFormationId, currentUserId) {
 
@@ -2099,12 +2098,12 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             task: task,
             participant: participant
 
-        }
+        };
         // Store data in eventService
         eventService.set(data);
 
         $location.path('/events/' + eventId + '/challenges/' + taskId + '/TRAT/start');
-    }
+    };
 
     this.mustRegister = function (task, profile) {
         return Boolean(
@@ -2221,6 +2220,8 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         }
     };
     this.promptForLink = function (eventId, taskId, task, participant, userSolution) {
+        task.team = self.team[task.teamFormationRef];
+
         $mdDialog.show({
             parent: $document.body,
             template: linkTmpl,
@@ -2241,21 +2242,45 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                 if (link.indexOf("http:") > -1) {
                     link = link.replace("http:", "https:");
                 }
-                clmDataStore.events.submitSolution(eventId, taskId, participant.$id, link).then(function () {
+                if(task.team) {
+                    console.log('SUBMIT FOR THE TEAM!');
+                    Object.keys(task.team).forEach(function(key) {
+                        if(task.team[key].displayName) {
+                            // console.log('Submitting for: ' + key);
+                            clmDataStore.events.submitSolution(eventId, taskId, key, link);
+                        }
+                    });
                     $mdDialog.hide();
                     spfAlert.success('Link is saved.');
-                }).catch(function (err) {
-                    $log.error(err);
-                    spfAlert.error('Failed to save the link.');
-                    return err;
-                });
-                clmDataStore.logging.inputLog({
-                    action: "submitLinkResponse",
-                    publicId: self.profile.$id,
-                    eventId: self.event.$id,
-                    taskId: taskId,
-                    timestamp: TIMESTAMP
-                });
+                    clmDataStore.logging.inputLog({
+                        action: "submitTeamLinkResponse",
+                        publicId: self.profile.$id,
+                        eventId: self.event.$id,
+                        taskId: taskId,
+                        members: Object.keys(task.team).filter(function (key) {
+                            if(task.team[key].displayName) {
+                                return key
+                            }
+                        }),
+                        timestamp: TIMESTAMP
+                    });
+                } else {
+                    clmDataStore.events.submitSolution(eventId, taskId, participant.$id, link).then(function () {
+                        $mdDialog.hide();
+                        spfAlert.success('Link is saved.');
+                    }).catch(function (err) {
+                        $log.error(err);
+                        spfAlert.error('Failed to save the link.');
+                        return err;
+                    });
+                    clmDataStore.logging.inputLog({
+                        action: "submitLinkResponse",
+                        publicId: self.profile.$id,
+                        eventId: self.event.$id,
+                        taskId: taskId,
+                        timestamp: TIMESTAMP
+                    });
+                }
             };
 
             this.cancel = function () {
@@ -2334,9 +2359,11 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
 
             self.leave = function (index) {
                 console.log("leave index is:", index);
-                leaveTeam(index);
-                self.selectedTeam = undefined;
-                previousSelectedTeam = undefined;
+                db.ref(`classMentors/eventSolutions/${eventId}/${participant.$id}/${taskId}`).remove().then(function () {
+                    leaveTeam(index);
+                    self.selectedTeam = undefined;
+                    previousSelectedTeam = undefined;
+                });
             };
 
             self.onChange = function (index) {
@@ -2344,21 +2371,71 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                 // If user has not joined any team before
                 if (previousSelectedTeam == undefined) {
                     if (index2 != undefined) {
-                        leaveTeam(index2);
+                        switchTeam(index2, index);
+                    } else {
+                        joinTeam(index);
                     }
-                    joinTeam(index);
                     previousSelectedTeam = index;
                 } else if (index != previousSelectedTeam) { //Check if selected index has changed, else do nothing.
                     // Leave previous team.
 
-                    leaveTeam(previousSelectedTeam);
-                    // Join new team.
-                    joinTeam(index);
+                    // leaveTeam(previousSelectedTeam);
+                    // // Join new team.
+                    // joinTeam(index);
+                    switchTeam(previousSelectedTeam, index);
                     previousSelectedTeam = index;
                 }else{
                     joinTeam(index);
                 }
             };
+
+            function switchTeam(oldIndex, newIndex) {
+                var team = self.teams[oldIndex];
+                var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${team.$id}/${participant.$id}`);
+                var currentSize;
+                ref.remove().then(function () {
+                    //do nothing
+                    var refCurrentSize = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${team.$id}/currentSize`);
+                    refCurrentSize.on("value", function (snapshot) {
+                        currentSize = snapshot.val();
+                        currentSize--;
+                    });
+                    //update currentsize in firebase, then assign to self.teams
+                    refCurrentSize.set(currentSize).then(function () {
+                        //retrieve the newly updated team promise and assign to this.teams
+                        var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}`);
+                        var teamEventPromise = $firebaseArray(ref);
+                        teamEventPromise.$loaded().then(function (result) {
+                            self.teams = result;
+                        })
+                    }).then(function () {
+                        var team = self.teams[newIndex];
+                        var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${team.$id}/${participant.$id}`);
+                        // var currentSize = 0;
+                        var currentSize;
+
+                        clmDataStore.events.joinTeam(eventId, taskId, team.$id, participant.$id, participant.user).then(function () {
+                            var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}`);
+                            var teamEventPromise = $firebaseArray(ref);
+                            teamEventPromise.$loaded().then(function (result) {
+                                self.teams = result;
+                            });
+                            clmDataStore.logging.inputLog(
+                                {
+                                    action: "formTeam",
+                                    eventId: eventId,
+                                    publicId: participant.$id,
+                                    timestamp: Date.now(),
+                                    taskId: taskId
+                                }
+                            );
+                        }).then(function () {
+                            //update progress asynchronously
+                            clmDataStore.events.submitSolution(eventId, taskId, participant.$id, "Team " + (newIndex + 1));
+                        });
+                    })
+                });
+            }
 
             function leaveTeam(index) {
                 var team = self.teams[index];
@@ -2381,7 +2458,6 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                         teamEventPromise.$loaded().then(function (result) {
                             self.teams = result;
                         })
-
                     });
 
                     // var refCurrentSize = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${team.$id}/currentSize`);
@@ -2485,7 +2561,6 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         DialogController.$inject = ['initialData'];
     };
 
-
     this.promptForSurvey = function (eventId, taskId, task, participant, userSolution) {
 
         if (task.survey === "School engagement scale") {
@@ -2506,6 +2581,8 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
     };
 
     this.promptForTextResponse = function (eventId, taskId, task, participant, userSolution) {
+        task.team = self.team[task.teamFormationRef];
+
         $mdDialog.show({
             parent: $document.body,
             template: responseTmpl,
@@ -2525,21 +2602,45 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             this.save = function (response) {
                 // console.log("this response is: ", response);
                 //this line adds solution to firebase
-                clmDataStore.events.submitSolution(eventId, taskId, participant.$id, response).then(function () {
+                if(task.team) {
+                    console.log('SUBMIT FOR THE TEAM!');
+                    Object.keys(task.team).forEach(function(key) {
+                        if(task.team[key].displayName) {
+                            // console.log('Submitting for: ' + key);
+                            clmDataStore.events.submitSolution(eventId, taskId, key, response);
+                        }
+                    });
                     $mdDialog.hide();
                     spfAlert.success('Response is saved.');
-                }).catch(function (err) {
-                    $log.error(err);
-                    spfAlert.error('Failed to save your response.');
-                    return err;
-                });
-                clmDataStore.logging.inputLog({
-                    action: "submitTextResponse",
-                    publicId: self.profile.$id,
-                    eventId: self.event.$id,
-                    taskId: taskId,
-                    timestamp: TIMESTAMP
-                });
+                    clmDataStore.logging.inputLog({
+                        action: "submitTeamTextResponse",
+                        publicId: self.profile.$id,
+                        eventId: self.event.$id,
+                        taskId: taskId,
+                        members: Object.keys(task.team).filter(function (key) {
+                            if(task.team[key].displayName) {
+                                return key
+                            }
+                        }),
+                        timestamp: TIMESTAMP
+                    });
+                } else {
+                    clmDataStore.events.submitSolution(eventId, taskId, participant.$id, response).then(function () {
+                        $mdDialog.hide();
+                        spfAlert.success('Response is saved.');
+                    }).catch(function (err) {
+                        $log.error(err);
+                        spfAlert.error('Failed to save your response.');
+                        return err;
+                    });
+                    clmDataStore.logging.inputLog({
+                        action: "submitTextResponse",
+                        publicId: self.profile.$id,
+                        eventId: self.event.$id,
+                        taskId: taskId,
+                        timestamp: TIMESTAMP
+                    });
+                }
             };
 
             this.cancel = function () {
@@ -2549,6 +2650,8 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
     };
 
     this.promptForCodeResponse = function (eventId, taskId, task, participant, userSolution) {
+        task.team = self.team[task.teamFormationRef];
+
         $mdDialog.show({
             clickOutsideToClose: true,
             parent: $document.body,
@@ -2586,21 +2689,46 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             this.save = function () {
                 var editor = ace.edit($document[0].querySelector('#editor'));
                 var response = editor.getValue();
-                clmDataStore.events.submitSolution(eventId, taskId, participant.$id, response).then(function () {
+
+                if(task.team) {
+                    console.log('SUBMIT FOR THE TEAM!');
+                    Object.keys(task.team).forEach(function(key) {
+                        if(task.team[key].displayName) {
+                            // console.log('Submitting for: ' + key);
+                            clmDataStore.events.submitSolution(eventId, taskId, key, response);
+                        }
+                    });
                     $mdDialog.hide();
                     spfAlert.success('Response is saved.');
-                }).catch(function (err) {
-                    $log.error(err);
-                    spfAlert.error('Failed to save your response.');
-                    return err;
-                });
-                clmDataStore.logging.inputLog({
-                    action: "submitCodeResponse",
-                    publicId: self.profile.$id,
-                    eventId: self.event.$id,
-                    taskId: taskId,
-                    timestamp: TIMESTAMP
-                });
+                    clmDataStore.logging.inputLog({
+                        action: "submitTeamCode",
+                        publicId: self.profile.$id,
+                        eventId: self.event.$id,
+                        taskId: taskId,
+                        members: Object.keys(task.team).filter(function (key) {
+                            if(task.team[key].displayName) {
+                                return key
+                            }
+                        }),
+                        timestamp: TIMESTAMP
+                    });
+                } else {
+                    clmDataStore.events.submitSolution(eventId, taskId, participant.$id, response).then(function () {
+                        $mdDialog.hide();
+                        spfAlert.success('Response is saved.');
+                    }).catch(function (err) {
+                        $log.error(err);
+                        spfAlert.error('Failed to save your response.');
+                        return err;
+                    });
+                    clmDataStore.logging.inputLog({
+                        action: "submitCodeResponse",
+                        publicId: self.profile.$id,
+                        eventId: self.event.$id,
+                        taskId: taskId,
+                        timestamp: TIMESTAMP
+                    });
+                }
             };
 
             this.cancel = function () {
@@ -2888,7 +3016,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             {name: 'Brother(s)'},
             {name: 'Relative(s)'},
             {name: 'Grandparent(s)'}
-        ]
+        ];
         this.selectedFamily = [];
         this.selectedRaceEthnicity = [];
 

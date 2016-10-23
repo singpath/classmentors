@@ -15,8 +15,8 @@
         <div>
           <md-input-container>
         <md-radio-group ng-model='ctrl.activityType' required>
-              <md-radio-button value="gameShow">Game Show (IRAT,TRAT)</md-radio-button>
-              <md-radio-button value="indexCards">Index Cards</md-radio-button>
+              <md-radio-button value="gameShow">IRAT:TRAT</md-radio-button>
+              <md-radio-button value="indexCards">Team Questions</md-radio-button>
               <md-radio-button value="collabSubmission">Collaborative Submission</md-radio-button>
             </md-radio-group>
           </md-input-container>
@@ -32,7 +32,7 @@
         <div>
           <label for="newExistingTeams">Select team formation method:</label><br>
           <md-input-container>
-            <md-select ng-model="ctrl.newExistingTeams" id="newExistingTeams">
+            <md-select aria-label="Team Formation Type" ng-model="ctrl.newExistingTeams" id="newExistingTeams">
               <md-option value="existingTeams" selected>From existing team formation</md-option>
               <md-option value="newTeams">Create new teams</md-option>
             </md-select>
@@ -45,7 +45,7 @@
           <!--{{ctrl.teamFormationMethod}}-->
           <label>Select create new team method:</label>
           <md-input-container>
-            <md-select ng-model="ctrl.teamFormationMethod" name="teamFormationMethod">
+            <md-select aria-label="Team Formation Method" ng-model="ctrl.teamFormationMethod" name="teamFormationMethod">
               <md-option value="teamSize" >By Team Size</md-option>
               <md-option value="noOfTeams" selected>By Number Of Teams</md-option>
             </md-select>
@@ -86,7 +86,7 @@
 
 
         <!--multiple choice segment-->
-        <div flex layout="column" layout-align="center stretch" ng-show="ctrl.activityType == 'gameShow'">
+        <div flex layout="column" layout-align="center stretch" ng-if="ctrl.activityType == 'gameShow'">
 
           <md-divider layout-padding ng-if="!$last"></md-divider>
           <label><b>IRAT/TRAT Questions</b></label><br>
@@ -99,11 +99,84 @@
 
           <label>Select existing or create new multiple choice question</label>
           <md-input-container>
-            <md-select ng-model="ctrl.selectedMCQ">
+            <md-select aria-label="MCQ Type" ng-model="ctrl.selectedMCQ">
               <md-option ng-value="createMCQ" selected>Create new MCQ</md-option>
               <md-option ng-repeat="m in mcqs" ng-value="$index"></md-option>
             </md-select>
           </md-input-container>
+        </div>
+
+        <div flex layout="column" layout-align="center stretch" ng-if="ctrl.activityType == 'collabSubmission'">
+
+          <md-divider layout-padding ng-if="!$last"></md-divider>
+          <label><b>Select Collaborative Submission Type</b></label><br>
+
+          <md-input-container>
+            <md-select aria-label="ColSubType" ng-model="ctrl.collabChallengeType" placeholder="Select Challenge to Submit Collaboratively">
+              <md-option value='textResponse'>Team Text Response</md-option>
+              <md-option value='linkPattern'>Team Link Submission</md-option>
+              <md-option value='code'>Team Code Challenge</md-option>
+            </md-select>
+          </md-input-container>
+
+          <div ng-if="ctrl.collabChallengeType == 'linkPattern'">
+            <md-input-container>
+              <label for="edit-link-pattern">Link Pattern for Link Submissions</label>
+              <input type="text" name="editTaskLink" id="edit-link-pattern"
+                     ng-value="ctrl.task.linkPattern"
+                     ng-model="ctrl.task.linkPattern"
+                     required="true"
+                     placeholer="Pattern"
+              />
+              <span><font color="red" size="2">E.g. Only google doc submission, link pattern is: "https://docs.google.com/"</font></span>
+
+              <div ng-messages="editTask.editTaskLink.$error">
+                <div ng-message="required">Required.</div>
+              </div>
+            </md-input-container>
+          </div>
+
+          <div ng-if="ctrl.collabChallengeType == 'textResponse'">
+            <md-input-container>
+
+              <label for="edit-text-response">Question</label>
+              <textarea name="editTextResponse" id="edit-text-response"
+                        ng-model="ctrl.task.textResponse"
+                        required
+                        placeholder="Question"
+                        rows="2" md-select-on-focus
+              ></textarea>
+
+              <div ng-messages="editTask.editTextResponse.$error">
+                <div ng-message="required">Required.</div>
+              </div>
+            </md-input-container>
+          </div>
+
+
+          <div ng-if="ctrl.collabChallengeType == 'code'">
+            <md-input-container>
+              <label for="edit-text-response">Question</label>
+              <textarea name="editCodeQuestion" id="edit-code-question"
+                        ng-model="ctrl.task.textResponse"
+                        required
+                        placeholder="Question"
+                        rows="2" md-select-on-focus
+              ></textarea>
+
+              <div ng-messages="editTask.editCodeQuestion.$error">
+                <div ng-message="required">Required.</div>
+              </div>
+            </md-input-container>
+            <md-input-container flex layout="column">
+              <md-select flex name="editCodeLang"
+                         ng-model="ctrl.task.lang" required placeholder="Select a Language">
+                <md-option ng-value="opt" ng-repeat="opt in ['Java', 'Javascript', 'HTML', 'Python']">
+                  {{opt}}
+                </md-option>
+              </md-select>
+            </md-input-container>
+          </div>
         </div>
 
         <div align="center">
