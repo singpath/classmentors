@@ -106,9 +106,11 @@
                         <!--ng-hide="ctrl.teamLeader && ctrl.teamLeader != ctrl.currentUserParticipant.$id"-->
                         <!--method below to generate text on who the team leader is-->
                         <!--{{ctrl.isTeamLeader(ctrl.event.$id, task.teamFormationRef, ctrl.currentUserParticipant)}}-->
+
                         <span ng-if="!ctrl.currentUserSolutions[task.$id]">
+
                             <md-button class="md-raised md-primary" ng-if="task.startTRAT"
-                                       ng-hide="ctrl.team[task.teamFormationRef].teamLeader && ctrl.team[task.teamFormationRef].teamLeader != ctrl.currentUserParticipant.$id"
+                                       ng-hide="ctrl.checkUser(task.teamFormationRef, ctrl.currentUserParticipant.$id) && ctrl.team[task.teamFormationRef].teamLeader != ctrl.currentUserParticipant.$id && ctrl.team[task.teamFormationRef].teamLeader != undefined"
                                        ng-click="ctrl.startTRAT(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant)"
                                        target="_blank"
                                        ng-disabled="task.closedAt"
@@ -118,9 +120,7 @@
                             <!--<label ng-show="ctrl.teamLeader != ctrl.currentUserParticipant.$id && task.startTRAT && ctrl.teamLeader">-->
                             <!--Your team leader is: {{ctrl.team[ctrl.teamLeader].displayName}}-->
                             <!--</label>-->
-                            {{ctrl.team[task.teamFormationRef].teamLeader}}
-                            {{}}
-                            <label ng-show="ctrl.team[task.teamFormationRef].teamLeader && ctrl.team[task.teamFormationRef].teamLeader != ctrl.currentUserParticipant.$id">
+                            <label ng-show="task.startTRAT && task.teamFormationRef && ctrl.checkUser(task.teamFormationRef, ctrl.currentUserParticipant.$id) && (ctrl.team[task.teamFormationRef].teamLeader != undefined && ctrl.team[task.teamFormationRef].teamLeader != ctrl.currentUserParticipant.$id)">
                                 Your team leader is: {{ctrl.team[task.teamFormationRef].teamLeader}}
                              </label>
                         </span>

@@ -150,7 +150,7 @@ createTeamActivityController.$inject = [
 ];
 
 function startTRATInitialData($q, spfAuthData, eventService, clmDataStore, firebaseApp, $firebaseObject, $firebaseArray, $route) {
-    
+
     var data = eventService.get();
     var db = firebaseApp.database();
 
@@ -321,7 +321,7 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
             timestamp: TIMESTAMP
         };
     }
-
+    
     var attempts = [];
     self.nextQuestion = function(){
         // For Single answer MCQ
