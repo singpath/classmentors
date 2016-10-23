@@ -4,7 +4,10 @@ import './classmentors.css!';
 export const component = {
     template: tmpl,
     controller: sideNavController,
-    controllerAs: 'ctrl'
+    controllerAs: 'ctrl',
+    // resolve: {
+    //     route: sideNavControllerRouteResolver
+    // }
 };
 
 function sideNavController() {
@@ -14,7 +17,6 @@ function sideNavController() {
     this.navProfile = {};
     this.navFeedback = {};
     this.navQQ = {};
-
 
     this.navClick = function (navStyle) {
         if (navStyle == 'navAceOfCoders') {
@@ -76,7 +78,17 @@ function sideNavController() {
 
     }
 
-};
+}
+//
+// sideNavController.$inject = ['route'];
+//
+// function sideNavControllerRouteResolver($route) {
+//     return $route.current.params;
+// }
+//
+// sideNavControllerRouteResolver.$inject = ['$route'];
+
+
 
 export{
     sideNavController

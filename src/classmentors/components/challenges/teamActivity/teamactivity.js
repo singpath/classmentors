@@ -61,7 +61,7 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
     function formTeams(method, methodParameter, participants) {
         var teams = [];
         var teamStructure = [];
-        participants = participants + 1;
+        // participants = participants + 1;
         console.log('Total participants :', participants);
         if (method == 'noOfTeams') {
             //initialze teamStructure with team size of 0 each
@@ -391,7 +391,7 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
                     {
                         publicId: userPublicId,
                         timestamp: TIMESTAMP,
-                        action: "wrongTeamSubmission",
+                        action: "correctTeamSubmission",
                         taskId: self.tratId,
                         eventId: self.eventId,
                         members: self.team.map(function (member) {
@@ -432,20 +432,18 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
                     delete self.options[key].checked;
                 }
                 self.multiAns = [];
-                for(var member in self.team) {
-                    let publicId = self.team[member].$id;
-                    if(publicId.indexOf("teamLeader") < 0) {
-                        clmDataStore.logging.inputLog(
-                            {
-                                publicId: publicId,
-                                timestamp: TIMESTAMP,
-                                action: "wrongTeamSubmission",
-                                taskId: self.tratId,
-                                eventId: self.eventId
-                            }
-                        )
+                clmDataStore.logging.inputLog(
+                    {
+                        publicId: userPublicId,
+                        timestamp: TIMESTAMP,
+                        action: "wrongTeamSubmission",
+                        taskId: self.tratId,
+                        eventId: self.eventId,
+                        members: self.team.map(function (member) {
+                            return member.$id;
+                        })
                     }
-                }
+                )
             }else{
                 // Add score
                 // console.log('Single ans mcq is correct!');
@@ -469,20 +467,18 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
                     updateLog(buildMessage("Question " + (self.index + 1), 'Remaining attempts: ' + self.noOfTries, 'black'));
                     self.options = loadOptions(self.question);
                 }
-                for(var member in self.team) {
-                    let publicId = self.team[member].$id;
-                    if(publicId.indexOf("teamLeader") < 0) {
-                        clmDataStore.logging.inputLog(
-                            {
-                                publicId: publicId,
-                                timestamp: TIMESTAMP,
-                                action: "correctTeamSubmission",
-                                taskId: self.tratId,
-                                eventId: self.eventId
-                            }
-                        )
+                clmDataStore.logging.inputLog(
+                    {
+                        publicId: userPublicId,
+                        timestamp: TIMESTAMP,
+                        action: "correctTeamSubmission",
+                        taskId: self.tratId,
+                        eventId: self.eventId,
+                        members: self.team.map(function (member) {
+                            return member.$id;
+                        })
                     }
-                }
+                )
             }
             // console.log(self.totalScore);
             self.multiAns = [];

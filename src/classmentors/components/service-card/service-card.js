@@ -547,6 +547,12 @@ export class GenericServiceFormCtrl {
    * Should update the default profileUrl.
    */
   onNameChanged() {
+    // console.log("Service card info:", this.$card.service.name);
+    // console.log("Selected ID: ", this.name);
+    if(this.$card.service.name == 'Code Combat') {
+      this.name = this.name.toLowerCase();
+    }
+    // console.log("New ID: ", this.name);
     this.setProfileUrl();
   }
 
