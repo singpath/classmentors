@@ -1,0 +1,59 @@
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
+<md-content flex class="md-padding">
+    <div layout="row">
+        <div layout="column" layout-align="end center">
+            <md-button class="md-icon-button launch" aria-label="Flag" ng-click="ctrl.toggleQnFlag()" ng-disabled="ctrl.question.owner.publicId != ctrl.currentUser.publicId">
+                <md-icon ng-if="!ctrl.question.flagged" style="font-size: 30px">error_outline</md-icon>
+                <md-icon ng-if="ctrl.question.flagged" style="font-size: 30px; color: red">error_outline</md-icon>
+            </md-button>
+            <div style="font-size: 12px" >Alert</div>
+            <div style="font-size: 12px" >Educator</div>
+        </div>
+        <div layout="column" layout-align="center center" flex="10">
+            <md-button class="md-icon-button launch" aria-label="Vote" ng-click="ctrl.toggleQnVote(ctrl.question, ctrl.question.$id)">
+                <md-icon ng-if="!ctrl.question.upVotes || !ctrl.question.upVotes[ctrl.currentUser.publicId]" style="font-size: 35px">thumb_up</md-icon>
+                <md-icon ng-if="ctrl.question.upVotes && ctrl.question.upVotes[ctrl.currentUser.publicId]" style="font-size: 35px; color: orange;">thumb_up</md-icon>
+            </md-button>
+            <div style="font-size: 15px" >{{ctrl.question.upVotes | countObjKeys}} vote(s)</div>
+        </div>
+        <div layout="column" flex>
+            <div style="font-size: 20px">{{ctrl.question.title}}</div>
+            <div style="font-size: 10px; color:grey;">Posted by {{ctrl.question.owner.displayName}} ({{ctrl.question.createdAt | date:'dd/MM/yy hh:mma'}})</div>
+            <div style="font-size: 15px;">{{ctrl.question.body}}</div>
+        </div>
+        <md-button ng-if="!ctrl.question.answeredBy" class="md-raised md-primary" ng-click="ctrl.answerQuestion(ctrl.event.$id, ctrl.question.$id, ctrl.currentUser)">Post a Response</md-button>
+        <md-button ng-if="ctrl.question.answeredBy" class="md-raised md-primary" disabled="">Question closed</md-button>
+    </div>
+
+    <md-list>
+        <md-list-item ng-repeat="answer in ctrl.answers | orderBy:['acceptedAt', '-upVotes | countObjKeys', '-createdAt']" layout="row">
+            <div layout="column" layout-align="center center" ng-show="ctrl.question.owner.publicId == ctrl.currentUser.publicId">
+                <md-button class="md-icon-button launch" ng-if="!answer.acceptedAt" ng-click="ctrl.toggleAskerChoice(answer.$id, false, answer)">
+                    <md-icon ng-style="{'font-size': '30px'}">star_rate</md-icon>
+                </md-button>
+                <md-button class="md-icon-button launch" ng-if="answer.acceptedAt" ng-click="ctrl.toggleAskerChoice(answer.$id, true, answer)">
+                    <md-icon ng-style="{'font-size': '30px', color: 'orange'}">star_rate</md-icon>
+                </md-button>
+                <div style="font-size: 15px" ng-if="answer.acceptedAt">Asker's</div>
+                <div style="font-size: 15px" ng-if="answer.acceptedAt">Choice</div>
+            </div>
+            <div layout="column" layout-align="center center" ng-show="answer.acceptedAt && ctrl.question.owner.publicId != ctrl.currentUser.publicId">
+                <md-icon ng-style="{color: 'yellow', 'font-size': '30px'}">star_rate</md-icon>
+                <div style="font-size: 15px" >Asker's</div>
+                <div style="font-size: 15px" >Choice</div>
+            </div>
+            <div layout="column" layout-align="center center" flex="10">
+                <md-button class="md-icon-button launch" aria-label="Vote" ng-click="ctrl.toggleAnsVote(ctrl.question.$id, answer)">
+                    <md-icon ng-if="!answer.upVotes || !answer.upVotes[ctrl.currentUser.publicId]" style="font-size: 35px">thumb_up</md-icon>
+                    <md-icon ng-if="answer.upVotes && answer.upVotes[ctrl.currentUser.publicId]" style="font-size: 35px; color: orange;">thumb_up</md-icon>
+                </md-button>
+                <div style="font-size: 15px" >{{answer.upVotes | countObjKeys}} vote(s)</div>
+            </div>
+            <div layout="column" flex>
+                <div style="font-size: 10px; color:grey;">Posted by {{answer.owner.displayName}} ({{ctrl.question.createdAt | date:'dd/MM/yy hh:mma'}})</div>
+                <div style="font-size: 15px;">{{answer.body}}</div>
+            </div>
+        </md-list-item>
+    </md-list>
+</md-content>

@@ -6,7 +6,8 @@
       "publicIds": {
         "$publicId": {
           ".validate": "newData.isString() && newData.val().matches(/^[-:a-zA-Z0-9]+$/) && $publicId.matches(/^[-a-z0-9]{3,20}$/) && ($publicId == null || newData.parent().parent().parent().child('auth').child('publicIds').child($publicId).val() == newData.val() && newData.parent().parent().parent().child('auth').child('usedPublicIds').child($publicId).val() == true && newData.parent().parent().parent().child('auth').child('users').child(newData.val()).child('publicId').val() == $publicId)",
-          ".write": "auth != null && auth.uid == newData.val() && (newData.val() != null && data.val() == null)"
+          ".write": "auth != null && auth.uid == newData.val() && (newData.val() != null && data.val() == null)",
+          ".read": "auth != null"
         }
       },
       "usedPublicIds": {
@@ -96,11 +97,10 @@
       "eventQuestions": {
         ".read": "root.child('classMentors/admins').child(auth.uid).val() == true",
         "$eventId": {
-          ".read": "auth != null && root.child('auth/users').child(auth.uid).child('publicId').exists() && (root.child('classMentors/events').child($eventId).child('owner/publicId').val() == root.child('auth/users').child(auth.uid).child('publicId').val() || root.child('classMentors/eventParticipants').child($eventId).child(root.child('auth/users').child(auth.uid).child('publicId').val()).exists())",
-          ".write": "auth != null && root.child('auth/users').child(auth.uid).child('publicId').exists() && root.child('classMentors/events').child($eventId).child('owner/publicId').val() == root.child('auth/users').child(auth.uid).child('publicId').val()",
+          ".read": "auth != null && root.child('auth/users').child(auth.uid).child('publicId').exists() && (root.child('classMentors/events').child($eventId).child('owner/publicId').val() == root.child('auth/users').child(auth.uid).child('publicId').val() || root.child('classMentors/eventParticipants').child($eventId).child(root.child('auth/users').child(auth.uid).child('publicId').val()).exists() || root.child('classMentors/events').child($eventId).child('assistants').child(root.child('auth/users').child(auth.uid).child('publicId').val()).exists())",
+          ".write": "auth != null && root.child('auth/users').child(auth.uid).child('publicId').exists() && (root.child('classMentors/events').child($eventId).child('owner/publicId').val() == root.child('auth/users').child(auth.uid).child('publicId').val() || root.child('classMentors/eventParticipants').child($eventId).child(root.child('auth/users').child(auth.uid).child('publicId').val()).exists() || root.child('classMentors/events').child($eventId).child('assistants').child(root.child('auth/users').child(auth.uid).child('publicId').val()).exists())",
           "questions": {
             "$questionId": {
-              ".write": "auth != null && root.child('auth/users').child(auth.uid).child('publicId').exists() && root.child('classMentors/eventParticipants').child($eventId).child(root.child('auth/users').child(auth.uid).child('publicId').val()).exists()",
               ".validate": "newData.hasChildren(['title', 'body', 'owner', 'createdAt'])",
               "title": {
                 ".validate": "newData.isString() && newData.val().length >= 3"
@@ -120,10 +120,17 @@
               "upVotes": {
                 "$participantId": {}
               },
-              "createdAt": {
-                ".validate": "data.exists() == false && newData.val() == now"
+              "respondedBy": {
+                "$answerId": {}
               },
-              "answeredBy": {},
+              "createdAt": {
+                ".validate": "true || data.exists() == false && newData.val() == now"
+              },
+              "answeredBy": {
+                "$answerId": {}
+              },
+              "flagged": {
+              },
               "$other": {
                 ".validate": false
               }
@@ -131,25 +138,35 @@
           },
           "answers": {
             "$questionId": {
-              "$publicId": {
-                "body": {},
+              "$answerId": {
+                "owner": {
+                  ".validate": "newData.hasChildren(['displayName', 'gravatar', 'publicId'])",
+                  "publicId": {
+                    ".validate": "(data.exists() == false || data.val() == newData.val()) && newData.val().length > 0 && root.child('auth/publicIds').child(newData.val()).val() == auth.uid"
+                  },
+                  "$key": {
+                    ".validate": "$key == 'displayName' || $key == 'gravatar' && newData.val() == root.child('auth/users').child(auth.uid).child($key).val()"
+                  }
+                },
+                "body": {
+                  ".validate": "newData.isString() && newData.val().length >= 3"
+                },
                 "upVotes": {
                   "$participantId": {}
                 },
-                "createdAt": {},
-                "acceptedAt": {},
-                "comments": {
-                  "$commentId": {
-                    "body": {},
-                    "createdAt": {},
-                    "owner": {
-                      "displayName": {},
-                      "publicId": {}
-                    }
-                  }
-                }
+                "createdAt": {
+                  ".validate": "true || data.exists() == false && newData.val() == now"
+                },
+                "acceptedAt": {
+                  ".validate": "true || data.exists() == false && newData.val() == now"
+                },
+                "inResponseTo": {}
               }
             }
+          },
+          "closedForum": {
+            ".read": true,
+            ".write": "auth != null && root.child('auth/users').child(auth.uid).child('publicId').exists() && root.child('classMentors/events').child($eventId).child('owner/publicId').val() == root.child('auth/users').child(auth.uid).child('publicId').val()"
           },
           "$other": {
             ".validate": false
@@ -160,7 +177,7 @@
         "$userActions": {
           ".write": "newData.hasChildren(['publicId','action','timestamp'])",
           "publicId": {
-            ".validate": "newData.isString() && root.child('auth/publicIds').child(newData.val()).val() === auth.uid"
+            ".validate": " newData.isString() && root.child('auth/publicIds').child(newData.val()).val() === auth.uid"
           }
         },
         ".write": "auth !== null",
@@ -268,7 +285,22 @@
                 }
               },
               "$key": {
-                ".validate": "($key == 'displayName' || $key == 'gravatar') && newData.val() == root.child('auth/users').child(auth.uid).child($key).val()"
+                ".validate": "($key == 'displayName' || $key == 'gravatar') && newData.val() == root.child('auth/users').child(root.child('auth/publicIds').child($publicId).val()).child($key).val()"
+              }
+            },
+            "services": {
+              "$serviceId": {
+                "details": {
+                  "id": {
+                    ".validate": "newData.val() == root.child('classMentors/userProfiles').child($publicId).child('services').child($serviceId).child('details/id').val()"
+                  },
+                  "$other": {
+                    ".validate": "false"
+                  }
+                },
+                "$other": {
+                  ".validate": "false"
+                }
               }
             },
             "joinedAt": {
@@ -799,24 +831,6 @@
           },
           "services": {
             "$serviceId": {
-              "badges": {
-                "$badgeId": {
-                  ".validate": "newData.hasChildren(['id', 'name', 'iconUrl'])",
-                  "iconUrl": {
-                    ".validate": "newData.isString() && newData.val().matches(/(https?\\:\\/)?\\/.+/)"
-                  },
-                  "id": {
-                    ".validate": "newData.isString() && newData.val().length >= 3"
-                  },
-                  "name": {
-                    ".validate": "newData.isString() && newData.val().length >= 3"
-                  },
-                  "url": {
-                    ".validate": "newData.isString() && newData.val().matches(/(https?\\:)?\\/\\/.+/)"
-                  }
-                },
-                ".write": "auth !== null && root.child('classMentors/admins').child(auth.uid).val() === true"
-              },
               "details": {
                 ".validate": "newData.hasChildren(['id', 'name', 'registeredBefore'])",
                 "id": {

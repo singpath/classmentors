@@ -20,8 +20,7 @@ function createTeamActivityInitialData($q, eventService, clmDataStore) {
 }
 createTeamActivityInitialData.$inject = ['$q', 'eventService', 'clmDataStore'];
 
-function createTeamActivityController($q, initialData, clmDataStore, $location, 
-    urlFor, eventService, $mdDialog, firebaseApp, $firebaseObject, $firebaseArray, $log) {
+function createTeamActivityController($q, initialData, clmDataStore, $location, urlFor, eventService, $mdDialog, spfAlert, firebaseApp, $firebaseObject, $firebaseArray, $log) {
     var self = this;
 
     // console.log("initialdata for teamform are", initialData);
@@ -40,16 +39,17 @@ function createTeamActivityController($q, initialData, clmDataStore, $location,
     self.newExistingTeams = null;
     self.teamFormationMethod = null;
     self.teamFormationParameter = null;
+    self.collabChallengeType = null;
 
     self.submit = function () {
+
         self.task.activityType = self.activityType;
         self.task.newExistingTeams = self.newExistingTeams;
         self.task.teamFormationMethod = self.teamFormationMethod;
         self.task.teamFormationParameter = self.teamFormationParameter;
         self.event.teams = formTeams(self.teamFormationMethod, self.teamFormationParameter, self.participants.length);
 
-        console.log(self.task.activityType);
-        if(self.task.activityType == 'viewMcq'){
+        if(self.activityType == 'gameShow') {
             self.task.startIRAT = true;
             eventService.set({
                 taskType: self.taskType,
@@ -58,36 +58,38 @@ function createTeamActivityController($q, initialData, clmDataStore, $location,
                 isOpen: initialData.data.isOpen
             });
             $location.path(urlFor('viewMcq'));
-        }else if(self.task.activityType == 'indexCards'){
-            console.log(self.task);
-            var db = firebaseApp.database();
-            var eventTaskRef = db.ref(`classMentors/eventTasks/${self.event.$id}`);
-            //create text response challenge
-            console.log(self.event);
-            // var priority = 1;
-            var textResponsePromise = addTask(eventTaskRef ,addTextResponse(self.task), initialData.data.isOpen);
-            textResponsePromise.then(function(ref){
-                return addTask(eventTaskRef, buildTeamFormationTask(ref.key, self.task), false);
-            }).then(function(teamFormationPromise){
-                var eventTeamsRef = db.ref(`classMentors/eventTeams/${self.event.$id}/${teamFormationPromise.key}`);
-                return $q.all({
-                    teamVotingTask: addTask(eventTaskRef, buildTeamVotingTask(teamFormationPromise.key, self.task), false),
-                    initTeams: self.event.teams.map(function(team){return eventTeamsRef.push(team)})
-                });
-            }).then(function(voteTaskPromise){
-                return addTask(eventTaskRef, buildReflectionQuestion(voteTaskPromise.teamVotingTask.key,self.task), false);
-            })
+        } else if (self.activityType == 'collabSubmission') {
+            self.task.collabChallengeType = self.collabChallengeType;
+            createColSubActivity(self.event, self.task, initialData.data.isOpen)
+        } else if(self.task.activityType == 'indexCards'){
+                console.log(self.task);
+                var db = firebaseApp.database();
+                var eventTaskRef = db.ref(`classMentors/eventTasks/${self.event.$id}`);
+                //create text response challenge
+                console.log(self.event);
+                // var priority = 1;
+                var textResponsePromise = addTask(eventTaskRef ,addTextResponse(self.task), initialData.data.isOpen);
+                textResponsePromise.then(function(ref){
+                    return addTask(eventTaskRef, buildTeamFormationTask(ref.key, self.task), false);
+                }).then(function(teamFormationPromise){
+                    var eventTeamsRef = db.ref(`classMentors/eventTeams/${self.event.$id}/${teamFormationPromise.key}`);
+                    return $q.all({
+                        teamVotingTask: addTask(eventTaskRef, buildTeamVotingTask(teamFormationPromise.key, self.task), false),
+                        initTeams: self.event.teams.map(function(team){return eventTeamsRef.push(team)})
+                    });
+                }).then(function(voteTaskPromise){
+                    return addTask(eventTaskRef, buildReflectionQuestion(voteTaskPromise.teamVotingTask.key,self.task), false);
+                })
 
-            // console.log(textResponsePromise)
-            // textResponsePromise.then();
-            // var teamFormationPromise = clmDataStore.event.addTask()
-            //create team formation challenge
-            //create voting
-            //create reflection challenge
-        }
-        
-        
-    };
+                // console.log(textResponsePromise)
+                // textResponsePromise.then();
+                // var teamFormationPromise = clmDataStore.event.addTask()
+                //create team formation challenge
+                //create voting
+                //create reflection challenge
+            }
+        };
+
 
     function buildReflectionQuestion(taskFrom, task){
         return{
@@ -104,7 +106,7 @@ function createTeamActivityController($q, initialData, clmDataStore, $location,
                     "Figured it out on my own or answered by peers",
                     "Post this question to Question Queue to seek for an answer"
                 ]
-            }), 
+            }),
             type: "reflectionQuestion"
         }
 
@@ -150,10 +152,86 @@ function createTeamActivityController($q, initialData, clmDataStore, $location,
         }
     }
 
-    function addTextResponse(task){
-        task.textResponse = 'Placeholder';
-        // task.priority = priority;
-        return task;
+// function addTextResponse(task){
+//     task.textResponse = 'Placeholder';
+//     // task.priority = priority;
+//     return task;
+
+    function createColSubActivity(event, task, isOpen) {
+        console.log("Event: ",event);
+        console.log("Task: ",task);
+        console.log("isOpen: ",isOpen);
+
+        var timestamp = Date.now();
+
+        // Get firebase database object.
+        var db = firebaseApp.database();
+
+        self.creatingTask = true;
+
+        // Get firebase task reference.
+        var taskRef = db.ref(`classMentors/eventTasks/${event.$id}`);
+
+        var ref = taskRef.push();
+
+        var teamFormationTaskRef = db.ref(`classMentors/eventTasks/${event.$id}`).push();
+
+        var eventTeamsRef = db.ref(`classMentors/eventTeams/${event.$id}/${teamFormationTaskRef.key}`);
+        var settableRef = db.ref(`classMentors/eventTasks/${event.$id}/${teamFormationTaskRef.key}`);
+
+        // Define 'teamFormationTask'.
+        var teamFormationTask = {
+            title: task.title,
+            description: "Join a team to submit undertake a challenge together!",
+            taskFrom: teamFormationTaskRef.key,
+            formationPattern: true,
+            openedAt: {'.sv': 'timestamp'},
+            showProgress: task.showProgress,
+            archived: false,
+            type: "formTeam",
+            teamFormationMethod: task.teamFormationMethod
+        };
+
+        var collabTask = {
+            teamFormationRef: teamFormationTaskRef.key,
+            title: task.title,
+            description: task.description,
+            closedAt: {'.sv': 'timestamp'},
+            showProgress: task.showProgress,
+            archived: false,
+            type: task.collabChallengeType,
+            teamFormationMethod: task.teamFormationMethod
+        };
+
+        if(task.linkPattern) {
+            collabTask.linkPattern = task.linkPattern;
+        } else if (task.lang) {
+            collabTask.lang = task.lang;
+            collabTask.textResponse = task.textResponse;
+        } else {
+            collabTask.textResponse = task.textResponse;
+        }
+
+        console.log('TeamFormationTask: ', teamFormationTask);
+        console.log('collabTask: ', collabTask);
+
+        settableRef.set(teamFormationTask).then(function () {
+
+        }).catch(function (error) {
+            console.log('FAILED AT SETTING TEAM FORMATION TASK')
+        });
+
+        taskRef.push(collabTask).then(function () {
+            // Create 'teams' in 'eventTeams'.
+            for (let i = 0; i < event.teams.length; i++) {
+                let team = event.teams[i];
+                eventTeamsRef.push(team);
+            }
+            spfAlert.success('Challenge saved');
+            $location.path(urlFor('editEvent', {eventId: event.$id}));
+        }).catch(function (error) {
+            console.log('FAILED AT SETTING COLLAB TASK');
+        });
     }
 
     function formTeams(method, methodParameter, participants) {
@@ -166,7 +244,7 @@ function createTeamActivityController($q, initialData, clmDataStore, $location,
             teamStructure = Array.apply(null, Array(methodParameter)).map(Number.prototype.valueOf,0);
             console.log('teamStructure :', teamStructure);
             //add 1 to each team until there are no more participants left
-            for (var i = 0; i < participants; i++) {
+            for (let i = 0; i < participants; i++) {
                 teamStructure[i % methodParameter] += 1;
             }
 
@@ -176,12 +254,12 @@ function createTeamActivityController($q, initialData, clmDataStore, $location,
                 participants -= methodParameter;
             }
             // split up remaining participants
-            for (var i = 0; i < participants; i++) {
+            for (let i = 0; i < participants; i++) {
                 teamStructure[i % teamStructure.length] += 1;
             }
         }
         //Create 'teams'
-        for (var i = 0; i < teamStructure.length; i++) {
+        for (let i = 0; i < teamStructure.length; i++) {
             // teams[i] = populateTeam(teamStructure[i]);
             teams.push({
                 maxSize: teamStructure[i],
@@ -212,12 +290,12 @@ function createTeamActivityController($q, initialData, clmDataStore, $location,
         // console.log("cal", Math.ceil(totalParticipants / noTeamsOrStudents));
         self.teamsMaximumStudents = Math.ceil(totalParticipants / noTeamsOrStudents) ? Math.ceil(totalParticipants / noTeamsOrStudents) : 0;
 
-    }
+    };
 
     self.calculationResult = function () {
 
         return self.teamsMaximumStudents;
-    }
+    };
 
     //this function double checks with user if he wishes to go back and discard all changes thus far
     this.discardChanges = function (ev) {
@@ -243,14 +321,15 @@ createTeamActivityController.$inject = [
     'urlFor',
     'eventService',
     '$mdDialog',
-    'firebaseApp', 
-    '$firebaseObject', 
+    'spfAlert',
+    'firebaseApp',
+    '$firebaseObject',
     '$firebaseArray',
     '$log'
 ];
 
 function startTRATInitialData($q, spfAuthData, eventService, clmDataStore, firebaseApp, $firebaseObject, $firebaseArray, $route) {
-    
+
     var data = eventService.get();
     var db = firebaseApp.database();
 
@@ -327,7 +406,6 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
     self.question = self.questions[self.index];
     self.options = self.question.options;
     var userPublicId = initialData.currentUser.publicId;
-    // console.log(initialData.currentUser);
     self.eventId = initialData.eventId;
     var teamAndteamId = initialData.teamAndteamId;
     // console.log(initialData.teamAndteamId);
@@ -363,6 +441,7 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
     self.totalScore = 0;
     //Init team log
     self.teamLog = null;
+    //print out question number and number of attempts first
 
     function refreshLog() {
         $firebaseArray(teamLogRef.orderByKey()).$loaded(function (data) {
@@ -378,6 +457,8 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
             refreshLog();
         });
     };
+
+    updateLog(buildMessage("Question " + (self.index + 1), 'Remaining attempts: ' + self.noOfTries, 'black'));
 
     self.submitTrat = function () {
         $location.path(urlFor('oneEvent'));
@@ -422,9 +503,6 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
 
     var attempts = [];
     self.nextQuestion = function(){
-        // console.log(userAnswers);
-        // console.log('Curr index ', self.index);
-        // console.log(self.questions.length);
         // For Single answer MCQ
         if (self.selected != null) {
             var tempArray = [];
@@ -432,13 +510,13 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
             var result = markQuestions(tempArray, self.index);
             if(result == 0){
                 self.noOfTries -= 1;
-                updateLog(buildMessage("Incorrect", 'Remaining attempts: ' + self.noOfTries, '#A9241C'));
+                updateLog(buildMessage("Question " + (self.index + 1) + ": " + "Incorrect", 'Remaining attempts: ' + self.noOfTries, '#A9241C'));
                 console.log(self.team);
                 // Store reccord
                 attempts.push(tempArray);
                 // console.log('Current attempts: ', attempts);
                 if(self.noOfTries == 0){
-                    updateLog(buildMessage("Incorrect", 'No attempts remaining', '#A9241C'));
+                    updateLog(buildMessage("Question " + (self.index + 1) + ": " + "Incorrect", 'No attempts remaining', '#A9241C'));
                     self.totalScore += 0;
                     if(self.index == self.questions.length - 1){
                         userAnswers.push(attempts);
@@ -451,29 +529,27 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
                         self.noOfTries = 3;
                         userAnswers.push(attempts);
                         attempts = [];
-                        updateLog(buildMessage("New Question ", 'Remaining attempts: ' + self.noOfTries, 'black'));
                         self.question = loadQuestion(self.index += 1, self.questions);
+                        updateLog(buildMessage("Question " + (self.index + 1), 'Remaining attempts: ' + self.noOfTries, 'black'));
                         self.options = loadOptions(self.question);
                     }
                 }
-                for(var member in self.team) {
-                    let publicId = self.team[member].$id;
-                    if(publicId.indexOf("teamLeader") < 0) {
-                        clmDataStore.logging.inputLog(
-                            {
-                                publicId: publicId,
-                                timestamp: TIMESTAMP,
-                                action: "wrongTeamSubmission",
-                                taskId: self.tratId,
-                                eventId: self.eventId
-                            }
-                        )
+                clmDataStore.logging.inputLog(
+                    {
+                        publicId: userPublicId,
+                        timestamp: TIMESTAMP,
+                        action: "wrongTeamSubmission",
+                        taskId: self.tratId,
+                        eventId: self.eventId,
+                        members: self.team.map(function (member) {
+                            return member.$id;
+                        })
                     }
-                }
+                )
             }else{
                 // Add score if correct
                 self.totalScore += addScore(self.noOfTries, 1);
-                updateLog(buildMessage("Correct!", 'Remaining attempts: ' + self.noOfTries, '#259b24'));
+                updateLog(buildMessage("Question " + (self.index + 1) + ": " + "Correct!", 'Remaining attempts: ' + self.noOfTries, '#259b24'));
                 attempts.push(tempArray);
                 if(self.index == self.questions.length - 1){
                         userAnswers.push(attempts);
@@ -486,24 +562,22 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
                     self.noOfTries = 3;
                     userAnswers.push(attempts);
                     attempts = [];
-                    updateLog(buildMessage("New Question ", 'Remaining attempts: ' + self.noOfTries, 'black'));
                     self.question = loadQuestion(self.index += 1, self.questions);
+                    updateLog(buildMessage("Question " + (self.index + 1), 'Remaining attempts: ' + self.noOfTries, 'black'));
                     self.options = loadOptions(self.question);
                 }
-                for(var member in self.team) {
-                    let publicId = self.team[member].$id;
-                    if(publicId.indexOf("teamLeader") < 0) {
-                        clmDataStore.logging.inputLog(
-                            {
-                                publicId: publicId,
-                                timestamp: TIMESTAMP,
-                                action: "correctTeamSubmission",
-                                taskId: self.tratId,
-                                eventId: self.eventId
-                            }
-                        )
+                clmDataStore.logging.inputLog(
+                    {
+                        publicId: userPublicId,
+                        timestamp: TIMESTAMP,
+                        action: "correctTeamSubmission",
+                        taskId: self.tratId,
+                        eventId: self.eventId,
+                        members: self.team.map(function (member) {
+                            return member.$id;
+                        })
                     }
-                }
+                )
             }
             // console.log(self.totalScore);
             // teamAns(tempArray);
@@ -514,8 +588,7 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
                 self.noOfTries -= 1;
                 // Store reccord
                 attempts.push(self.multiAns);
-                console.log('Current attempts: ', attempts);
-                updateLog(buildMessage("Incorrect", 'Remaining attempts: ' + self.noOfTries, '#A9241C'));
+                updateLog(buildMessage("Question " + (self.index + 1) + ": " + "Incorrect", 'Remaining attempts: ' + self.noOfTries, '#A9241C'));
                 if(self.noOfTries == 0){
                     self.totalScore += 0;
                     if(self.index == self.questions.length - 1){
@@ -528,8 +601,8 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
                         self.noOfTries = 3;
                         userAnswers.push(attempts);
                         attempts = [];
-                        updateLog(buildMessage("New Question ", 'Remaining attempts: ' + self.noOfTries, 'black'));
                         self.question = loadQuestion(self.index += 1, self.questions);
+                        updateLog(buildMessage("Question " + (self.index + 1), 'Remaining attempts: ' + self.noOfTries, 'black'));
                         self.options = loadOptions(self.question);
                     }
                 }
@@ -538,27 +611,25 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
                     delete self.options[key].checked;
                 }
                 self.multiAns = [];
-                for(var member in self.team) {
-                    let publicId = self.team[member].$id;
-                    if(publicId.indexOf("teamLeader") < 0) {
-                        clmDataStore.logging.inputLog(
-                            {
-                                publicId: publicId,
-                                timestamp: TIMESTAMP,
-                                action: "wrongTeamSubmission",
-                                taskId: self.tratId,
-                                eventId: self.eventId
-                            }
-                        )
+                clmDataStore.logging.inputLog(
+                    {
+                        publicId: userPublicId,
+                        timestamp: TIMESTAMP,
+                        action: "wrongTeamSubmission",
+                        taskId: self.tratId,
+                        eventId: self.eventId,
+                        members: self.team.map(function (member) {
+                            return member.$id;
+                        })
                     }
-                }
+                )
             }else{
                 // Add score
                 // console.log('Single ans mcq is correct!');
                 // console.log('index is : ',self.index);
                 attempts.push(self.multiAns);
                 self.totalScore += addScore(self.noOfTries, 1);
-                updateLog(buildMessage("Correct!", 'Remaining attempts: ' + self.noOfTries, '#259b24'));
+                updateLog(buildMessage("Question " + (self.index + 1) + ": " + "Correct!", 'Remaining attempts: ' + self.noOfTries, '#259b24'));
                 if(self.index == self.questions.length - 1){
                     userAnswers.push(attempts);
                     attempts = [];
@@ -571,24 +642,22 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
                     self.noOfTries = 3;
                     userAnswers.push(attempts);
                     attempts = [];
-                    updateLog(buildMessage("New Question ", 'Remaining attempts: ' + self.noOfTries, 'black'));
                     self.question = loadQuestion(self.index += 1, self.questions);
+                    updateLog(buildMessage("Question " + (self.index + 1), 'Remaining attempts: ' + self.noOfTries, 'black'));
                     self.options = loadOptions(self.question);
                 }
-                for(var member in self.team) {
-                    let publicId = self.team[member].$id;
-                    if(publicId.indexOf("teamLeader") < 0) {
-                        clmDataStore.logging.inputLog(
-                            {
-                                publicId: publicId,
-                                timestamp: TIMESTAMP,
-                                action: "correctTeamSubmission",
-                                taskId: self.tratId,
-                                eventId: self.eventId
-                            }
-                        )
+                clmDataStore.logging.inputLog(
+                    {
+                        publicId: userPublicId,
+                        timestamp: TIMESTAMP,
+                        action: "correctTeamSubmission",
+                        taskId: self.tratId,
+                        eventId: self.eventId,
+                        members: self.team.map(function (member) {
+                            return member.$id;
+                        })
                     }
-                }
+                )
             }
             // console.log(self.totalScore);
             self.multiAns = [];
@@ -672,7 +741,7 @@ startTRATController.$inject = [
     '$firebaseObject',
     '$firebaseArray',
     'spfAlert'
-]
+];
 
 
 // Export

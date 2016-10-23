@@ -1,0 +1,7 @@
+md-dialog.question-dialog {
+    max-width: 60%;
+    max-height: 50%;
+    width: 60%;
+    height: 50%;
+    border-radius: 0;
+}

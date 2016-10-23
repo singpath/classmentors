@@ -29,7 +29,32 @@
         databaseURL: "https://singpath.firebaseio.com"
       };
 
-      classmentors.bootstrap({firebaseApp: firebase.initializeApp(config)});
+      var module = angular.module('clm.extra', ['ngRoute']);
+
+      /**
+       * Uncomment the next block below
+       * and edit "home.html" to change the landing page
+       */
+      // module.config([
+      //   '$routeProvider',
+      //   function($routeProvider) {
+      //     $routeProvider
+      //       .when('/home', {
+      //         templateUrl: './home.html',
+      //         resolve: {
+      //           navbar: function() {
+      //             return {title: 'Welcome'};
+      //           }
+      //         }
+      //       })
+      //       .otherwise('/home');
+      //   }
+      // ]);
+
+      classmentors.bootstrap({
+        firebaseApp: firebase.initializeApp(config),
+        extra: module
+      });
 		</script>
   </body>
 </html>

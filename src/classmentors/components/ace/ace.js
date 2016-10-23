@@ -3,15 +3,6 @@
  */
 import template from './ace-view.html!text';
 
-/**
- * Update navBar with a title and no action.
- * @param {spfNavBarService} spfNavBarService
- */
-function AceController(spfNavBarService) {
-  spfNavBarService.update('Ace of Coders');
-}
-
-AceController.$inject = ['spfNavBarService'];
 
 /**
  * ace component.
@@ -24,8 +15,7 @@ export const component = {
 
     // binds $ctrl.stats to the value of the stats attribute.
     stats: '<'
-  },
-  controller: AceController
+  }
 };
 
 export const ACE_STATS_URL = 'https://dl.dropboxusercontent.com/u/4972572/ace_of_coders_2016_stats.json';
@@ -58,7 +48,10 @@ export function configRoute($routeProvider, routes) {
   $routeProvider
     .when(routes.aceOfCoders, {
       template: '<ace stats="$resolve.stats"></ace>',
-      resolve: {stats: getStats}
+      resolve: {
+        stats: getStats,
+        navBar: () => ({title: 'Ace of Coders'})
+      }
     })
     .otherwise(routes.home);
 }

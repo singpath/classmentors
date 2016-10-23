@@ -453,7 +453,7 @@ function viewEventCtrlInitialData($q, $route, spfAuth, spfAuthData, clmDataStore
             }
         }),
         solutions: canviewPromise.then(function (canView) {
-            if(canView) {
+            if (canView) {
                 return clmDataStore.events.getSolutions(eventId);
             }
         }),
@@ -706,7 +706,7 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
         });
     };
 
-    this.loadSolutions = function() {
+    this.loadSolutions = function () {
         self.loadingSolutions = true;
         console.log("loading solutions....");
         // self.solutions = clmDataStore.events.getSolutions(self.event.$id).then(function (solutions) {
@@ -833,7 +833,7 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
     //allow users to feature their events
     //retrieve the current featured status
     this.featureEvent = clmDataStore.events.getFeatured(this.event.$id);
-    
+
     //set the selection by user
     this.toggle = function () {
         if (this.featureEvent) {
@@ -1054,7 +1054,7 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
 
     this.openTask = function (eventId, task) {
         var taskId = task.$id;
-        console.log('The task id is : ',taskId);
+        // console.log('The task id is : ',taskId);
         clmDataStore.events.openTask(eventId, taskId).then(function () {
             assignTeamLeaders(eventId, task);
             spfAlert.success('Challenge opened.');
@@ -1074,30 +1074,30 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
         });
     };
 
-    function assignTeamLeaders(eventId, task){
-        if(task.teamFormationRef){
+    function assignTeamLeaders(eventId, task) {
+        if (task.teamFormationRef) {
             var db = firebaseApp.database();
             // console.log(task.teamFormationRef);
             // console.log(eventId);
             var ref = db.ref(`classMentors/eventTeams/${eventId}/${task.teamFormationRef}`);
             ref.once("value")
-                .then(function(snapshot){
-                    snapshot.forEach(function(childSnapshot){
+                .then(function (snapshot) {
+                    snapshot.forEach(function (childSnapshot) {
                         // Assign team leader if it does not exists
                         var team = childSnapshot.val();
                         // console.log(team);
-                        if(!('teamLeader' in team)){
+                        if (!('teamLeader' in team)) {
                             var acc = []; //accumulator for team members.
-                            for(var key in team){
-                                if(key != 'currentSize' && key != 'maxSize'){
+                            for (var key in team) {
+                                if (key != 'currentSize' && key != 'maxSize') {
                                     acc.push(key);
                                 }
                             }
                             // If there are memebers in the team.
-                            if(acc.length > 0){
+                            if (acc.length > 0) {
                                 // Randomly pick a value out of acc.
                                 // console.log(acc);
-                                var item = acc[Math.floor(Math.random()*acc.length)];
+                                var item = acc[Math.floor(Math.random() * acc.length)];
                                 // console.log(item);
                                 // assign here.
                                 var teamRef = ref.child(childSnapshot.key);
@@ -1134,7 +1134,7 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
         });
     };
 }
-EditEventCtrl.$inject = ['initialData', 'spfNavBarService', 'urlFor', 'spfAlert', 'clmDataStore', 'firebaseApp', '$firebaseArray','$mdDialog','$location'];
+EditEventCtrl.$inject = ['initialData', 'spfNavBarService', 'urlFor', 'spfAlert', 'clmDataStore', 'firebaseApp', '$firebaseArray', '$mdDialog', '$location'];
 
 /**
  * AddEventTaskCtrl initial data
@@ -1289,7 +1289,7 @@ function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNav
 
         //check if user keys in http inside Link Pattern
         var checkLinkPattern = copy.linkPattern;
-        if (checkLinkPattern != null) { 
+        if (checkLinkPattern != null) {
             if (checkLinkPattern.indexOf("http:") > -1) {
                 checkLinkPattern = checkLinkPattern.replace("http:", "https:");
             }
@@ -1307,6 +1307,18 @@ function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNav
             delete copy.badge;
             delete copy.serviceId;
             delete copy.singPathProblem;
+
+            // console.log("it went here when create");
+            //check if user keys in http inside Link Pattern
+            var checkLinkPattern = copy.linkPattern;
+            if (checkLinkPattern != null) {
+                if (checkLinkPattern.indexOf("http:") > -1) {
+                    checkLinkPattern = checkLinkPattern.replace("http:", "https:");
+                }
+                copy.linkPattern = checkLinkPattern;
+            }
+
+
         } else if (copy.serviceId === 'singPath') {
             delete copy.badge;
             if (copy.singPathProblem) {
@@ -1333,7 +1345,7 @@ function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNav
                 event: event,
                 task: task
             };
-            console.log('Data shows... ', data);
+            // console.log('Data shows... ', data);
             spfNavBarService.update(
                 'Challenge Details', [{
                     title: 'Events',
@@ -1462,7 +1474,7 @@ editEventTaskCtrlInitialData.$inject = ['$q', '$route', 'spfAuthData', 'clmDataS
 
 
 /**Todo: enable edit to multiple choice, index card, etc. **/
-function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmDataStore, eventService, $mdDialog, $location, clmSurvey){
+function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmDataStore, eventService, $mdDialog, $location, clmSurvey) {
     var self = this;
 
     // console.log("the initialdata looks like this:", initialData);
@@ -1472,7 +1484,7 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
     this.task = initialData.task;
 
     this.taskTitle = initialData.task.title;
-    console.log(this.taskTitle);
+    // console.log(this.taskTitle);
 
     this.isOpen = Boolean(this.task.openedAt);
     this.savingTask = false;
@@ -1489,15 +1501,15 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
         this.taskType = 'linkPattern';
     } else if (this.task.lang) {
         this.taskType = 'code';
-    } else if(this.task.toEdit) {
+    } else if (this.task.toEdit) {
         this.taskType = 'profileEdit';
         this.selectedMetaData = this.task.toEdit;
-        console.log(this.task.toEdit);
+        // console.log(this.task.toEdit);
     } else if (this.task.textResponse) {
         this.taskType = 'textResponse';
     } else if (this.task.mcqQuestions) {
         this.taskType = 'multipleChoice';
-    } else if (this.task.survey){
+    } else if (this.task.survey) {
         this.taskType = 'survey';
     }
 
@@ -1530,7 +1542,7 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
     }
 
     spfNavBarService.update(
-      this.taskTitle, [{
+        this.taskTitle, [{
             title: 'Events',
             url: `#${urlFor('events')}`
         }, {
@@ -1584,7 +1596,7 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
         } else if (this.tasktype === 'profileEdit') {
             return 'Save';
 
-        } else if (this.taskType == 'survey'){
+        } else if (this.taskType == 'survey') {
             clmSurvey.set(this.event.$id, this.event, this.task, this.taskType, this.isOpen);
             var obj = clmSurvey.get();
 
@@ -1616,15 +1628,6 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
     this.saveTask = function (event, taskId, task, taskType, isOpen) {
         var copy = cleanObj(task);
 
-        //check if user keys in http inside Link Pattern
-        var checkLinkPattern = copy.linkPattern;
-        if (checkLinkPattern != null) {
-            if (checkLinkPattern.indexOf("http:") > -1) {
-                checkLinkPattern = checkLinkPattern.replace("http:", "https:");
-            }
-            copy.linkPattern = checkLinkPattern;
-        }
-
         var data = {
             taskType: taskType,
             isOpen: isOpen,
@@ -1636,6 +1639,18 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
             delete copy.badge;
             delete copy.serviceId;
             delete copy.singPathProblem;
+
+            // console.log("it went here in edit");
+            //check if user keys in http inside Link Pattern
+            var checkLinkPattern = copy.linkPattern;
+            if (checkLinkPattern != null) {
+                if (checkLinkPattern.indexOf("http:") > -1) {
+                    checkLinkPattern = checkLinkPattern.replace("http:", "https:");
+                }
+                copy.linkPattern = checkLinkPattern;
+            }
+
+
         } else if (copy.serviceId === 'singPath') {
             delete copy.badge;
             if (copy.singPathProblem) {
@@ -1746,11 +1761,10 @@ export function clmEventTableFactory() {
 function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                            urlFor, spfAlert, clmServicesUrl, clmDataStore, clmPagerOption,
                            eventService, $location, routes, $route, spfAuthData, authFirebaseApp,
-                           firebaseApp, $firebaseArray, $firebaseObject) {
+                           firebaseApp, $firebaseArray, $firebaseObject, $routeParams) {
     var authDb = authFirebaseApp.database();
     var self = this;
     var unwatchers = [];
-
     this.currentUserParticipant = undefined;
     this.participantsView = [];
     this.visibleTasks = [];
@@ -1761,32 +1775,69 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         reversed: false
     };
 
-    // Load 'team leaders' of each member. 
-    self.teamLeader = null;
-    self.team = null
-    self.isTeamLeader = function(eventId, teamFormationId, currentUserId){
-        // Get all teams.
-        var db = firebaseApp.database();
-        var teamRef = db.ref(`classMentors/eventTeams/${eventId}/${teamFormationId}`);
-        teamRef.once("value")
-            .then(function(snapshot){
-                snapshot.forEach(function(childSnapShot){
-                    // console.log(childSnapShot.key);
-                    var team = childSnapShot.val();
-                    // console.log(team);
-                    // console.log(team.teamLeader);
-                    // console.log(currentUserId);
-                    if(team[currentUserId.$id] != null){
-                        // console.log(team.teamLeader);
-                        // self.teamLeader = team[team.teamLeader].displayName;
-                        self.team = team;
-                        self.teamLeader = team.teamLeader;
-                        // Break execution.
-                        return true;                    
+    // Load 'team leaders' of each member.
+    // self.teamLeaders = null;
+    // self.team = null;
+    var teamByTask = null;
+    var eventId = $routeParams.eventId;
+    var teamByUsers = {};
+    var allEventTeams = clmDataStore.events.getEventTeams(eventId).then(function (result) {
+        //get all the tasks wif teams belonging to a single event
+        teamByTask = result;
+        return result;
+    });
+
+    self.team = {};
+
+    self.applied = false;
+
+    //display team leader
+    self.checkUser = function (taskId, currentUserId) {
+        // console.log("taskId is:", taskId)
+
+        if (teamByTask != null) {
+            for (var i = 0; i < teamByTask.length; i++) {
+                if (teamByTask[i].$id != undefined && teamByTask[i].$id == taskId) {
+                    for (name in teamByTask[i]) {
+                        if (name != '$id' && name != '$priority') {
+
+                            if (teamByTask[i][name][currentUserId] != null) {
+                                self.team[taskId] = teamByTask[i][name];
+                                // console.log("team leader is:", self.team[taskId].teamLeader);
+                            }
+                        }
                     }
-                })
-            });
-    }
+                }
+            }
+        }
+
+        if (Object.keys(self.team).length != 0) {
+            return true;
+        } else {
+            return false;
+        }
+
+        // return Object.keys(self.team).length != 0;
+
+    };
+
+    // self.isTeamLeader = function (eventId, teamFormationId, currentUserId) {
+
+    // var db = firebaseApp.database();
+    // var teamRef = db.ref(`classMentors/eventTeams/${eventId}`);
+    // teamRef.once("value")
+    //     .then(function(snapshot){
+    //         snapshot.forEach(function(childSnapShot){
+    //             var team = childSnapShot.val();
+    //             if(team[currentUserId.$id] != null){
+    //                 self.team = team;
+    //                 self.teamLeader = team.teamLeader;
+    //                 // Break execution.
+    //                 return true;
+    //             }
+    //         })
+    //     });
+    // };
 
 
     //Find superReviewUser rights
@@ -2047,9 +2098,8 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
     };
 
 
-
     this.startMCQ = function (eventId, taskId, task, participant, userSolution) {
-        console.log("participant isss:", participant);
+        // console.log("participant isss:", participant);
         $location.path('/events/' + eventId + '/challenges/' + taskId + '/mcq/start');
     }
 
@@ -2060,12 +2110,12 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             task: task,
             participant: participant
 
-        }
+        };
         // Store data in eventService
         eventService.set(data);
 
         $location.path('/events/' + eventId + '/challenges/' + taskId + '/TRAT/start');
-    }
+    };
 
     this.mustRegister = function (task, profile) {
         return Boolean(
@@ -2100,7 +2150,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                 return promise;
             }).then(function (data) {
                 self.participantInfo = data;
-                console.log(self.participantInfo);
+                // console.log(self.participantInfo);
                 if (self.participantInfo.yearOfBirth) {
                     self.userData.yearOfBirth = self.participantInfo.yearOfBirth;
                 }
@@ -2182,6 +2232,8 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         }
     };
     this.promptForLink = function (eventId, taskId, task, participant, userSolution) {
+        task.team = self.team[task.teamFormationRef];
+
         $mdDialog.show({
             parent: $document.body,
             template: linkTmpl,
@@ -2202,21 +2254,45 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                 if (link.indexOf("http:") > -1) {
                     link = link.replace("http:", "https:");
                 }
-                clmDataStore.events.submitSolution(eventId, taskId, participant.$id, link).then(function () {
+                if(task.team) {
+                    console.log('SUBMIT FOR THE TEAM!');
+                    Object.keys(task.team).forEach(function(key) {
+                        if(task.team[key].displayName) {
+                            // console.log('Submitting for: ' + key);
+                            clmDataStore.events.submitSolution(eventId, taskId, key, link);
+                        }
+                    });
                     $mdDialog.hide();
                     spfAlert.success('Link is saved.');
-                }).catch(function (err) {
-                    $log.error(err);
-                    spfAlert.error('Failed to save the link.');
-                    return err;
-                });
-                clmDataStore.logging.inputLog({
-                    action: "submitLinkResponse",
-                    publicId: self.profile.$id,
-                    eventId: self.event.$id,
-                    taskId: taskId,
-                    timestamp: TIMESTAMP
-                });
+                    clmDataStore.logging.inputLog({
+                        action: "submitTeamLinkResponse",
+                        publicId: self.profile.$id,
+                        eventId: self.event.$id,
+                        taskId: taskId,
+                        members: Object.keys(task.team).filter(function (key) {
+                            if(task.team[key].displayName) {
+                                return key
+                            }
+                        }),
+                        timestamp: TIMESTAMP
+                    });
+                } else {
+                    clmDataStore.events.submitSolution(eventId, taskId, participant.$id, link).then(function () {
+                        $mdDialog.hide();
+                        spfAlert.success('Link is saved.');
+                    }).catch(function (err) {
+                        $log.error(err);
+                        spfAlert.error('Failed to save the link.');
+                        return err;
+                    });
+                    clmDataStore.logging.inputLog({
+                        action: "submitLinkResponse",
+                        publicId: self.profile.$id,
+                        eventId: self.event.$id,
+                        taskId: taskId,
+                        timestamp: TIMESTAMP
+                    });
+                }
             };
 
             this.cancel = function () {
@@ -2239,7 +2315,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         function reviewQuestionIntitalData(){
             //TODO needed?
         }
-    } 
+    }
 
 
     this.promptForVoteQuestion = function(eventId, taskId, task, participant, userSolution){
@@ -2275,18 +2351,18 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             $log.info(`${angular.toJson(participant)}`);
             var self = this;
             var eventTeamsRef = db.ref(`classMentors/eventTeams/${eventId}/${task.taskFrom}`);
-            
+
             var team = $firebaseArray(eventTeamsRef).$loaded(function(teams){
                 return teams.reduce(function(team, nextTeam){
                     if(nextTeam[participant.$id] != null){
                         return nextTeam;
-                    }  
+                    }
                 }, {});
             });
-            var getMembers = team => Object.keys(team).filter(key => 
+            var getMembers = team => Object.keys(team).filter(key =>
                 key != 'currentSize' && key != 'maxSize' && key != '$id' && key != '$priority'
             );
-            
+
 
             var eventTasksRef = db.ref(`classMentors/eventTasks/${eventId}/${task.taskFrom}`);
             var teamMemberAnswers = team.then(function(team){
@@ -2306,7 +2382,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                     }
                     return getMembers(team).map(getAnswerFromMember);
                 });
-                return fbObj;  
+                return fbObj;
             });
             var teamMembers = team.then(team => getMembers(team));
             return $q.all({
@@ -2315,7 +2391,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                 teamMemberAnswers: teamMemberAnswers
             });
         }
-        
+
     }
 
     this.promptForTeamFormation = function (eventId, taskId, task, participant, userSolution) {
@@ -2340,7 +2416,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                     return result;
                 }),
                 selectedTeam: teamEventPromise.$loaded().then(function (result) {
-                    console.log(result);
+                    // console.log(result);
                     var teams = result;
                     for (var i = 0; i < teams.length; i++) {
                         var team = teams[i];
@@ -2362,7 +2438,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             self.selectedTeam = initialData.selectedTeam;
             self.teams = {};
             self.teams = initialData.teams;
-            console.log("self teams iss:", self.teams);
+            console.log("selected Team isss:", self.selectedTeam);
             // var teamMembers = [];
             //separate the names to be populated
             // for (var i = 0; i < self.teams.length; i++) {
@@ -2386,23 +2462,85 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                 }
             }
 
+            self.leave = function (index) {
+                console.log("leave index is:", index);
+                db.ref(`classMentors/eventSolutions/${eventId}/${participant.$id}/${taskId}`).remove().then(function () {
+                    leaveTeam(index);
+                    self.selectedTeam = undefined;
+                    previousSelectedTeam = undefined;
+                });
+            };
+
             self.onChange = function (index) {
+                console.log("on change index is:", index);
                 // If user has not joined any team before
                 if (previousSelectedTeam == undefined) {
                     if (index2 != undefined) {
-                        leaveTeam(index2);
+                        switchTeam(index2, index);
+                    } else {
+                        joinTeam(index);
                     }
-                    joinTeam(index);
                     previousSelectedTeam = index;
                 } else if (index != previousSelectedTeam) { //Check if selected index has changed, else do nothing.
                     // Leave previous team.
 
-                    leaveTeam(previousSelectedTeam);
-                    // Join new team.
-                    joinTeam(index);
+                    // leaveTeam(previousSelectedTeam);
+                    // // Join new team.
+                    // joinTeam(index);
+                    switchTeam(previousSelectedTeam, index);
                     previousSelectedTeam = index;
+                }else{
+                    joinTeam(index);
                 }
             };
+
+            function switchTeam(oldIndex, newIndex) {
+                var team = self.teams[oldIndex];
+                var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${team.$id}/${participant.$id}`);
+                var currentSize;
+                ref.remove().then(function () {
+                    //do nothing
+                    var refCurrentSize = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${team.$id}/currentSize`);
+                    refCurrentSize.on("value", function (snapshot) {
+                        currentSize = snapshot.val();
+                        currentSize--;
+                    });
+                    //update currentsize in firebase, then assign to self.teams
+                    refCurrentSize.set(currentSize).then(function () {
+                        //retrieve the newly updated team promise and assign to this.teams
+                        var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}`);
+                        var teamEventPromise = $firebaseArray(ref);
+                        teamEventPromise.$loaded().then(function (result) {
+                            self.teams = result;
+                        })
+                    }).then(function () {
+                        var team = self.teams[newIndex];
+                        var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${team.$id}/${participant.$id}`);
+                        // var currentSize = 0;
+                        var currentSize;
+
+                        clmDataStore.events.joinTeam(eventId, taskId, team.$id, participant.$id, participant.user).then(function () {
+                            var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}`);
+                            var teamEventPromise = $firebaseArray(ref);
+                            teamEventPromise.$loaded().then(function (result) {
+                                self.teams = result;
+                            });
+                            clmDataStore.logging.inputLog(
+                                {
+                                    action: "formTeam",
+                                    eventId: eventId,
+                                    publicId: participant.$id,
+                                    timestamp: Date.now(),
+                                    taskId: taskId
+                                }
+                            );
+                        }).then(function () {
+                            //update progress asynchronously
+                            clmDataStore.events.submitSolution(eventId, taskId, participant.$id, "Team " + (newIndex + 1));
+                        });
+                    })
+                });
+            }
 
             function leaveTeam(index) {
                 var team = self.teams[index];
@@ -2425,7 +2563,6 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                         teamEventPromise.$loaded().then(function (result) {
                             self.teams = result;
                         })
-
                     });
 
                     // var refCurrentSize = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${team.$id}/currentSize`);
@@ -2445,6 +2582,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             }
 
             function joinTeam(index) {
+                // console.log("index isss:", index);
                 var team = self.teams[index];
                 var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${team.$id}/${participant.$id}`);
                 // var currentSize = 0;
@@ -2468,7 +2606,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                 //     })
                 // });
 
-                clmDataStore.events.joinTeam(eventId, taskId, team.$id, participant.$id, participant.user).then(function(){
+                clmDataStore.events.joinTeam(eventId, taskId, team.$id, participant.$id, participant.user).then(function () {
                     var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}`);
                     var teamEventPromise = $firebaseArray(ref);
                     teamEventPromise.$loaded().then(function (result) {
@@ -2483,6 +2621,9 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                             taskId: taskId
                         }
                     );
+                }).then(function () {
+                    //update progress asynchronously
+                    clmDataStore.events.submitSolution(eventId, taskId, participant.$id, "Team " + (index + 1));
                 });
 
                 // console.log("self teams isss:", self.teams);
@@ -2525,7 +2666,6 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         DialogController.$inject = ['initialData'];
     };
 
-
     this.promptForSurvey = function (eventId, taskId, task, participant, userSolution) {
 
         if (task.survey === "School engagement scale") {
@@ -2546,6 +2686,8 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
     };
 
     this.promptForTextResponse = function (eventId, taskId, task, participant, userSolution) {
+        task.team = self.team[task.teamFormationRef];
+
         $mdDialog.show({
             parent: $document.body,
             template: responseTmpl,
@@ -2563,23 +2705,47 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             }
 
             this.save = function (response) {
-                console.log("this response is: ", response);
+                // console.log("this response is: ", response);
                 //this line adds solution to firebase
-                clmDataStore.events.submitSolution(eventId, taskId, participant.$id, response).then(function () {
+                if(task.team) {
+                    console.log('SUBMIT FOR THE TEAM!');
+                    Object.keys(task.team).forEach(function(key) {
+                        if(task.team[key].displayName) {
+                            // console.log('Submitting for: ' + key);
+                            clmDataStore.events.submitSolution(eventId, taskId, key, response);
+                        }
+                    });
                     $mdDialog.hide();
                     spfAlert.success('Response is saved.');
-                }).catch(function (err) {
-                    $log.error(err);
-                    spfAlert.error('Failed to save your response.');
-                    return err;
-                });
-                clmDataStore.logging.inputLog({
-                    action: "submitTextResponse",
-                    publicId: self.profile.$id,
-                    eventId: self.event.$id,
-                    taskId: taskId,
-                    timestamp: TIMESTAMP
-                });
+                    clmDataStore.logging.inputLog({
+                        action: "submitTeamTextResponse",
+                        publicId: self.profile.$id,
+                        eventId: self.event.$id,
+                        taskId: taskId,
+                        members: Object.keys(task.team).filter(function (key) {
+                            if(task.team[key].displayName) {
+                                return key
+                            }
+                        }),
+                        timestamp: TIMESTAMP
+                    });
+                } else {
+                    clmDataStore.events.submitSolution(eventId, taskId, participant.$id, response).then(function () {
+                        $mdDialog.hide();
+                        spfAlert.success('Response is saved.');
+                    }).catch(function (err) {
+                        $log.error(err);
+                        spfAlert.error('Failed to save your response.');
+                        return err;
+                    });
+                    clmDataStore.logging.inputLog({
+                        action: "submitTextResponse",
+                        publicId: self.profile.$id,
+                        eventId: self.event.$id,
+                        taskId: taskId,
+                        timestamp: TIMESTAMP
+                    });
+                }
             };
 
             this.cancel = function () {
@@ -2589,6 +2755,8 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
     };
 
     this.promptForCodeResponse = function (eventId, taskId, task, participant, userSolution) {
+        task.team = self.team[task.teamFormationRef];
+
         $mdDialog.show({
             clickOutsideToClose: true,
             parent: $document.body,
@@ -2626,21 +2794,46 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             this.save = function () {
                 var editor = ace.edit($document[0].querySelector('#editor'));
                 var response = editor.getValue();
-                clmDataStore.events.submitSolution(eventId, taskId, participant.$id, response).then(function () {
+
+                if(task.team) {
+                    console.log('SUBMIT FOR THE TEAM!');
+                    Object.keys(task.team).forEach(function(key) {
+                        if(task.team[key].displayName) {
+                            // console.log('Submitting for: ' + key);
+                            clmDataStore.events.submitSolution(eventId, taskId, key, response);
+                        }
+                    });
                     $mdDialog.hide();
                     spfAlert.success('Response is saved.');
-                }).catch(function (err) {
-                    $log.error(err);
-                    spfAlert.error('Failed to save your response.');
-                    return err;
-                });
-                clmDataStore.logging.inputLog({
-                    action: "submitCodeResponse",
-                    publicId: self.profile.$id,
-                    eventId: self.event.$id,
-                    taskId: taskId,
-                    timestamp: TIMESTAMP
-                });
+                    clmDataStore.logging.inputLog({
+                        action: "submitTeamCode",
+                        publicId: self.profile.$id,
+                        eventId: self.event.$id,
+                        taskId: taskId,
+                        members: Object.keys(task.team).filter(function (key) {
+                            if(task.team[key].displayName) {
+                                return key
+                            }
+                        }),
+                        timestamp: TIMESTAMP
+                    });
+                } else {
+                    clmDataStore.events.submitSolution(eventId, taskId, participant.$id, response).then(function () {
+                        $mdDialog.hide();
+                        spfAlert.success('Response is saved.');
+                    }).catch(function (err) {
+                        $log.error(err);
+                        spfAlert.error('Failed to save your response.');
+                        return err;
+                    });
+                    clmDataStore.logging.inputLog({
+                        action: "submitCodeResponse",
+                        publicId: self.profile.$id,
+                        eventId: self.event.$id,
+                        taskId: taskId,
+                        timestamp: TIMESTAMP
+                    });
+                }
             };
 
             this.cancel = function () {
@@ -2722,7 +2915,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             unwatchers.push(paths.$destroy.bind(paths));
             return paths;
         }),
-        userTeams: function(){
+        userTeams: function () {
             var db = firebaseApp.database();
             var eventTeamsReference = db.ref(`classMentors/eventTeams/${this.event.$id}`);
         }
@@ -2797,7 +2990,8 @@ ClmEventTableCtrl.$inject = [
     'authFirebaseApp',
     'firebaseApp',
     '$firebaseArray',
-    '$firebaseObject'
+    '$firebaseObject',
+    '$routeParams'
 ];
 
 //TODO: include the event to load initial data into surveyformfillctrl
@@ -2806,7 +3000,7 @@ function addSurveyEventTaskCtrlInitialData($q, $route, firebaseApp, $firebaseArr
     // var eventId = $route.current.params.eventId
     // var eventPromise = clmDataStore.events.get(eventId);
     var db = firebaseApp.database();
-    console.log("this firebaseapp database is", db);
+    // console.log("this firebaseapp database is", db);
     var errNoEvent = new Error('Event not found');
     var eventId = $route.current.params.eventId;
 
@@ -2927,7 +3121,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
             {name: 'Brother(s)'},
             {name: 'Relative(s)'},
             {name: 'Grandparent(s)'}
-        ]
+        ];
         this.selectedFamily = [];
         this.selectedRaceEthnicity = [];
 
@@ -2974,7 +3168,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
 
         this.eduDissResp = {};
         this.questionJson = {};
-        console.log("this initialdata is", initialData.survey2[0]);
+        // console.log("this initialdata is", initialData.survey2[0]);
         //console.log("initial data before: ", initialData.survey2[0]);
         for (let i = 1; i < Object.keys(initialData.survey2[0]).length - 1; i++) {
 
@@ -3160,7 +3354,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
         schEngageInvalid = true;
 
         var allResponses = true;
-        console.log("trying ", motiResp);
+        // console.log("trying ", motiResp);
         for (var i = 1; i < motiResp.length; i++) {
             if (motiResp[i][i + 1] === 0) {
                 allResponses = false;
@@ -3294,11 +3488,15 @@ export function clmEventRankTableFactory() {
     };
 }
 
-function ClmEventRankTableCtrl($scope, $log, firebaseApp, $firebaseObject, $firebaseArray, clmDataStore, clmPagerOption) {
+/**
+ * Ranking table controller.
+ *
+ * @todo move code dependent on bound attributes to $onInit method
+ */
+function ClmEventRankTableCtrl($log, $q, $filter, firebaseApp, $firebaseObject, $firebaseArray, clmDataStore) {
 
     var self = this;
     var db = firebaseApp.database();
-    var unwatchers = [];
 
     var updateLog = function (actionObj) {
         actionObj.publicId = self.profile.$id;
@@ -3306,254 +3504,84 @@ function ClmEventRankTableCtrl($scope, $log, firebaseApp, $firebaseObject, $fire
         clmDataStore.logging.inputLog(actionObj);
     };
 
-    // June 2016
-    this.rankingView2 = []; // 2016 update to new cm-worker
-    // If there are no ranked services on the event, use the default.
-    // Add this after the event is fetched if rankedServices is null.
+    this.rankingView = [];
 
-    var addRankedServices = function (parentScope) {
-        if (parentScope.event.rankedServices) {
-            parentScope.rankedServices = [];
-            for (var property in parentScope.event.rankedServices) {
-                if (parentScope.event.rankedServices.hasOwnProperty(property)) {
-                    // do stuff
-                    parentScope.rankedServices.push({id: property, name: property});
-                }
-            }
-        } else { // load the default services to list in ranking table.
-            parentScope.rankedServices = [
-                {id: 'freeCodeCamp', name: 'Free Code Camp'},
-                //{id: 'pivotalExpert', name: 'Pivotal Expert'}
-                // {id: 'codeCombat',name: 'Code Combat'},
-                // {id: 'singPath',name:  'SingPath Problems'},
-                // {id: 'codeSchool', name: 'Code School'}
-            ];
+    setRankedServices(this);
+    setParticipants(this);
+
+    function setRankedServices(ctrl) {
+        if (!ctrl.event.rankedServices) {
+            ctrl.rankedServices = [{id: 'freeCodeCamp', name: 'Free Code Camp'},
+                {id: 'codeCombat', name: 'Code Combat'}];
+            return;
         }
 
-    };
-    // Update the list of services to show in table.
-    addRankedServices(this);
+        ctrl.rankedServices = [];
 
-    var getUserProfile = function (publicId, parentScope) {
-        var profileRef = db.ref(`classMentors/userProfiles/${publicId}`);
-        var result = $firebaseObject(profileRef);
-
-        result.$loaded().then(function () {
-            var temp = {};
-
-            temp.$id = publicId;
-            temp.$ranking = parentScope.rankingView2.length + 1;
-            temp.services = result.services;
-
-            // console.log("In user profile fetch with services", result.services);
-            var total = 0;
-
-            // If the user has no registered services, add an empty object to support the following logic.
-            if (!result.services) {
-                result.services = {};
-            }
-
-            // For each ranked service in the event.
-            for (var i = 0; i < self.rankedServices.length; i++) {
-                // console.log(self.rankedServices[i].id);
-                // If the user has registered for the service and has a totoalAchievements value.
-                if (
-                    result.services[self.rankedServices[i].id] &&
-                    result.services[self.rankedServices[i].id].totalAchievements
-                ) {
-                    temp[self.rankedServices[i].id] = parseInt(
-                        result.services[self.rankedServices[i].id].totalAchievements, 10
-                    );
-                    total += parseInt(result.services[self.rankedServices[i].id].totalAchievements, 10);
-                } else {
-                    temp[self.rankedServices[i].id] = 0;
-                }
-            }
-
-            temp.total = total;
-            temp.displayName = result.user.displayName;
-            temp.name = result.user.displayName;
-            temp.user = result.user;
-            // console.log(parentScope.event);
-            // console.log(parentScope.profile);
-            if (parentScope.assistants.indexOf(result.$id) < 0 && parentScope.event.owner.publicId !== result.$id) {
-                parentScope.rankingView2.push(temp);
-            }
-        }, function (reason) {
-            console.log(`Failed ${reason}`);
-        });
-    };
-
-    var refreshAchievements = function (profileId, service) {
-        // TODO: Only request updates for the services that users have registered for.
-        console.log(`Requesting achievement update for ${profileId}`);
-        db.ref('queue/tasks').push({id: profileId, service: service});
-    };
-
-    this.updateAllParticipantUserProfiles = function () {
-        // console.log("Requesting all users in ranking to be updated.");
-        updateLog({action: "updateAllParticipantUserProfiles", "eventId": self.event.$id});
-        // For each user in the ranking
-        for (var i = 0; i < self.rankingView2.length; i++) {
-            var publicId = self.rankingView2[i].$id;
-            // for service in ranked services
-            for (var j = 0; j < self.rankedServices.length; j++) {
-                // console.log(self.rankedServices[j].id);
-                // If the user in the ranking has the key services and key for a service
-                if (self.rankingView2[i].services && self.rankingView2[i].services[self.rankedServices[j].id]) {
-                    // console.log("Adding "+self.rankedServices[j].id+ " for user "+publicId);
-                    refreshAchievements(publicId, self.rankedServices[j].id);
-                } else {
-                    // console.log("Skipping "+self.rankedServices[j].id+ " for user "+publicId+ " since not registered");
-                }
+        for (var property in ctrl.event.rankedServices) {
+            if (ctrl.event.rankedServices.hasOwnProperty(property)) {
+                // do stuff
+                ctrl.rankedServices.push({id: property, name: property});
             }
         }
     };
 
-    var getUserProfilesFromEventParticipants = function (parentScope) {
-        // Clear ranking and re-rank
-        parentScope.rankingView2 = [];
-        console.log('Fetching participants for event');
-        for (var i = 0; i < parentScope.eventParticipants.length; i++) {
-            var publicId = parentScope.eventParticipants[i].$id;
-            getUserProfile(publicId, parentScope);
-        }
-    };
-
-    this.getParticipants = function (parentScope) {
-        var ref = db.ref(`classMentors/eventParticipants/${parentScope.event.$id}`);
+    function setParticipants(ctrl) {
+        var ref = db.ref(`classMentors/eventParticipants/${ctrl.event.$id}`);
         var query = ref.limitToLast(100);
         var data = $firebaseArray(query);
 
         data.$loaded().then(function () {
-            var result = data;
-            // console.log(result);
-            parentScope.eventParticipants = result;
-            getUserProfilesFromEventParticipants(parentScope);
-
-        }, function (reason) {
+            ctrl.participants = data;
+            setRankingView(ctrl);
+        }).catch(function (reason) {
             console.log('Failed ' + reason);
         });
-
     };
 
-    this.getParticipants(this);
-    this.loading = true; // This will hide the table view.
+    function setRankingView(ctrl) {
+        ctrl.rankingView = [];
+
+        clmDataStore.events.getRanking(ctrl.event, ctrl.participants, ctrl.rankedServices, sortRanking).then(ranking => {
+            ctrl.rankingView = ranking;
+        }).catch(
+            err => console.log(`Failed: ${err}`)
+        );
+    };
+
+    function sortRanking(ranking) {
+        const order = self.orderOpts.map(opt => {
+            const dir = opt.reversed ? '-' : '+';
+
+            return `${dir}${opt.key}`;
+        });
+
+        return $filter('orderBy')(ranking, order);
+    }
+
+    /**
+     * Request update for all participants achievement.
+     *
+     * @todo redraw ranking when a profile is updated
+     */
+    this.updateAllParticipantUserProfiles = function () {
+        // console.log("Requesting all users in ranking to be updated.");
+        updateLog({action: "updateAllParticipantUserProfiles", "eventId": self.event.$id});
+        self.participants.forEach(p => clmDataStore.services.refresh(p));
+    };
+
     this.loading = false;
 
     this.currentUserRanking = undefined;
     this.orderOpts = [{
-        key: 'total',
+        key: '$total',
         reversed: true
     }, {
-        key: 'name',
+        key: '$user.displayName',
         reversed: false
     }];
-    this.pagerOpts = clmPagerOption();
-    unwatchers.push(self.pagerOpts.$destroy.bind(self.pagerOpts));
-    /*
-     load();
-
-     function load() {
-     $scope.$on('$destroy', unload);
-
-     return clmDataStore.events.getRanking(self.event.$id).then(function(ranking) {
-     self.ranking = ranking;
-
-     // Update ranking view via the pager range update event.
-     unwatchers.push(self.pagerOpts.onChange(rankingView));
-     updateRowCount();
-
-     unwatchers.push(self.ranking.$destroy.bind(self.ranking));
-     unwatchers.push(self.ranking.$watch(updateRowCount));
-     }).finally(function() {
-     self.loading = false;
-     }).catch(function(e) {
-     $log.error(e);
-     });
-     }
-
-     function unload() {
-     unwatchers.forEach(function(f) {
-     if (f) {
-     try {
-     f();
-     } catch (err) {
-     $log.error(err);
-     }
-     }
-     });
-     }
-     */
-    // function badgeComparer(propId) {
-    //   return function(a, b) {
-    //     var aB = a[propId] || 0;
-    //     var bB = b[propId] || 0;
-
-    //     return aB - bB;
-    //   };
-    // }
-
-    // function comparer(options) {
-    //   return chainComparer(options.map(function(opt) {
-    //     return reverseComparer(opt.reversed, _comparers[opt.key] || _comparers.total);
-    //   }));
-    // }
-
-    // function currentUserRanking() {
-    //   self.currentUserRanking = undefined;
-    //   rankingList.some(function(p) {
-    //     if (!self.profile) {
-    //       return true;
-    //     }
-
-    //     if (p.$id === self.profile.$id) {
-    //       self.currentUserRanking = p;
-    //       return true;
-    //     }
-
-    //     return false;
-    //   });
-    // }
-
-    // function rankingView() {
-    //   console.log('In ranking view');
-    //   rankingList.sort(comparer(self.orderOpts)).forEach(function(p, i) {
-    //     p.$ranking = i + 1;
-    //   });
-
-    //   self.rankingView2 = rankingList.slice(
-    //     self.pagerOpts.range.start,
-    //     self.pagerOpts.range.end
-    //   );
-
-    //   currentUserRanking();
-    // }
-
-    // Update pager's row count
-    // (the pager should trigger a range update and call rankingView)
-    // function updateRowCount() {
-    //   if (!self.ranking) {
-    //     rankingList = [];
-    //     self.pagerOpts.setRowCount(0);
-    //     return;
-    //   }
-
-    //   rankingList = Object.keys(self.ranking).filter(function(publicId) {
-    //     return self.ranking[publicId] && self.ranking[publicId].user;
-    //   }).map(function(publicId) {
-    //     self.ranking[publicId].$id = publicId;
-    //     return self.ranking[publicId];
-    //   });
-
-    //   self.pagerOpts.setRowCount(rankingList.length);
-    // }
 
     this.orderBy = function (key) {
-        // Adjust this to support new ordering mechanism.
-
-        console.log('orderBy ' + key);
-
         if (self.orderOpts[0] && self.orderOpts[0].key === key) {
             self.orderOpts[0].reversed = !self.orderOpts[0].reversed;
         } else {
@@ -3564,6 +3592,8 @@ function ClmEventRankTableCtrl($scope, $log, firebaseApp, $firebaseObject, $fire
             self.orderOpts = self.orderOpts.slice(0, 2);
         }
 
+        self.rankingView = sortRanking(self.rankingView);
+
         updateLog({
             action: "eventRankingOrderby",
             "eventId": self.event.$id,
@@ -3571,54 +3601,18 @@ function ClmEventRankTableCtrl($scope, $log, firebaseApp, $firebaseObject, $fire
             "reversed": self.orderOpts[0].reversed
         });
 
-        // TODO: Revisit when 2nd order ranking becomes a priority.
-        // There was an issue with getting both strings and numbers to rank properly.
-        // Just leaving the array as is and allowing the view to do the sorting.
-        // console.log(self.orderOpts);
-        // Can we use > rather than - to deal with strings?
-        /*
-         if(self.orderOpts[1].reversed){
-         self.rankingView2.sort(function(a, b) {
-         return b[self.orderOpts[1].key] - a[self.orderOpts[1].key];
-         });
-         }
-         else{
-         self.rankingView2.sort(function(a, b) {
-         return a[self.orderOpts[1].key] - b[self.orderOpts[1].key];
-         });
-         }
-
-         if(self.orderOpts[0].reversed){
-         self.rankingView2.sort(function(a, b) {
-         return b[self.orderOpts[0].key] - a[self.orderOpts[0].key];
-         });
-         }
-         else{
-         self.rankingView2.sort(function(a, b) {
-         return a[self.orderOpts[0].key] - b[self.orderOpts[0].key];
-         });
-         }
-
-         //Update ordering
-         for(var i=0; i<self.rankingView2.length; i++){
-         self.rankingView2[i]["$ranking"] = i+1;
-         }
-         */
-
-        // rankingView();
-
     };
 
 }
 
 ClmEventRankTableCtrl.$inject = [
-    '$scope',
     '$log',
+    '$q',
+    '$filter',
     'firebaseApp',
     '$firebaseObject',
     '$firebaseArray',
-    'clmDataStore',
-    'clmPagerOption'
+    'clmDataStore'
 ];
 
 // Show event participants and submissions in a paged table
@@ -4069,7 +4063,7 @@ function ClmEventResultsTableCtrl($scope, $q, $log, $mdDialog, $document,
             this.save = function () {
                 var editor = ace.edit(document.querySelector('#editor'));
                 var response = editor.getValue();
-                console.log("Function submitted for answer " + response);
+                // console.log("Function submitted for answer " + response);
                 clmDataStore.events.submitSolution(eventId, taskId, participant.$id, response).then(function () {
                     $mdDialog.hide();
                     spfAlert.success('Response is saved.');
@@ -4425,5 +4419,3 @@ function chainComparer(comparerList) {
         return 0;
     };
 }
-
-

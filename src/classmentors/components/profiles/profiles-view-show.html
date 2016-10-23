@@ -1,6 +1,6 @@
 <md-content flex class="md-padding" layout="row">
     <div class="profile" flex="33">
-        <div class="md-whiteframe-z1 avatar">
+        <div class="avatar" md-whiteframe="1">
             <img ng-src="{{ctrl.profile.user.gravatar}}?s=200&amp;r=g&amp;d=mm" alt="user avatar">
             <h2>
                 {{ctrl.profile.user.displayName}}
@@ -35,10 +35,12 @@
         <clm-service-card service-id="codeCombat" public-id="ctrl.profile.$id" disable-refresh="ctrl.refreshTimeout"
           profile-template="https://codecombat.com/user/{{name}}"
         >
+            <!--<div ng-if="{{name}}">Invalid name</div>-->
             <clm-description>
                 <a href="http://codecombat.com/" target="_blank">Code Combat</a>,
                 learn to Code JavaScript by Playing a Game.
             </clm-description>
+
         </clm-service-card>
 
     </div>

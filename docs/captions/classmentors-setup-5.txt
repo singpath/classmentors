@@ -1,0 +1,14 @@
+0, 9
+Download Classmentors initial data
+
+10, 14
+Go to your Firebase Project.
+
+14, 18
+Go to "Database" > "Data".
+
+18, 24
+Find an select "Import JSON" option.
+
+25, 32
+Import the data you just downloaded.

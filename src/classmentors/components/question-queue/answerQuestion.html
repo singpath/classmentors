@@ -1,0 +1,25 @@
+<md-dialog aria-label="askQuestion" class="question-dialog">
+    <form name="answerForm" ng-submit="ctrl.answerQn(ctrl.event.$id, ctrl.question.$id, ctrl.currentUser)">
+        <md-dialog-content class="sticky-container">
+            <md-subheader class="md-sticky-no-effect">Question Queue - Response</md-subheader>
+            <div>
+                <md-input-container class="md-block">
+                    <label for="answer-body">Your Response</label>
+                    <textarea name="ansBody" id="answer-body"
+                              ng-model="ctrl.answer.body"
+                              required md-select-on-focus md-maxlength="300" rows="3">
+                    </textarea>
+                    <div ng-messages="answerForm.answer-body.$error">
+                        <div ng-message="required">Required.</div>
+                    </div>
+                </md-input-container>
+            </div>
+            <div class="md-dialog-actions" align="center">
+                <md-button type="submit" class="md-primary md-raised" ng-disabled="!answerForm.$valid">
+                    Post
+                </md-button>
+                <md-button ng-click="ctrl.closeDialog()" type="button" class="md-accent">Cancel</md-button>
+            </div>
+        </md-dialog-content>
+    </form>
+</md-dialog>

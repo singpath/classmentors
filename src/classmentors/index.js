@@ -73,6 +73,8 @@ module.filter('cmTruncate', filters.cmTruncateFilterFactory);
 module.filter('cmTruncated', filters.cmTruncateFilterBooleanFactory);
 module.filter('showSchool', filters.showSchoolFilterFactory);
 module.filter('showTeamMembers', filters.showTeamMembersFilterFactory);
+module.filter('countObjKeys', filters.countObjKeysFactory);
+module.filter('countConditionally', filters.countConditionallyFilterFactory);
 // module.filter('reverseArray', filters.reverseArray);
 //for page controls in trat
 module.run(components.profiles.configServices);
@@ -90,6 +92,35 @@ module.config(components.challenges.configRoute);
 // added new survey factory for tryout purpose
 module.factory('clmSurvey', components.events.clmSurveyTaskFactory);
 
+//no back list:
+var noBackList = {
+  "/events/:eventId/challenges/:taskId/mcq/start": true,
+  '/events/:eventId/challenges/:taskId/TRAT/start': true,
+}
+// Testing routing protection for pages.
+var thisCurrentRoute = null;
+var thisTaskId = null;
+var routeChangeStartListener= function(event, nextRoute, currentRoute){
+  let nextRoutePath = nextRoute.$$route.originalPath;
+  let nextTaskId = nextRoute.params.taskId;
+  if(noBackList[nextRoutePath] && nextTaskId == thisTaskId){
+    event.preventDefault();
+    window.history.forward();
+  }
+}
+var routeChangeSuccessListener = function(event, nextRoute, currentRoute){
+  thisCurrentRoute = currentRoute.$$route.originalPath;
+  thisTaskId = currentRoute.params.taskId;
+}
+
+function routeProtection ($rootScope, $location){
+  $rootScope.$on('$routeChangeStart', routeChangeStartListener);//  function(event, next, current){
+  $rootScope.$on('$routeChangeSuccess', routeChangeSuccessListener);
+};
+routeProtection.$inject = ['$rootScope', '$location'];
+
+// Passing callback for routeProtection
+module.run(routeProtection);
 /**
  * Label route paths.
  *
@@ -119,11 +150,14 @@ module.constant('routes', {
   startMcq: '/events/:eventId/challenges/:taskId/mcq/start',
   editMcq: '/challenges/mcq/edit',
   viewSurvey: '/challenges/survey',
+  editSurvey: '/challenges/survey/edit',
   createTeamActivity: '/challenges/team-activity/create',
   viewIRAT: '/challenges/IRAT',
   viewTRAT: '/events/:eventId/challenges/:taskId/TRAT/start',
   feedback: '/feedback',
   questionQueue: '/question-queue',
+  eventQueue: '/question-queue/:eventId',
+  oneQuestion: '/question-queue/:eventId/questions/:questionId',
   indexCard: '/challenges/team-activity/indexCard'
 });
 
@@ -135,9 +169,10 @@ export {module};
  * @param {{firebaseApp: string, singpathUrl: string, backendUrl: string}} options Application
  */
 export function bootstrap(options) {
-  const bootstrapModule = angular.module('classmentors.bootstrap', [module.name]);
-
   options = options || {};
+
+  const deps = options.extra ? [module.name, options.extra.name] : [module.name];
+  const bootstrapModule = angular.module('classmentors.bootstrap', deps);
 
   if (options.firebaseApp) {
     bootstrapModule.constant('firebaseApp', options.firebaseApp);
