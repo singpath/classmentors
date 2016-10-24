@@ -714,6 +714,26 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
         //     monitorHandler = clmDataStore.events.monitorEvent(
         //         this.event, this.tasks, this.participants, this.solutions, this.progress
         // ));
+
+        if(self.selected.teamFormationRef) {
+            this.loadingTeams = true;
+            clmDataStore.events.getTeams(self.event.$id, self.selected.teamFormationRef)
+                .then(function (teams) {
+                    self.teams = teams;
+                    // console.log(self.teams);
+                    for(var index in self.teams) {
+                        self.teams[index].number = parseInt(index) + 1;
+                    }
+                })
+                .finally(
+                    self.loadingTeams = false
+                );
+        }
+
+        if(self.selected.mcqQuestions) {
+            self.selected.numQns = angular.fromJson(self.selected.mcqQuestions).length;
+        }
+
         self.loadingSolutions = false;
     }
 }
@@ -3524,7 +3544,8 @@ export function clmEventResultsTableFactory() {
             progress: '=',
             solutions: '=',
             selected: '=',
-            scores: '='
+            scores: '=',
+            teams: '='
         },
         controller: ClmEventResultsTableCtrl,
         controllerAs: 'ctrl'
@@ -3532,7 +3553,7 @@ export function clmEventResultsTableFactory() {
 }
 
 function ClmEventResultsTableCtrl($scope, $q, $log, $mdDialog, $document,
-                                  urlFor, spfAlert, clmServicesUrl, clmDataStore, clmPagerOption, $sce) {
+                                  urlFor, spfAlert, clmServicesUrl, clmDataStore, clmPagerOption, $sce, firebaseApp, $firebaseObject) {
     var self = this;
     var unwatchers = [];
 
@@ -3849,15 +3870,26 @@ function ClmEventResultsTableCtrl($scope, $q, $log, $mdDialog, $document,
         });
 
         function DialogController() {
+            var self = this;
             this.task = task;
             this.viewOnly = true;
-            this.questions = angular.fromJson(this.task.mcqQuestions);
+            this.questions = angular.fromJson(task.mcqQuestions);
+
             this.isChecked = function (answers, index) {
-                return answers.indexOf(index) > -1;
-            }
+                if(answers) {
+                    return answers.indexOf(index) > -1;
+                } else {
+                    return false;
+                }
+            };
+
             this.show = function (answers) {
-                return answers.length > 1;
-            }
+                if(answers) {
+                    return answers.length > 1;
+                } else {
+                    return false;
+                }
+            };
 
             // If userSolution is not null and userSolution given
             // taskId is not null
@@ -3867,15 +3899,26 @@ function ClmEventResultsTableCtrl($scope, $q, $log, $mdDialog, $document,
             ) {
                 this.solution = userSolution[taskId];
             }
-            var userAnswers = angular.fromJson(this.solution).userAnswers;
-            for (var i = 0; i < this.questions.length; i++) {
-                this.questions[i].answers = userAnswers[i];
+            if(task.type=='TRAT') {
+                clmDataStore.events.getMCQAnswers(eventId, task.taskFrom)
+                    .then(function (answers) {
+                        var userAnswers = angular.fromJson(answers.$value);
+                        for (var i = 0; i < self.questions.length; i++) {
+                            self.questions[i].answers = userAnswers[i];
+                        }
+                    });
+            } else {
+                var userAnswers = angular.fromJson(this.solution).userAnswers;
+                for (var i = 0; i < this.questions.length; i++) {
+                    this.questions[i].answers = userAnswers[i];
+                }
             }
+
             this.cancel = function () {
                 $mdDialog.hide();
             };
         }
-    }
+    };
 
     this.viewTextResponse = function (eventId, taskId, task, participant, userSolution) {
         $mdDialog.show({
@@ -4094,7 +4137,9 @@ ClmEventResultsTableCtrl.$inject = [
     'clmServicesUrl',
     'clmDataStore',
     'clmPagerOption',
-    '$sce'
+    '$sce',
+    'firebaseApp',
+    '$firebaseObject'
 ];
 
 export function clmPagerFactory() {
