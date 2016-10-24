@@ -64,7 +64,7 @@
                 </md-card-title-text>
             </md-card-title>
             <md-card-content layout="row" layout-align="space-between">
-                <div style="white-space: pre-wrap; font-size: 15px;">{{answer.body}}</div>
+                <p style="max-width: 360px; white-space: pre-wrap; word-wrap: break-word; overflow: auto; font-size: 15px;" layout-wrap>{{answer.body}}</p>
 
                 <md-card-actions layout="column">
                     <div layout="column" layout-align="center center" ng-show="ctrl.question.owner.publicId == ctrl.currentUser.publicId">
@@ -86,7 +86,7 @@
                         <md-icon ng-if="!answer.upVotes || !answer.upVotes[ctrl.currentUser.publicId]" style="font-size: 35px">thumb_up</md-icon>
                         <md-icon ng-if="answer.upVotes && answer.upVotes[ctrl.currentUser.publicId]" style="font-size: 35px; color: orange;">thumb_up</md-icon>
                     </md-button>
-                    <div style="font-size: 15px" >{{answer.upVotes | countObjKeys}} vote(s)</div>
+                    <div style="font-size: 15px">{{answer.upVotes | countObjKeys}} vote(s)</div>
                 </md-card-actions>
             </md-card-content>
         </md-card>
