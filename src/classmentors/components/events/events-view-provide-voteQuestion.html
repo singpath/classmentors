@@ -1,31 +1,56 @@
 <md-dialog aria-label="{{ctrl.task.title}}" class="enlarged-dialog">
-    <div name='voteDialog' layout-align='column start' >
-        <div name='title'>
-            <h2>{{ctrl.title}}</h2>
-        </div>
-        <div name='desc'><label>{{ctrl.desc}}</label></div>
-        <div name='voting'>
-            <h4>Your question ranking:</h4>
-            <md-content class='md-padding autocomplete' layout='column'>
-                <md-contact-chips
-                    ng-model='ctrl.ranking'
-                    md-contacts='ctrl.queryMembers($query)'
-                    placeholder='Ranking'
-                    md-require-match="true"
-                    md-highlight-flags="i"
-                    md-contact-name="member"
-                >   
-                </md-contact-chips>
-            </md-content>
-            <md-content>
-                <md-list>
-                    <md-list-item class="md-3-line" ng-repeat="item in ctrl.allMemberAnswers" ng-click="null">
-                        {{item}}
-                        <h3>{{item.member}}</h3>
-                        <h4>{{item.answer}}</h4>
-                    </md-list-item>
-                </md-list>
-            </md-content>
-        </div>
-    </div>
+  <form name='voteQuestion' ng-submit='ctrl.save()'>
+    <md-dialog-content class="sticky-container">
+      <div name='voteDialog' layout-align='column start' >
+          <div name='title'>
+              <h2>{{ctrl.title}}</h2>
+          </div>
+          <div name='desc'><label>{{ctrl.desc}}</label></div>
+          <div name='voting'>
+              <h4>Your question ranking:</h4>
+              <md-content class='md-padding autocomplete' layout='column'>
+                  <md-chips ng-model='ctrl.rankedQuestions' md-require-match="true">
+                    <md-chip-template>
+                      <span>
+                        <strong>#{{$chip.rank}} {{$chip.member}}</strong>
+                      </span>
+                    </md-chip-template>
+                    <md-autocomplete
+                      md-search-text="ctrl.searchText"
+                      md-autofocus='true'
+                      md-items='item in ctrl.queryMembers(ctrl.searchText)'
+                      placeholder='Rank Questions By User'
+                      md-match-case-insensitive='true'
+                      md-item-text='item.member'
+                      md-select-on-match='true'
+                      md-autoselect='true'
+                    >
+                    <md-item-template>
+                      <span md-highlight-text="searchText">{{item.member}}</span>
+                    </md-item-template>
+                  </md-autocomplete>
+                  </md-chips>
+              </md-content>
+              {{ctrl.rankedQuestions}}
+              <md-content>
+                  <md-list>
+                      <md-list-item class="md-3-line" ng-repeat="item in ctrl.allMemberAnswers" >
+                        <div class="md-list-item-text compact">
+                          <h3>{{item.member}}</h3>
+                          <p>{{item.answer}}</p>
+                        </div>
+                      </md-list-item>
+                  </md-list>
+              </md-content>
+          </div>
+      </div>
+      <div flex align='row'>
+          <md-button ng-click="ctrl.submit()" class="md-raised md-primary" style="width: 150px;">Submit and close
+          </md-button>
+          <md-button ng-click="ctrl.cancel()" class="md-raised md-primary" style="width: 150px;">
+              Cancel
+          </md-button>
+      </div>
+    </md-dialog-content>
+  </form>
 </md-dialog>

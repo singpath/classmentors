@@ -152,10 +152,11 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
         }
     }
 
-// function addTextResponse(task){
-//     task.textResponse = 'Placeholder';
-//     // task.priority = priority;
-//     return task;
+    function addTextResponse(task){
+        task.textResponse = 'Placeholder';
+        // task.priority = priority;
+        return task;
+    }
 
     function createColSubActivity(event, task, isOpen) {
         console.log("Event: ",event);

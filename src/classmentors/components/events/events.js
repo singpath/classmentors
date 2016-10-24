@@ -2325,26 +2325,76 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             template: voteQuestionTmpl,
             controller: DialogController,
             controllerAs: 'ctrl',
+            preserveScope: true,
             resolve:{
                 initialData: voteQuestionIntitalData
             }
         });
 
-        function DialogController(initialData){
+        function DialogController(initialData, $scope){
             var self = this;
             $log.info(`Code reaches here`);
             console.log(initialData);
             self.title = task.title;
             self.desc = task.description;
             self.allMembers = initialData.teamMembers;
-            self.allMemberAnswers = initialData.teamMemberAnswers;
+            self.rankedQuestions = [];
+            self.filterSelected = true;
+            self.searchText = '';
 
-            self.queryMembers = function(query){
+            //Watch rankedQuestions array
+            $scope.$watch(()=>self.rankedQuestions,function(newValue, oldValue){
+              if(newValue.length != oldValue.length){
+                self.rankedQuestions = self.rankedQuestions.map(rankAnswer);
+              }
+            },true);
 
+            var resolveMapTeamMemberAnswers = function (record){
+              return {
+                member: record.member,
+                answer: record.answer.$value
+              }
             }
-            // $log.info(`InitialData contains: ${angular.toJson(initialData)}`);
+            self.allMemberAnswers = initialData.teamMemberAnswers.map(resolveMapTeamMemberAnswers);
+
+            function rankAnswer(answer, index, array){
+              answer.rank = index + 1;
+              return answer;
+            }
+            var cachedQuery;
+            self.queryMembers = function(query){
+              $log.info(`Queried text: ${query}`);
+              cachedQuery = cachedQuery || query;
+              if(cachedQuery != query){
+                cachedQuery = query;
+              }
+              $log.info(`This is cachedQuery: ${cachedQuery}`);
+              return cachedQuery ? self.allMemberAnswers.filter(createFilterFor(cachedQuery)) : [];
+            }
+
+            function createFilterFor(query) {
+              query = query || '';
+              var lowercaseQuery = angular.lowercase(query);
+              $log.info(`LowercaseQuery is : ${lowercaseQuery}`);
+              return function filterFn(contact) {
+                $log.info(`Contact is : ${angular.toJson(contact.member)}`);
+                var bool = (contact.member.indexOf(lowercaseQuery) != -1);
+                $log.info(`What here? : ${bool}`)
+                return bool;
+              }
+            }
+
+            self.submit = function(){
+              // var eventSolutionRef = db.ref(`classMentors/eventSolutions/${eventId}/${participant.$id}/${task.$id}`);
+              $q.all([clmDataStore.events.submitSolution(eventId, taskId, participant.$id, angular.toJson(self.rankedQuestions))])
+                .finally((action) => {$mdDialog.hide(),spfAlert.success('Response is saved.')});
+            }
+
+            self.cancel = function(){
+              $mdDialog.hide();
+            }
         }
-        DialogController.$inject = ['initialData'];
+        DialogController.$inject = ['initialData', '$scope'];
 
         function voteQuestionIntitalData (){
             $log.info(`task is: ${angular.toJson(task)}`);
@@ -2354,32 +2404,35 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
 
             var team = $firebaseArray(eventTeamsRef).$loaded(function(teams){
                 return teams.reduce(function(team, nextTeam){
+                    console.log(nextTeam);
                     if(nextTeam[participant.$id] != null){
+                        console.log('pass?');
                         return nextTeam;
                     }
                 }, {});
             });
+
             var getMembers = team => Object.keys(team).filter(key =>
                 key != 'currentSize' && key != 'maxSize' && key != '$id' && key != '$priority'
             );
-
+            console.log(team);
 
             var eventTasksRef = db.ref(`classMentors/eventTasks/${eventId}/${task.taskFrom}`);
             var teamMemberAnswers = team.then(function(team){
+                console.log('What is team here?', team);
                 var fbObj = $firebaseObject(eventTasksRef).$loaded(function(task){
                     var eventSolutionRef = db.ref(`classMentors/eventSolutions/${eventId}`);
                     var getAnswerFromMember = function(member){
-                        var answerRef = eventSolutionRef
-                                .child(`${member}`)
-                                .child(`${task.taskFrom}`);
-                        $firebaseObject(answerRef).$loaded(function(promise){
-                            console.log(promise.$value);
-                        });
-                        return {
-                            answer: $firebaseObject(answerRef).$loaded(promise => promise.$value),
-                            member: member
-                        };
+                      var answerRef = eventSolutionRef.child(`${member}/${task.taskFrom}`);
+                      $firebaseObject(answerRef).$loaded(function(promise){
+                          console.log(promise.$value);
+                      });
+                      return {
+                          answer: $firebaseObject(answerRef),
+                          member: member
+                      };
                     }
+                    console.log(team);
                     return getMembers(team).map(getAnswerFromMember);
                 });
                 return fbObj;
@@ -2730,6 +2783,8 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                         timestamp: TIMESTAMP
                     });
                 } else {
+                    console.log(response);
+                    console.log(eventId, taskId, participant.$id);
                     clmDataStore.events.submitSolution(eventId, taskId, participant.$id, response).then(function () {
                         $mdDialog.hide();
                         spfAlert.success('Response is saved.');

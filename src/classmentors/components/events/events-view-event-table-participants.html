@@ -127,11 +127,6 @@
                              </label>
                         </span>
 
-                        <!--remove teamleader and team components-->
-                        <!--ng-hide="ctrl.teamLeader && ctrl.teamLeader != ctrl.currentUserParticipant.$id"-->
-                        <!--method below to generate text on who the team leader is-->
-                        <!--{{ctrl.isTeamLeader(ctrl.event.$id, task.teamFormationRef, ctrl.currentUserParticipant)}}-->
-
                         <span ng-if="!ctrl.currentUserSolutions[task.$id]">
 
                             <md-button class="md-raised md-primary" ng-if="task.startTRAT"
@@ -175,9 +170,17 @@
                             </span>
                     </div>
 
+                    <div ng-if="task.activityType='indexCards' && task.textResponse">
+                      <md-button class="md-raised md-primary"
+                                 ng-click="ctrl.promptForTextResponse(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant, ctrl.currentUserSolutions)"
+                                 ng-disabled="task.closedAt"
+                                 aria-label="Collab Text Response"
+                      >Submit Response
+                      </md-button>
+                    </div>
                     <div ng-if="task.type == 'voteQuestions'">
                         <!--{{task}}-->
-                        <span ng-if="ctrl.currentUserSolutions[task.$id] && !task.formationPattern">
+                        <span ng-if="ctrl.currentUserSolutions[task.$id]">
                             Completed<span ng-if="!ctrl.currentUserProgress[task.$id].completed"></span>
                         </span>
                         <span ng-if="!ctrl.currentUserSolutions[task.$id]">
