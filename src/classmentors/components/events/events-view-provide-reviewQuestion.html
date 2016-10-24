@@ -1,1 +1,49 @@
-<md-dialog></md-dialog>
+<md-dialog>
+  <form name='submitReview'>
+    <md-dialog-content>
+      <div>
+        <h3>Your Question:</h3><br/>
+        <h4>{{ctrl.userQuestion}}</h4>
+      </div>
+      <div>
+        <label><h2>Select the appropriate response below for your question.</h2></label>
+        <md-content>
+          <md-radio-group>
+            <div layout="row">
+              <div flex="80">
+                <label>Instructor answered it</label>
+              </div>
+              <div flex="20">
+                <md-radio-button value={{$index}}></md-radio-button>
+              </div>
+            </div>
+            <div layout="row">
+              <div flex="80">
+                <label>Teaching Assistants answered it</label>
+              </div>
+              <div flex="20">
+                <md-radio-button value={{$index}}></md-radio-button>
+              </div>
+            </div>
+            <div layout="row">
+              <div flex="80">
+                <label>Figured it out on my own or answered by peers</label>
+              </div>
+              <div flex="20">
+                <md-radio-button value={{$index}}></md-radio-button>
+              </div>
+            </div>
+            <div layout="row">
+              <div flex="80">
+                <label>Post this question to Question Queue to seek for an answer</label>
+              </div>
+              <div flex="20">
+                <md-radio-button value={{$index}}></md-radio-button>
+              </div>
+            </div>
+          </md-radio-group>
+        </md-content>
+      </div>
+    </md-dialog-content>
+  </form>
+</md-dialog>
