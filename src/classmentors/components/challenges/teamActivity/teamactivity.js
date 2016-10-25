@@ -69,6 +69,7 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
                 console.log(self.event);
                 // var priority = 1;
                 var textResponsePromise = addTask(eventTaskRef ,addTextResponse(self.task), initialData.data.isOpen);
+                // console.log(textResponsePromise);
                 textResponsePromise.then(function(ref){
                     return addTask(eventTaskRef, buildTeamFormationTask(ref.key, self.task), false);
                 }).then(function(teamFormationPromise){
@@ -78,11 +79,11 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
                         initTeams: self.event.teams.map(function(team){return eventTeamsRef.push(team)})
                     });
                 }).then(function(voteTaskPromise){
-                  return addTask(eventTaskRef, buildReflectionQuestion(voteTaskPromise.teamVotingTask.key,self.task), false);
-                }).finally(function(){
+                  return $q.all([addTask(eventTaskRef, buildReflectionQuestion(voteTaskPromise.teamVotingTask.key,self.task), false)]);
+                }).then(function(){
                   spfAlert.success('Index Card Challenge Created!');
                   $location.path(urlFor('oneEvent'));
-                })
+                });
 
                 // console.log(textResponsePromise)
                 // textResponsePromise.then();
@@ -91,7 +92,7 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
                 //create voting
                 //create reflection challenge
             }
-        };
+        }
 
 
     function buildReflectionQuestion(taskFrom, task){
