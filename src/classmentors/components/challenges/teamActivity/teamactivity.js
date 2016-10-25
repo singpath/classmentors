@@ -78,7 +78,10 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
                         initTeams: self.event.teams.map(function(team){return eventTeamsRef.push(team)})
                     });
                 }).then(function(voteTaskPromise){
-                    return addTask(eventTaskRef, buildReflectionQuestion(voteTaskPromise.teamVotingTask.key,self.task), false);
+                  return addTask(eventTaskRef, buildReflectionQuestion(voteTaskPromise.teamVotingTask.key,self.task), false);
+                }).finally(function(){
+                  spfAlert.success('Index Card Challenge Created!');
+                  $location.path(urlFor('oneEvent'));
                 })
 
                 // console.log(textResponsePromise)
