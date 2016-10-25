@@ -64,7 +64,13 @@
                         <md-option ng-value="task" ng-repeat="task in ctrl.tasks" ng-if="task.startTRAT && !task.formationPattern && !task.survey && (!task.archived || ctrl.viewArchived)">
                             {{task.title}} (TRAT)
                         </md-option>
-                        <md-option ng-value="task" ng-repeat="task in ctrl.tasks" ng-if="!task.startTRAT && !task.startIRAT && !task.formationPattern && !task.survey && (!task.archived || ctrl.viewArchived)">
+                        <md-option ng-value="task" ng-repeat="task in ctrl.tasks" ng-if="task.type=='voteQuestions'">
+                            {{task.title}} (Voted Cards)
+                        </md-option>
+                        <!--<md-option ng-value="task" ng-repeat="task in ctrl.tasks" ng-if="task.type=='reflectionQuestion'">-->
+                            <!--{{task.title}} (Reflection Cards)-->
+                        <!--</md-option>-->
+                        <md-option ng-value="task" ng-repeat="task in ctrl.tasks" ng-if="!task.startTRAT && !task.startIRAT && !task.formationPattern && !task.survey && (!task.archived || ctrl.viewArchived) && !task.teamFormationParameter">
                             {{task.title}}
                         </md-option>
                     </md-select>

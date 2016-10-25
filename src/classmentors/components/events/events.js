@@ -733,6 +733,51 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
                 );
         }
 
+        if(self.selected.type=='voteQuestions') {
+            this.loadingTeams = true;
+            clmDataStore.events.getTeams(self.event.$id, self.selected.taskFrom)
+                .then(function (teams) {
+                    self.teams = teams;
+                    // console.log(self.teams);
+                    for(var index in self.teams) {
+                        self.teams[index].number = parseInt(index) + 1;
+                    }
+                })
+                .then(function() {
+                    for(let teamIndex in self.teams) {
+                        var team = self.teams[teamIndex];
+                        var members = Object.keys(team).filter(function (k) {
+                            if(team[k] && team[k].displayName) {
+                                return k
+                            }
+                        });
+                        if(members[0]) {
+                            var qnInfo = angular.fromJson(self.solutions[members[0]][self.selected.$id]);
+                            self.teams[teamIndex].questions = qnInfo.map(function(obj) {
+                                return {question: obj.answer, score: 0, askedBy: obj.member};
+                            });
+                            // console.log(self.teams[teamIndex].questions);
+                            for(let memberIndex in members) {
+                                var member = members[memberIndex];
+                                var indvVotes = angular.fromJson(self.solutions[member][self.selected.$id]);
+                                for(let qnVoteIndex in indvVotes) {
+                                    var qnVote = indvVotes[qnVoteIndex];
+                                    // console.log(qnVote);
+                                    self.teams[teamIndex].questions.find(x => x.question == qnVote.answer).score += qnVote.rank;
+                                };
+                            }
+                            self.teams[teamIndex].qnState = 0;
+                            self.teams[teamIndex].questions.sort(function(a,b) {
+                                return a.score - b.score;
+                            });
+                        }
+                    }
+                })
+                .finally(
+                    self.loadingTeams = false
+                );
+        }
+
         if(self.selected.mcqQuestions) {
             self.selected.numQns = angular.fromJson(self.selected.mcqQuestions).length;
         }

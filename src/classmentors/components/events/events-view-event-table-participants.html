@@ -169,7 +169,7 @@
                             </span>
                     </div>
 
-                    <div ng-if="task.activityType='indexCards' && task.textResponse">
+                    <div ng-if="task.activityType=='indexCards' && task.textResponse">
                       <md-button class="md-raised md-primary"
                                  ng-click="ctrl.promptForTextResponse(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant, ctrl.currentUserSolutions)"
                                  ng-disabled="task.closedAt"
