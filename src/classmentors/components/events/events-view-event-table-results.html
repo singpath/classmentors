@@ -202,7 +202,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr ng-repeat="team in ctrl.teams | orderBy:ctrl.scores[team.teamLeader][ctrl.selected.$id]:reverse" ng-class="'index-' + $index + ' ' + ($odd ? 'odd' : 'even')">
+            <tr ng-repeat="team in ctrl.teams | orderBy:ctrl.scores[teamLeader][ctrl.selected.$id]" ng-class="'index-' + $index + ' ' + ($odd ? 'odd' : 'even')">
                 <th rowspan="team.currentSize" layout-align="center center">
                     <md-button disbaled>Team {{team.number}}</md-button>
                 </th>
