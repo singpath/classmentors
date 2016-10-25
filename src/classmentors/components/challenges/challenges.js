@@ -56,6 +56,14 @@ tratQuestionFactory.$inject = ['$q', 'spfAuthData', 'eventService', 'clmDataStor
 //TODO: Add config for routing to various challenges
 export function configRoute($routeProvider, routes) {
     $routeProvider
+        .when(routes.indexCard, {
+            template: '',
+            controller:'',
+            controllerAs:'ctrl',
+            resolve: {
+                initialData: ''
+            }
+        })
         .when(routes.viewMcq, {
             template: mcq.newMcqTmpl,
             controller: mcq.newMcqController,

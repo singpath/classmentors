@@ -157,7 +157,8 @@ module.constant('routes', {
   feedback: '/feedback',
   questionQueue: '/question-queue',
   eventQueue: '/question-queue/:eventId',
-  oneQuestion: '/question-queue/:eventId/questions/:questionId'
+  oneQuestion: '/question-queue/:eventId/questions/:questionId',
+  indexCard: '/challenges/team-activity/indexCard'
 });
 
 export {module};

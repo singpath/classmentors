@@ -20,7 +20,7 @@ function createTeamActivityInitialData($q, eventService, clmDataStore) {
 }
 createTeamActivityInitialData.$inject = ['$q', 'eventService', 'clmDataStore'];
 
-function createTeamActivityController($q, initialData, clmDataStore, $location, urlFor, eventService, $mdDialog, spfAlert, firebaseApp, $firebaseObject) {
+function createTeamActivityController($q, initialData, clmDataStore, $location, urlFor, eventService, $mdDialog, spfAlert, firebaseApp, $firebaseObject, $firebaseArray, $log) {
     var self = this;
 
     // console.log("initialdata for teamform are", initialData);
@@ -61,8 +61,105 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
         } else if (self.activityType == 'collabSubmission') {
             self.task.collabChallengeType = self.collabChallengeType;
             createColSubActivity(self.event, self.task, initialData.data.isOpen)
+        } else if(self.task.activityType == 'indexCards'){
+                console.log(self.task);
+                var db = firebaseApp.database();
+                var eventTaskRef = db.ref(`classMentors/eventTasks/${self.event.$id}`);
+                //create text response challenge
+                console.log(self.event);
+                // var priority = 1;
+                var textResponsePromise = addTask(eventTaskRef ,addTextResponse(self.task), initialData.data.isOpen);
+                textResponsePromise.then(function(ref){
+                    return addTask(eventTaskRef, buildTeamFormationTask(ref.key, self.task), false);
+                }).then(function(teamFormationPromise){
+                    var eventTeamsRef = db.ref(`classMentors/eventTeams/${self.event.$id}/${teamFormationPromise.key}`);
+                    return $q.all({
+                        teamVotingTask: addTask(eventTaskRef, buildTeamVotingTask(teamFormationPromise.key, self.task), false),
+                        initTeams: self.event.teams.map(function(team){return eventTeamsRef.push(team)})
+                    });
+                }).then(function(voteTaskPromise){
+                  return addTask(eventTaskRef, buildReflectionQuestion(voteTaskPromise.teamVotingTask.key,self.task), false);
+                }).finally(function(){
+                  spfAlert.success('Index Card Challenge Created!');
+                  $location.path(urlFor('oneEvent'));
+                })
+
+                // console.log(textResponsePromise)
+                // textResponsePromise.then();
+                // var teamFormationPromise = clmDataStore.event.addTask()
+                //create team formation challenge
+                //create voting
+                //create reflection challenge
+            }
+        };
+
+
+    function buildReflectionQuestion(taskFrom, task){
+        return{
+            taskFrom: taskFrom,
+            title: task.title,
+            description: "Tell us about your question",
+            showProgress: task.showProgress,
+            archived: false,
+            question: angular.toJson({
+                question:"Select the appropriate response below for your question",
+                options: [
+                    "Instructor answered it",
+                    "Teaching Assistants answered it",
+                    "Figured it out on my own or answered by peers",
+                    "Post this question to Question Queue to seek for an answer"
+                ]
+            }),
+            type: "reflectionQuestion"
         }
-    };
+
+    }
+
+    function addTask(ref, task, isOpen){
+        if (isOpen) {
+            task.openedAt = {'.sv': 'timestamp'};
+            task.closedAt = null;
+        } else {
+            task.closedAt = {'.sv': 'timestamp'};
+            task.openedAt = null;
+        }
+        var promise = ref.push(task);
+        $log.info(`Task: ${angular.toJson(task)} is stored at ${ref}, ${promise.key}`)
+        return promise;
+    }
+
+    function buildTeamVotingTask(taskFrom, task){
+        return{
+            taskFrom: taskFrom,
+            title: task.title,
+            description: "As a team, select your favorite question",
+            formationPattern: true,
+            closedAt: {'.sv': 'timestamp'},
+            showProgress: task.showProgress,
+            archived: false,
+            type: "voteQuestions"
+        }
+    }
+
+    function buildTeamFormationTask(taskFrom, task){
+        return{
+            taskFrom: taskFrom,
+            title: task.title,
+            description: "Click Below To Join Team",
+            formationPattern: true,
+            closedAt: {'.sv': 'timestamp'},
+            showProgress: task.showProgress,
+            archived: false,
+            type: "formTeam",
+            teamFormationMethod: task.teamFormationMethod
+        }
+    }
+
+    function addTextResponse(task){
+        task.textResponse = 'Placeholder';
+        // task.priority = priority;
+        return task;
+    }
 
     function createColSubActivity(event, task, isOpen) {
         console.log("Event: ",event);
@@ -144,19 +241,17 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
     function formTeams(method, methodParameter, participants) {
         var teams = [];
         var teamStructure = [];
-        // participants = participants + 1;
+        // participants = participants + 1;// hmm, shouldn't need to add 1 here.
         console.log('Total participants :', participants);
         if (method == 'noOfTeams') {
             //initialze teamStructure with team size of 0 each
-            for (let i = 0; i < methodParameter; i++) {
-                teamStructure.push(0);
-            }
-
+            teamStructure = Array.apply(null, Array(methodParameter)).map(Number.prototype.valueOf,0);
             console.log('teamStructure :', teamStructure);
             //add 1 to each team until there are no more participants left
             for (let i = 0; i < participants; i++) {
                 teamStructure[i % methodParameter] += 1;
             }
+
         } else {//else by teamSize
             while (participants > methodParameter) {
                 teamStructure.push(methodParameter);
@@ -232,7 +327,9 @@ createTeamActivityController.$inject = [
     '$mdDialog',
     'spfAlert',
     'firebaseApp',
-    '$firebaseObject'
+    '$firebaseObject',
+    '$firebaseArray',
+    '$log'
 ];
 
 function startTRATInitialData($q, spfAuthData, eventService, clmDataStore, firebaseApp, $firebaseObject, $firebaseArray, $route) {
@@ -407,7 +504,7 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
             timestamp: TIMESTAMP
         };
     }
-    
+
     var attempts = [];
     self.nextQuestion = function(){
         // For Single answer MCQ

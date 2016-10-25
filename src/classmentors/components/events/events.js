@@ -41,6 +41,8 @@ import responseTmpl from './events-view-provide-response.html!text';
 import editProfileTmpl from './events-view-edit-profile.html!text';
 import codeTmpl from './events-view-provide-code.html!text';
 import mcqTmpl from './events-view-provide-mcq.html!text';
+import voteQuestionTmpl from './events-view-provide-voteQuestion.html!text';
+import reviewQuestionTmpl from './events-view-provide-reviewQuestion.html!text';
 import './events.css!';
 import ace from 'ace';
 import 'ace/theme-monokai.js';
@@ -1306,6 +1308,15 @@ function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNav
 
         var copy = cleanObj(task);
 
+        //check if user keys in http inside Link Pattern
+        var checkLinkPattern = copy.linkPattern;
+        if (checkLinkPattern != null) {
+            if (checkLinkPattern.indexOf("http:") > -1) {
+                checkLinkPattern = checkLinkPattern.replace("http:", "https:");
+            }
+            copy.linkPattern = checkLinkPattern;
+        }
+
         var data = {
             taskType: taskType,
             isOpen: isOpen,
@@ -1785,7 +1796,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         reversed: false
     };
 
-    // Load 'team leaders' of each member. 
+    // Load 'team leaders' of each member.
     // self.teamLeaders = null;
     // self.team = null;
     var teamByTask = null;
@@ -1848,6 +1859,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
     //         })
     //     });
     // };
+
 
     //Find superReviewUser rights
     // console.log(self.profile);
@@ -2321,6 +2333,193 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         }
     };
 
+    this.promptForReviewQuestion = function(eventId, taskId, task, participant, userSolution){
+        var db = firebaseApp.database();
+        $mdDialog.show({
+            parent: $document.body,
+            template: reviewQuestionTmpl,
+            controller: DialogController,
+            controllerAs: 'ctrl',
+            resolve:{
+                initialData: reviewQuestionIntitalData
+            }
+        });
+
+        function reviewQuestionIntitalData(){
+          //Get user's question
+          var eventReviewTaskRef = db.ref(`classMentors/eventTasks/${eventId}/${taskId}`);
+          var userQuestion = $firebaseObject(eventReviewTaskRef).$loaded(function(promise){
+            var votingTaskRef = db.ref(`classMentors/eventTasks/${eventId}/${promise.taskFrom}`);
+            return $firebaseObject(votingTaskRef);
+          }).then(function(promise){
+            var formTeamTaskRef = db.ref(`classMentors/eventTasks/${eventId}/${promise.taskFrom}`);
+            return $firebaseObject(formTeamTaskRef);
+          }).then(function(promise){
+            var questionTaskRef = db.ref(`classMentors/eventSolutions/${eventId}/${participant.$id}/${promise.taskFrom}`);
+            return $firebaseObject(questionTaskRef);
+          });
+          return $q.all({userQuestion:userQuestion});
+        }
+
+        function DialogController(initialData){
+          var self = this;
+          self.answer = null;
+          self.userQuestion =  initialData.userQuestion.$value; //'No question found';
+          self.options = [
+            {
+              text: "Instructor answered it"
+            },
+            {
+              text: "Teaching Assistants answered it"
+            },
+            {
+              text: "Figured it out on my own or answered by peers"
+            },
+            {
+              text: "Post this question to Question Queue to seek for an answer"
+            }
+          ]
+
+          self.submit = function (){
+
+            $q.all([clmDataStore.events.submitSolution(eventId, taskId, participant.$id, angular.toJson(self.options[self.answer]))])
+            .finally(action => {spfAlert.success('Response is saved.'),$mdDialog.hide()});
+          }
+        }
+        DialogController.$inject = [
+          'initialData'
+        ]
+    }
+
+
+    this.promptForVoteQuestion = function(eventId, taskId, task, participant, userSolution){
+        var db = firebaseApp.database();
+        $mdDialog.show({
+            parent: $document.body,
+            template: voteQuestionTmpl,
+            controller: DialogController,
+            controllerAs: 'ctrl',
+            preserveScope: true,
+            resolve:{
+                initialData: voteQuestionIntitalData
+            }
+        });
+
+        function DialogController(initialData, $scope){
+            var self = this;
+            $log.info(`Code reaches here`);
+            console.log(initialData);
+            self.title = task.title;
+            self.desc = task.description;
+            self.allMembers = initialData.teamMembers;
+            self.rankedQuestions = [];
+            self.filterSelected = true;
+            self.searchText = '';
+
+            //Watch rankedQuestions array
+            $scope.$watch(()=>self.rankedQuestions,function(newValue, oldValue){
+              if(newValue.length != oldValue.length){
+                self.rankedQuestions = self.rankedQuestions.map(rankAnswer);
+              }
+            },true);
+
+            var resolveMapTeamMemberAnswers = function (record){
+              return {
+                member: record.member,
+                answer: record.answer.$value
+              }
+            }
+            self.allMemberAnswers = initialData.teamMemberAnswers.map(resolveMapTeamMemberAnswers);
+
+            function rankAnswer(answer, index, array){
+              answer.rank = index + 1;
+              return answer;
+            }
+            var cachedQuery;
+            self.queryMembers = function(query){
+              $log.info(`Queried text: ${query}`);
+              cachedQuery = cachedQuery || query;
+              if(cachedQuery != query){
+                cachedQuery = query;
+              }
+              $log.info(`This is cachedQuery: ${cachedQuery}`);
+              return cachedQuery ? self.allMemberAnswers.filter(createFilterFor(cachedQuery)) : [];
+            }
+
+            function createFilterFor(query) {
+              query = query || '';
+              var lowercaseQuery = angular.lowercase(query);
+              $log.info(`LowercaseQuery is : ${lowercaseQuery}`);
+              return function filterFn(contact) {
+                $log.info(`Contact is : ${angular.toJson(contact.member)}`);
+                var bool = (contact.member.indexOf(lowercaseQuery) != -1);
+                $log.info(`What here? : ${bool}`)
+                return bool;
+              }
+            }
+
+            self.submit = function(){
+              // var eventSolutionRef = db.ref(`classMentors/eventSolutions/${eventId}/${participant.$id}/${task.$id}`);
+              $q.all([clmDataStore.events.submitSolution(eventId, taskId, participant.$id, angular.toJson(self.rankedQuestions))])
+                .finally((action) => {spfAlert.success('Response is saved.'),$mdDialog.hide()});
+            }
+
+            self.cancel = function(){
+              $mdDialog.hide();
+            }
+        }
+        DialogController.$inject = ['initialData', '$scope'];
+
+        function voteQuestionIntitalData (){
+            $log.info(`task is: ${angular.toJson(task)}`);
+            $log.info(`${angular.toJson(participant)}`);
+            var self = this;
+            var eventTeamsRef = db.ref(`classMentors/eventTeams/${eventId}/${task.taskFrom}`);
+
+            var team = $firebaseArray(eventTeamsRef).$loaded(function(teams){
+                console.log(teams);
+                return teams.filter(function(nextTeam){
+                  console.log(nextTeam);
+                  return nextTeam[participant.$id] != null;
+                });
+            });
+
+            var getMembers = team => Object.keys(team[0]).filter(key =>
+                key != 'currentSize' && key != 'maxSize' && key != '$id' && key != '$priority'
+            );
+            console.log(team);
+
+            var eventTasksRef = db.ref(`classMentors/eventTasks/${eventId}/${task.taskFrom}`);
+            var teamMemberAnswers = team.then(function(team){
+                console.log('What is team here?', team);
+                var fbObj = $firebaseObject(eventTasksRef).$loaded(function(task){
+                    var eventSolutionRef = db.ref(`classMentors/eventSolutions/${eventId}`);
+                    var getAnswerFromMember = function(member){
+                      var answerRef = eventSolutionRef.child(`${member}/${task.taskFrom}`);
+                      // $firebaseObject(answerRef).$loaded(function(promise){
+                      //     console.log(promise.$value);
+                      // });
+                      console.log('Member is :', member );
+                      return {
+                          answer: $firebaseObject(answerRef),
+                          member: member
+                      };
+                    }
+                    console.log(team);
+                    return getMembers(team).map(getAnswerFromMember);
+                });
+                return fbObj;
+            });
+            var teamMembers = team.then(team => getMembers(team));
+            return $q.all({
+                team: team,
+                teamMembers:teamMembers,
+                teamMemberAnswers: teamMemberAnswers
+            });
+        }
+
+    }
+
     this.promptForTeamFormation = function (eventId, taskId, task, participant, userSolution) {
         var db = firebaseApp.database();
         $mdDialog.show({
@@ -2657,6 +2856,8 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                         timestamp: TIMESTAMP
                     });
                 } else {
+                    console.log(response);
+                    console.log(eventId, taskId, participant.$id);
                     clmDataStore.events.submitSolution(eventId, taskId, participant.$id, response).then(function () {
                         $mdDialog.hide();
                         spfAlert.success('Response is saved.');
@@ -4371,5 +4572,3 @@ function chainComparer(comparerList) {
         return 0;
     };
 }
-
-
