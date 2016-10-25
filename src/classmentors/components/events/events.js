@@ -2302,6 +2302,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
     };
 
     this.promptForReviewQuestion = function(eventId, taskId, task, participant, userSolution){
+        var db = firebaseApp.database();
         $mdDialog.show({
             parent: $document.body,
             template: reviewQuestionTmpl,
@@ -2313,8 +2314,49 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         });
 
         function reviewQuestionIntitalData(){
-            //TODO needed?
+          //Get user's question
+          var eventReviewTaskRef = db.ref(`classMentors/eventTasks/${eventId}/${taskId}`);
+          var userQuestion = $firebaseObject(eventReviewTaskRef).$loaded(function(promise){
+            var votingTaskRef = db.ref(`classMentors/eventTasks/${eventId}/${promise.taskFrom}`);
+            return $firebaseObject(votingTaskRef);
+          }).then(function(promise){
+            var formTeamTaskRef = db.ref(`classMentors/eventTasks/${eventId}/${promise.taskFrom}`);
+            return $firebaseObject(formTeamTaskRef);
+          }).then(function(promise){
+            var questionTaskRef = db.ref(`classMentors/eventSolutions/${eventId}/${participant.$id}/${promise.taskFrom}`);
+            return $firebaseObject(questionTaskRef);
+          });
+          return $q.all({userQuestion:userQuestion});
         }
+
+        function DialogController(initialData){
+          var self = this;
+          self.answer = null;
+          self.userQuestion =  initialData.userQuestion.$value; //'No question found';
+          self.options = [
+            {
+              text: "Instructor answered it"
+            },
+            {
+              text: "Teaching Assistants answered it"
+            },
+            {
+              text: "Figured it out on my own or answered by peers"
+            },
+            {
+              text: "Post this question to Question Queue to seek for an answer"
+            }
+          ]
+
+          self.submit = function (){
+
+            $q.all([clmDataStore.events.submitSolution(eventId, taskId, participant.$id, angular.toJson(self.options[self.answer]))])
+            .finally(action => {spfAlert.success('Response is saved.'),$mdDialog.hide()});
+          }
+        }
+        DialogController.$inject = [
+          'initialData'
+        ]
     }
 
 
@@ -2387,7 +2429,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             self.submit = function(){
               // var eventSolutionRef = db.ref(`classMentors/eventSolutions/${eventId}/${participant.$id}/${task.$id}`);
               $q.all([clmDataStore.events.submitSolution(eventId, taskId, participant.$id, angular.toJson(self.rankedQuestions))])
-                .finally((action) => {$mdDialog.hide(),spfAlert.success('Response is saved.')});
+                .finally((action) => {spfAlert.success('Response is saved.'),$mdDialog.hide()});
             }
 
             self.cancel = function(){
@@ -2403,16 +2445,14 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             var eventTeamsRef = db.ref(`classMentors/eventTeams/${eventId}/${task.taskFrom}`);
 
             var team = $firebaseArray(eventTeamsRef).$loaded(function(teams){
-                return teams.reduce(function(team, nextTeam){
-                    console.log(nextTeam);
-                    if(nextTeam[participant.$id] != null){
-                        console.log('pass?');
-                        return nextTeam;
-                    }
-                }, {});
+                console.log(teams);
+                return teams.filter(function(nextTeam){
+                  console.log(nextTeam);
+                  return nextTeam[participant.$id] != null;
+                });
             });
 
-            var getMembers = team => Object.keys(team).filter(key =>
+            var getMembers = team => Object.keys(team[0]).filter(key =>
                 key != 'currentSize' && key != 'maxSize' && key != '$id' && key != '$priority'
             );
             console.log(team);
@@ -2424,9 +2464,10 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                     var eventSolutionRef = db.ref(`classMentors/eventSolutions/${eventId}`);
                     var getAnswerFromMember = function(member){
                       var answerRef = eventSolutionRef.child(`${member}/${task.taskFrom}`);
-                      $firebaseObject(answerRef).$loaded(function(promise){
-                          console.log(promise.$value);
-                      });
+                      // $firebaseObject(answerRef).$loaded(function(promise){
+                      //     console.log(promise.$value);
+                      // });
+                      console.log('Member is :', member );
                       return {
                           answer: $firebaseObject(answerRef),
                           member: member
