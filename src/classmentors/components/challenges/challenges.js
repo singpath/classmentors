@@ -7,6 +7,7 @@
 import * as mcq from './mcq/mcq.js';
 import * as survey from './survey/survey.js';
 import * as team from './teamActivity/teamactivity.js';
+import * as mentor from './mentoring/mentoring.js';
 import {cleanObj} from 'singpath-core/services/firebase.js';
 
 const noop = () => undefined;
@@ -118,6 +119,17 @@ export function configRoute($routeProvider, routes) {
                 initialData: team.createTeamActivityInitialData
             }
         })
+
+        .when(routes.viewMentorCreation, {
+            template: mentor.mentorCreationTmpl,
+            controller: mentor.createMentoringController,
+            controllerAs: 'ctrl',
+            resolve:{
+                initialData: mentor.createMentoringInitialData
+
+            }
+        })
+
         .when(routes.viewIRAT, {
             template: team.teamIRATTmpl,
             controller: team.startIRATController,
