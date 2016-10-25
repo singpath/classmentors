@@ -550,7 +550,7 @@ export class GenericServiceFormCtrl {
     // console.log("Service card info:", this.$card.service.name);
     // console.log("Selected ID: ", this.name);
     if(this.$card.service.name == 'Code Combat') {
-      this.name = this.name.toLowerCase();
+      this.name = this.name.toLowerCase().replace(" ","-");
     }
     // console.log("New ID: ", this.name);
     this.setProfileUrl();
