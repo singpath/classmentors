@@ -92,6 +92,35 @@ module.config(components.challenges.configRoute);
 // added new survey factory for tryout purpose
 module.factory('clmSurvey', components.events.clmSurveyTaskFactory);
 
+//no back list:
+var noBackList = {
+  "/events/:eventId/challenges/:taskId/mcq/start": true,
+  '/events/:eventId/challenges/:taskId/TRAT/start': true,
+}
+// Testing routing protection for pages.
+var thisCurrentRoute = null;
+var thisTaskId = null;
+var routeChangeStartListener= function(event, nextRoute, currentRoute){
+  let nextRoutePath = nextRoute.$$route.originalPath;
+  let nextTaskId = nextRoute.params.taskId;
+  if(noBackList[nextRoutePath] && nextTaskId == thisTaskId){
+    event.preventDefault();
+    window.history.forward();
+  }
+}
+var routeChangeSuccessListener = function(event, nextRoute, currentRoute){
+  thisCurrentRoute = currentRoute.$$route.originalPath;
+  thisTaskId = currentRoute.params.taskId;
+}
+
+function routeProtection ($rootScope, $location){
+  $rootScope.$on('$routeChangeStart', routeChangeStartListener);//  function(event, next, current){
+  $rootScope.$on('$routeChangeSuccess', routeChangeSuccessListener);
+};
+routeProtection.$inject = ['$rootScope', '$location'];
+
+// Passing callback for routeProtection
+module.run(routeProtection);
 /**
  * Label route paths.
  *
@@ -128,7 +157,8 @@ module.constant('routes', {
   feedback: '/feedback',
   questionQueue: '/question-queue',
   eventQueue: '/question-queue/:eventId',
-  oneQuestion: '/question-queue/:eventId/questions/:questionId'
+  oneQuestion: '/question-queue/:eventId/questions/:questionId',
+  indexCard: '/challenges/team-activity/indexCard'
 });
 
 export {module};

@@ -27,7 +27,7 @@
                   <label>{{$index + 1}}) {{option.text}}</label>
                 </div>
                 <div flex="20">
-                  <md-radio-button ng-disabled="true" value={{$index}} ng-checked="ctrl.isChecked(question.answers, $index)"></md-radio-button>
+                  <md-radio-button aria-label="Is Selected" ng-disabled="true" value={{$index}} ng-checked="ctrl.isChecked(question.answers, $index)"></md-radio-button>
                 </div>
               </div>
               <md-divider layout-padding ng-if="!$last"></md-divider>
@@ -42,7 +42,7 @@
                 <label>{{$index + 1}}) {{option.text}}</label>
               </div>
               <div flex="20">
-                <md-checkbox ng-disabled="true" ng-checked="ctrl.isChecked(question.answers, $index)"></md-checkbox>
+                <md-checkbox aria-label="Is Checked" ng-disabled="true" ng-checked="ctrl.isChecked(question.answers, $index)"></md-checkbox>
               </div>
             </div>
             <md-divider layout-padding ng-if="!$last"></md-divider>
