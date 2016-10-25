@@ -51,6 +51,7 @@ import 'ace/mode-html.js';
 import 'ace/mode-java.js';
 import 'ace/mode-python.js';
 
+
 import schEngageScaleTmpl from './events-view-schEngageScale-task-form.html!text';
 import motiStratLearnTmpl from './events-view-motiStratLearn-task-form.html!text';
 import eduDisLearnTmpl from './events-view-eduDisLearn-task-form.html!text';
@@ -1280,7 +1281,12 @@ function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNav
         } else if (tasktype === 'profileEdit') {
             return 'Save';
 
-        } else {
+        } else if (tasktype ==='mentoringActivity'){
+            console.log("mentoring activity is clicked");
+            location = '/challenges/mentoring-activity/create';
+            return 'Continue';
+        }
+        else {
             return 'Save'; // by default should show 'save'
         }
     }
@@ -1359,7 +1365,7 @@ function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNav
 
 
         self.creatingTask = true;
-        if (taskType === 'multipleChoice' || taskType === 'journalling' || taskType === 'survey' || taskType === 'teamActivity') {
+        if (taskType === 'multipleChoice' || taskType === 'journalling' || taskType === 'survey' || taskType === 'teamActivity' || taskType === 'mentoringActivity') {
             var data = {
                 taskType: taskType,
                 isOpen: isOpen,
