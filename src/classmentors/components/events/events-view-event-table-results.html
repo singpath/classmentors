@@ -182,7 +182,7 @@
         <md-button class="md-raised md-primary"
                    aria-label="View MCQ"
                    ng-click="ctrl.viewMultipleChoiceResponse(ctrl.event.$id, ctrl.selected.$id, ctrl.selected, team.teamLeader, ctrl.solutions[team.teamLeader])"
-                   ng-if="ctrl.selected.openedAt"
+                   ng-if="ctrl.selected.openedAt && ctrl.selected.mcqQuestions"
         >Show Model Answer
         </md-button>
         <table class="events tasks">
@@ -195,7 +195,7 @@
                     <md-button>Members</md-button>
                 </th>
                 <th rowspan="8">
-                    <md-button>Score</md-button>
+                    <md-button>Submission</md-button>
                 </th>
             </tr>
             </thead>
@@ -212,7 +212,10 @@
                     </ul>
                 </td>
                 <td>
-                    <div>{{ctrl.scores[team.teamLeader][ctrl.selected.$id]}} / {{ctrl.selected.numQns}}</div>
+                    <div ng-if="ctrl.selected.mcqQuestions">{{ctrl.scores[team.teamLeader][ctrl.selected.$id]}} / {{ctrl.selected.numQns}}</div>
+                    <md-button class="md-raised md-primary" ng-if="ctrl.selected.type=='textResponse'" ng-click="ctrl.viewTextResponse(ctrl.event.$id, ctrl.selected.$id, ctrl.selected, team[team.teamLeader], ctrl.solutions[team.teamLeader])">View Submission</md-button>
+                    <md-button class="md-raised md-primary" ng-if="ctrl.selected.type=='linkPattern'" ng-click="ctrl.viewLink(ctrl.event.$id, ctrl.selected.$id, ctrl.selected, team[team.teamLeader], ctrl.solutions[team.teamLeader])">View Submission</md-button>
+                    <md-button class="md-raised md-primary" ng-if="ctrl.selected.type=='code'" ng-click="ctrl.viewCodeResponse(ctrl.event.$id, ctrl.selected.$id, ctrl.selected, team[team.teamLeader], ctrl.solutions[team.teamLeader])">View Submission</md-button>
                 </td>
             </tr>
             <tr ng-if="ctrl.participantsView | spfEmpty">

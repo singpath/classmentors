@@ -707,6 +707,7 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
     this.loadSolutions = function () {
         self.loadingSolutions = true;
         console.log("loading solutions....");
+        console.log(self.selected);
         // self.solutions = clmDataStore.events.getSolutions(self.event.$id).then(function (solutions) {
         //     console.log(solutions);
         //     return solutions;

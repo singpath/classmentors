@@ -148,7 +148,6 @@
                             <!--</label>-->
                             <label ng-show="task.startTRAT && task.teamFormationRef && ctrl.checkUser(task.teamFormationRef, ctrl.currentUserParticipant.$id) && (ctrl.team[task.teamFormationRef].teamLeader != undefined && ctrl.team[task.teamFormationRef].teamLeader != ctrl.currentUserParticipant.$id)">
                                 Your team leader is: {{ctrl.team[task.teamFormationRef].teamLeader}}
-
                              </label>
                         </span>
                         <span ng-if="ctrl.currentUserSolutions[task.$id] && !task.formationPattern">
