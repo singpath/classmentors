@@ -2106,11 +2106,22 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         codeCombat: true
     };
 
+    this.logClick = function (taskId, url) {
+        console.log("logging click...");
+        var logObj = {
+            action: 'moreDetails',
+            taskId: taskId,
+            eventId: self.event.$id,
+            helpLink: url,
+            publicId: self.currentUserParticipant.$id
+        };
+        clmDataStore.logging.inputLog(logObj);
+    };
 
     this.startMCQ = function (eventId, taskId, task, participant, userSolution) {
         // console.log("participant isss:", participant);
         $location.path('/events/' + eventId + '/challenges/' + taskId + '/mcq/start');
-    }
+    };
 
     this.startTRAT = function (eventId, taskId, task, participant) {
         var data = {

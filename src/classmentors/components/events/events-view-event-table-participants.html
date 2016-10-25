@@ -28,7 +28,7 @@
             <tr>
                 <th ng-if="ctrl.visibleTasks.length == 0"></th>
                 <th ng-repeat="task in ctrl.visibleTasks track by task.$id">
-                    <a ng-href="{{task.link}}" ng-if="task.link" target="_blank">More details</a>
+                    <a ng-href="{{task.link}}" ng-if="task.link" target="_blank" ng-click="ctrl.logClick(task.$id, task.link)">More details</a>
                 </th>
             </tr>
             <tr>
