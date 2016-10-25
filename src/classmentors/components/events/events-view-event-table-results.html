@@ -1,8 +1,8 @@
-<div ng-if="ctrl.loading" layout="row" layout-align="space-around" class="md-padding">
+<div ng-if="ctrl.loading || ctrl.loadingTeams" layout="row" layout-align="space-around" class="md-padding">
     <md-progress-circular md-mode="indeterminate"></md-progress-circular>
 </div>
 
-<div ng-if="!ctrl.loading">
+<div ng-if="!ctrl.loading && !ctrl.selected.teamFormationRef">
 
     <md-content class="md-padding">
         <table class="events tasks">
@@ -156,7 +156,7 @@
                                placeholder="Allocate task score"
                         />
                         <div ng-messages="editTask.editTaskScore.$error" ng-if="editTask.editTaskScore.$error">
-                            <div ng-message="number">The priority should be a positive number.</div>
+                            <div ng-message="number">The score should be a positive number.</div>
                         </div>
                     </md-input-container>
                     <md-button ng-show="!ctrl.selected.mcqQuestions" class="md-raised md-primary"
@@ -175,4 +175,53 @@
     </md-content>
 
     <clm-pager options="ctrl.pagerOptions" class="md-padding"></clm-pager>
+</div>
+
+<div ng-if="!ctrl.loading && ctrl.selected.teamFormationRef && !ctrl.loadingTeams">
+    <md-content class="md-padding">
+        <md-button class="md-raised md-primary"
+                   aria-label="View MCQ"
+                   ng-click="ctrl.viewMultipleChoiceResponse(ctrl.event.$id, ctrl.selected.$id, ctrl.selected, team.teamLeader, ctrl.solutions[team.teamLeader])"
+                   ng-if="ctrl.selected.openedAt && ctrl.selected.mcqQuestions"
+        >Show Model Answer
+        </md-button>
+        <table class="events tasks">
+            <thead>
+            <tr>
+                <th rowspan="4">
+                    <md-button>Teams</md-button>
+                </th>
+                <th rowspan="8">
+                    <md-button>Members</md-button>
+                </th>
+                <th rowspan="8">
+                    <md-button>Submission</md-button>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="team in ctrl.teams | orderBy: 'ctrl.scores[team.teamLeader][ctrl.selected.$id]'" ng-class="'index-' + $index + ' ' + ($odd ? 'odd' : 'even')">
+                <th rowspan="team.currentSize" layout-align="center center">
+                    <md-button disbaled>Team {{team.number}}</md-button>
+                </th>
+                <td layout-align="start center">
+                    <ul>
+                        <li ng-repeat="item in team" ng-if="item.displayName">
+                            {{item.displayName}}
+                        </li>
+                    </ul>
+                </td>
+                <td>
+                    <div ng-if="ctrl.selected.mcqQuestions">{{ctrl.scores[team.teamLeader][ctrl.selected.$id]}} / {{ctrl.selected.numQns}}</div>
+                    <md-button class="md-raised md-primary" ng-if="ctrl.selected.type=='textResponse'" ng-click="ctrl.viewTextResponse(ctrl.event.$id, ctrl.selected.$id, ctrl.selected, team[team.teamLeader], ctrl.solutions[team.teamLeader])">View Submission</md-button>
+                    <md-button class="md-raised md-primary" ng-if="ctrl.selected.type=='linkPattern'" ng-click="ctrl.viewLink(ctrl.event.$id, ctrl.selected.$id, ctrl.selected, team[team.teamLeader], ctrl.solutions[team.teamLeader])">View Submission</md-button>
+                    <md-button class="md-raised md-primary" ng-if="ctrl.selected.type=='code'" ng-click="ctrl.viewCodeResponse(ctrl.event.$id, ctrl.selected.$id, ctrl.selected, team[team.teamLeader], ctrl.solutions[team.teamLeader])">View Submission</md-button>
+                </td>
+            </tr>
+            <tr ng-if="ctrl.participantsView | spfEmpty">
+                <td>No<span ng-if="ctrl.ctrl.currentUserParticipant"> other</span> participants</td>
+            </tr>
+            </tbody>
+        </table>
+    </md-content>
 </div>

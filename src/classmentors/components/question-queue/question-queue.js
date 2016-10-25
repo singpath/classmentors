@@ -107,8 +107,6 @@ function eventQController(initialData, spfNavBarService, urlFor, firebaseApp, sp
     this.myQnLimit = 3;
     this.voteQnLimit = 3;
 
-    spfAlert.info('Classmentors does not support inline images. Please use an external image hosting service such as droplr.com for pictures that you wish to include in your questions or answers.');
-
     this.expandMyQns = function() {
         if(self.myQnLimit+3 > self.questions.filter(function (qn) {
                 return qn.owner.publicId == self.currentUser.publicId;

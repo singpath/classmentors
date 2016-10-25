@@ -28,7 +28,7 @@
             <tr>
                 <th ng-if="ctrl.visibleTasks.length == 0"></th>
                 <th ng-repeat="task in ctrl.visibleTasks track by task.$id">
-                    <a ng-href="{{task.link}}" ng-if="task.link" target="_blank">More details</a>
+                    <a ng-href="{{task.link}}" ng-if="task.link" target="_blank" ng-click="ctrl.logClick(task.$id, task.link)">More details</a>
                 </th>
             </tr>
             <tr>
@@ -103,7 +103,7 @@
                         </div>
 
                         <!--prompt for collaborative submission-->
-                        <span ng-if="!ctrl.currentUserSolutions[task.$id] && !task.formationPattern">
+                        <span ng-if="!ctrl.currentUserSolutions[task.$id] && !task.formationPattern && !task.mcqQuestions">
                             <md-button class="md-raised md-primary" ng-if="task.type == 'textResponse' && ctrl.team[task.teamFormationRef].teamLeader && ctrl.team[task.teamFormationRef].teamLeader == ctrl.currentUserParticipant.$id"
                                        ng-click="ctrl.promptForTextResponse(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant, ctrl.currentUserSolutions)"
                                        ng-disabled="task.closedAt"
@@ -122,7 +122,7 @@
                                        aria-label="Collab Link Pattern"
                             >Submit Link
                             </md-button>
-                            <label ng-show="task.teamFormationRef && ctrl.checkUser(task.teamFormationRef, ctrl.currentUserParticipant.$id) && ctrl.team[task.teamFormationRef].teamLeader != ctrl.currentUserParticipant.$id">
+                            <label ng-show="task.teamFormationRef && ctrl.checkUser(task.teamFormationRef, ctrl.currentUserParticipant.$id) && ctrl.team[task.teamFormationRef].teamLeader != ctrl.currentUserParticipant.$id && task.openedAt">
                                 Your team leader is: {{ctrl.team[task.teamFormationRef][ctrl.team[task.teamFormationRef].teamLeader].displayName}}
                              </label>
                         </span>
@@ -141,9 +141,8 @@
                             <!--<label ng-show="ctrl.teamLeader != ctrl.currentUserParticipant.$id && task.startTRAT && ctrl.teamLeader">-->
                             <!--Your team leader is: {{ctrl.team[ctrl.teamLeader].displayName}}-->
                             <!--</label>-->
-                            <label ng-show="task.startTRAT && task.teamFormationRef && ctrl.checkUser(task.teamFormationRef, ctrl.currentUserParticipant.$id) && (ctrl.team[task.teamFormationRef].teamLeader != undefined && ctrl.team[task.teamFormationRef].teamLeader != ctrl.currentUserParticipant.$id)">
+                            <label ng-show="task.startTRAT && task.teamFormationRef && ctrl.checkUser(task.teamFormationRef, ctrl.currentUserParticipant.$id) && (ctrl.team[task.teamFormationRef].teamLeader != undefined && ctrl.team[task.teamFormationRef].teamLeader != ctrl.currentUserParticipant.$id) && task.openedAt">
                                 Your team leader is: {{ctrl.team[task.teamFormationRef].teamLeader}}
-
                              </label>
                         </span>
                         <span ng-if="ctrl.currentUserSolutions[task.$id] && !task.formationPattern">

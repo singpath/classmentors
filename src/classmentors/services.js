@@ -1804,6 +1804,16 @@ export function clmDataStoreFactory(
 
         }
 
+      },
+      
+      getTeams: function (eventId, taskId) {
+        var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}`);
+        return loaded($firebaseArray(ref));
+      },
+
+      getMCQAnswers: function (eventId, taskId) {
+        var ref = db.ref(`classMentors/eventAnswers/${eventId}/${taskId}`);
+        return loaded($firebaseObject(ref));
       }
     },
 
