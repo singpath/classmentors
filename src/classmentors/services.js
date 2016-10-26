@@ -1284,7 +1284,7 @@ export function clmDataStoreFactory(
           task.textResponse &&
           solutions &&
           solutions[task.$id]
-        );
+        ) || (task.type=='reflectionQuestion' && solutions && solutions[task.$id]);
       },
 
       _hasDoneSurvey: function(task, solutions) {

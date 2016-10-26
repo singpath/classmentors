@@ -147,6 +147,14 @@
                                 No Submission
                         </span>
                     </div>
+                    <div ng-if="ctrl.selected.type=='reflectionQuestion'">
+                        <span ng-if="ctrl.solutions[participant.$id][ctrl.selected.$id]">
+                                {{ctrl.solutions[participant.$id][ctrl.selected.$id]}}
+                        </span>
+                        <span ng-if="!ctrl.solutions[participant.$id][ctrl.selected.$id]">
+                                No Submission
+                        </span>
+                    </div>
                 </td>
                 <td>
                     <!--{{ctrl.scores[participant.$id][ctrl.selected.$id]}}-->

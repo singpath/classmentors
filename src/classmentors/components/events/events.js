@@ -2430,19 +2430,24 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             {
               text: "Post this question to Question Queue to seek for an answer"
             }
-          ]
+          ];
 
           self.submit = function (){
-
-            $q.all([clmDataStore.events.submitSolution(eventId, taskId, participant.$id, angular.toJson(self.options[self.answer]))])
-            .finally(action => {spfAlert.success('Response is saved.'),$mdDialog.hide()});
+              clmDataStore.events.submitSolution(eventId, taskId, participant.$id, angular.toJson(self.options[self.answer]))
+                  .then(function () {
+                      // clmDataStore.events.setProgress(eventId, taskId, participant.$id, true)
+                      //     .then(function () {
+                      //
+                      //     })
+                      spfAlert.success('Response is saved.');
+                      $mdDialog.hide();
+                  })
           }
         }
         DialogController.$inject = [
           'initialData'
         ]
-    }
-
+    };
 
     this.promptForVoteQuestion = function(eventId, taskId, task, participant, userSolution){
         var db = firebaseApp.database();
@@ -2572,7 +2577,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             });
         }
 
-    }
+    };
 
     this.promptForTeamFormation = function (eventId, taskId, task, participant, userSolution) {
         var db = firebaseApp.database();
