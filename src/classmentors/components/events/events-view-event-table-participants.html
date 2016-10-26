@@ -176,7 +176,7 @@
                         <md-button class="md-icon-button md-primary small-icon"
                                    aria-label="Update response"
                                    ng-click="ctrl.promptForTextResponse(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant, ctrl.currentUserSolutions)"
-                                   ng-if="task.openedAt"
+                                   ng-disabled="task.closedAt"
                         >
                             <md-icon md-svg-icon="create"></md-icon>
                         </md-button>
@@ -191,12 +191,12 @@
                       </span>
                     </div>
                     <div ng-if="task.type == 'voteQuestions'">
-                        <!--{{task}}-->
                         <span ng-if="ctrl.currentUserSolutions[task.$id]">
                           <md-button class="md-raised md-primary"
                                      aria-label="Update response"
                                      ng-click="ctrl.promptForVoteQuestion(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant, ctrl.currentUserSolutions)"
-                                     ng-if="task.openedAt"
+                                     ng-disabled="task.closedAt"
+
                           >
                           Edit Vote
                           </md-button>

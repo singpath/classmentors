@@ -2474,6 +2474,8 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                 self.rankedQuestions = self.rankedQuestions.map(rankAnswer);
               }
             },true);
+
+
             var resolveMapTeamMemberAnswers = function (record){
               return {
                 member: record.displayName,
@@ -2481,11 +2483,21 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
               }
             }
 
-            if(initialData.userRankedQuestions != null){
+            if(initialData.userRankedQuestions.$value != null){
               self.rankedQuestions = angular.fromJson(initialData.userRankedQuestions.$value);
             }
             self.allMemberAnswers = initialData.teamMemberAnswers.map(resolveMapTeamMemberAnswers);
 
+            self.validateChip = function (chip){
+              var question = self.rankedQuestions.filter(function(question){
+                return ( angular.lowercase(question.member).indexOf(angular.lowercase(chip.member)) != -1 );
+              });
+              if(question.length > 0){
+                return null;
+              }else{
+                return undefined;
+              }
+            }
 
             function rankAnswer(answer, index, array){
               answer.rank = index + 1;
@@ -2493,31 +2505,25 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             }
             var cachedQuery;
             self.queryMembers = function(query){
-              $log.info(`Queried text: ${query}`);
               cachedQuery = cachedQuery || query;
               if(cachedQuery != query){
                 cachedQuery = query;
               }
-              $log.info(`This is cachedQuery: ${cachedQuery}`);
               return cachedQuery ? self.allMemberAnswers.filter(createFilterFor(cachedQuery)) : [];
             }
 
             function createFilterFor(query) {
               query = query || '';
               var lowercaseQuery = angular.lowercase(query);
-              $log.info(`LowercaseQuery is : ${lowercaseQuery}`);
               return function filterFn(contact) {
-                $log.info(`Contact is : ${angular.toJson(contact.member)}`);
-                var bool = (contact.member.indexOf(lowercaseQuery) != -1);
-                $log.info(`What here? : ${bool}`)
+                var bool = (contact.member.toLowerCase().indexOf(lowercaseQuery) != -1);
                 return bool;
               }
             }
 
             self.submit = function(){
-              // var eventSolutionRef = db.ref(`classMentors/eventSolutions/${eventId}/${participant.$id}/${task.$id}`);
               $q.all([clmDataStore.events.submitSolution(eventId, taskId, participant.$id, angular.toJson(self.rankedQuestions))])
-                .finally((action) => {$mdDialog.hide()});
+                .then((action) => {$mdDialog.hide()});
             }
 
             self.cancel = function(){
