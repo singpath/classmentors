@@ -2435,10 +2435,13 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
           self.submit = function (){
               clmDataStore.events.submitSolution(eventId, taskId, participant.$id, angular.toJson(self.options[self.answer]))
                   .then(function () {
-                      // clmDataStore.events.setProgress(eventId, taskId, participant.$id, true)
-                      //     .then(function () {
-                      //
-                      //     })
+                      clmDataStore.logging.inputLog({
+                          action: 'setAskedQuestionStatus',
+                          eventId: eventId,
+                          taskId: taskId,
+                          publicId: participant.$id,
+                          timestamp: Date.now(),
+                      });
                       spfAlert.success('Response is saved.');
                       $mdDialog.hide();
                   })
@@ -2486,7 +2489,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                 member: record.displayName,
                 answer: record.answer.$value
               }
-            }
+            };
 
             if(initialData.userRankedQuestions.$value != null){
               self.rankedQuestions = angular.fromJson(initialData.userRankedQuestions.$value);
@@ -2502,7 +2505,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
               }else{
                 return undefined;
               }
-            }
+            };
 
             function rankAnswer(answer, index, array){
               answer.rank = index + 1;
@@ -2515,7 +2518,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                 cachedQuery = query;
               }
               return cachedQuery ? self.allMemberAnswers.filter(createFilterFor(cachedQuery)) : [];
-            }
+            };
 
             function createFilterFor(query) {
               query = query || '';
@@ -2528,8 +2531,17 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
 
             self.submit = function(){
               $q.all([clmDataStore.events.submitSolution(eventId, taskId, participant.$id, angular.toJson(self.rankedQuestions))])
-                .then((action) => {$mdDialog.hide()});
-            }
+                .then((action) => {$mdDialog.hide()})
+                  .then(function () {
+                      clmDataStore.logging.inputLog({
+                          action: 'voteTeamQuestions',
+                          eventId: eventId,
+                          taskId: taskId,
+                          publicId: participant.$id,
+                          timestamp: Date.now(),
+                      });
+                  });
+            };
 
             self.cancel = function(){
               $mdDialog.hide();
@@ -2872,6 +2884,9 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
 
     this.promptForTextResponse = function (eventId, taskId, task, participant, userSolution) {
         task.team = self.team[task.teamFormationRef];
+        if(!task.team && task.activityType && task.activityType=='indexCards') {
+            console.log('indexcard condition met');
+        }
 
         $mdDialog.show({
             parent: $document.body,
@@ -2925,13 +2940,24 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                         spfAlert.error('Failed to save your response.');
                         return err;
                     });
-                    clmDataStore.logging.inputLog({
-                        action: "submitTextResponse",
-                        publicId: self.profile.$id,
-                        eventId: self.event.$id,
-                        taskId: taskId,
-                        timestamp: TIMESTAMP
-                    });
+
+                    if(task.activityType && task.activityType=='indexCards') {
+                        clmDataStore.logging.inputLog({
+                            action: "askIndividualQuestion",
+                            publicId: self.profile.$id,
+                            eventId: self.event.$id,
+                            taskId: taskId,
+                            timestamp: TIMESTAMP
+                        });
+                    } else {
+                        clmDataStore.logging.inputLog({
+                            action: "submitTextResponse",
+                            publicId: self.profile.$id,
+                            eventId: self.event.$id,
+                            taskId: taskId,
+                            timestamp: TIMESTAMP
+                        });
+                    }
                 }
             };
 
