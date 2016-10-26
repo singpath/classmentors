@@ -148,6 +148,36 @@
                         <span ng-if="ctrl.currentUserSolutions[task.$id] && !task.formationPattern && task.type == 'indexCards'">
                             Completed<span ng-if="!ctrl.currentUserProgress[task.$id].completed"></span>
                         </span>
+                        <span ng-if="ctrl.currentUserSolutions[task.$id] && !task.formationPattern && task.type == 'linkPattern'">
+                            Completed
+                            <md-button class="md-icon-button md-primary small-icon"
+                                       aria-label="Update link"
+                                       ng-click="promptForLink(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant, ctrl.currentUserSolutions)"
+                                       ng-if="task.openedAt"
+                            >
+                                <md-icon md-svg-icon="create"></md-icon>
+                            </md-button>
+                        </span>
+                        <span ng-if="ctrl.currentUserSolutions[task.$id] && !task.formationPattern && task.type == 'textResponse'">
+                            Completed
+                            <md-button class="md-icon-button md-primary small-icon"
+                                                aria-label="Update link"
+                                                ng-click="promptForTextResponse(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant, ctrl.currentUserSolutions)"
+                                                ng-if="task.openedAt"
+                        >
+                                <md-icon md-svg-icon="create"></md-icon>
+                            </md-button>
+                        </span>
+                        <span ng-if="ctrl.currentUserSolutions[task.$id] && !task.formationPattern && task.type == 'code'">
+                            Completed
+                            <md-button class="md-icon-button md-primary small-icon"
+                                       aria-label="Update link"
+                                       ng-click="promptForCodeResponse(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant, ctrl.currentUserSolutions)"
+                                       ng-if="task.openedAt"
+                            >
+                                <md-icon md-svg-icon="create"></md-icon>
+                            </md-button>
+                        </span>
                     </div>
 
                     <div ng-if="task.serviceId && !task.teamFormationMethod">
