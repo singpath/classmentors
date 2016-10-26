@@ -2463,7 +2463,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             console.log(initialData);
             self.title = task.title;
             self.desc = task.description;
-            self.allMembers = initialData.teamMembers;
+            // self.allMembers = initialData.teamMembers;
             self.rankedQuestions = [];
             self.filterSelected = true;
             self.searchText = '';
@@ -2474,14 +2474,18 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                 self.rankedQuestions = self.rankedQuestions.map(rankAnswer);
               }
             },true);
-
             var resolveMapTeamMemberAnswers = function (record){
               return {
-                member: record.member,
+                member: record.displayName,
                 answer: record.answer.$value
               }
             }
+
+            if(initialData.userRankedQuestions != null){
+              self.rankedQuestions = angular.fromJson(initialData.userRankedQuestions.$value);
+            }
             self.allMemberAnswers = initialData.teamMemberAnswers.map(resolveMapTeamMemberAnswers);
+
 
             function rankAnswer(answer, index, array){
               answer.rank = index + 1;
@@ -2513,7 +2517,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             self.submit = function(){
               // var eventSolutionRef = db.ref(`classMentors/eventSolutions/${eventId}/${participant.$id}/${task.$id}`);
               $q.all([clmDataStore.events.submitSolution(eventId, taskId, participant.$id, angular.toJson(self.rankedQuestions))])
-                .finally((action) => {spfAlert.success('Response is saved.'),$mdDialog.hide()});
+                .finally((action) => {$mdDialog.hide()});
             }
 
             self.cancel = function(){
@@ -2523,15 +2527,12 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         DialogController.$inject = ['initialData', '$scope'];
 
         function voteQuestionIntitalData (){
-            $log.info(`task is: ${angular.toJson(task)}`);
-            $log.info(`${angular.toJson(participant)}`);
             var self = this;
             var eventTeamsRef = db.ref(`classMentors/eventTeams/${eventId}/${task.taskFrom}`);
+            var userRankedQuestions = db.ref(`classMentors/eventSolutions/${eventId}/${participant.$id}/${taskId}`)
 
             var team = $firebaseArray(eventTeamsRef).$loaded(function(teams){
-                console.log(teams);
                 return teams.filter(function(nextTeam){
-                  console.log(nextTeam);
                   return nextTeam[participant.$id] != null;
                 });
             });
@@ -2539,25 +2540,19 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             var getMembers = team => Object.keys(team[0]).filter(key =>
                 key != 'currentSize' && key != 'maxSize' && key != '$id' && key != '$priority'
             );
-            console.log(team);
 
             var eventTasksRef = db.ref(`classMentors/eventTasks/${eventId}/${task.taskFrom}`);
             var teamMemberAnswers = team.then(function(team){
-                console.log('What is team here?', team);
                 var fbObj = $firebaseObject(eventTasksRef).$loaded(function(task){
                     var eventSolutionRef = db.ref(`classMentors/eventSolutions/${eventId}`);
                     var getAnswerFromMember = function(member){
                       var answerRef = eventSolutionRef.child(`${member}/${task.taskFrom}`);
-                      // $firebaseObject(answerRef).$loaded(function(promise){
-                      //     console.log(promise.$value);
-                      // });
-                      console.log('Member is :', member );
                       return {
                           answer: $firebaseObject(answerRef),
-                          member: member
+                          member: member,
+                          displayName: team[0][member].displayName
                       };
                     }
-                    console.log(team);
                     return getMembers(team).map(getAnswerFromMember);
                 });
                 return fbObj;
@@ -2566,7 +2561,8 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             return $q.all({
                 team: team,
                 teamMembers:teamMembers,
-                teamMemberAnswers: teamMemberAnswers
+                teamMemberAnswers: teamMemberAnswers,
+                userRankedQuestions: $firebaseObject(userRankedQuestions)
             });
         }
 
