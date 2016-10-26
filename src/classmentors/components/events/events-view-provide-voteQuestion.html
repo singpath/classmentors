@@ -1,5 +1,5 @@
 <md-dialog aria-label="{{ctrl.task.title}}" class="enlarged-dialog">
-  <form name='voteQuestion' ng-submit='ctrl.save()'>
+  <form name='voteQuestion' ng-submit='ctrl.submit()'>
     <md-dialog-content class="sticky-container">
       <div name='voteDialog' layout-align='column start' >
           <div name='title'>
@@ -9,7 +9,7 @@
           <div name='voting'>
               <h4>Your question ranking:</h4>
               <md-content class='md-padding autocomplete' layout='column'>
-                  <md-chips ng-model='ctrl.rankedQuestions' md-require-match="true">
+                  <md-chips required ng-model='ctrl.rankedQuestions' md-require-match="true" md-transform-chip='ctrl.validateChip($chip)'>
                     <md-chip-template>
                       <span>
                         <strong>#{{$chip.rank}} {{$chip.member}}</strong>
@@ -30,8 +30,10 @@
                     </md-item-template>
                   </md-autocomplete>
                   </md-chips>
+                  <span ng-show='ctrl.rankedQuestions.length != ctrl.allMemberAnswers.length'>
+                    You need to vote for all questions
+                  </span>
               </md-content>
-              {{ctrl.rankedQuestions}}
               <md-content>
                   <md-list>
                       <md-list-item class="md-3-line" ng-repeat="item in ctrl.allMemberAnswers" >
@@ -45,7 +47,7 @@
           </div>
       </div>
       <div flex align='row'>
-          <md-button ng-click="ctrl.submit()" class="md-raised md-primary" style="width: 150px;">Submit and close
+          <md-button type='submit' ng-disabled="ctrl.rankedQuestions.length != ctrl.allMemberAnswers.length" class="md-raised md-primary" style="width: 150px;">Submit and close
           </md-button>
           <md-button ng-click="ctrl.cancel()" class="md-raised md-primary" style="width: 150px;">
               Cancel

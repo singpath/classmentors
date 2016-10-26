@@ -1,8 +1,10 @@
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
 <div ng-if="ctrl.loading || ctrl.loadingTeams" layout="row" layout-align="space-around" class="md-padding">
     <md-progress-circular md-mode="indeterminate"></md-progress-circular>
 </div>
 
-<div ng-if="!ctrl.loading && !ctrl.selected.teamFormationRef">
+<div ng-if="!ctrl.loading && !ctrl.selected.teamFormationRef && ctrl.selected.type!='voteQuestions'">
 
     <md-content class="md-padding">
         <table class="events tasks">
@@ -145,6 +147,14 @@
                                 No Submission
                         </span>
                     </div>
+                    <div ng-if="ctrl.selected.type=='reflectionQuestion'">
+                        <span ng-if="ctrl.solutions[participant.$id][ctrl.selected.$id]">
+                                {{ctrl.solutions[participant.$id][ctrl.selected.$id]}}
+                        </span>
+                        <span ng-if="!ctrl.solutions[participant.$id][ctrl.selected.$id]">
+                                No Submission
+                        </span>
+                    </div>
                 </td>
                 <td>
                     <!--{{ctrl.scores[participant.$id][ctrl.selected.$id]}}-->
@@ -200,7 +210,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr ng-repeat="team in ctrl.teams | orderBy: 'ctrl.scores[team.teamLeader][ctrl.selected.$id]'" ng-class="'index-' + $index + ' ' + ($odd ? 'odd' : 'even')">
+            <tr ng-repeat="team in ctrl.teams | orderBy:'-score'" ng-class="'index-' + $index + ' ' + ($odd ? 'odd' : 'even')">
                 <th rowspan="team.currentSize" layout-align="center center">
                     <md-button disbaled>Team {{team.number}}</md-button>
                 </th>
@@ -224,4 +234,33 @@
             </tbody>
         </table>
     </md-content>
+</div>
+
+<div ng-if="ctrl.selected.type=='voteQuestions'">
+    <!--<div ng-repeat="p in ctrl.participants">-->
+        <!--{{ctrl.solutions[p.$id][ctrl.selected.$id]}}<br>-->
+    <!--</div>-->
+    <md-card ng-repeat="team in ctrl.teams">
+        <md-card-title layout="row">
+            <md-card-title-text>
+                <span class="md-title">Team {{team.number}} Questions</span>
+                <span class="md-subhead">Rank: {{team.qnState + 1}}</span>
+                <span class="md-subhead">Asked By: {{team.questions[team.qnState].askedBy}}</span>
+            </md-card-title-text>
+            <md-card-actions layout="row" layout-align="end center">
+                <md-button class="md-icon-button launch" aria-label="Favorite" ng-show="team.qnState > 0" ng-click="team.qnState = team.qnState - 1">
+                    <md-icon style="font-size: 35px">undo</md-icon>
+                </md-button>
+                <md-button class="md-icon-button launch" aria-label="Favorite" ng-show="team.qnState < team.questions.length-1" ng-click="team.qnState = team.qnState + 1">
+                    <md-icon style="font-size: 35px">redo</md-icon>
+                </md-button>
+            </md-card-actions>
+        </md-card-title>
+        <md-divider></md-divider>
+        <md-card-content layout="row">
+            <p style="max-width: 650px; white-space: pre-wrap; word-wrap: break-word; overflow: auto; font-size: 15px;" layout-wrap>
+                {{team.questions[team.qnState].question}}
+            </p>
+        </md-card-content>
+    </md-card>
 </div>

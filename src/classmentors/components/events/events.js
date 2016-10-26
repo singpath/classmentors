@@ -51,6 +51,7 @@ import 'ace/mode-html.js';
 import 'ace/mode-java.js';
 import 'ace/mode-python.js';
 
+
 import schEngageScaleTmpl from './events-view-schEngageScale-task-form.html!text';
 import motiStratLearnTmpl from './events-view-motiStratLearn-task-form.html!text';
 import eduDisLearnTmpl from './events-view-eduDisLearn-task-form.html!text';
@@ -709,7 +710,6 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
     this.loadSolutions = function () {
         self.loadingSolutions = true;
         console.log("loading solutions....");
-        console.log(self.selected);
         // self.solutions = clmDataStore.events.getSolutions(self.event.$id).then(function (solutions) {
         //     console.log(solutions);
         //     return solutions;
@@ -726,6 +726,52 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
                     // console.log(self.teams);
                     for(var index in self.teams) {
                         self.teams[index].number = parseInt(index) + 1;
+                        self.teams[index].score = self.scores[self.teams[index].teamLeader][self.selected.$id];
+                    }
+                })
+                .finally(
+                    self.loadingTeams = false
+                );
+        }
+
+        if(self.selected.type=='voteQuestions') {
+            this.loadingTeams = true;
+            clmDataStore.events.getTeams(self.event.$id, self.selected.taskFrom)
+                .then(function (teams) {
+                    self.teams = teams;
+                    // console.log(self.teams);
+                    for(var index in self.teams) {
+                        self.teams[index].number = parseInt(index) + 1;
+                    }
+                })
+                .then(function() {
+                    for(let teamIndex in self.teams) {
+                        var team = self.teams[teamIndex];
+                        var members = Object.keys(team).filter(function (k) {
+                            if(team[k] && team[k].displayName) {
+                                return k
+                            }
+                        });
+                        if(members[0]) {
+                            var qnInfo = angular.fromJson(self.solutions[members[0]][self.selected.$id]);
+                            self.teams[teamIndex].questions = qnInfo.map(function(obj) {
+                                return {question: obj.answer, score: 0, askedBy: obj.member};
+                            });
+                            // console.log(self.teams[teamIndex].questions);
+                            for(let memberIndex in members) {
+                                var member = members[memberIndex];
+                                var indvVotes = angular.fromJson(self.solutions[member][self.selected.$id]);
+                                for(let qnVoteIndex in indvVotes) {
+                                    var qnVote = indvVotes[qnVoteIndex];
+                                    // console.log(qnVote);
+                                    self.teams[teamIndex].questions.find(x => x.question == qnVote.answer).score += qnVote.rank;
+                                };
+                            }
+                            self.teams[teamIndex].qnState = 0;
+                            self.teams[teamIndex].questions.sort(function(a,b) {
+                                return a.score - b.score;
+                            });
+                        }
                     }
                 })
                 .finally(
@@ -1280,7 +1326,12 @@ function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNav
         } else if (tasktype === 'profileEdit') {
             return 'Save';
 
-        } else {
+        } else if (tasktype ==='mentoringActivity'){
+            console.log("mentoring activity is clicked");
+            location = '/challenges/mentoring-activity/create';
+            return 'Continue';
+        }
+        else {
             return 'Save'; // by default should show 'save'
         }
     }
@@ -1359,7 +1410,7 @@ function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNav
 
 
         self.creatingTask = true;
-        if (taskType === 'multipleChoice' || taskType === 'journalling' || taskType === 'survey' || taskType === 'teamActivity') {
+        if (taskType === 'multipleChoice' || taskType === 'journalling' || taskType === 'survey' || taskType === 'teamActivity' || taskType === 'mentoringActivity') {
             var data = {
                 taskType: taskType,
                 isOpen: isOpen,
@@ -1382,6 +1433,7 @@ function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNav
             eventService.set(data);
             $location.path(location);
         } else {
+            console.log("this copy issss:", copy);
             clmDataStore.events.addTask(event.$id, copy, isOpen).then(function () {
                 spfAlert.success('Challenge created.');
                 $location.path(urlFor('editEvent', {eventId: self.event.$id}));
@@ -2378,19 +2430,27 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             {
               text: "Post this question to Question Queue to seek for an answer"
             }
-          ]
+          ];
 
           self.submit = function (){
-
-            $q.all([clmDataStore.events.submitSolution(eventId, taskId, participant.$id, angular.toJson(self.options[self.answer]))])
-            .finally(action => {spfAlert.success('Response is saved.'),$mdDialog.hide()});
+              clmDataStore.events.submitSolution(eventId, taskId, participant.$id, angular.toJson(self.options[self.answer]))
+                  .then(function () {
+                      clmDataStore.logging.inputLog({
+                          action: 'setAskedQuestionStatus',
+                          eventId: eventId,
+                          taskId: taskId,
+                          publicId: participant.$id,
+                          timestamp: Date.now(),
+                      });
+                      spfAlert.success('Response is saved.');
+                      $mdDialog.hide();
+                  })
           }
         }
         DialogController.$inject = [
           'initialData'
         ]
-    }
-
+    };
 
     this.promptForVoteQuestion = function(eventId, taskId, task, participant, userSolution){
         var db = firebaseApp.database();
@@ -2411,7 +2471,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             console.log(initialData);
             self.title = task.title;
             self.desc = task.description;
-            self.allMembers = initialData.teamMembers;
+            // self.allMembers = initialData.teamMembers;
             self.rankedQuestions = [];
             self.filterSelected = true;
             self.searchText = '';
@@ -2423,13 +2483,29 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
               }
             },true);
 
+
             var resolveMapTeamMemberAnswers = function (record){
               return {
-                member: record.member,
+                member: record.displayName,
                 answer: record.answer.$value
               }
+            };
+
+            if(initialData.userRankedQuestions.$value != null){
+              self.rankedQuestions = angular.fromJson(initialData.userRankedQuestions.$value);
             }
             self.allMemberAnswers = initialData.teamMemberAnswers.map(resolveMapTeamMemberAnswers);
+
+            self.validateChip = function (chip){
+              var question = self.rankedQuestions.filter(function(question){
+                return ( angular.lowercase(question.member).indexOf(angular.lowercase(chip.member)) != -1 );
+              });
+              if(question.length > 0){
+                return null;
+              }else{
+                return undefined;
+              }
+            };
 
             function rankAnswer(answer, index, array){
               answer.rank = index + 1;
@@ -2437,32 +2513,35 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             }
             var cachedQuery;
             self.queryMembers = function(query){
-              $log.info(`Queried text: ${query}`);
               cachedQuery = cachedQuery || query;
               if(cachedQuery != query){
                 cachedQuery = query;
               }
-              $log.info(`This is cachedQuery: ${cachedQuery}`);
               return cachedQuery ? self.allMemberAnswers.filter(createFilterFor(cachedQuery)) : [];
-            }
+            };
 
             function createFilterFor(query) {
               query = query || '';
               var lowercaseQuery = angular.lowercase(query);
-              $log.info(`LowercaseQuery is : ${lowercaseQuery}`);
               return function filterFn(contact) {
-                $log.info(`Contact is : ${angular.toJson(contact.member)}`);
-                var bool = (contact.member.indexOf(lowercaseQuery) != -1);
-                $log.info(`What here? : ${bool}`)
+                var bool = (contact.member.toLowerCase().indexOf(lowercaseQuery) != -1);
                 return bool;
               }
             }
 
             self.submit = function(){
-              // var eventSolutionRef = db.ref(`classMentors/eventSolutions/${eventId}/${participant.$id}/${task.$id}`);
               $q.all([clmDataStore.events.submitSolution(eventId, taskId, participant.$id, angular.toJson(self.rankedQuestions))])
-                .finally((action) => {spfAlert.success('Response is saved.'),$mdDialog.hide()});
-            }
+                .then((action) => {$mdDialog.hide()})
+                  .then(function () {
+                      clmDataStore.logging.inputLog({
+                          action: 'voteTeamQuestions',
+                          eventId: eventId,
+                          taskId: taskId,
+                          publicId: participant.$id,
+                          timestamp: Date.now(),
+                      });
+                  });
+            };
 
             self.cancel = function(){
               $mdDialog.hide();
@@ -2471,15 +2550,12 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         DialogController.$inject = ['initialData', '$scope'];
 
         function voteQuestionIntitalData (){
-            $log.info(`task is: ${angular.toJson(task)}`);
-            $log.info(`${angular.toJson(participant)}`);
             var self = this;
             var eventTeamsRef = db.ref(`classMentors/eventTeams/${eventId}/${task.taskFrom}`);
+            var userRankedQuestions = db.ref(`classMentors/eventSolutions/${eventId}/${participant.$id}/${taskId}`)
 
             var team = $firebaseArray(eventTeamsRef).$loaded(function(teams){
-                console.log(teams);
                 return teams.filter(function(nextTeam){
-                  console.log(nextTeam);
                   return nextTeam[participant.$id] != null;
                 });
             });
@@ -2487,25 +2563,19 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             var getMembers = team => Object.keys(team[0]).filter(key =>
                 key != 'currentSize' && key != 'maxSize' && key != '$id' && key != '$priority'
             );
-            console.log(team);
 
             var eventTasksRef = db.ref(`classMentors/eventTasks/${eventId}/${task.taskFrom}`);
             var teamMemberAnswers = team.then(function(team){
-                console.log('What is team here?', team);
                 var fbObj = $firebaseObject(eventTasksRef).$loaded(function(task){
                     var eventSolutionRef = db.ref(`classMentors/eventSolutions/${eventId}`);
                     var getAnswerFromMember = function(member){
                       var answerRef = eventSolutionRef.child(`${member}/${task.taskFrom}`);
-                      // $firebaseObject(answerRef).$loaded(function(promise){
-                      //     console.log(promise.$value);
-                      // });
-                      console.log('Member is :', member );
                       return {
                           answer: $firebaseObject(answerRef),
-                          member: member
+                          member: member,
+                          displayName: team[0][member].displayName
                       };
                     }
-                    console.log(team);
                     return getMembers(team).map(getAnswerFromMember);
                 });
                 return fbObj;
@@ -2514,11 +2584,12 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             return $q.all({
                 team: team,
                 teamMembers:teamMembers,
-                teamMemberAnswers: teamMemberAnswers
+                teamMemberAnswers: teamMemberAnswers,
+                userRankedQuestions: $firebaseObject(userRankedQuestions)
             });
         }
 
-    }
+    };
 
     this.promptForTeamFormation = function (eventId, taskId, task, participant, userSolution) {
         var db = firebaseApp.database();
@@ -2813,6 +2884,9 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
 
     this.promptForTextResponse = function (eventId, taskId, task, participant, userSolution) {
         task.team = self.team[task.teamFormationRef];
+        if(!task.team && task.activityType && task.activityType=='indexCards') {
+            console.log('indexcard condition met');
+        }
 
         $mdDialog.show({
             parent: $document.body,
@@ -2866,13 +2940,24 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                         spfAlert.error('Failed to save your response.');
                         return err;
                     });
-                    clmDataStore.logging.inputLog({
-                        action: "submitTextResponse",
-                        publicId: self.profile.$id,
-                        eventId: self.event.$id,
-                        taskId: taskId,
-                        timestamp: TIMESTAMP
-                    });
+
+                    if(task.activityType && task.activityType=='indexCards') {
+                        clmDataStore.logging.inputLog({
+                            action: "askIndividualQuestion",
+                            publicId: self.profile.$id,
+                            eventId: self.event.$id,
+                            taskId: taskId,
+                            timestamp: TIMESTAMP
+                        });
+                    } else {
+                        clmDataStore.logging.inputLog({
+                            action: "submitTextResponse",
+                            publicId: self.profile.$id,
+                            eventId: self.event.$id,
+                            taskId: taskId,
+                            timestamp: TIMESTAMP
+                        });
+                    }
                 }
             };
 

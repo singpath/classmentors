@@ -158,7 +158,8 @@ module.constant('routes', {
   questionQueue: '/question-queue',
   eventQueue: '/question-queue/:eventId',
   oneQuestion: '/question-queue/:eventId/questions/:questionId',
-  indexCard: '/challenges/team-activity/indexCard'
+  indexCard: '/challenges/team-activity/indexCard',
+  viewMentorCreation: '/challenges/mentoring-activity/create'
 });
 
 export {module};
