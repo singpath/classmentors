@@ -1,7 +1,7 @@
 'use strict';
 
 var chai = require('chai');
-var targaryen = require('@dinoboff/targaryen');
+var targaryen = require('targaryen');
 
 chai.use(targaryen.chai);
 
