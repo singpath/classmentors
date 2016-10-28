@@ -6,7 +6,7 @@
 <div ng-if="!ctrl.loading">
     <md-content class="md-padding">
         <!--<timer interval="1000">{{hhours}} hour{{hhoursS}}, {{mminutes}} minute{{minutesS}}, {{sseconds}} second{{secondsS}}.</timer>-->
-        <md-switch ng-model="ctrl.showFilteredRanking" aria-label="showFilter?" ng-change="ctrl.filterRanking()">
+        <md-switch ng-model="ctrl.showFilteredRanking" aria-label="showFilter?" ng-change="ctrl.filterRanking()" ng-init="ctrl.showFilteredRanking=true">
             Show Filtered Rankings: {{ ctrl.showFilteredRanking }}
         </md-switch>
         <table class="events ranking">
