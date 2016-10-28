@@ -15,11 +15,11 @@
                 <th>
                     <md-button>Rank</md-button>
                 </th>
-                <th>
-                    <md-button>Registered ({{ctrl.cohortTotalParticipants.length}})</md-button>
-                </th>
                 <th ng-if="ctrl.showFilteredRanking">
                     <md-button>Qualified</md-button>
+                </th>
+                <th>
+                    <md-button>Registered ({{ctrl.cohortTotalParticipants.length}})</md-button>
                 </th>
                 <th>
                     <md-button>Event</md-button>
@@ -50,8 +50,8 @@
                     <th>
                         {{$index+1}}
                     </th>
-                    <td>{{ event.participants.length }}</td>
                     <td>{{ event.qualifiedParticipants.length }}</td>
+                    <td>{{ event.participants.length }} <i> ({{event.qualifiedParticipants.length/event.participants.length*100| number: 0}}%)</i></td>
                     <td><a href="#{{ 'oneEvent' | urlFor: {eventId: event.id} }}">{{ event.title }}</a></td>
                     <td ng-if="ctrl.showFilteredRanking && $index<6 && event.qualifiedParticipants[0]">{{event.qualifiedParticipants[0].displayName }} ({{event.qualifiedParticipants[0].score}})</td>
                     <td ng-if="ctrl.showFilteredRanking && $index<6 && event.qualifiedParticipants[1]">{{event.qualifiedParticipants[1].displayName }} ({{event.qualifiedParticipants[1].score}})</td>
@@ -62,8 +62,8 @@
                     <th>
                         {{$index+1}}
                     </th>
-                    <td>{{ event.participants.length }}</td>
                     <td>{{ event.qualifiedParticipants.length }}</td>
+                    <td>{{ event.participants.length }} <i> ({{event.qualifiedParticipants.length/event.participants.length*100| number: 0}}%)</i></td>
                     <td><a href="#{{ 'oneEvent' | urlFor: {eventId: event.id} }}">{{ event.title }}</a></td>
                     <td ng-if="ctrl.showFilteredRanking && $index<12 && event.qualifiedParticipants[0]">{{event.qualifiedParticipants[0].displayName }} ({{event.qualifiedParticipants[0].score}})</td>
                     <td ng-if="ctrl.showFilteredRanking && $index<12 && event.qualifiedParticipants[1]">{{event.qualifiedParticipants[1].displayName }} ({{event.qualifiedParticipants[1].score}})</td>
