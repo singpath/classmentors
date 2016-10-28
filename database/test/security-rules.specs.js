@@ -6,7 +6,7 @@
 
 var chai = require('chai');
 var expect = chai.expect;
-var targaryen = require('@dinoboff/targaryen');
+var targaryen = require('targaryen');
 var utils = require('./utils.js');
 
 describe('With current security rules', function() {
@@ -46,7 +46,7 @@ describe('With current security rules', function() {
       expect({uid: 'google:12345'})
         .cannot.write(goodAction).path('classMentors/userActions/someAction');
     });
-    
+
     /* Temporarily commenting out
     it.skip('cannot read classMentors/userActions', function() {
       expect(chris).cannot.read.path('classMentors/userActions');
