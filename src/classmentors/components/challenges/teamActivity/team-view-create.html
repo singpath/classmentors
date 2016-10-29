@@ -58,7 +58,7 @@
           <md-input-container ng-required="true">
             <label for='edit-teamFormationInput_${{index}}'>{{ctrl.teamFormationMethod === "teamSize" ? "Maximum number of students per team" : "Number of Teams"}}</label>
             <input type ="number" ng-model="ctrl.teamFormationParameter"
-              name="teamFormationInput"
+              name="teamFormationInput" min="1"
               id='edit-teamFormationInput_${{index}}' ng-change="ctrl.calculateTeamMaximumStudent(ctrl.teamFormationParameter)" required
               >
           </md-input-container>
