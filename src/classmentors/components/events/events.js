@@ -3141,11 +3141,11 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         // Reassign the two depending if they have completed the challenge already
         if(self.progress[toDelete.mentor.publicId][toCheckId].completed) {
             console.log('Reassign mentor to other mentee');
-            assignMentorPairing(toCheckId, writeToId, toDelete.mentor.publicId, assignmentMethod);
+            assignMentorPairing(toCheckId, writeToId, toDelete.mentor.publicId, 'random');
         }
         if(self.progress[toDelete.mentee.publicId][toCheckId].completed) {
             console.log('Reassign mentee to mentor');
-            assignMentorPairing(toCheckId, writeToId, toDelete.mentee.publicId, assignmentMethod)
+            assignMentorPairing(toCheckId, writeToId, toDelete.mentee.publicId, 'random')
         }
     };
 
