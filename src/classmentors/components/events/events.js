@@ -3094,6 +3094,18 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             // select mentee
             var mentee = incompleteParticipants[Math.floor(Math.random() * incompleteParticipants.length)];
             console.log(mentee);
+        } else if(assignmentMethod=='prevCompletion') {
+            var orderedIncompleteParticipants = incompleteParticipants.map(function (p) {
+                return {
+                    publicId: p.publicId,
+                    displayName: p.displayName,
+                    completed: p.completed,
+                    challengesCompleted: self.solutions[p.publicId] ? Object.keys(self.solutions[p.publicId]).length:0
+                };
+            });
+            orderedIncompleteParticipants.sort(function(a, b){return a.challengesCompleted-b.challengesCompleted});
+            console.log(orderedIncompleteParticipants);
+            var mentee = orderedIncompleteParticipants[0];
         }
 
         // Write pairing as solution to assignment challenge for both mentor and mentee
