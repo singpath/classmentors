@@ -3101,24 +3101,26 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             mentor: {publicId: publicId, displayName: participants.find(p => p.publicId == publicId) ? participants.find(p => p.publicId == publicId).displayName:self.profile.user.displayName},
             mentee: {publicId: mentee.publicId, displayName: mentee.displayName}
         };
-        clmDataStore.events.submitSolution(self.event.$id, writeToId, publicId, angular.toJson(mentObj));
-        clmDataStore.events.submitSolution(self.event.$id, writeToId, mentee.publicId, angular.toJson(mentObj));
-        clmDataStore.logging.inputLog({
-            action: "formMentorship",
-            publicId: mentObj.mentor.publicId,
-            eventId: self.event.$id,
-            taskId: currentTaskId,
-            mentorAssignmentId: writeToId,
-            mentee: mentObj.mentee.publicId,
-            timestamp: TIMESTAMP
-        })
+        console.log(self.solutions);
+        if(self.solutions[mentObj.mentee.publicId] && self.solutions[mentObj.mentee.publicId][writeToId]) {
+            assignMentorPairing(currentTaskId, writeToId, publicId, assignmentMethod);
+        } else {
+            clmDataStore.events.submitSolution(self.event.$id, writeToId, publicId, angular.toJson(mentObj));
+            clmDataStore.events.submitSolution(self.event.$id, writeToId, mentee.publicId, angular.toJson(mentObj));
+            clmDataStore.logging.inputLog({
+                action: "formMentorship",
+                publicId: mentObj.mentor.publicId,
+                eventId: self.event.$id,
+                taskId: currentTaskId,
+                mentorAssignmentId: writeToId,
+                mentee: mentObj.mentee.publicId,
+                timestamp: TIMESTAMP
+            });
+        }
     }
 
     this.reassignMentorPairing = function(toCheckId, writeToId, currentPair, assignmentMethod) {
         var toDelete = angular.fromJson(currentPair);
-        console.log(toDelete);
-        console.log('toCheck', toCheckId);
-        console.log('writeTo', writeToId);
 
         // Blow up current pairing
         clmDataStore.events.deleteUserSolution(self.event.$id, toDelete.mentor.publicId, writeToId);
