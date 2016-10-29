@@ -367,6 +367,9 @@
                             </md-button>
                         </div>
                     </div>
+                    <span ng-if="task.type=='mentorAssignment'">
+                        {{ctrl.solutions[ctrl.currentUserParticipant.$id][task.$id] | displayMentorship}}
+                    </span>
                 </td>
                 <!--team activity challenge button!
                 <td ng-if="ctrl.currentUserParticipant">
@@ -397,7 +400,7 @@
                         {{ participant.user.displayName }}
                     </md-button>
 
-                    <span ng-if="ctrl.profile.$id == ctrl.event.owner.publicId &amp;&amp; participant.$id != ctrl.profile.$id">
+                    <span ng-if="ctrl.profile.$id == ctrl.event.owner.publicId && participant.$id != ctrl.profile.$id">
                             <md-button class="md-icon-button md-primary small-icon" aria-label="Delete"
                                        ng-click="ctrl.removeParticipant($event, ctrl.event, participant)">
                                 <md-icon md-svg-icon="clear"></md-icon>
@@ -444,9 +447,17 @@
                             <span ng-if="task.type=='formTeam' && ctrl.solutions[participant.$id][task.$id]">
                                 {{ctrl.solutions[participant.$id][task.$id]}}
                             </span>
-                            <span ng-if="task.type!='formTeam' && ctrl.solutions[participant.$id][task.$id]">
+                            <span ng-if="task.type!='formTeam' && task.type!='mentorAssignment' && ctrl.solutions[participant.$id][task.$id]">
                                 Completed
                             </span>
+                        </span>
+
+                        <span ng-if="task.type=='mentorAssignment'">
+                            {{ctrl.solutions[participant.$id][task.$id] | displayMentorship}}
+                            <md-button class="md-icon-button md-primary small-icon" aria-label="Update"
+                                       ng-click="ctrl.reassignMentorPairing(task.taskFrom, task.$id, ctrl.solutions[participant.$id][task.$id], task.mentorAssignmentMethod)" ng-if="ctrl.profile.$id == ctrl.event.owner.publicId && participant.$id != ctrl.profile.$id">
+                                <md-icon md-svg-icon="loop"></md-icon>
+                            </md-button>
                         </span>
                     </div>
                 </td>

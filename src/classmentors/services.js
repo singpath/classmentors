@@ -983,6 +983,12 @@ export function clmDataStoreFactory(
 
         return loaded($firebaseObject(ref));
       },
+      
+      deleteUserSolution: function (eventId, publicId, taskId) {
+        var ref = db.ref(`classMentors/eventSolutions/${eventId}/${publicId}/${taskId}`);
+
+        return ref.remove();
+      },
 
       getTasks: function(eventId) {
         var ref = db.ref(`classMentors/eventTasks/${eventId}`);
@@ -1284,7 +1290,8 @@ export function clmDataStoreFactory(
           task.textResponse &&
           solutions &&
           solutions[task.$id]
-        ) || (task.type=='reflectionQuestion' && solutions && solutions[task.$id]);
+        ) || (task.type=='reflectionQuestion' && solutions && solutions[task.$id])
+            || (task.type=='mentorAssignment' && solutions && solutions[task.$id]);
       },
 
       _hasDoneSurvey: function(task, solutions) {
@@ -1348,6 +1355,8 @@ export function clmDataStoreFactory(
 
           if (solved) {
             progress[task.$id] = {completed: true};
+          } else {
+            progress[task.$id] = {completed: false};
           }
 
           return progress;
