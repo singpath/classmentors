@@ -2,7 +2,7 @@
 
 const fixtures = require('./fixtures.json');
 const rules = require('../security-rules.json');
-const targaryen = require('@dinoboff/targaryen');
+const targaryen = require('targaryen');
 const mergeWith = require('lodash.mergewith');
 
 const baseData = mergeWith({}, fixtures);

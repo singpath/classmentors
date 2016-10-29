@@ -6,7 +6,7 @@
 
 var chai = require('chai');
 var expect = chai.expect;
-var targaryen = require('@dinoboff/targaryen');
+var targaryen = require('targaryen');
 var utils = require('./utils.js');
 
 describe('With current security rules', function() {
@@ -23,10 +23,12 @@ describe('With current security rules', function() {
   describe('Unauthorized users', function() {
     var chris = {uid: 'google:chris'};
 
+    /* Temporarily commenting out
     it.skip('can not write bad data to classMentors/userActions/$userActions', function() {
       expect(chris)
         .cannot.write({action: 'button'}).path('classMentors/userActions/someAction');
     });
+    */
 
     var goodAction = {
       publicId: 'chris',
@@ -45,10 +47,11 @@ describe('With current security rules', function() {
         .cannot.write(goodAction).path('classMentors/userActions/someAction');
     });
 
+    /* Temporarily commenting out
     it.skip('cannot read classMentors/userActions', function() {
       expect(chris).cannot.read.path('classMentors/userActions');
     });
-
+    */
     it('can read classMentors/userAchievements', function() {
       expect(targaryen.users.unauthenticated)
         .can.read.path('classMentors/userAchievements');

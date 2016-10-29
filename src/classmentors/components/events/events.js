@@ -3741,7 +3741,7 @@ function ClmEventRankTableCtrl($log, $q, $filter, firebaseApp, $firebaseObject, 
 
     function setParticipants(ctrl) {
         var ref = db.ref(`classMentors/eventParticipants/${ctrl.event.$id}`);
-        var query = ref.limitToLast(100);
+        var query = ref.limitToLast(1000);
         var data = $firebaseArray(query);
 
         data.$loaded().then(function () {

@@ -6,8 +6,7 @@
       "publicIds": {
         "$publicId": {
           ".validate": "newData.isString() && newData.val().matches(/^[-:a-zA-Z0-9]+$/) && $publicId.matches(/^[-a-z0-9]{3,20}$/) && ($publicId == null || newData.parent().parent().parent().child('auth').child('publicIds').child($publicId).val() == newData.val() && newData.parent().parent().parent().child('auth').child('usedPublicIds').child($publicId).val() == true && newData.parent().parent().parent().child('auth').child('users').child(newData.val()).child('publicId').val() == $publicId)",
-          ".write": "auth != null && auth.uid == newData.val() && (newData.val() != null && data.val() == null)",
-          ".read": "auth != null"
+          ".write": "auth != null && auth.uid == newData.val() && (newData.val() != null && data.val() == null)"
         }
       },
       "usedPublicIds": {
@@ -281,11 +280,11 @@
               "school": {
                 ".validate": "newData.hasChildren(['name', 'type'])",
                 "$key": {
-                  ".validate": "($key == 'name' || $key == 'type' || $key == 'id' || $key == 'iconUrl') && newData.val() == root.child('auth/users').child(auth.uid).child('school').child($key).val()"
+                  ".validate": "($key == 'name' || $key == 'type' || $key == 'id' || $key == 'iconUrl') && newData.val() == root.child('classMentors/userProfiles').child($publicId).child('user/school').child($key).val()"
                 }
               },
               "$key": {
-                ".validate": "($key == 'displayName' || $key == 'gravatar') && newData.val() == root.child('auth/users').child(root.child('auth/publicIds').child($publicId).val()).child($key).val()"
+                ".validate": "($key == 'displayName' || $key == 'gravatar') && newData.val() == root.child('classMentors/userProfiles').child($publicId).child('user').child($key).val()"
               }
             },
             "services": {
