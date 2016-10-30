@@ -42,11 +42,11 @@
                 <!--ng-model="ctrl.selectedTeam"
                     ng-change="ctrl.onClick($index)"-->
                 <!--{{ctrl.teams | json}}-->
-                <div flex align='row'>
-                    <md-button ng-click="ctrl.cancel()" class="md-raised md-primary" style="width: 150px;">Close
-                    </md-button>
-                    <md-button ng-click="ctrl.leave(ctrl.selectedTeam)" class="md-raised md-primary" style="width: 150px;">
+                <div flex align='row' >
+                    <md-button ng-click="ctrl.leave(ctrl.selectedTeam)" class="md-raised" style="width: 150px;">
                         Leave Team
+                    </md-button>
+                    <md-button ng-click="ctrl.cancel()" class="md-raised md-primary" style="width: 150px;">Close
                     </md-button>
                 </div>
             </div>
