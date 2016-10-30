@@ -437,7 +437,7 @@ challengeServiceFactory.$inject =
 //
 // }
 
-function surveyFormEvent($scope, clmSurvey, clmDataStore, $log, spfAlert, $location, urlFor,$mdDialog) {
+function surveyFormEvent($scope, clmSurvey, clmDataStore, $log, spfAlert, $location, urlFor,$mdDialog, spfNavBarService) {
 
     this.surveys = [
         {id: 1, name: 'Education vs Dissatisfaction with learning'},
@@ -449,6 +449,21 @@ function surveyFormEvent($scope, clmSurvey, clmDataStore, $log, spfAlert, $locat
     var sharedData = clmSurvey.get();
     var getTask = sharedData.task;
     var self = this;
+
+    // console.log(sharedData);
+
+    spfNavBarService.update(
+        sharedData.task.title, [{
+            title: 'Events',
+            url: `#${urlFor('events')}`
+        }, {
+            title: sharedData.event.title,
+            url: `#${urlFor('oneEvent', {eventId: sharedData.event.$id})}`
+        }, {
+            title: 'Challenges',
+            url: `#${urlFor('editEvent', {eventId: sharedData.event.$id})}`
+        }]
+    );
 
     // console.log("my survey temp is ", self.surveyType);
 
@@ -526,7 +541,8 @@ surveyFormEvent.$inject = [
     'spfAlert',
     '$location',
     'urlFor',
-    '$mdDialog'
+    '$mdDialog',
+    'spfNavBarService'
 ];
 
 function editsurveyFormEvent($scope, clmSurvey, clmDataStore, $log, spfAlert, $location, urlFor,spfNavBarService,eventService, $mdDialog) {

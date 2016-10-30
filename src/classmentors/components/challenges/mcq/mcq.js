@@ -400,14 +400,30 @@ startMcqController.$inject = [
     'spfNavBarService'
 ];
 
-export function newMcqController(initialData, challengeService, $filter,$mdDialog,urlFor,$location){
+export function newMcqController(initialData, challengeService, $filter,$mdDialog,urlFor,$location, spfNavBarService){
   var self = this;
 
   // Checks if all questions have at least one answer
   // self.isMcqValid = true;
+  // console.log("new mcq data are", initialData);
   self.task = initialData.task;
+  self.event = initialData.event;
   self.isMcqValid = false;
   self.isTextFilled = false;
+
+  spfNavBarService.update(
+      self.task.title, [{
+        title: 'Events',
+        url: `#${urlFor('events')}`
+      }, {
+        title: self.event.title,
+        url: `#${urlFor('oneEvent', {eventId: self.event.$id})}`
+      }, {
+        title: 'Challenges',
+        url: `#${urlFor('editEvent', {eventId: self.event.$id})}`
+      }]
+  );
+
   self.checkMCQValid = function(text){
     console.log(text);
     if(text.length == 0 || text == undefined){
@@ -581,7 +597,8 @@ newMcqController.$inject = [
   '$filter',
   '$mdDialog',
   'urlFor',
-  '$location'
+  '$location',
+  'spfNavBarService'
 ];
 
 export function starMcqTmpl() {
