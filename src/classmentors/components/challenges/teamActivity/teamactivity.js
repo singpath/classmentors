@@ -61,10 +61,12 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
         } else if (self.activityType == 'collabSubmission') {
             self.task.collabChallengeType = self.collabChallengeType;
             createColSubActivity(self.event, self.task, initialData.data.isOpen)
+
         } else if(self.activityType == 'mentoring') {
             self.task.mentorChallengeType = self.mentorChallengeType;
             createMentoringActivity(self.event, self.task, initialData.data.isOpen)
             console.log('Create mentoring activity');
+
         } else if(self.task.activityType == 'indexCards'){
                 console.log(self.task);
                 var db = firebaseApp.database();
@@ -84,9 +86,10 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
                     });
                 }).then(function(voteTaskPromise){
                   return $q.all([addTask(eventTaskRef, buildReflectionQuestion(voteTaskPromise.teamVotingTask.key,self.task), false)]);
+
                 }).then(function(){
-                  spfAlert.success('Index Card Challenge Created!');
-                  $location.path(urlFor('oneEvent', {eventId: event.$id}));
+                  spfAlert.success('Challenge created.');
+                  $location.path(urlFor('editEvent', {eventId: self.event.$id}));
                 });
             }
         };
