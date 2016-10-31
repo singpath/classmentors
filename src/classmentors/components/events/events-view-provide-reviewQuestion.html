@@ -1,12 +1,12 @@
-<md-dialog>
+<md-dialog class="md-padding " >
   <form name='submitReview' ng-submit="ctrl.submit()">
-    <md-dialog-content>
+    <md-dialog-content class="sticky-container">
       <div>
         <h3>Your Question:</h3>
         <h4>{{ctrl.userQuestion}}</h4>
       </div>
       <div>
-        <label><h2>Select the appropriate response below for your question.</h2></label>
+        <label><h5>Select the appropriate response below for your question.</h5></label>
         <md-content>
           <md-radio-group ng-required="true" ng-model="ctrl.answer">
             <div layout="column" ng-repeat="option in ctrl.options">
@@ -23,8 +23,11 @@
           </md-radio-group>
         </md-content>
       </div>
+      <br>
       <div layout="row" layout-align="center center">
-        <md-button type="submit" class="md-raised md-primary" ng-disabled="submitReview.$invalid">Done</md-button>
+        <md-button type="submit" class="md-raised md-primary" ng-disabled="submitReview.$invalid" style="width: 150px;">Done</md-button>
+        <md-button ng-click="ctrl.cancel()" class=" md-accent" style="width: 150px;">Cancel</md-button>
+
       </div>
     </md-dialog-content>
   </form>

@@ -2420,7 +2420,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
           return $q.all({userQuestion:userQuestion});
         }
 
-        function DialogController(initialData){
+        function DialogController(initialData, $mdDialog){
           var self = this;
           self.answer = null;
           self.userQuestion =  initialData.userQuestion.$value; //'No question found';
@@ -2453,9 +2453,15 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                       $mdDialog.hide();
                   })
           }
+
+            self.cancel = function () {
+                $mdDialog.hide();
+            };
+
         }
         DialogController.$inject = [
-          'initialData'
+          'initialData',
+            '$mdDialog'
         ]
     };
 
@@ -3653,6 +3659,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
 
 
     };
+
     this.submitMotiStratResponse = function (motiResp) {
 
         //to set warning
@@ -3763,7 +3770,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
 
     this.backToChallenge = function () {
         $location.path(urlFor('oneEvent', {eventId: self.event.$id}));
-    }
+    };
 
 }
 

@@ -20,7 +20,7 @@ function createTeamActivityInitialData($q, eventService, clmDataStore) {
 }
 createTeamActivityInitialData.$inject = ['$q', 'eventService', 'clmDataStore'];
 
-function createTeamActivityController($q, initialData, clmDataStore, $location, urlFor, eventService, $mdDialog, spfAlert, firebaseApp, $firebaseObject, $firebaseArray, $log) {
+function createTeamActivityController($q, initialData, clmDataStore, $location, urlFor, eventService, $mdDialog, spfAlert, firebaseApp, $firebaseObject, $firebaseArray, $log, spfNavBarService) {
     var self = this;
 
     // console.log("initialdata for teamform are", initialData);
@@ -40,6 +40,20 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
     self.teamFormationMethod = null;
     self.teamFormationParameter = null;
     self.collabChallengeType = null;
+
+    spfNavBarService.update(
+        self.task.title, [{
+            title: 'Events',
+            url: `#${urlFor('events')}`
+        }, {
+            title: self.event.title,
+            url: `#${urlFor('oneEvent', {eventId: self.event.$id})}`
+        }, {
+            title: 'Challenges',
+            url: `#${urlFor('editEvent', {eventId: self.event.$id})}`
+        }]
+    );
+
 
     self.submit = function () {
 
@@ -61,10 +75,12 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
         } else if (self.activityType == 'collabSubmission') {
             self.task.collabChallengeType = self.collabChallengeType;
             createColSubActivity(self.event, self.task, initialData.data.isOpen)
+
         } else if(self.activityType == 'mentoring') {
             self.task.mentorChallengeType = self.mentorChallengeType;
             createMentoringActivity(self.event, self.task, initialData.data.isOpen)
             console.log('Create mentoring activity');
+
         } else if(self.task.activityType == 'indexCards'){
                 console.log(self.task);
                 var db = firebaseApp.database();
@@ -84,9 +100,10 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
                     });
                 }).then(function(voteTaskPromise){
                   return $q.all([addTask(eventTaskRef, buildReflectionQuestion(voteTaskPromise.teamVotingTask.key,self.task), false)]);
+
                 }).then(function(){
-                  spfAlert.success('Index Card Challenge Created!');
-                  $location.path(urlFor('oneEvent', {eventId: event.$id}));
+                  spfAlert.success('Challenge created.');
+                  $location.path(urlFor('editEvent', {eventId: self.event.$id}));
                 });
             }
         };
@@ -149,8 +166,8 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
                 mentorAssignmentSettableRef.set(mentorAssignmentTask).then(function () {
                     console.log('Mentor Assignment set!');
                 }).then(function () {
-                    spfAlert.success('Mentoring Activity Created!');
-                    $location.path(urlFor('editEvent', {eventId: event.$id}));
+                    spfAlert.success('Challenge created.');
+                    $location.path(urlFor('editEvent', {eventId: self.event.$id}));
                 });
             });
         }
@@ -385,7 +402,8 @@ createTeamActivityController.$inject = [
     'firebaseApp',
     '$firebaseObject',
     '$firebaseArray',
-    '$log'
+    '$log',
+    'spfNavBarService'
 ];
 
 function startTRATInitialData($q, spfAuthData, eventService, clmDataStore, firebaseApp, $firebaseObject, $firebaseArray, $route) {
