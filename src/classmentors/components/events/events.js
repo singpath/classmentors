@@ -2035,7 +2035,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         var taskId = options.key;
         var task = self.tasks.$getRecord(taskId);
 
-        if (!task || (!task.textResponse && !task.linkPattern)) {
+        if (!task || (!task.textResponse && !task.linkPattern && task.type!='formteam' && task.type!='mentorAssignment')) {
             return noop;
         }
 
@@ -2376,6 +2376,13 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                         taskId: taskId,
                         timestamp: TIMESTAMP
                     });
+                    if(task.type && task.type=='linkPatternMentoring') {
+                        if(self.solutions[self.currentUserParticipant.$id] && self.solutions[self.currentUserParticipant.$id][task.mentorAssignmentRef]) {
+
+                        } else {
+                            assignMentorPairing(taskId, task.mentorAssignmentRef, self.profile.$id, task.mentorAssignmentMethod);
+                        }
+                    }
                 }
             };
 
@@ -2413,7 +2420,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
           return $q.all({userQuestion:userQuestion});
         }
 
-        function DialogController(initialData){
+        function DialogController(initialData, $mdDialog){
           var self = this;
           self.answer = null;
           self.userQuestion =  initialData.userQuestion.$value; //'No question found';
@@ -2446,9 +2453,15 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                       $mdDialog.hide();
                   })
           }
+
+            self.cancel = function () {
+                $mdDialog.hide();
+            };
+
         }
         DialogController.$inject = [
-          'initialData'
+          'initialData',
+            '$mdDialog'
         ]
     };
 
@@ -2958,6 +2971,13 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                             timestamp: TIMESTAMP
                         });
                     }
+                    if(task.type && task.type=='textResponseMentoring') {
+                        if(self.solutions[self.currentUserParticipant.$id] && self.solutions[self.currentUserParticipant.$id][task.mentorAssignmentRef]) {
+
+                        } else {
+                            assignMentorPairing(taskId, task.mentorAssignmentRef, self.profile.$id, task.mentorAssignmentMethod);
+                        }
+                    }
                 }
             };
 
@@ -3046,12 +3066,92 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                         taskId: taskId,
                         timestamp: TIMESTAMP
                     });
+                    if(task.type && task.type=='codeMentoring') {
+                        if(self.solutions[self.currentUserParticipant.$id] && self.solutions[self.currentUserParticipant.$id][task.mentorAssignmentRef]) {
+
+                        } else {
+                            assignMentorPairing(taskId, task.mentorAssignmentRef, self.profile.$id, task.mentorAssignmentMethod);
+                        }
+                    }
                 }
             };
 
             this.cancel = function () {
                 $mdDialog.hide();
             };
+        }
+    };
+    
+    function assignMentorPairing(currentTaskId, writeToId, publicId, assignmentMethod) {
+        var participants = self.participantsView.map(function (p) {
+            return {
+                publicId: p.$id,
+                displayName: p.user.displayName,
+                completed: self.progress[p.$id] && (self.progress[p.$id][currentTaskId].completed || self.progress[p.$id][writeToId].completed)
+            };
+        });
+        var incompleteParticipants = participants.filter(function (p) {
+            return !p.completed;
+        });
+
+        var mentee = {};
+
+        if(assignmentMethod=='random') {
+            // select mentee
+            var mentee = incompleteParticipants[Math.floor(Math.random() * incompleteParticipants.length)];
+            console.log(mentee);
+        } else if(assignmentMethod=='prevCompletion') {
+            var orderedIncompleteParticipants = incompleteParticipants.map(function (p) {
+                return {
+                    publicId: p.publicId,
+                    displayName: p.displayName,
+                    completed: p.completed,
+                    challengesCompleted: self.solutions[p.publicId] ? Object.keys(self.solutions[p.publicId]).length:0
+                };
+            });
+            orderedIncompleteParticipants.sort(function(a, b){return a.challengesCompleted-b.challengesCompleted});
+            console.log(orderedIncompleteParticipants);
+            var mentee = orderedIncompleteParticipants[0];
+        }
+
+        // Write pairing as solution to assignment challenge for both mentor and mentee
+        var mentObj = {
+            mentor: {publicId: publicId, displayName: participants.find(p => p.publicId == publicId) ? participants.find(p => p.publicId == publicId).displayName:self.profile.user.displayName},
+            mentee: {publicId: mentee.publicId, displayName: mentee.displayName}
+        };
+        console.log(self.solutions);
+        if(self.solutions[mentObj.mentee.publicId] && self.solutions[mentObj.mentee.publicId][writeToId]) {
+            assignMentorPairing(currentTaskId, writeToId, publicId, assignmentMethod);
+        } else {
+            clmDataStore.events.submitSolution(self.event.$id, writeToId, publicId, angular.toJson(mentObj));
+            clmDataStore.events.submitSolution(self.event.$id, writeToId, mentee.publicId, angular.toJson(mentObj));
+            clmDataStore.logging.inputLog({
+                action: "formMentorship",
+                publicId: mentObj.mentor.publicId,
+                eventId: self.event.$id,
+                taskId: currentTaskId,
+                mentorAssignmentId: writeToId,
+                mentee: mentObj.mentee.publicId,
+                timestamp: TIMESTAMP
+            });
+        }
+    }
+
+    this.reassignMentorPairing = function(toCheckId, writeToId, currentPair, assignmentMethod) {
+        var toDelete = angular.fromJson(currentPair);
+
+        // Blow up current pairing
+        clmDataStore.events.deleteUserSolution(self.event.$id, toDelete.mentor.publicId, writeToId);
+        clmDataStore.events.deleteUserSolution(self.event.$id, toDelete.mentee.publicId, writeToId);
+
+        // Reassign the two depending if they have completed the challenge already
+        if(self.progress[toDelete.mentor.publicId][toCheckId].completed) {
+            console.log('Reassign mentor to other mentee');
+            assignMentorPairing(toCheckId, writeToId, toDelete.mentor.publicId, 'random');
+        }
+        if(self.progress[toDelete.mentee.publicId][toCheckId].completed) {
+            console.log('Reassign mentee to mentor');
+            assignMentorPairing(toCheckId, writeToId, toDelete.mentee.publicId, 'random')
         }
     };
 
@@ -3559,6 +3659,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
 
 
     };
+
     this.submitMotiStratResponse = function (motiResp) {
 
         //to set warning
@@ -3669,7 +3770,7 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
 
     this.backToChallenge = function () {
         $location.path(urlFor('oneEvent', {eventId: self.event.$id}));
-    }
+    };
 
 }
 

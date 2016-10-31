@@ -96,8 +96,19 @@ export function countObjKeysFactory() {
         return 0;
     }
 }
-
 countObjKeysFactory.$inject = [];
+
+export function displayMentorshipFactory() {
+    return function displayMentorship(s) {
+        if(s) {
+            let mentObj = angular.fromJson(s);
+            return mentObj.mentor.displayName + ' mentoring ' + mentObj.mentee.displayName;
+        } else {
+            return '';
+        }
+    }
+}
+displayMentorshipFactory.$inject = [];
 
 // export function reverseArray (){
 //   return function(items) {
