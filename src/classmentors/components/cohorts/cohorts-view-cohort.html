@@ -68,9 +68,13 @@
         </md-tab>
         <md-tab label="Manage" ng-if="ctrl.isOwner">
             <md-content layout-padding>
-                <md-button ng-click="ctrl.selectedAction='dupChallenges'">
+                <md-button ng-click="ctrl.selectedAction='dupChallenges'" ng-class="{false:'md-raised', true:'md-raised md-primary'}[ctrl.selectedAction=='dupChallenges']">
                     Duplicate event challenges
                     <md-icon class="material-icons">leak_remove</md-icon>
+                </md-button>
+                <md-button ng-click="ctrl.startManageAsst()" ng-class="{false:'md-raised', true:'md-raised md-primary'}[ctrl.selectedAction=='cohortAsst']">
+                    Manage assistants
+                    <md-icon class="material-icons">supervisor_account</md-icon>
                 </md-button>
                 <div ng-if="ctrl.selectedAction=='dupChallenges'">
                     Move events:<br>
@@ -115,6 +119,25 @@
                         <md-button class="md-raised md-primary" ng-if="ctrl.selectedEvents" ng-click="ctrl.duplicateChallenges()">
                             Duplicate
                         </md-button>
+                    </div>
+                </div>
+                <div ng-if="ctrl.selectedAction=='cohortAsst'">
+                    <md-input-container>
+                        <label for="findUser">Find a User</label>
+                        <input name="findUser" type="text" id="findUser" ng-model="ctrl.userQuery"/>
+                    </md-input-container>
+                    <md-button class="md-raised md-primary" ng-click="ctrl.findUsers()">
+                        Find User
+                    </md-button>
+                    <div ng-if="ctrl.foundUsers">
+                        Found {{ctrl.foundUsers.length}} user(s)
+                        <md-list>
+                            <md-list-item ng-repeat="user in ctrl.foundUsers">
+                                <span flex>{{user.user.displayName}}</span>
+                                <md-button class="md-raised md-primary" ng-click="ctrl.assignCohortAssistant(user)">Make Cohort Assistant</md-button>
+                            </md-list-item>
+                        </md-list>
+                        <md-divider></md-divider>
                     </div>
                 </div>
             </md-content>

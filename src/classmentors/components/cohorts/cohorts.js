@@ -330,7 +330,7 @@ viewCohortCtrlInitialData.$inject = [
 
 function ViewCohortCtrl(
     $log, $scope, initialData, $document, $mdDialog, $route, $firebaseObject,
-    spfAlert, urlFor, firebaseApp, spfAuthData, spfNavBarService, clmDataStore
+    spfAlert, urlFor, firebaseApp, spfAuthData, spfNavBarService, clmDataStore, $firebaseArray
 ) {
     var self = this;
     var db = firebaseApp.database();
@@ -458,6 +458,38 @@ function ViewCohortCtrl(
         }
     };
 
+    this.userQuery = '';
+    this.foundUsers = null;
+
+    this.startManageAsst = function () {
+        self.selectedAction = 'cohortAsst';
+    };
+    this.findUsers = function () {
+        var ref = db.ref(`classMentors/userProfiles`).orderByChild(`user/displayName`).startAt(self.userQuery).endAt(self.userQuery);
+
+        var data = $firebaseArray(ref);
+
+        data.$loaded().then(function (result) {
+            self.foundUsers = result;
+            console.log(self.foundUsers);
+        })
+    };
+
+    this.assignCohortAssistant = function (user) {
+        var asst = {
+            name: user.user.displayName,
+            canEdit: true,
+            canReview: true
+        };
+        var assistantId = user.$id;
+        for(let event in self.cohort.events) {
+            let eventId = self.cohort.events[event];
+            clmDataStore.events.addAssistant(eventId, assistantId, asst);
+        };
+        spfAlert.success('Added assistant.');
+        this.foundUsers = null;
+    };
+
     //
     // function promptPassword() {
     //     if (
@@ -544,7 +576,8 @@ ViewCohortCtrl.$inject = [
     'firebaseApp',
     'spfAuthData',
     'spfNavBarService',
-    'clmDataStore'
+    'clmDataStore',
+    '$firebaseArray'
 ];
 
 /**
