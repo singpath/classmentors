@@ -1050,7 +1050,7 @@ export function clmDataStoreFactory(
         if(priority) {
           return ref.setWithPriority(task, priority);
         } else {
-          ref.set(task);
+          return ref.set(task);
         }
       },
 
