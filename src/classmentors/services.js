@@ -1047,7 +1047,11 @@ export function clmDataStoreFactory(
         var ref = db.ref(`classMentors/eventTasks/${eventId}/${taskId}`);
         var priority = task.priority;
 
-        return ref.setWithPriority(task, priority);
+        if(priority) {
+          return ref.setWithPriority(task, priority);
+        } else {
+          return ref.set(task);
+        }
       },
 
       joinTeam: function(eventId, taskId, teamId, participantId, user) {
