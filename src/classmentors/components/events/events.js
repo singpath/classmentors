@@ -2035,7 +2035,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         var taskId = options.key;
         var task = self.tasks.$getRecord(taskId);
 
-        if (!task || (!task.textResponse && !task.linkPattern && task.type!='formteam' && task.type!='mentorAssignment')) {
+        if (!task || (!task.textResponse && !task.linkPattern && task.type!='formTeam' && task.type!='mentorAssignment')) {
             return noop;
         }
 
