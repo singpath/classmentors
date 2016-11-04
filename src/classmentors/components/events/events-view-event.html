@@ -107,30 +107,24 @@
 
         <md-tab label="Submissions" ng-if="ctrl.hasSubmissions">
             <md-content>
-                Your submissions:
+                Search for Submissions by Challenge Title:
+                <md-input-container>
+                    <input ng-model="ctrl.taskQuery" ng-change="ctrl.filterTaskSearch()">
+                </md-input-container>
                 <md-list>
-                    <md-list-item ng-repeat="task in ctrl.tasks" ng-if="ctrl.solutions[ctrl.profile.$id][task.$id]">
-                        <!--Task: {{task}}-->
-                        <!--My Answer: {{ctrl.solutions[ctrl.profile.$id][task.$id]}}-->
-                        <div flex="70">
-                            <h4>{{task.title}}</h4>
+                    <md-list-item class='md-4-line' ng-repeat="task in ctrl.filteredTasks | orderBy:['-closedAt', '-openedAt']" ng-if="ctrl.solutions[ctrl.profile.$id][task.$id] && !task.survey && !task.toEdit && task.type!='formTeam'" ng-click="ctrl.submissionRouter(ctrl.event.$id, task.$id, task, ctrl.participant, ctrl.solutions[ctrl.profile.$id])">
+                        <div flex>
+                            <b>{{task.title}}</b>
+                            <small>Last edited at: {{task.openedAt || task.closedAt | date}}</small><br>
                             {{task.description}}<br>
-                            {{task.textResponse}}
-                            <!--<span ng-if="task.lang">-->
-                                <!--Code Submission:<br>-->
-                                <!--{{ctrl.solutions[ctrl.profile.$id][task.$id] | cmTruncate: 20}}-->
-                            <!--</span>-->
-                            <!--<span ng-if="task.linkPattern">-->
-                                <!--Link Submission:<br>-->
-                                <!--{{ctrl.solutions[ctrl.profile.$id][task.$id] | cmTruncate: 20}}-->
-                            <!--</span>-->
+                            <i>{{task.textResponse}}</i>
                         </div>
-                        <div layout="column" layout-align="center center">
-                            <md-button class="material-icons" ng-click="">visibility
-                                <md-tooltip>View Submission</md-tooltip>
-                            </md-button>
-                        </div>
-                        <md-divider></md-divider>
+                        <!--<div layout="column" layout-align="center center">-->
+                            <!--<md-button class="material-icons" ng-click="ctrl.submissionRouter(ctrl.event.$id, task.$id, task, ctrl.participant, ctrl.solutions[ctrl.profile.$id])">visibility-->
+                                <!--<md-tooltip>View Submission</md-tooltip>-->
+                            <!--</md-button>-->
+                        <!--</div>-->
+                        <md-divider ng-if="!$last"></md-divider>
                     </md-list-item>
                 </md-list>
             </md-content>
