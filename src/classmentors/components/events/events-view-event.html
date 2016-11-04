@@ -112,7 +112,7 @@
                     <input ng-model="ctrl.taskQuery" ng-change="ctrl.filterTaskSearch()">
                 </md-input-container>
                 <md-list>
-                    <md-list-item class='md-4-line' ng-repeat="task in ctrl.filteredTasks | orderBy:['-closedAt', '-openedAt']" ng-if="ctrl.solutions[ctrl.profile.$id][task.$id] && !task.survey && !task.toEdit && task.type!='formTeam'" ng-click="ctrl.submissionRouter(ctrl.event.$id, task.$id, task, ctrl.participant, ctrl.solutions[ctrl.profile.$id])">
+                    <md-list-item class='md-4-line' ng-repeat="task in ctrl.filteredTasks | orderBy:['-closedAt', '-openedAt']" ng-if="ctrl.solutions[ctrl.profile.$id][task.$id] && !task.survey && !task.toEdit && task.type!='formTeam' && task.type!='mentorAssignment'" ng-click="ctrl.submissionRouter(ctrl.event.$id, task.$id, task, ctrl.participant, ctrl.solutions[ctrl.profile.$id])">
                         <div flex>
                             <b>{{task.title}}</b>
                             <small>Last edited at: {{task.openedAt || task.closedAt | date}}</small><br>
