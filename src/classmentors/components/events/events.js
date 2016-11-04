@@ -488,13 +488,11 @@ viewEventCtrlInitialData.$inject = [
  *
  */
 function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
-                       spfAlert, urlFor, spfAuthData, spfNavBarService, clmDataStore) {
+                       spfAlert, urlFor, spfAuthData, spfNavBarService, clmDataStore, $sce) {
     var self = this;
     var monitorHandler;
 
     this.event = initialData.event;
-
-    // initialData.solutions = initialData.progress;
 
     this.currentUser = initialData.currentUser;
     this.participants = initialData.participants;
@@ -503,7 +501,6 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
     this.loadingSolutions = true;
     this.progress = initialData.progress;
     this.solutions = initialData.solutions;
-    // this.solutions = {};
     this.scores = initialData.scores;
     this.canView = initialData.canView;
     this.viewArchived = false;
@@ -518,6 +515,24 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
             self.asstArr.push(self.assistants[asst].$id);
         }
     }
+
+    // console.log('Tasks: ', self.tasks);
+    // console.log('Solutions: ', self.solutions);
+
+    this.hasSubmissions = self.participants.find(p => p.$id == self.profile.$id);
+
+    this.filteredTasks = self.tasks;
+    this.taskQuery = '';
+
+    this.filterTaskSearch = function () {
+        if(self.taskQuery.length >= 1) {
+            self.filteredTasks = self.tasks.filter(function (task) {
+                return task.title.toLowerCase().indexOf(self.taskQuery.toLowerCase()) >= 0;
+            })
+        } else {
+            self.filteredTasks = self.tasks;
+        }
+    };
 
     // this.solutions = clmDataStore.events.getSolutions(self.event.$id).then(function (solutions) {
     //     console.log(solutions);
@@ -784,6 +799,219 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
         }
 
         self.loadingSolutions = false;
+    };
+
+    this.submissionRouter = function (eventId, taskId, task, participant, userSolution) {
+        if(task.linkPattern) {
+            viewLink(eventId, taskId, task, participant, userSolution);
+        } else if (task.lang) {
+            viewCodeResponse(eventId, taskId, task, participant, userSolution)
+        } else if (task.textResponse) {
+            viewTextResponse(eventId, taskId, task, participant, userSolution);
+        } else if (task.mcqQuestions) {
+            viewMultipleChoiceResponse(eventId, taskId, task, participant, userSolution);
+        }
+        else {
+            console.log(task);
+        }
+    };
+
+    function viewLink (eventId, taskId, task, participant, userSolution) {
+        $mdDialog.show({
+            clickOutsideToClose: true,
+            parent: $document.body,
+            template: linkTmpl,
+            controller: DialogController,
+            controllerAs: 'ctrl'
+        });
+
+        function DialogController() {
+            this.task = task;
+            this.review = true;
+            this.participant = participant;
+            if (
+                userSolution &&
+                userSolution[taskId]
+            ) {
+                this.solution = $sce.trustAsResourceUrl(userSolution[taskId]);
+            }
+
+            this.save = function (link) {
+                clmDataStore.events.submitSolution(eventId, taskId, participant.$id, link).then(function () {
+                    $mdDialog.hide();
+                    spfAlert.success('Link is saved.');
+                }).catch(function (err) {
+                    $log.error(err);
+                    spfAlert.error('Failed to save the link.');
+                    return err;
+                });
+            };
+
+            this.cancel = function () {
+                $mdDialog.hide();
+            };
+        }
+    }
+
+    function viewMultipleChoiceResponse (eventId, taskId, task, participant, userSolution) {
+        $mdDialog.show({
+            clickOutsideToClose: true,
+            parent: $document.body,
+            template: mcqTmpl,
+            controller: DialogController,
+            controllerAs: 'ctrl'
+        });
+
+        function DialogController() {
+            var self = this;
+            this.task = task;
+            this.viewOnly = true;
+            this.questions = angular.fromJson(task.mcqQuestions);
+
+            this.isChecked = function (answers, index) {
+                if(answers) {
+                    return answers.indexOf(index) > -1;
+                } else {
+                    return false;
+                }
+            };
+
+            this.show = function (answers) {
+                if(answers) {
+                    return answers.length > 1;
+                } else {
+                    return false;
+                }
+            };
+
+            // If userSolution is not null and userSolution given
+            // taskId is not null
+            if (
+                userSolution &&
+                userSolution[taskId]
+            ) {
+                this.solution = userSolution[taskId];
+            }
+            if(task.type=='TRAT') {
+                clmDataStore.events.getMCQAnswers(eventId, task.taskFrom)
+                    .then(function (answers) {
+                        var userAnswers = angular.fromJson(answers.$value);
+                        for (var i = 0; i < self.questions.length; i++) {
+                            self.questions[i].answers = userAnswers[i];
+                        }
+                    });
+            } else {
+                var userAnswers = angular.fromJson(this.solution).userAnswers;
+                for (var i = 0; i < this.questions.length; i++) {
+                    this.questions[i].answers = userAnswers[i];
+                }
+            }
+
+            this.cancel = function () {
+                $mdDialog.hide();
+            };
+        }
+    }
+
+    function getMCQModelAnswers() {
+
+    }
+
+    function viewTextResponse (eventId, taskId, task, participant, userSolution) {
+        $mdDialog.show({
+            clickOutsideToClose: true,
+            parent: $document.body,
+            template: responseTmpl,
+            controller: DialogController,
+            controllerAs: 'ctrl'
+        });
+
+        function DialogController() {
+            this.task = task;
+            this.viewOnly = true;
+            if (
+                userSolution &&
+                userSolution[taskId]
+            ) {
+                this.solution = userSolution[taskId];
+            }
+
+            this.save = function (response) {
+                clmDataStore.events.submitSolution(eventId, taskId, participant.$id, response).then(function () {
+                    $mdDialog.hide();
+                    spfAlert.success('Response is saved.');
+                }).catch(function (err) {
+                    $log.error(err);
+                    spfAlert.error('Failed to save your response.');
+                    return err;
+                });
+            };
+
+            this.cancel = function () {
+                $mdDialog.hide();
+            };
+        }
+    }
+
+    function viewCodeResponse (eventId, taskId, task, participant, userSolution) {
+        $mdDialog.show({
+            clickOutsideToClose: true,
+            parent: $document.body,
+            template: codeTmpl,
+            onComplete: loadEditor,
+            controller: CodeController,
+            controllerAs: 'ctrl'
+        });
+
+        self.loadingEditor = true;
+        var parent = self;
+
+        function loadEditor() {
+            var editor = ace.edit($document[0].querySelector('#editor'));
+            editor.setTheme("ace/theme/monokai");
+            editor.getSession().setMode("ace/mode/" + task.lang.toLowerCase());
+            editor.getSession().setUseWrapMode(true);
+            editor.setOptions({
+                readOnly: true,
+                highlightActiveLine: false,
+                highlightGutterLine: false
+            });
+            parent.loadingEditor = false;
+        }
+
+        function CodeController() {
+            this.task = task;
+            this.viewOnly = true;
+
+            this.checkEditor = function () {
+                return parent.loadingEditor;
+            };
+
+            if (
+                userSolution &&
+                userSolution[taskId]
+            ) {
+                this.solution = userSolution[taskId];
+            }
+
+            this.save = function () {
+                var editor = ace.edit(document.querySelector('#editor'));
+                var response = editor.getValue();
+                // console.log("Function submitted for answer " + response);
+                clmDataStore.events.submitSolution(eventId, taskId, participant.$id, response).then(function () {
+                    $mdDialog.hide();
+                    spfAlert.success('Response is saved.');
+                }).catch(function (err) {
+                    $log.error(err);
+                    spfAlert.error('Failed to save your response.');
+                    return err;
+                });
+            };
+
+            this.cancel = function () {
+                $mdDialog.hide();
+            };
+        }
     }
 }
 ViewEventCtrl.$inject = [
@@ -796,7 +1024,8 @@ ViewEventCtrl.$inject = [
     'urlFor',
     'spfAuthData',
     'spfNavBarService',
-    'clmDataStore'
+    'clmDataStore',
+    '$sce'
 ];
 
 /**
@@ -2035,7 +2264,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         var taskId = options.key;
         var task = self.tasks.$getRecord(taskId);
 
-        if (!task || (!task.textResponse && !task.linkPattern && task.type!='formteam' && task.type!='mentorAssignment')) {
+        if (!task || (!task.textResponse && !task.linkPattern && task.type!='formTeam' && task.type!='mentorAssignment')) {
             return noop;
         }
 
