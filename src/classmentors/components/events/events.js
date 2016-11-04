@@ -494,8 +494,6 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
 
     this.event = initialData.event;
 
-    // initialData.solutions = initialData.progress;
-
     this.currentUser = initialData.currentUser;
     this.participants = initialData.participants;
     this.profile = initialData.profile;
@@ -503,7 +501,6 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
     this.loadingSolutions = true;
     this.progress = initialData.progress;
     this.solutions = initialData.solutions;
-    // this.solutions = {};
     this.scores = initialData.scores;
     this.canView = initialData.canView;
     this.viewArchived = false;
@@ -518,6 +515,11 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
             self.asstArr.push(self.assistants[asst].$id);
         }
     }
+
+    console.log('Tasks: ', self.tasks);
+    console.log('Solutions: ', self.solutions);
+
+    this.hasSubmissions = self.participants.find(p => p.$id == self.profile.$id);
 
     // this.solutions = clmDataStore.events.getSolutions(self.event.$id).then(function (solutions) {
     //     console.log(solutions);

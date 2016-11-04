@@ -50,7 +50,7 @@
             </md-content>
         </md-tab>
 
-        <md-tab label="Results" ng-disabled="!ctrl.participants || !ctrl.isReviewSuperUser">
+        <md-tab label="Results" ng-if="ctrl.participants && ctrl.isReviewSuperUser">
             <md-content layout-padding>
                 <md-switch class="md-primary" ng-model="ctrl.viewArchived" aria-label="ViewArchived?">
                     View archived challenges
@@ -102,6 +102,37 @@
                         Loading solutions...
                     </div>
                 </div>
+            </md-content>
+        </md-tab>
+
+        <md-tab label="Submissions" ng-if="ctrl.hasSubmissions">
+            <md-content>
+                Your submissions:
+                <md-list>
+                    <md-list-item ng-repeat="task in ctrl.tasks" ng-if="ctrl.solutions[ctrl.profile.$id][task.$id]">
+                        <!--Task: {{task}}-->
+                        <!--My Answer: {{ctrl.solutions[ctrl.profile.$id][task.$id]}}-->
+                        <div flex="70">
+                            <h4>{{task.title}}</h4>
+                            {{task.description}}<br>
+                            {{task.textResponse}}
+                            <!--<span ng-if="task.lang">-->
+                                <!--Code Submission:<br>-->
+                                <!--{{ctrl.solutions[ctrl.profile.$id][task.$id] | cmTruncate: 20}}-->
+                            <!--</span>-->
+                            <!--<span ng-if="task.linkPattern">-->
+                                <!--Link Submission:<br>-->
+                                <!--{{ctrl.solutions[ctrl.profile.$id][task.$id] | cmTruncate: 20}}-->
+                            <!--</span>-->
+                        </div>
+                        <div layout="column" layout-align="center center">
+                            <md-button class="material-icons" ng-click="">visibility
+                                <md-tooltip>View Submission</md-tooltip>
+                            </md-button>
+                        </div>
+                        <md-divider></md-divider>
+                    </md-list-item>
+                </md-list>
             </md-content>
         </md-tab>
     </md-tabs>
