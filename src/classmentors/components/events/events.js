@@ -746,7 +746,9 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
                     // console.log(self.teams);
                     for(var index in self.teams) {
                         self.teams[index].number = parseInt(index) + 1;
-                        self.teams[index].score = self.scores[self.teams[index].teamLeader][self.selected.$id];
+                        if(self.teams[index].score) {
+                            self.teams[index].score = self.scores[self.teams[index].teamLeader][self.selected.$id];
+                        }
                     }
                 })
                 .finally(
