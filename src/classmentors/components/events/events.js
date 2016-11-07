@@ -519,7 +519,9 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
     // console.log('Tasks: ', self.tasks);
     // console.log('Solutions: ', self.solutions);
 
-    this.hasSubmissions = self.participants.find(p => p.$id == self.profile.$id);
+    if(self.participants) {
+        this.hasSubmissions = self.participants.find(p => p.$id == self.profile.$id);
+    }
 
     this.filteredTasks = self.tasks;
     this.taskQuery = '';
@@ -562,6 +564,9 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
     }
 
     if (self.event && self.currentUser && self.asstArr.indexOf(self.currentUser.publicId) >= 0) {
+        monitorHandler = clmDataStore.events.monitorEvent(
+            this.event, this.tasks, this.participants, this.solutions, this.progress
+        );
         var asst = self.assistantObj[self.currentUser.publicId];
         if (asst.canReview) {
             this.isReviewAssistant = true;
@@ -741,7 +746,9 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
                     // console.log(self.teams);
                     for(var index in self.teams) {
                         self.teams[index].number = parseInt(index) + 1;
-                        self.teams[index].score = self.scores[self.teams[index].teamLeader][self.selected.$id];
+                        if(self.teams[index].score) {
+                            self.teams[index].score = self.scores[self.teams[index].teamLeader][self.selected.$id];
+                        }
                     }
                 })
                 .finally(
