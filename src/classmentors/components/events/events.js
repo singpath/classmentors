@@ -564,6 +564,9 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
     }
 
     if (self.event && self.currentUser && self.asstArr.indexOf(self.currentUser.publicId) >= 0) {
+        monitorHandler = clmDataStore.events.monitorEvent(
+            this.event, this.tasks, this.participants, this.solutions, this.progress
+        );
         var asst = self.assistantObj[self.currentUser.publicId];
         if (asst.canReview) {
             this.isReviewAssistant = true;
