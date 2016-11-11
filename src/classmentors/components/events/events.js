@@ -3131,13 +3131,14 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         var completedUsers = 0;
         var numUserInTeam = 0;
         var teamNumber = '';
-        // self.team = {'taskId': taskId, 'teamNum': '', 'numUsersInTeam': numUserInTeam, 'completedUsers': completedUsers}
+        var teamMembers = [];
 
         var teamInfoArr = [];
         teamInfoArr.push(teamNumber);
         teamInfoArr.push(numUserInTeam);
         teamInfoArr.push(completedUsers);
         teamInfoArr.push(self.coopStyle);
+        teamInfoArr.push(teamMembers);
 
         var belongToTeam = false;
 
@@ -3158,26 +3159,30 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                 belongToTeam = true;
 
                 //take out all variables within the team to begin calculation...
-                var totalNumUsers = self.coopTeam[teamRef][1]
+                var totalNumUsers = self.coopTeam[teamRef][1];
                 var teamNum = self.coopTeam[teamRef][0];
-                var usersCompleted = self.coopTeam[teamRef][2]
+                var usersCompleted = self.coopTeam[teamRef][2];
+                var members = [];
+                members = self.coopTeam[teamRef][4];
 
                 //loop through this team that the user is in
                 for (var user in team[key]) {
+
+
                     if (user != 'currentSize' && user != 'maxSize') {
 
                         //assign the total number of users inside the team
                         totalNumUsers++;
-
+                        members.push(user);
                         //assign self team num to the user's team number
                         teamNum = solutionByTask[user][teamRef];
-
                         //if user has submitted an answer, increment by 1
                         if (solutionByTask[user][taskId] != undefined || solutionByTask[user][taskId] != null) {
                             usersCompleted++;
                         }
                     }
                 }
+
                 if(usersCompleted == totalNumUsers){
                     self.coopStyle={
                         display: 'inline-block',
@@ -3189,13 +3194,18 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                 self.coopTeam[teamRef][1] = totalNumUsers;
                 self.coopTeam[teamRef][2] = usersCompleted;
                 self.coopTeam[teamRef][3] = self.coopStyle;
+                self.coopTeam[teamRef][4] = members;
             }
-        }
 
+        }
+        console.log("coop team is: ", self.coopTeam);
         return belongToTeam;
 
     }
 
+    self.displayTeam = function(){
+        console.log("testing one two threee");
+    };
 
     this.promptForSurvey = function (eventId, taskId, task, participant, userSolution) {
 
