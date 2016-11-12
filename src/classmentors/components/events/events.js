@@ -3120,92 +3120,85 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
 
     self.coopTeam = {};
     self.coopStyle = {};
-    //show coop team progress after students are done
+    self.selectedProgress = {};
+
     self.showTeamComplete = function (participantId, taskId, eventId, task) {
-        //store teamRef as key, put all important data into array
-        // self.team[teamRef] => [teamNumber, numberOfUsersInsideTeam, numberOfUsersCompletedChallenge]
+
         self.coopStyle = {
             display: 'inline-block',
             color: 'red'
         }
+        // taskByEvent
+        // solutionByTask
+        // allTeamsByEvent
+        // console.log("this task id is: ", taskId);
+        //get this task
+        var selectedTask = taskByEvent[taskId];
+        //get the task where team formation is from
+        var teamTaskFrom = selectedTask.teamFormationRef;
+        //get all the teams that belong to this event
+        var teamFromEvent = allTeamsByEvent[teamTaskFrom];
+        // console.log("teamFromEvent is: ", teamFromEvent);
+        //create arrays to store users who has completed task and total number of users in a team
         var completedUsers = 0;
-        var numUserInTeam = 0;
-        var teamNumber = '';
-        var teamMembers = [];
-
-        var teamInfoArr = [];
-        teamInfoArr.push(teamNumber);
-        teamInfoArr.push(numUserInTeam);
-        teamInfoArr.push(completedUsers);
-        teamInfoArr.push(self.coopStyle);
-        teamInfoArr.push(teamMembers);
-
-        var belongToTeam = false;
-
-        var eventTask = taskByEvent[taskId];
-        //retrieve the teamformation taskId to retrieve the teams inside
-        var teamRef = eventTask.teamFormationRef;
-        //retrieve all eventTeam that belong to the teamformation taskId
-        var team = allTeamsByEvent[teamRef];
-
-        for (var key in team) {
-            if (team[teamRef] == null || team[teamRef] == undefined) {
-                self.coopTeam[teamRef] = teamInfoArr;
-            }
-            //if event team contains the user's id, retrieve the team number from user solution
-            if (JSON.stringify(team[key]).indexOf(participantId) > -1) {
-
-                //if user belongs to the team, set it to true
-                belongToTeam = true;
-
-                //take out all variables within the team to begin calculation...
-                var totalNumUsers = self.coopTeam[teamRef][1];
-                var teamNum = self.coopTeam[teamRef][0];
-                var usersCompleted = self.coopTeam[teamRef][2];
-                var members = [];
-                members = self.coopTeam[teamRef][4];
-
-                //loop through this team that the user is in
-                for (var user in team[key]) {
+        var usersInTeam = 0;
 
 
-                    if (user != 'currentSize' && user != 'maxSize') {
+        //set initial data into array
+        var coopTeamDetails = [];
+        var usersInside = [];
+        coopTeamDetails.push(completedUsers);
+        coopTeamDetails.push(usersInTeam);
+        coopTeamDetails.push(usersInside);
 
-                        //assign the total number of users inside the team
-                        totalNumUsers++;
-                        members.push(user);
-                        //assign self team num to the user's team number
-                        teamNum = solutionByTask[user][teamRef];
-                        //if user has submitted an answer, increment by 1
-                        if (solutionByTask[user][taskId] != undefined || solutionByTask[user][taskId] != null) {
-                            usersCompleted++;
-                        }
+        var status = [];
+
+        for (var teamId in teamFromEvent) {
+            console.log("teamId is: ", teamId);
+            for (var user in teamFromEvent[teamId]) {
+
+                if (user != 'maxSize' && user != 'currentSize' && user != 'status') {
+                    usersInTeam++;
+
+                    //if user has submitted an answer, increment by 1
+
+                    if (typeof solutionByTask[user][taskId] == 'undefined') {
+                        //do nothing
+
+                    } else {
+                        completedUsers++;
                     }
+
+
                 }
 
-                if(usersCompleted == totalNumUsers){
-                    self.coopStyle={
-                        display: 'inline-block',
-                        color: 'green'
-                    }
-                }
-
-                self.coopTeam[teamRef][0]= teamNum;
-                self.coopTeam[teamRef][1] = totalNumUsers;
-                self.coopTeam[teamRef][2] = usersCompleted;
-                self.coopTeam[teamRef][3] = self.coopStyle;
-                self.coopTeam[teamRef][4] = members;
             }
 
+            status.push(usersInTeam);
+            status.push(completedUsers);
+
+            teamFromEvent[teamId]['status'] = status;
+            //reset user information
+            usersInTeam = 0;
+            completedUsers = 0;
+            status = [];
         }
-        console.log("coop team is: ", self.coopTeam);
-        return belongToTeam;
+        self.coopTeam[teamTaskFrom] = teamFromEvent;
+
+
+
+        for (var team in self.coopTeam[teamTaskFrom]) {
+            if (JSON.stringify(self.coopTeam[teamTaskFrom][team]).indexOf(participantId) > -1) {
+                console.log("check if participant is inside: ", self.coopTeam[teamTaskFrom][team]);
+                self.selectedProgress[participantId] = self.coopTeam[teamTaskFrom][team].status;
+            }
+        }
+
+        console.log("testing final array: ", self.selectedProgress);
+
+        return true;
 
     }
-
-    self.displayTeam = function(){
-        console.log("testing one two threee");
-    };
 
     this.promptForSurvey = function (eventId, taskId, task, participant, userSolution) {
 
