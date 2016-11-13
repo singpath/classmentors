@@ -1392,6 +1392,7 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
                         // console.log(team);
                         if (!('teamLeader' in team)) {
                             var acc = []; //accumulator for team members.
+                            console.log("assigned team is: ", team);
                             for (var key in team) {
                                 if (key != 'currentSize' && key != 'maxSize') {
                                     acc.push(key);
@@ -2138,7 +2139,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                 }
             }
         }
-
+        console.log("self team is: ", self.team);
         if (Object.keys(self.team).length != 0) {
             return true;
         } else {
