@@ -3127,7 +3127,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         self.coopStyle = {
             display: 'inline-block',
             color: 'red'
-        }
+        };
         var completedUsers = 0;
         var numUserInTeam = 0;
         var teamNumber = '';
@@ -3201,7 +3201,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         console.log("coop team is: ", self.coopTeam);
         return belongToTeam;
 
-    }
+    };
 
     self.displayTeam = function(){
         console.log("testing one two threee");
