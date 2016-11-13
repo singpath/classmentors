@@ -3179,8 +3179,8 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             status = [];
         }
         self.coopTeam[teamTaskFrom] = teamFromEvent;
-        console.log("self team id is: ", self.teamId);
-        console.log("self coopteam is : ", self.coopTeam);
+        // console.log("self team id is: ", self.teamId);
+        // console.log("self coopteam is : ", self.coopTeam);
 
         // for (var team in self.coopTeam[teamTaskFrom]) {
         //     if (JSON.stringify(self.coopTeam[teamTaskFrom][team]).indexOf(participantId) > -1) {
