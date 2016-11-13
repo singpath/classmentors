@@ -990,6 +990,12 @@ export function clmDataStoreFactory(
         return ref.remove();
       },
 
+      getTasksAsObject: function(eventId){
+          var ref = db.ref(`classMentors/eventTasks/${eventId}`);
+          var query = ref.orderByPriority();
+
+          return loaded($firebaseObject(query));
+      },
       getTasks: function(eventId) {
         var ref = db.ref(`classMentors/eventTasks/${eventId}`);
         var query = ref.orderByPriority();
@@ -1072,6 +1078,12 @@ export function clmDataStoreFactory(
 
         return loaded($firebaseArray(ref));
       },
+
+      getEventTeamsObj: function (eventId){
+          var ref = db.ref(`classMentors/eventTeams/${eventId}`);
+          return loaded($firebaseObject(ref));
+      },
+
       openTask: function(eventId, taskId) {
         var ref = db.ref(`classMentors/eventTasks/${eventId}/${taskId}`);
         var abort;
