@@ -171,7 +171,7 @@
                             <!--Your team leader is: {{ctrl.team[ctrl.teamLeader].displayName}}-->
                             <!--</label>-->
                             <label ng-show="task.startTRAT && task.teamFormationRef && ctrl.checkUser(task.teamFormationRef, ctrl.currentUserParticipant.$id) && (ctrl.team[task.teamFormationRef].teamLeader != undefined && ctrl.team[task.teamFormationRef].teamLeader != ctrl.currentUserParticipant.$id) && task.openedAt">
-                                Your team leader is: {{ctrl.team[task.teamFormationRef].teamLeader}}
+                                Your team leader is: {{ctrl.team[task.teamFormationRef][ctrl.team[task.teamFormationRef].teamLeader].displayName}}
                              </label>
                         </span>
                         <span ng-if="ctrl.currentUserSolutions[task.$id] && !task.formationPattern && task.type == 'indexCards'">
@@ -182,7 +182,7 @@
                             <md-button class="md-icon-button md-primary small-icon"
                                        aria-label="Update link"
                                        ng-click="ctrl.promptForLink(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant, ctrl.currentUserSolutions)"
-                                       ng-if="task.openedAt && ctrl.checkUser(task.teamFormationRef, ctrl.currentUserParticipant.$id) && ctrl.team[task.teamFormationRef].teamLeader == ctrl.currentUserParticipant.$id"
+                                       ng-if="task.coopSubmission || (task.openedAt && ctrl.checkUser(task.teamFormationRef, ctrl.currentUserParticipant.$id) && ctrl.team[task.teamFormationRef].teamLeader == ctrl.currentUserParticipant.$id)"
                             >
                                 <md-icon md-svg-icon="create"></md-icon>
                             </md-button>
@@ -192,7 +192,7 @@
                             <md-button class="md-icon-button md-primary small-icon"
                                                 aria-label="Update link"
                                                 ng-click="ctrl.promptForTextResponse(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant, ctrl.currentUserSolutions)"
-                                                ng-if="task.openedAt && ctrl.checkUser(task.teamFormationRef, ctrl.currentUserParticipant.$id) && ctrl.team[task.teamFormationRef].teamLeader == ctrl.currentUserParticipant.$id"
+                                                ng-if="task.coopSubmission || (task.openedAt && ctrl.checkUser(task.teamFormationRef, ctrl.currentUserParticipant.$id) && ctrl.team[task.teamFormationRef].teamLeader == ctrl.currentUserParticipant.$id)"
                         >
                                 <md-icon md-svg-icon="create"></md-icon>
                             </md-button>
@@ -203,7 +203,7 @@
                             <md-button class="md-icon-button md-primary small-icon"
                                        aria-label="Update link"
                                        ng-click="ctrl.promptForCodeResponse(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant, ctrl.currentUserSolutions)"
-                                       ng-if="task.openedAt && ctrl.checkUser(task.teamFormationRef, ctrl.currentUserParticipant.$id) && ctrl.team[task.teamFormationRef].teamLeader == ctrl.currentUserParticipant.$id"
+                                       ng-if="task.coopSubmission || (task.openedAt && ctrl.checkUser(task.teamFormationRef, ctrl.currentUserParticipant.$id) && ctrl.team[task.teamFormationRef].teamLeader == ctrl.currentUserParticipant.$id)"
                             >
                                 <md-icon md-svg-icon="create"></md-icon>
                             </md-button>
@@ -487,7 +487,6 @@
                                 <md-icon md-svg-icon="loop"></md-icon>
                             </md-button>
                         </span>
-                        <!--&& ctrl.solutions[participant.$id][task.$id]-->
 
                     </div>
                     <div>
@@ -498,9 +497,6 @@
                 </td>
             </tr>
 
-            <!--ng-if="ctrl.displayTeam()"-->
-
-            <!--{{ctrl.coopTeam[task.teamFormationRef][0]}}-->
             <tr ng-if="ctrl.participantsView | spfEmpty">
                 <td>No<span ng-if="ctrl.ctrl.currentUserParticipant"> other</span> participants</td>
             </tr>
