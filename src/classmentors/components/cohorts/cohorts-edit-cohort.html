@@ -58,7 +58,7 @@
                 </md-card-content>
                 <md-card-actions layout="row" layout-align="start center">
                     <md-button class="md-raised md-primary" type="submit" ng-disabled="addEventForm.$pristine || addEventForm.$invalid || !ctrl.selectedEvent">Add Event</md-button>
-                    <md-button class="md-raised" ng-click="ctrl.closeAddingEvent()">Cancel</md-button>
+                    <md-button class="md-accent" ng-click="ctrl.closeAddingEvent()">Cancel</md-button>
                 </md-card-actions>
             </md-card>
         </form>
@@ -101,7 +101,7 @@
             </md-switch>
             <md-card-actions layout="row" layout-align="start center">
                 <md-button class="md-raised md-primary" type="submit" ng-disabled="addAnnouncementForm.$pristine || addAnnouncementForm.$invalid">Save Announcement</md-button>
-                <md-button class="md-raised" ng-click="ctrl.closeNewAnnouncement()">Cancel</md-button>
+                <md-button class="md-accent" ng-click="ctrl.closeNewAnnouncement()">Cancel</md-button>
             </md-card-actions>
         </md-card>
     </form>
