@@ -427,6 +427,7 @@ export function newMcqController(initialData, challengeService, $filter,$mdDialo
     }
   };
   self.isOptionValid = false;
+
   self.checkOptionValid = function(text){
     if(text.length == 0 || text == undefined){
       self.isOptionValid = false;
@@ -494,7 +495,9 @@ export function newMcqController(initialData, challengeService, $filter,$mdDialo
     // Push new question object into questions list
     self.questions.push(question);
     checkMCQValid();
+
   }
+
   function checkMCQValid(){
     for (var i = 0; i < self.questions.length; i ++){
       if(self.questions[i].answers.length == 0){
@@ -523,9 +526,6 @@ export function newMcqController(initialData, challengeService, $filter,$mdDialo
     });
   };
 
-  // Functionality for toggleOption between single answer and multi ans functionality
-  // Needs further review though..
-  // Is it better to set the answers as default multiple and the users will just set 1..n answers?
   self.toggleOption = function(question, itemIndex){
     console.log('Index being deleted...', itemIndex)
     var idx = question.answers.indexOf(itemIndex);
@@ -536,6 +536,7 @@ export function newMcqController(initialData, challengeService, $filter,$mdDialo
       question.answers.push(itemIndex);
     }
     console.log(question.answers);
+
     checkMCQValid();
   }
 
@@ -545,6 +546,7 @@ export function newMcqController(initialData, challengeService, $filter,$mdDialo
     question.options.push({
       text:""
     });
+
     checkMCQValid();
   }
 
@@ -580,7 +582,6 @@ export function newMcqController(initialData, challengeService, $filter,$mdDialo
 
     })
   }
-
 
 }
 newMcqController.$inject = [
