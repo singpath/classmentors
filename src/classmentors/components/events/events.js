@@ -3122,12 +3122,14 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
     self.coopStyle = {};
     self.selectedProgress = {};
 
+    self.teamId = {};
     self.showTeamComplete = function (participantId, taskId, eventId, task) {
-
+        self.selectedProgress[taskId] = {};
         self.coopStyle = {
             display: 'inline-block',
             color: 'red'
         }
+        self.taskId = taskId;
         // taskByEvent
         // solutionByTask
         // allTeamsByEvent
@@ -3142,7 +3144,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         //create arrays to store users who has completed task and total number of users in a team
         var completedUsers = 0;
         var usersInTeam = 0;
-
+        self.teamId[teamTaskFrom] = {};
 
         //set initial data into array
         var coopTeamDetails = [];
@@ -3154,26 +3156,19 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         var status = [];
 
         for (var teamId in teamFromEvent) {
-            console.log("teamId is: ", teamId);
             for (var user in teamFromEvent[teamId]) {
 
                 if (user != 'maxSize' && user != 'currentSize' && user != 'status') {
                     usersInTeam++;
-
                     //if user has submitted an answer, increment by 1
-
                     if (typeof solutionByTask[user][taskId] == 'undefined') {
                         //do nothing
-
                     } else {
                         completedUsers++;
                     }
-
-
+                    self.teamId[teamTaskFrom][user] = teamId;
                 }
-
             }
-
             status.push(usersInTeam);
             status.push(completedUsers);
 
@@ -3184,17 +3179,15 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             status = [];
         }
         self.coopTeam[teamTaskFrom] = teamFromEvent;
+        console.log("self team id is: ", self.teamId);
+        console.log("self coopteam is : ", self.coopTeam);
 
+        // for (var team in self.coopTeam[teamTaskFrom]) {
+        //     if (JSON.stringify(self.coopTeam[teamTaskFrom][team]).indexOf(participantId) > -1) {
+        //         self.selectedProgress[taskId][participantId] = self.coopTeam[teamTaskFrom][team].status;
+        //     }
+        // }
 
-
-        for (var team in self.coopTeam[teamTaskFrom]) {
-            if (JSON.stringify(self.coopTeam[teamTaskFrom][team]).indexOf(participantId) > -1) {
-                console.log("check if participant is inside: ", self.coopTeam[teamTaskFrom][team]);
-                self.selectedProgress[participantId] = self.coopTeam[teamTaskFrom][team].status;
-            }
-        }
-
-        console.log("testing final array: ", self.selectedProgress);
 
         return true;
 

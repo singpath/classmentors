@@ -492,7 +492,7 @@
                     </div>
                     <div>
                         <span ng-if="task.coopSubmission && task.type!='formTeam'">
-                            <label ng-show="ctrl.showTeamComplete(participant.$id, task.$id,ctrl.event.$id, task)">{{ctrl.solutions[participant.$id][task.teamFormationRef]}} : {{ctrl.selectedProgress[participant.$id][1]}} / {{ctrl.selectedProgress[participant.$id][0]}}</label>
+                            <label ng-show="ctrl.showTeamComplete(participant.$id, task.$id,ctrl.event.$id, task)">{{ctrl.solutions[participant.$id][task.teamFormationRef]}} : {{ctrl.coopTeam[task.teamFormationRef][ctrl.teamId[task.teamFormationRef][participant.$id]].status[1]}} / {{ctrl.coopTeam[task.teamFormationRef][ctrl.teamId[task.teamFormationRef][participant.$id]].status[0]}}</label>
                         </span>
                     </div>
                 </td>
