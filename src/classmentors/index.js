@@ -160,7 +160,10 @@ module.constant('routes', {
   eventQueue: '/question-queue/:eventId',
   oneQuestion: '/question-queue/:eventId/questions/:questionId',
   indexCard: '/challenges/team-activity/indexCard',
-  viewMentorCreation: '/challenges/mentoring-activity/create'
+  viewMentorCreation: '/challenges/mentoring-activity/create',
+  viewSchEngagePreview: '/challenges/survey1/:eventTitle/:eventId/:task/:surveyType',
+  viewMotiStratPreview: '/challenges/survey2/:eventTitle/:eventId/:task/:surveyType',
+  viewEduDissPreview: '/challenges/survey3/:eventTitle/:eventId/:task/:surveyType'
 });
 
 export {module};

@@ -146,6 +146,32 @@ export function configRoute($routeProvider, routes) {
                 initialData: team.startTRATInitialData
             }
         })
+        .when(routes.viewSchEngagePreview, {
+            template: survey.schEngagePreview,
+            controller: survey.showPreviewController,
+            controllerAs: 'ctrl',
+            resolve: {
+                initialData: survey.showPreviewInitialData
+            }
+        })
+
+        .when(routes.viewMotiStratPreview, {
+            template: survey.motiStratPreview,
+            controller: survey.showPreviewController,
+            controllerAs: 'ctrl',
+            resolve: {
+                initialData: survey.showPreviewInitialData
+            }
+        })
+
+        .when(routes.viewEduDissPreview, {
+            template: survey.eduDissPreview,
+            controller: survey.showPreviewController,
+            controllerAs: 'ctrl',
+            resolve: {
+                initialData: survey.showPreviewInitialData
+            }
+        })
 
 }
 
@@ -482,8 +508,17 @@ function surveyFormEvent($scope, clmSurvey, clmDataStore, $log, spfAlert, $locat
     };
 
     // console.log("the survey t/f is", self.hasSurveyTitle);
-    self.showPreview = function(surveyType){
-      console.log("this survey preview type is: ", surveyType);
+    self.showPreview = function (surveyType) {
+        console.log("show preview survey type is: ", surveyType.name);
+        if (surveyType.name == 'School engagement scale') {
+            $location.path('/challenges/survey1/' + eventTitle +'/' + eventId + '/' + $route.current.params.task + '/' + surveyType.name);
+        }
+        if (surveyType.name == 'Motivated strategies for learning') {
+            $location.path('/challenges/survey2/' + eventTitle +'/' + eventId + '/' + $route.current.params.task + '/' + surveyType.name);
+        }
+        if (surveyType.name == 'Education vs Dissatisfaction with learning') {
+            $location.path('/challenges/survey3/' + eventTitle +'/' + eventId + '/' + $route.current.params.task + '/' + surveyType.name);
+        }
     };
 
     this.saveSurveyTask = function (surveyType) {
