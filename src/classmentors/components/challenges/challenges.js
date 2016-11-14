@@ -509,7 +509,7 @@ function surveyFormEvent($scope, clmSurvey, clmDataStore, $log, spfAlert, $locat
 
     // console.log("the survey t/f is", self.hasSurveyTitle);
     self.showPreview = function (surveyType) {
-        console.log("show preview survey type is: ", surveyType.name);
+        self.loadPreview = true;
         if (surveyType.name == 'School engagement scale') {
             $location.path('/challenges/survey1/' + eventTitle +'/' + eventId + '/' + $route.current.params.task + '/' + surveyType.name);
         }

@@ -67,6 +67,23 @@ showPreviewInitialData.$inject = ['$q', '$location', '$route', 'firebaseApp', '$
 
 function showPreviewController(spfNavBarService, $location, urlFor, initialData, $routeParams, clmDataStore, clmPagerOption, spfAlert, $scope, firebase, $route) {
     var self = this;
+    var eventId = $route.current.params.eventId;
+    var getTask = JSON.parse($route.current.params.task);
+    var eventTitle = $route.current.params.eventTitle;
+
+    spfNavBarService.update(
+        getTask.title, [{
+            title: 'Events',
+            url: `#${urlFor('events')}`
+        }, {
+            title: eventTitle,
+            url: `#${urlFor('oneEvent', {eventId: eventId})}`
+        }, {
+            title: 'Challenges',
+            url: `#${urlFor('editEvent', {eventId: eventId})}`
+        }]
+    );
+
 
     this.questions = initialData.survey2;
     this.ratingOptions = [
@@ -80,7 +97,7 @@ function showPreviewController(spfNavBarService, $location, urlFor, initialData,
     ];
 
 
-    if ($routeParams.surveyTask === 'School engagement scale') {
+    if ($routeParams.surveyType === 'School engagement scale') {
 
 
         self.responseRating = [
@@ -95,7 +112,7 @@ function showPreviewController(spfNavBarService, $location, urlFor, initialData,
 
     }
 
-    if ($routeParams.surveyTask === 'Motivated strategies for learning') {
+    if ($routeParams.surveyType == 'Motivated strategies for learning') {
 
         self.questionsArr = [];
         for (let i = 1; i < Object.keys(initialData.survey2[1]).length - 1; i++) {
@@ -107,7 +124,7 @@ function showPreviewController(spfNavBarService, $location, urlFor, initialData,
 
     }
 
-    if ($routeParams.surveyTask === 'Education vs Dissatisfaction with learning') {
+    if ($routeParams.surveyType === 'Education vs Dissatisfaction with learning') {
         this.familyMembers = [
             {name: 'Father'},
             {name: 'Mother'},
@@ -158,8 +175,6 @@ function showPreviewController(spfNavBarService, $location, urlFor, initialData,
             {secondRow: 'Other'}
         ];
 
-        //this.selectEthnicity = [];
-
         this.eduDissResp = {};
         this.questionJson = {};
         // console.log("this initialdata is", initialData.survey2[0]);
@@ -169,9 +184,12 @@ function showPreviewController(spfNavBarService, $location, urlFor, initialData,
             this.eduDissResp[initialData.survey2[0][i].title] = {};
 
         }
-
-
     }
+
+    self.back = function(){
+        $location.path('/challenges/survey/' + eventTitle +'/' + eventId + '/' + JSON.stringify(getTask));
+    };
+
 }
 showPreviewController.$inject = ['spfNavBarService', '$location', 'urlFor', 'initialData', '$routeParams',
     'clmDataStore', 'clmPagerOption', 'spfAlert', '$scope', 'firebase', '$route'];

@@ -1655,7 +1655,7 @@ function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNav
                 event: event,
                 task: task
             };
-            // console.log('Data shows... ', data);
+
             spfNavBarService.update(
                 'Challenge Details', [{
                     title: 'Events',
@@ -1671,7 +1671,7 @@ function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNav
             eventService.set(data);
             $location.path(location);
         } else {
-            console.log("this copy issss:", copy);
+
             clmDataStore.events.addTask(event.$id, copy, isOpen).then(function () {
                 spfAlert.success('Challenge created.');
                 $location.path(urlFor('editEvent', {eventId: self.event.$id}));
