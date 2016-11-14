@@ -303,7 +303,7 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
                 let team = event.teams[i];
                 eventTeamsRef.push(team);
             }
-            spfAlert.success('Challenge saved');
+            spfAlert.success('Challenge created');
             $location.path(urlFor('editEvent', {eventId: event.$id}));
         }).catch(function (error) {
             console.log('FAILED AT SETTING COOPERATIVE TASK');
@@ -370,7 +370,7 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
                 let team = event.teams[i];
                 eventTeamsRef.push(team);
             }
-            spfAlert.success('Challenge saved');
+            spfAlert.success('Challenge created');
             $location.path(urlFor('editEvent', {eventId: event.$id}));
         }).catch(function (error) {
             console.log('FAILED AT SETTING COLLAB TASK');

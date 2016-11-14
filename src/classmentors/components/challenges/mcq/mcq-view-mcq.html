@@ -3,65 +3,69 @@
         {{ctrl.data}}
         <div align="center">
             <h3>Multiple Choice Question Details</h3>
-            <br><br>
         </div>
 
         <div ng-repeat="question in ctrl.questions">
-            <h3>
-                Question {{$index + 1}}
-                <md-button class="md-raised" ng-click="ctrl.removeQuestion($event,$index)"
-                           ng-disabled="ctrl.questions.length == 1">Delete this question
-                </md-button>
-            </h3>
+           <md-toolbar layout="row" class="md-hue-3">
+                <span class="md-toolbar-tools">
+                    Q{{$index +1}}: {{question.text}}
+                   <span ng-show="question.answers.length == 0 || question.answers == undefined">
+                       <font size="3"> (No Answer Selected)</font>
+                   </span>
+                </span>
 
 
-            <div layout="row">
-                <md-input-container flex>
-                    <label for="edit-question_{{$index}}">Click here to set your question</label>
+               <md-button class="md-warn" ng-click="ctrl.removeQuestion($event,$index)"
+                          ng-disabled="ctrl.questions.length == 1">Delete
+               </md-button>
+
+               <md-button ng-click="hideDetails = !hideDetails">Details
+               </md-button>
+            </md-toolbar>
+            <br>
+
+            <span ng-hide="hideDetails">
+                <md-input-container layout="row" >
+                    <label for="edit-question_{{$index}}">Question {{$index + 1}}</label>
                     <input type="text" name="editQuestion" id="edit-question_{{$index}}"
                            ng-change="ctrl.checkMCQValid(question.text)"
                            ng-model="question.text"
                            placeholer="Click here to set your question"
-
-                    />
-
-                </md-input-container>
-            </div>
-
-            <md-input-container>
-                <md-button type="button" class="md-raised md-primary" id="addOptions"
-                           ng-click="ctrl.addOption(question)">Add option
-                </md-button>
-            </md-input-container>
-
-            <!--<p ng-show="!ctrl.isMcqValid"><font color="red">*One of the option must be an answer.</font></p>-->
-
-            <!--answer options-->
-            <div layout="row" ng-repeat="option in question.options">
-                <!--{{$index}}-->
-                <md-input-container flex>
-                    <label for="q-option_{{$index}}">Click here to set your option</label>
-                    <input type="text" name="editQuestion" id="q-option_{{$index}}"
-                           ng-model="option.text"
-                           placeholer="Options"
-                           ng-change="ctrl.checkOptionValid(option.text)"
                     />
                 </md-input-container>
 
-                <!--todo: required at least one option to be the answer.-->
-                <md-input-container>
-                    <md-button ng-model="question.answers"
-                               ng-class="question.answers.indexOf($index) != -1 ? 'md-raised md-primary' : 'md-raised'"
-                               ng-click="ctrl.toggleOption(question, $index)">Answer
+                <md-input-container layout="row">
+                    <md-button type="button" class="md-raised" id="addOptions"
+                               ng-click="ctrl.addOption(question)">Add option
                     </md-button>
+                    <p ng-show="question.answers.length == 0 || question.answers == undefined">
+                        <font color="red" size="2">You must select one or more options as answer(s).</font>
+                    </p>
                 </md-input-container>
 
-                <md-input-container>
-                    <md-button class="md-raised" ng-click="ctrl.removeOption(question,$index)"
-                               ng-disabled="question.options.length == 1">Delete option
-                    </md-button>
-                </md-input-container>
-            </div>
+                <!--answer options-->
+                <span layout="row" ng-repeat="option in question.options">
+                    <md-input-container flex>
+                        <label for="q-option_{{$index}}">Answer option {{$index + 1}}</label>
+                        <input type="text" name="editQuestion" id="q-option_{{$index}}"
+                               ng-model="option.text"
+                               placeholer="Options"
+                               ng-change="ctrl.checkOptionValid(option.text)"
+                        />
+                    </md-input-container>
+
+                    <md-input-container>
+                        <md-button ng-model="question.answers"
+                                   ng-class="question.answers.indexOf($index) != -1 ? 'md-raised md-primary' : 'md-raised'"
+                                   ng-click="ctrl.toggleOption(question, $index)">Answer
+                        </md-button>
+
+                        <md-button class="md-accent" ng-click="ctrl.removeOption(question,$index)"
+                                   ng-disabled="question.options.length == 1">Delete
+                        </md-button>
+                    </md-input-container>
+                </span>
+            </span>
 
         </div>
 
