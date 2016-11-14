@@ -1556,8 +1556,8 @@ function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNav
             // console.log("clicked clmdataa: ", initialData.event);
 
             clmSurvey.set(initialData.event.$id, initialData.event, task, tasktype, isOpen);
-            var obj = clmSurvey.get();
-            location = '/challenges/survey';
+            // var obj = clmSurvey.get();
+            location = '/challenges/survey/' + initialData.event.title +'/' + initialData.event.$id + '/' + JSON.stringify(task);
 
             return 'Continue';
 
@@ -1655,7 +1655,7 @@ function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNav
                 event: event,
                 task: task
             };
-            // console.log('Data shows... ', data);
+
             spfNavBarService.update(
                 'Challenge Details', [{
                     title: 'Events',
@@ -1671,7 +1671,7 @@ function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNav
             eventService.set(data);
             $location.path(location);
         } else {
-            console.log("this copy issss:", copy);
+
             clmDataStore.events.addTask(event.$id, copy, isOpen).then(function () {
                 spfAlert.success('Challenge created.');
                 $location.path(urlFor('editEvent', {eventId: self.event.$id}));
@@ -3629,13 +3629,9 @@ ClmEventTableCtrl.$inject = [
     '$routeParams'
 ];
 
-//TODO: include the event to load initial data into surveyformfillctrl
 function addSurveyEventTaskCtrlInitialData($q, $route, firebaseApp, $firebaseArray, spfAuthData, clmDataStore) {
-    //TODO: load and assign initial data for the survey form
-    // var eventId = $route.current.params.eventId
-    // var eventPromise = clmDataStore.events.get(eventId);
+
     var db = firebaseApp.database();
-    // console.log("this firebaseapp database is", db);
     var errNoEvent = new Error('Event not found');
     var eventId = $route.current.params.eventId;
 
@@ -3707,7 +3703,6 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
     this.pagerOpts = clmPagerOption();
 
     var self = this;
-
 
     this.questions = initialData.survey2;
     this.ratingOptions = [

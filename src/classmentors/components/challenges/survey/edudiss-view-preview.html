@@ -1,10 +1,10 @@
 <md-content flex class="md-padding">
     <form name="surveyForm"
-          ng-submit="ctrl.submitEduDissResponse(ctrl.eduDissResp, ctrl.selectedFamily, ctrl.selectedRaceEthnicity)">
+          ng-submit="">
         <div>
-            <h1>Education vs Dissatisfaction with learning</h1>
+            <h1>Preview: Education vs Dissatisfaction with learning</h1>
         </div>
-
+        <md-button type="button" class="md-raised md-primary" ng-click="ctrl.back()">Back</md-button>
 
         <table ng-repeat="(key, value) in ctrl.questions[0]" width="100%">
             <tr>
@@ -20,7 +20,6 @@
                 </td>
             </tr>
 
-            <!--to generate questions-->
             <tr ng-if="key2 != 'title'" ng-repeat="(key2, value2) in value"
                 ng-class="'index-' + $index + ' ' + ($odd ? 'odd' : 'even')" style="height:50px">
                 <td style="width:800px">
@@ -40,18 +39,33 @@
                     <div ng-if="key == '6'">
                         <div ng-if="key2 == '1'">
                             <input placeholder="State a valid age" ng-model="$parent.$parent.age" type="number" min="3"
-                                   style="width: 30%" ng-change="ctrl.eduDissResp[value.title][key2] = age" required /> years old
+                                   style="width: 30%" ng-change="ctrl.eduDissResp[value.title][key2] = age" required/>
+                            years old
                         </div>
                         <div ng-if="key2 == '2'">
                             <table width="100%">
                                 <tr>
-                                    <td ng-repeat="family in ctrl.familyMembers track by $index">
-                                        <md-checkbox value="{{family.name}}"
-                                                     ng-click="ctrl.toggle(family, ctrl.selectedFamily)"
-                                                     ng-checked="ctrl.exists(family, ctrl.selectedFamily)" required>
-                                            {{family.name}}
-                                        </md-checkbox>
-                                    </td>
+                                    <!--<td ng-repeat="family in ctrl.familyMembers track by $index">-->
+                                    <md-checkbox>
+                                        Father
+                                    </md-checkbox>
+                                    <md-checkbox>
+                                        Mother
+                                    </md-checkbox>
+                                    <md-checkbox>
+                                        Sister(s)
+                                    </md-checkbox>
+                                    <md-checkbox>
+                                        Brother(s)
+                                    </md-checkbox>
+                                    <md-checkbox>
+                                        Relative(s)
+                                    </md-checkbox>
+                                    <md-checkbox>
+                                        Grandparent(s)
+                                    </md-checkbox>
+
+                                    <!--</td>-->
                                 </tr>
                             </table>
                         </div>
@@ -73,21 +87,17 @@
                         <div ng-if="key2 == '5'">
                             <table width="100%">
                                 <tr>
-                                    <td ng-if="ethnic.firstRow" ng-repeat="ethnic in ctrl.ethnicity track by $index">
-                                        <md-checkbox ng-click="ctrl.toggle(ethnic, ctrl.selectedRaceEthnicity)"
-                                                     ng-checked="ctrl.exists(ethnic, ctrl.selectedRaceEthnicity)"
-                                                     value="{{ethnic.firstRow}}">
-                                            {{ethnic.firstRow}}
-                                        </md-checkbox>
+                                    <td>
+                                        <md-checkbox>White</md-checkbox>
+                                        <md-checkbox>African American</md-checkbox>
+                                        <md-checkbox>Hispanic/Latino</md-checkbox>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td ng-if="ethnic.secondRow" ng-repeat="ethnic in ctrl.ethnicity track by $index">
-                                        <md-checkbox ng-click="ctrl.toggle(ethnic, ctrl.selectedRaceEthnicity)"
-                                                     ng-checked="ctrl.exists(ethnic, ctrl.selectedRaceEthnicity)"
-                                                     value="{{ethnic.secondRow}}">
-                                            {{ethnic.secondRow}}
-                                        </md-checkbox>
+                                    <td>
+                                        <md-checkbox>Asian</md-checkbox>
+                                        <md-checkbox>Native Hawaii/Pacific Islander</md-checkbox>
+                                        <md-checkbox>Other</md-checkbox>
                                     </td>
                                 </tr>
                             </table>
@@ -100,7 +110,7 @@
                         <div ng-if="key2 == '7'">
                             <input type="text" placeholder="State a valid language"
                                    ng-model="$parent.$parent.spokenLanguage"
-                                   ng-change="ctrl.eduDissResp[value.title][key2] = spokenLanguage" required />
+                                   ng-change="ctrl.eduDissResp[value.title][key2] = spokenLanguage" required/>
                             for multiple languages, separate by a comma (,)
                         </div>
 
@@ -113,14 +123,7 @@
         </table>
 
         <br>
-        <div align="center">
-            <md-button ng-disabled="surveyForm.$invalid || ctrl.selectedRaceEthnicity.length == 0 || ctrl.selectedFamily.length == 0" type="submit" class="md-raised md-primary"
-                       style="width: 150px;">Submit
-            </md-button>
-            <md-button ng-click="ctrl.backToChallenge()" class="md-accent" style="width: 150px;">
-                Discard
-            </md-button>
-        </div>
+        <md-button type="button" class="md-raised md-primary" ng-click="ctrl.back()">Back</md-button>
 
     </form>
 </md-content>

@@ -1,0 +1,42 @@
+<md-content flex class="md-padding">
+    <form name="surveyForm" ng-submit="">
+        <div>
+            <h1>Preview: Motivated Strategies for Learning</h1>
+        </div>
+        <div>
+            <h3>Please respond to the questions below using the following scale:</h3>
+        </div>
+        <div><b>1= not at all true of me</b></div>
+        <div><b>7=very true of me</b></div>
+        <md-button type="button" class="md-raised md-primary" ng-click="ctrl.back()">Back</md-button>
+        <br>
+        <hr style="background: #808080; border: 0; height: 3px"/>
+        <br>
+        <md-input container flex>
+
+            <table ng-repeat="question in ctrl.questionsArr" width="100%">
+                <tr ng-class="'index-' + $index + ' ' + ($odd ? 'odd' : 'even')" style="height: 50px">
+                    <td style="width:50px">
+                        {{question.qnid}}.
+                    </td>
+                    <td style="width:700px">
+                        {{question.name}}
+                    </td>
+                    <td align="right">
+                        <md-radio-group layout="row" ng-model="ans" ng-change="ctrl.motiResp[question.qnid] = ans"
+                                        required>
+                            <div ng-repeat="ratingOption in ctrl.ratingOptions">
+                                <md-radio-button style="margin-right:60px" class="md-primary"
+                                                 ng-value="ratingOption.id">
+                                    {{ratingOption.id}}
+                                </md-radio-button>
+                            </div>
+                        </md-radio-group>
+                    </td>
+                </tr>
+            </table>
+            <md-button type="button" class="md-raised md-primary" ng-click="ctrl.back()">Back</md-button>
+        </md-input>
+    </form>
+
+</md-content>
