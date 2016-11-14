@@ -3629,13 +3629,9 @@ ClmEventTableCtrl.$inject = [
     '$routeParams'
 ];
 
-//TODO: include the event to load initial data into surveyformfillctrl
 function addSurveyEventTaskCtrlInitialData($q, $route, firebaseApp, $firebaseArray, spfAuthData, clmDataStore) {
-    //TODO: load and assign initial data for the survey form
-    // var eventId = $route.current.params.eventId
-    // var eventPromise = clmDataStore.events.get(eventId);
+
     var db = firebaseApp.database();
-    // console.log("this firebaseapp database is", db);
     var errNoEvent = new Error('Event not found');
     var eventId = $route.current.params.eventId;
 
@@ -3707,7 +3703,6 @@ function SurveyFormFillCtrl(spfNavBarService, $location, urlFor, initialData, $r
     this.pagerOpts = clmPagerOption();
 
     var self = this;
-
 
     this.questions = initialData.survey2;
     this.ratingOptions = [
