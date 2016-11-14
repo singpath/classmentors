@@ -1556,8 +1556,8 @@ function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNav
             // console.log("clicked clmdataa: ", initialData.event);
 
             clmSurvey.set(initialData.event.$id, initialData.event, task, tasktype, isOpen);
-            var obj = clmSurvey.get();
-            location = '/challenges/survey';
+            // var obj = clmSurvey.get();
+            location = '/challenges/survey/' + initialData.event.title +'/' + initialData.event.$id + '/' + JSON.stringify(task);
 
             return 'Continue';
 
