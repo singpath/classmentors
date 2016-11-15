@@ -146,21 +146,21 @@
                                        ng-click="ctrl.promptForTextResponse(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant, ctrl.currentUserSolutions)"
                                        ng-disabled="task.closedAt"
                                        aria-label="Cooperative Text Response"
-                            >Submit Cooperative Response
+                            >Submit Response
                             </md-button>
 
                             <md-button class="md-raised md-primary" ng-if="task.type == 'code'"
                                        ng-click="ctrl.promptForCodeResponse(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant, ctrl.currentUserSolutions)"
                                        ng-disabled="task.closedAt"
                                        aria-label="Cooperative Code Challenge"
-                            >Submit Cooperative Code
+                            >Submit Code
                             </md-button>
 
                             <md-button class="md-raised md-primary" ng-if="task.type == 'linkPattern'"
                                        ng-click="ctrl.promptForLink(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant, ctrl.currentUserSolutions)"
                                        ng-disabled="task.closedAt"
                                        aria-label="Cooperative Link Pattern"
-                            >Submit Cooperative Link
+                            >Submit Link
                             </md-button>
 
                         </span>
