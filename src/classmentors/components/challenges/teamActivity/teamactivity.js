@@ -476,7 +476,7 @@ function startTRATInitialData($q, spfAuthData, eventService, clmDataStore, fireb
     var data = eventService.get();
     var db = firebaseApp.database();
 
-    // console.log("my data is:", data);
+    console.log("my data is:", data);
     var eventId = $route.current.params.eventId;
     var taskId = $route.current.params.taskId;
 
@@ -489,6 +489,8 @@ function startTRATInitialData($q, spfAuthData, eventService, clmDataStore, fireb
     var eventTeamRef = db.ref(`classMentors/eventTeams/${eventId}/${teamFormationRefKey}`);
 
     return $q.all({
+        task: data.task,
+        event: clmDataStore.events.get(eventId),
         currentUser: spfAuthData.user(),
         correctAnswers: clmDataStore.events.getTaskAnswers(data.eventId, data.task.taskFrom)
             .then(function (data) {
@@ -536,10 +538,10 @@ function startTRATInitialData($q, spfAuthData, eventService, clmDataStore, fireb
 startTRATInitialData.$inject = ['$q', 'spfAuthData', 'eventService', 'clmDataStore', 'firebaseApp', '$firebaseObject', '$firebaseArray', '$route'];
 
 function startTRATController($q, initialData, clmDataStore, $location, urlFor,
-                             firebaseApp, $firebaseObject, $firebaseArray, spfAlert) {
+                             firebaseApp, $firebaseObject, $firebaseArray, spfAlert,spfNavBarService) {
 
     // Sanity check
-    console.log('Initial data contains: ', initialData);
+    console.log('Initial dataaaaa contains: ', initialData);
     var self = this;
     var db = firebaseApp.database();
     self.index = 0;
@@ -558,12 +560,23 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
         self.team = result;
     });
 
+    spfNavBarService.update(
+        initialData.task.title, [{
+            title: 'Events',
+            url: `#${urlFor('events')}`
+        }, {
+            title: initialData.event.title,// modify initialdata
+            url: `#${urlFor('oneEvent', {eventId: initialData.eventId})}`
+        }]
+    );
+
     self.tratId = initialData.tratId;
     self.teamFormId = initialData.teamFormId;
     var userAnswers = [];
     self.multiAns = [];
     self.correctAnswers = angular.fromJson(initialData.correctAnswers);
     var teamLogRef = db.ref(`classMentors/eventTeamsLog/${self.teamFormId}/${self.teamId}`);
+
     self.multipleAns = (function () {
         var multipleAnsArray = [];
         for (var i = 0; i < self.correctAnswers.length; i++) {
@@ -886,7 +899,8 @@ startTRATController.$inject = [
     'firebaseApp',
     '$firebaseObject',
     '$firebaseArray',
-    'spfAlert'
+    'spfAlert',
+    'spfNavBarService'
 ];
 
 
