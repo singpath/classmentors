@@ -1081,7 +1081,7 @@ export function clmDataStoreFactory(
 
           return ref.transaction(function(team){
             for(var member in team){
-              if(member != 'maxSize' && member != 'currentSize'){
+              if(member != 'maxSize' && member != 'currentSize' && member!='teamLeader'){
                 currentSize++;
               }
             }

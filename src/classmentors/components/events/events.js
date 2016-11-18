@@ -2902,13 +2902,15 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             self.selectedTeam = undefined;
             self.userInCurrentTeam = undefined;
 
-            self.teams = {};
+            // self.teams = {};
             self.initialDataStore = initialData.teams;
 
-            //assign the current team that the user is in to a variable
+            //assign self.teams to initialdata to be displayed
+            self.teams = self.initialDataStore;
+
+            //assign the current team that the user is in, to a variable
             for (var item in self.initialDataStore) {
                 if (item.charAt(0) != '$' && item != 'forEach') {
-                    self.teams[item] = self.initialDataStore[item];
                     //check if participant is inside one of the teams initially
                     if (JSON.stringify(self.teams[item]).indexOf(participant.$id) > -1) {
                         self.userInCurrentTeam = item;
@@ -2924,13 +2926,14 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                     //remove user
                     clmDataStore.events.leaveTeam(eventId, taskId, teamId, participant.$id);
                     //update current size
-                    clmDataStore.events.setCurrentSize(eventId, taskId, teamId, participant.$id, participant.user);
+                    clmDataStore.events.setCurrentSize(eventId, taskId, teamId, participant.$id, participant.user).then(function () {
+                        clmDataStore.events.deleteUserSolution(eventId, participant.$id, taskId);
+                    });
                     self.selectedTeam = undefined;
                     self.userInCurrentTeam = undefined;
                 }
 
             };
-
 
             self.teamChange = function (nextSelectedTeamId) {
 
@@ -2961,6 +2964,10 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                             }
                         ).then(function () {
                             clmDataStore.events.submitSolution(eventId, taskId, participant.$id, "Team " + (userIndex + 1));
+                        }).then(function () {
+                            clmDataStore.events.getEventTaskTeams(eventId, taskId).then(function (result) {
+                                self.teams = result;
+                            })
                         })
 
                     });
@@ -2980,7 +2987,6 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
 
                     var taskTeam = clmDataStore.events.getEventTaskTeamsArr(eventId, taskId).then(function (team) {
 
-
                         for (var i = 0; i < team.length; i++) {
                             if (team[i][participant.$id]) {
                                 userIndex = i;
@@ -2997,12 +3003,16 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                             }
                         ).then(function () {
                             clmDataStore.events.submitSolution(eventId, taskId, participant.$id, "Team " + (userIndex + 1));
+                        }).then(function () {
+                            clmDataStore.events.getEventTaskTeams(eventId, taskId).then(function (result) {
+                                self.teams = result;
+                            })
                         })
 
                     });
                 }
 
-                //finally, checks the team formation again to see if there are any inconsistency
+                //finally, refresh the current team size again to ensure no inconsistency within the data
                 clmDataStore.events.setCurrentSize(eventId, taskId, self.userInCurrentTeam, participant.$id, participant.user);
                 clmDataStore.events.setCurrentSize(eventId, taskId, nextSelectedTeamId, participant.$id, participant.user);
 
@@ -3162,7 +3172,6 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         var teamTaskFrom = selectedTask.teamFormationRef;
         //get all the teams that belong to this event
         var teamFromEvent = allTeamsByEvent[teamTaskFrom];
-        // console.log("teamFromEvent is: ", teamFromEvent);
         //create arrays to store users who has completed task and total number of users in a team
         var completedUsers = 0;
         var usersInTeam = 0;
@@ -3201,8 +3210,6 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             status = [];
         }
         self.coopTeam[teamTaskFrom] = teamFromEvent;
-        // console.log("self team id is: ", self.teamId);
-        // console.log("self coopteam is : ", self.coopTeam);
 
         // for (var team in self.coopTeam[teamTaskFrom]) {
         //     if (JSON.stringify(self.coopTeam[teamTaskFrom][team]).indexOf(participantId) > -1) {
