@@ -983,7 +983,7 @@ export function clmDataStoreFactory(
 
         return loaded($firebaseObject(ref));
       },
-      
+
       deleteUserSolution: function (eventId, publicId, taskId) {
         var ref = db.ref(`classMentors/eventSolutions/${eventId}/${publicId}/${taskId}`);
 
@@ -1101,6 +1101,12 @@ export function clmDataStoreFactory(
             participantToRemove.remove();
           }
         })
+
+      },
+
+      leaveTeam: function(eventId, taskId, currentTeamId, participantId){
+        var participantToRemove = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${currentTeamId}/${participantId}`);
+        participantToRemove.remove();
 
       },
 
@@ -1871,7 +1877,7 @@ export function clmDataStoreFactory(
         }
 
       },
-      
+
       getTeams: function (eventId, taskId) {
         var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}`);
         return loaded($firebaseArray(ref));

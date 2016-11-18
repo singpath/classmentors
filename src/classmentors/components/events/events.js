@@ -2887,20 +2887,6 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                 teams: clmDataStore.events.getEventTaskTeams(eventId, taskId).then(function (result) {
                     return result;
                 })
-                // selectedTeam: teamEventPromise.$loaded().then(function (result) {
-                //     // console.log(result);
-                //     var teams = result;
-                //     for (var i = 0; i < teams.length; i++) {
-                //         var team = teams[i];
-                //         // If participant's public Id can be found, return team index.
-                //         // console.log('Team: ', team);
-                //         // console.log('Participant id: ', participant.$id);
-                //         if (team[participant.$id]) {
-                //             return i;
-                //         }
-                //     }
-                //     return undefined;
-                // })
             });
         };
 
@@ -2916,15 +2902,15 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             self.selectedTeam = undefined;
             self.userInCurrentTeam = undefined;
 
-            self.teams[taskId] = {};
+            self.teams = {};
             self.initialDataStore = initialData.teams;
 
             //assign the current team that the user is in to a variable
             for (var item in self.initialDataStore) {
                 if (item.charAt(0) != '$' && item != 'forEach') {
-                    self.teams[taskId][item] = self.initialDataStore[item];
+                    self.teams[item] = self.initialDataStore[item];
                     //check if participant is inside one of the teams initially
-                    if (JSON.stringify(self.teams[taskId][item]).indexOf(participant.$id) > -1) {
+                    if (JSON.stringify(self.teams[item]).indexOf(participant.$id) > -1) {
                         self.userInCurrentTeam = item;
                     }
                 }
@@ -2933,23 +2919,16 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             //ensure that radio button is checked if user clicks on one of the teams
             self.selectedTeam = self.userInCurrentTeam;
 
-            //Todo: remove previous selected team
-            var previousSelectedTeam = undefined;
-            var index2 = undefined;
-            for (var i = 0; i < self.teams.length; i++) {
-                if (self.teams[i][participant.$id]) {
-                    index2 = i;
-                    break;
-                }
-            }
-            //todo: modify leave team
-            self.leave = function (index) {
-                console.log("leave index is:", index);
-                db.ref(`classMentors/eventSolutions/${eventId}/${participant.$id}/${taskId}`).remove().then(function () {
-                    leaveTeam(index);
+            self.leave = function (teamId) {
+                if (typeof teamId != 'undefined') {
+                    //remove user
+                    clmDataStore.events.leaveTeam(eventId, taskId, teamId, participant.$id);
+                    //update current size
+                    clmDataStore.events.setCurrentSize(eventId, taskId, teamId, participant.$id, participant.user);
                     self.selectedTeam = undefined;
-                    previousSelectedTeam = undefined;
-                });
+                    self.userInCurrentTeam = undefined;
+                }
+
             };
 
 
@@ -2966,11 +2945,10 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
 
                     var taskTeam = clmDataStore.events.getEventTaskTeamsArr(eventId, taskId).then(function (team) {
 
-                        for(var i = 0; i < team.length; i++){
-                            if(team[i][participant.$id]){
+                        for (var i = 0; i < team.length; i++) {
+                            if (team[i][participant.$id]) {
                                 userIndex = i;
                             }
-
                         }
 
                         clmDataStore.logging.inputLog(
@@ -2981,12 +2959,11 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                                 timestamp: Date.now(),
                                 taskId: taskId
                             }
-                        ).then(function(){
+                        ).then(function () {
                             clmDataStore.events.submitSolution(eventId, taskId, participant.$id, "Team " + (userIndex + 1));
                         })
 
                     });
-
 
                 } else if (typeof self.userInCurrentTeam != 'undefined') {
                     //if user has previously joined a team
@@ -2994,7 +2971,6 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                     clmDataStore.events.removeUser(eventId, taskId, self.userInCurrentTeam, participant.$id, nextSelectedTeamId);
                     //update current size
                     clmDataStore.events.setCurrentSize(eventId, taskId, self.userInCurrentTeam, participant.$id, participant.user);
-
 
                     //join another team
                     clmDataStore.events.joinTeam(eventId, taskId, nextSelectedTeamId, participant.$id, participant.user);
@@ -3004,11 +2980,11 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
 
                     var taskTeam = clmDataStore.events.getEventTaskTeamsArr(eventId, taskId).then(function (team) {
 
-                        for(var i = 0; i < team.length; i++){
-                            if(team[i][participant.$id]){
+
+                        for (var i = 0; i < team.length; i++) {
+                            if (team[i][participant.$id]) {
                                 userIndex = i;
                             }
-
                         }
 
                         clmDataStore.logging.inputLog(
@@ -3019,15 +2995,19 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                                 timestamp: Date.now(),
                                 taskId: taskId
                             }
-                        ).then(function(){
+                        ).then(function () {
                             clmDataStore.events.submitSolution(eventId, taskId, participant.$id, "Team " + (userIndex + 1));
                         })
 
                     });
                 }
 
+                //finally, checks the team formation again to see if there are any inconsistency
+                clmDataStore.events.setCurrentSize(eventId, taskId, self.userInCurrentTeam, participant.$id, participant.user);
+                clmDataStore.events.setCurrentSize(eventId, taskId, nextSelectedTeamId, participant.$id, participant.user);
 
             }
+
 
             // self.onChange = function (index) {
             //     // If user has not joined any team before
