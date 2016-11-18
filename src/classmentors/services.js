@@ -1080,13 +1080,17 @@ export function clmDataStoreFactory(
         var currentSize = 0;
 
           return ref.transaction(function(team){
+
             for(var member in team){
               if(member != 'maxSize' && member != 'currentSize' && member!='teamLeader'){
                 currentSize++;
               }
             }
-
-            team.currentSize = currentSize;
+            if(currentSize <= team.maxSize){
+                team.currentSize = currentSize;
+            }else{
+                team.currentSize = team.maxSize;
+            }
             return team;
 
           });

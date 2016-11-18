@@ -2954,6 +2954,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                             }
                         }
 
+
                         clmDataStore.logging.inputLog(
                             {
                                 action: "formTeam",
@@ -2966,6 +2967,28 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                             clmDataStore.events.submitSolution(eventId, taskId, participant.$id, "Team " + (userIndex + 1));
                         }).then(function () {
                             clmDataStore.events.getEventTaskTeams(eventId, taskId).then(function (result) {
+                                var insideTeam = false;
+                                for (var team in result) {
+                                    if (team.charAt(0) != '$') {
+                                        for (var member in result[team]) {
+                                            if (member == participant.$id) {
+                                                insideTeam = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    if (insideTeam) {
+                                        break;
+                                    }
+                                }
+
+                                if (!insideTeam) {
+                                    self.selectedTeam = undefined;
+                                    self.userInCurrentTeam = undefined;
+                                    clmDataStore.events.deleteUserSolution(eventId, participant.$id, taskId).then(function(){
+                                        spfAlert.error('Oops! Seems like you have a conflict with another user. Please try again!');
+                                    });
+                                }
                                 self.teams = result;
                             })
                         })
@@ -2975,6 +2998,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                 } else if (typeof self.userInCurrentTeam != 'undefined') {
                     //if user has previously joined a team
                     //remove user
+
                     clmDataStore.events.removeUser(eventId, taskId, self.userInCurrentTeam, participant.$id, nextSelectedTeamId);
                     //update current size
                     clmDataStore.events.setCurrentSize(eventId, taskId, self.userInCurrentTeam, participant.$id, participant.user);
@@ -3005,6 +3029,28 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                             clmDataStore.events.submitSolution(eventId, taskId, participant.$id, "Team " + (userIndex + 1));
                         }).then(function () {
                             clmDataStore.events.getEventTaskTeams(eventId, taskId).then(function (result) {
+                                var insideTeam = false;
+                                for (var team in result) {
+                                    if (team.charAt(0) != '$') {
+                                        for (var member in result[team]) {
+                                            if (member == participant.$id) {
+                                                insideTeam = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    if (insideTeam) {
+                                        break;
+                                    }
+                                }
+
+                                if (!insideTeam) {
+                                    self.selectedTeam = undefined;
+                                    self.userInCurrentTeam = undefined;
+                                    clmDataStore.events.deleteUserSolution(eventId, participant.$id, taskId).then(function(){
+                                        spfAlert.error('Oops! Seems like you have a conflict with another user. Please try again!');
+                                    });
+                                }
                                 self.teams = result;
                             })
                         })
@@ -3012,9 +3058,21 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                     });
                 }
 
+                var userInsideTeam = false;
                 //finally, refresh the current team size again to ensure no inconsistency within the data
-                clmDataStore.events.setCurrentSize(eventId, taskId, self.userInCurrentTeam, participant.$id, participant.user);
-                clmDataStore.events.setCurrentSize(eventId, taskId, nextSelectedTeamId, participant.$id, participant.user);
+                var taskTeam = clmDataStore.events.getEventTaskTeamsArr(eventId, taskId).then(function (team) {
+                    for (var i = 0; i < team.length; i++) {
+                        if (team[i][participant.$id]) {
+                            userInsideTeam = true;
+                            break;
+                        }
+                    }
+
+                    console.log("userinsideteam? ", userInsideTeam);
+
+                })
+                // clmDataStore.events.setCurrentSize(eventId, taskId, self.userInCurrentTeam, participant.$id, participant.user);
+                // clmDataStore.events.setCurrentSize(eventId, taskId, nextSelectedTeamId, participant.$id, participant.user);
 
             }
 
