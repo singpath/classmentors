@@ -1062,15 +1062,46 @@ export function clmDataStoreFactory(
 
       joinTeam: function(eventId, taskId, teamId, participantId, user) {
 
-        // console.log("jointeam user iss:", user);
-        var currentSize;
         var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${teamId}`);
 
-        return ref.transaction(function(team) {
-          team[participantId] = user;
-          team.currentSize = team.currentSize += 1;
-          return team;
-        });
+          return ref.transaction(function(team) {
+
+            if(team.currentSize+1 <= team.maxSize && team.currentSize >= 0){
+              team[participantId] = user;
+              team[participantId].joinedAt = {'.sv': 'timestamp'};
+              return team;
+            }
+          });
+
+      },
+
+      setCurrentSize: function(eventId, taskId, teamId, participantId, user){
+        var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${teamId}`);
+        var currentSize = 0;
+
+          return ref.transaction(function(team){
+            for(var member in team){
+              if(member != 'maxSize' && member != 'currentSize'){
+                currentSize++;
+              }
+            }
+
+            team.currentSize = currentSize;
+            return team;
+
+          });
+      },
+
+      removeUser: function(eventId, taskId, currentTeamId, participantId, nextSelectedTeamId){
+        var participantToRemove = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${currentTeamId}/${participantId}`);
+        var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}/${nextSelectedTeamId}`);
+
+        ref.transaction(function(team){
+          if(team.currentSize+1 <= team.maxSize && team.currentSize >= 0){
+            participantToRemove.remove();
+          }
+        })
+
       },
 
       getEventTeams: function (eventId){
@@ -1080,8 +1111,18 @@ export function clmDataStoreFactory(
       },
 
       getEventTeamsObj: function (eventId){
-          var ref = db.ref(`classMentors/eventTeams/${eventId}`);
-          return loaded($firebaseObject(ref));
+        var ref = db.ref(`classMentors/eventTeams/${eventId}`);
+        return loaded($firebaseObject(ref));
+      },
+
+      getEventTaskTeams: function(eventId, taskId){
+        var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}`);
+        return loaded($firebaseObject(ref));
+      },
+
+      getEventTaskTeamsArr: function(eventId, taskId){
+        var ref = db.ref(`classMentors/eventTeams/${eventId}/${taskId}`);
+        return loaded($firebaseArray(ref));
       },
 
       openTask: function(eventId, taskId) {
@@ -1089,7 +1130,7 @@ export function clmDataStoreFactory(
         var abort;
 
         return ref.transaction(function(task) {
-          console.log('opentask task iss:', task);
+
           if (!task.closedAt) {
             return abort;
           }
