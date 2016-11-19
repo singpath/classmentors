@@ -1080,19 +1080,20 @@ export function clmDataStoreFactory(
         var currentSize = 0;
 
           return ref.transaction(function(team){
+            if(team != null){
+                for(var member in team){
+                  if(member != 'maxSize' && member != 'currentSize' && member!='teamLeader'){
+                    currentSize++;
+                  }
+                }
 
-            for(var member in team){
-              if(member != 'maxSize' && member != 'currentSize' && member!='teamLeader'){
-                currentSize++;
-              }
+                    if(currentSize <= team.maxSize){
+                        team.currentSize = currentSize;
+                    }else{
+                        team.currentSize = team.maxSize;
+                    }
+                    return team;
             }
-            if(currentSize <= team.maxSize){
-                team.currentSize = currentSize;
-            }else{
-                team.currentSize = team.maxSize;
-            }
-            return team;
-
           });
       },
 

@@ -2921,6 +2921,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             //ensure that radio button is checked if user clicks on one of the teams
             self.selectedTeam = self.userInCurrentTeam;
 
+
             self.leave = function (teamId) {
                 if (typeof teamId != 'undefined') {
                     //remove user
@@ -2935,8 +2936,9 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
 
             };
 
+            self.previousTeam = undefined;
             self.teamChange = function (nextSelectedTeamId) {
-
+                // var previousTeam = self.selectedTeam;
                 var userIndex = 0;
                 //check if user is the first time joining team
                 if (typeof self.userInCurrentTeam == 'undefined') {
@@ -2954,7 +2956,6 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                             }
                         }
 
-
                         clmDataStore.logging.inputLog(
                             {
                                 action: "formTeam",
@@ -2967,28 +2968,117 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                             clmDataStore.events.submitSolution(eventId, taskId, participant.$id, "Team " + (userIndex + 1));
                         }).then(function () {
                             clmDataStore.events.getEventTaskTeams(eventId, taskId).then(function (result) {
+
+                                //perform error checking and assign self.team for display
+                                clmDataStore.events.setCurrentSize(eventId, taskId, self.userInCurrentTeam, participant.$id, participant.user);
+                                clmDataStore.events.setCurrentSize(eventId, taskId, nextSelectedTeamId, participant.$id, participant.user);
+
                                 var insideTeam = false;
+                                var userInTeam = undefined;
+                                var memberNum = 0;
+                                var userEqualCurrentSize = true;
+                                var numOfOccurrence = 0;
                                 for (var team in result) {
-                                    if (team.charAt(0) != '$') {
-                                        for (var member in result[team]) {
-                                            if (member == participant.$id) {
-                                                insideTeam = true;
-                                                break;
+                                    if (team.charAt(0) != '$' && team != 'forEach') {
+                                        //if user can be found inside this team
+                                        if (JSON.stringify(result[team]).indexOf(participant.$id) > -1) {
+                                            numOfOccurrence++;
+                                            for (var member in result[team]) {
+                                                if (member == participant.$id) {
+                                                    insideTeam = true;
+                                                    userInTeam = team;
+                                                }
+
+                                                if (member != 'currentSize' && member != 'maxSize') {
+                                                    //count the number of members within each team
+                                                    memberNum++;
+                                                }
                                             }
+                                            //check for error...if the currentSize is less than the number of members, means it's wrong
+                                            if (memberNum != result[team].currentSize) {
+                                                userEqualCurrentSize = false;
+                                            }
+                                            memberNum = 0;
                                         }
                                     }
-                                    if (insideTeam) {
-                                        break;
-                                    }
+
                                 }
 
+                                //if check finds out that user is not inside any team, remove the user solution
                                 if (!insideTeam) {
                                     self.selectedTeam = undefined;
                                     self.userInCurrentTeam = undefined;
-                                    clmDataStore.events.deleteUserSolution(eventId, participant.$id, taskId).then(function(){
-                                        spfAlert.error('Oops! Seems like you have a conflict with another user. Please try again!');
+                                    clmDataStore.events.deleteUserSolution(eventId, participant.$id, taskId).then(function () {
+                                        spfAlert.error('Oops! Seems like there is a conflict while joining team. Please wait awhile and try again!');
                                     });
+                                } else if (!userEqualCurrentSize || (typeof userInTeam != 'undefined' && userInTeam != nextSelectedTeamId && numOfOccurrence == 1)) {
+                                    //check if user's team is equal to the current size. If not, remove the user and ask him to try again
+                                    //or he is inside a team which he did not select, remove this user
+                                    console.log("user undefined, error 1");
+
+                                    for (var team in result) {
+                                        if (team.charAt(0) != '$' && team != 'forEach') {
+                                            //if user can be found inside this team
+                                            if (JSON.stringify(result[team]).indexOf(participant.$id) > -1) {
+                                                for (var member in result[team]) {
+                                                    if (member == participant.$id) {
+                                                        clmDataStore.events.leaveTeam(eventId, taskId, team, member);
+                                                        clmDataStore.events.setCurrentSize(eventId, taskId, team, member, participant.user);
+                                                        clmDataStore.events.deleteUserSolution(eventId, participant.$id, taskId);
+                                                    }
+
+                                                }
+
+                                            }
+                                        }
+
+                                    }
+
+                                    self.selectedTeam = undefined;
+                                    self.userInCurrentTeam = undefined;
+
+                                    // clmDataStore.events.leaveTeam(eventId, taskId, nextSelectedTeamId, participant.$id);
+                                    // //refresh currentSize
+                                    // clmDataStore.events.setCurrentSize(eventId, taskId, self.previousTeam, participant.$id, participant.user);
+                                    // clmDataStore.events.setCurrentSize(eventId, taskId, nextSelectedTeamId, participant.$id, participant.user);
+                                    //
+                                    // clmDataStore.events.deleteUserSolution(eventId, participant.$id, taskId);
+                                    // self.selectedTeam = undefined;
+                                    // self.userInCurrentTeam = undefined;
+
+                                    spfAlert.error('Oops! Seems like you have a conflict with others while joining team. Please try again!');
+
+                                } else if (numOfOccurrence > 1) {
+                                    //check if user DOES NOT exist in more than 1 team at any point of time. If so, remove the user and ask the user to try again
+                                    //delete every trace of the user in the team
+                                    console.log("user undefined, error 2");
+                                    for (var team in result) {
+                                        if (team.charAt(0) != '$' && team != 'forEach') {
+                                            //if user can be found inside this team
+                                            if (JSON.stringify(result[team]).indexOf(participant.$id) > -1) {
+                                                for (var member in result[team]) {
+                                                    if (member == participant.$id) {
+                                                        clmDataStore.events.leaveTeam(eventId, taskId, team, member);
+                                                        clmDataStore.events.setCurrentSize(eventId, taskId, team, member, participant.user);
+                                                        clmDataStore.events.deleteUserSolution(eventId, participant.$id, taskId);
+                                                    }
+
+                                                }
+
+                                            }
+                                        }
+
+                                    }
+
+                                    self.selectedTeam = undefined;
+                                    self.userInCurrentTeam = undefined;
+
+                                    spfAlert.error('Oops! Seems like you appear in 2 teams while joining team. Please try again!');
+
                                 }
+                                //refresh once more
+                                // clmDataStore.events.setCurrentSize(eventId, taskId, self.userInCurrentTeam, participant.$id, participant.user);
+                                // clmDataStore.events.setCurrentSize(eventId, taskId, nextSelectedTeamId, participant.$id, participant.user);
                                 self.teams = result;
                             })
                         })
@@ -2996,9 +3086,12 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                     });
 
                 } else if (typeof self.userInCurrentTeam != 'undefined') {
+
+                    //store his currentTeam first
+                    self.previousTeam = self.userInCurrentTeam;
+
                     //if user has previously joined a team
                     //remove user
-
                     clmDataStore.events.removeUser(eventId, taskId, self.userInCurrentTeam, participant.$id, nextSelectedTeamId);
                     //update current size
                     clmDataStore.events.setCurrentSize(eventId, taskId, self.userInCurrentTeam, participant.$id, participant.user);
@@ -3029,28 +3122,116 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                             clmDataStore.events.submitSolution(eventId, taskId, participant.$id, "Team " + (userIndex + 1));
                         }).then(function () {
                             clmDataStore.events.getEventTaskTeams(eventId, taskId).then(function (result) {
+                                //perform error checking and assign self.team for display
+                                clmDataStore.events.setCurrentSize(eventId, taskId, self.userInCurrentTeam, participant.$id, participant.user);
+                                clmDataStore.events.setCurrentSize(eventId, taskId, nextSelectedTeamId, participant.$id, participant.user);
                                 var insideTeam = false;
+                                var userInTeam = undefined;
+                                var memberNum = 0;
+                                var userEqualCurrentSize = true;
+                                var numOfOccurrence = 0;
                                 for (var team in result) {
-                                    if (team.charAt(0) != '$') {
-                                        for (var member in result[team]) {
-                                            if (member == participant.$id) {
-                                                insideTeam = true;
-                                                break;
+                                    if (team.charAt(0) != '$' && team != 'forEach') {
+                                        //if user can be found inside this team
+                                        if (JSON.stringify(result[team]).indexOf(participant.$id) > -1) {
+                                            numOfOccurrence++;
+                                            for (var member in result[team]) {
+                                                if (member == participant.$id) {
+                                                    insideTeam = true;
+                                                    userInTeam = team;
+                                                }
+
+                                                if (member != 'currentSize' && member != 'maxSize') {
+                                                    //count the number of members within each team
+                                                    memberNum++;
+                                                }
                                             }
+                                            //check for error...if the currentSize is less than the number of members, means it's wrong
+                                            if (memberNum != result[team].currentSize) {
+                                                userEqualCurrentSize = false;
+                                            }
+                                            memberNum = 0;
                                         }
                                     }
-                                    if (insideTeam) {
-                                        break;
-                                    }
+
                                 }
 
+                                //if check finds out that user is not inside any team, remove the user solution
                                 if (!insideTeam) {
                                     self.selectedTeam = undefined;
                                     self.userInCurrentTeam = undefined;
-                                    clmDataStore.events.deleteUserSolution(eventId, participant.$id, taskId).then(function(){
-                                        spfAlert.error('Oops! Seems like you have a conflict with another user. Please try again!');
+                                    clmDataStore.events.deleteUserSolution(eventId, participant.$id, taskId).then(function () {
+                                        spfAlert.error('Oops! Seems like there is a conflict while joining team. Please wait awhile and try again!');
                                     });
+                                } else if (!userEqualCurrentSize || (typeof userInTeam != 'undefined' && userInTeam != nextSelectedTeamId && numOfOccurrence == 1)) {
+                                    //check if user's team is equal to the current size. If not, remove the user and ask him to try again
+                                    //or he is inside a team which he did not select, remove this user
+                                    console.log("user defined, error 1");
+                                    for (var team in result) {
+                                        if (team.charAt(0) != '$' && team != 'forEach') {
+                                            //if user can be found inside this team
+                                            if (JSON.stringify(result[team]).indexOf(participant.$id) > -1) {
+                                                for (var member in result[team]) {
+                                                    if (member == participant.$id) {
+                                                        clmDataStore.events.leaveTeam(eventId, taskId, team, member);
+                                                        clmDataStore.events.setCurrentSize(eventId, taskId, team, member, participant.user);
+                                                        clmDataStore.events.deleteUserSolution(eventId, participant.$id, taskId);
+                                                    }
+
+                                                }
+
+                                            }
+                                        }
+
+                                    }
+
+                                    self.selectedTeam = undefined;
+                                    self.userInCurrentTeam = undefined;
+
+
+                                    // clmDataStore.events.leaveTeam(eventId, taskId, self.previousTeam, participant.$id);
+                                    // clmDataStore.events.leaveTeam(eventId, taskId, nextSelectedTeamId, participant.$id);
+                                    // //refresh currentSize
+                                    // clmDataStore.events.setCurrentSize(eventId, taskId, self.previousTeam, participant.$id, participant.user);
+                                    // clmDataStore.events.setCurrentSize(eventId, taskId, nextSelectedTeamId, participant.$id, participant.user);
+                                    //
+                                    // clmDataStore.events.deleteUserSolution(eventId, participant.$id, taskId);
+                                    // self.selectedTeam = undefined;
+                                    // self.userInCurrentTeam = undefined;
+
+                                    spfAlert.error('Oops! Seems like you have a conflict with others while joining team. Please try again!');
+
+                                } else if (numOfOccurrence > 1) {
+                                    console.log("user defined, error 2");
+                                    //check if user DOES NOT exist in more than 1 team at any point of time. If so, remove the user and ask the user to try again
+                                    //delete every trace of the user in the team
+                                    for (var team in result) {
+                                        if (team.charAt(0) != '$' && team != 'forEach') {
+                                            //if user can be found inside this team
+                                            if (JSON.stringify(result[team]).indexOf(participant.$id) > -1) {
+                                                for (var member in result[team]) {
+                                                    if (member == participant.$id) {
+                                                        clmDataStore.events.leaveTeam(eventId, taskId, team, member);
+                                                        clmDataStore.events.setCurrentSize(eventId, taskId, team, member, participant.user);
+                                                        clmDataStore.events.deleteUserSolution(eventId, participant.$id, taskId);
+                                                    }
+
+                                                }
+
+                                            }
+                                        }
+
+                                    }
+
+                                    self.selectedTeam = undefined;
+                                    self.userInCurrentTeam = undefined;
+
+                                    spfAlert.error('Oops! Seems like you appear in 2 teams while joining team. Please try again!');
+
                                 }
+                                //refresh once more
+                                // clmDataStore.events.setCurrentSize(eventId, taskId, self.userInCurrentTeam, participant.$id, participant.user);
+                                // clmDataStore.events.setCurrentSize(eventId, taskId, nextSelectedTeamId, participant.$id, participant.user);
                                 self.teams = result;
                             })
                         })
@@ -3058,19 +3239,17 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                     });
                 }
 
-                var userInsideTeam = false;
-                //finally, refresh the current team size again to ensure no inconsistency within the data
-                var taskTeam = clmDataStore.events.getEventTaskTeamsArr(eventId, taskId).then(function (team) {
-                    for (var i = 0; i < team.length; i++) {
-                        if (team[i][participant.$id]) {
-                            userInsideTeam = true;
-                            break;
-                        }
-                    }
-
-                    console.log("userinsideteam? ", userInsideTeam);
-
-                })
+                // var userInsideTeam = false;
+                // //finally, refresh the current team size again to ensure no inconsistency within the data
+                // var taskTeam = clmDataStore.events.getEventTaskTeamsArr(eventId, taskId).then(function (team) {
+                //     for (var i = 0; i < team.length; i++) {
+                //         if (team[i][participant.$id]) {
+                //             userInsideTeam = true;
+                //             break;
+                //         }
+                //     }
+                //
+                // })
                 // clmDataStore.events.setCurrentSize(eventId, taskId, self.userInCurrentTeam, participant.$id, participant.user);
                 // clmDataStore.events.setCurrentSize(eventId, taskId, nextSelectedTeamId, participant.$id, participant.user);
 
