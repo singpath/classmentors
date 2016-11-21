@@ -3000,6 +3000,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                                             }
                                             memberNum = 0;
                                         }
+                                        clmDataStore.events.setCurrentSize(eventId, taskId, team, participant.$id, participant.user);
                                     }
 
                                 }
@@ -3152,6 +3153,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                                             }
                                             memberNum = 0;
                                         }
+                                        clmDataStore.events.setCurrentSize(eventId, taskId, team, participant.$id, participant.user);
                                     }
 
                                 }
