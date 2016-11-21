@@ -476,7 +476,7 @@ function startTRATInitialData($q, spfAuthData, eventService, clmDataStore, fireb
     var data = eventService.get();
     var db = firebaseApp.database();
 
-    console.log("my data is:", data);
+    // console.log("my data is:", data);
     var eventId = $route.current.params.eventId;
     var taskId = $route.current.params.taskId;
 
@@ -538,10 +538,19 @@ function startTRATInitialData($q, spfAuthData, eventService, clmDataStore, fireb
 startTRATInitialData.$inject = ['$q', 'spfAuthData', 'eventService', 'clmDataStore', 'firebaseApp', '$firebaseObject', '$firebaseArray', '$route'];
 
 function startTRATController($q, initialData, clmDataStore, $location, urlFor,
-                             firebaseApp, $firebaseObject, $firebaseArray, spfAlert,spfNavBarService) {
+                             firebaseApp, $firebaseObject, $firebaseArray, spfAlert, $scope,spfNavBarService) {
 
     // Sanity check
-    console.log('Initial dataaaaa contains: ', initialData);
+    var mcqInvalid = true;
+    $scope.$on("$routeChangeStart", function (event, next, current) {
+        if (mcqInvalid) {
+            if (!confirm("You have not complete your multiple choice questions. Are you sure you want to continue? All data will be lost!")) {
+                event.preventDefault();
+            }
+        }
+
+
+    });
     var self = this;
     var db = firebaseApp.database();
     self.index = 0;
@@ -668,7 +677,6 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
             if (result == 0) {
                 self.noOfTries -= 1;
                 updateLog(buildMessage("Question " + (self.index + 1) + ": " + "Incorrect", 'Remaining attempts: ' + self.noOfTries, '#A9241C'));
-                console.log(self.team);
                 // Store reccord
                 attempts.push(tempArray);
                 // console.log('Current attempts: ', attempts);
@@ -709,6 +717,7 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
                 updateLog(buildMessage("Question " + (self.index + 1) + ": " + "Correct!", 'Remaining attempts: ' + self.noOfTries, '#259b24'));
                 attempts.push(tempArray);
                 if (self.index == self.questions.length - 1) {
+                    mcqInvalid = false;
                     userAnswers.push(attempts);
                     attempts = [];
                     $q.all(writeScoreAndProgress(self.team, self.totalScore, userAnswers)).then(function () {
@@ -716,6 +725,7 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
                         $location.path(urlFor('oneEvent', {eventId: self.eventId}));
                     })
                 } else {
+                    mcqInvalid = true;
                     self.noOfTries = 3;
                     userAnswers.push(attempts);
                     attempts = [];
@@ -749,12 +759,14 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
                 if (self.noOfTries == 0) {
                     self.totalScore += 0;
                     if (self.index == self.questions.length - 1) {
+                        mcqInvalid = false;
                         userAnswers.push(attempts);
                         attempts = [];
                         writeScoreAndProgress(self.team, self.totalScore, userAnswers);
                         spfAlert.success('TRAT Submitted');
                         $location.path(urlFor('oneEvent', {eventId: self.eventId}));
                     } else {
+                        mcqInvalid = true;
                         self.noOfTries = 3;
                         userAnswers.push(attempts);
                         attempts = [];
@@ -788,12 +800,14 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
                 self.totalScore += addScore(self.noOfTries, 1);
                 updateLog(buildMessage("Question " + (self.index + 1) + ": " + "Correct!", 'Remaining attempts: ' + self.noOfTries, '#259b24'));
                 if (self.index == self.questions.length - 1) {
+                    mcqInvalid = false;
                     userAnswers.push(attempts);
                     attempts = [];
                     writeScoreAndProgress(self.team, self.totalScore, userAnswers);
                     spfAlert.success('TRAT Submitted');
                     $location.path(urlFor('oneEvent', {eventId: self.eventId}));
                 } else {
+                    mcqInvalid = true;
                     // console.log('Questions : ', self.questions);
                     // console.log('Load next question!');
                     self.noOfTries = 3;
@@ -863,7 +877,6 @@ function startTRATController($q, initialData, clmDataStore, $location, urlFor,
     }
 
     self.toggle = function (list, item) {
-        console.log(list);
         var idx = list.indexOf(item);
         if (idx > -1) {
             list.splice(idx, 1);
@@ -900,6 +913,7 @@ startTRATController.$inject = [
     '$firebaseObject',
     '$firebaseArray',
     'spfAlert',
+    '$scope',
     'spfNavBarService'
 ];
 
