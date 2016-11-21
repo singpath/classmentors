@@ -3695,8 +3695,55 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             orderedIncompleteParticipants.sort(function (a, b) {
                 return a.challengesCompleted - b.challengesCompleted
             });
-            console.log(orderedIncompleteParticipants);
+            // console.log(orderedIncompleteParticipants);
             var mentee = orderedIncompleteParticipants[0];
+        } else if (assignmentMethod == 'roulette') {
+            var valIncompleteParticipants = incompleteParticipants.map(function (p) {
+                return {
+                    publicId: p.publicId,
+                    displayName: p.displayName,
+                    completed: p.completed,
+                    challengesCompleted: self.solutions[p.publicId] ? Object.keys(self.solutions[p.publicId]).length : 0
+                };
+            });
+
+            let totalCompleteChals = valIncompleteParticipants.reduce(function (a, b) {
+                return a.challengesCompleted + b.challengesCompleted;
+            });
+
+            var divisor = weightedIncompleteParticipants.length - 1;
+
+            var weightedIncompleteParticipants = valIncompleteParticipants.map(function (p) {
+                return {
+                    publicId: p.publicId,
+                    displayName: p.displayName,
+                    completed: p.completed,
+                    challengesCompleted: p.challengesCompleted,
+                    fitness: ((totalCompleteChals - p.challengesCompleted) / divisor) / totalCompleteChals
+                };
+            });
+
+            var normalisedObj = {};
+            var runningCount = 0;
+            for (let entryIndex in weightedIncompleteParticipants) {
+                let entry = weightedIncompleteParticipants[entryIndex];
+                runningCount += entry.fitness;
+                normalisedObj[runningCount] = entry;
+            }
+
+            var assignedMentee = weightedIncompleteParticipants[findRangeKey(normalisedObj, Math.random())];
+
+            function findRangeKey(normalisedObj, rand) {
+                var prev = -1;
+                var i;
+                for (i in normalisedObj) {
+                    var n = parseInt(i);
+                    if ((prev != -1) && (rand < n))
+                        return prev;
+                    else
+                        prev = n;
+                }
+            }
         }
 
         // Write pairing as solution to assignment challenge for both mentor and mentee
