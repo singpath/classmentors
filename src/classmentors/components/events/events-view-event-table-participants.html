@@ -57,7 +57,7 @@
                 <td ng-repeat="task in ctrl.visibleTasks track by task.$id">
                     <div ng-if="task.mcqQuestions && !task.teamFormationMethod">
                         <span ng-if="ctrl.currentUserSolutions[task.$id]">
-                            Completed <span ng-if="!ctrl.currentUserProgress[task.$id].completed"></span>
+                            Completed<span ng-if="!ctrl.currentUserProgress[task.$id].completed"></span>
                         </span>
 
                         <!--added one more contraint to change the button to Start IRAT-->
@@ -180,7 +180,7 @@
                              </label>
                         </span>
                         <span ng-if="ctrl.currentUserSolutions[task.$id] && !task.formationPattern && task.type == 'indexCards'">
-                            Completed <span ng-if="!ctrl.currentUserProgress[task.$id].completed"></span>
+                            Completed<span ng-if="!ctrl.currentUserProgress[task.$id].completed"></span>
                         </span>
                         <span ng-if="ctrl.currentUserSolutions[task.$id] && !task.formationPattern && task.type == 'linkPattern'">
                             Completed
@@ -217,7 +217,7 @@
 
                     <div ng-if="task.serviceId && !task.teamFormationMethod">
                             <span ng-if="ctrl.currentUserSolutions[task.$id]">
-                                Completed <span ng-if="!ctrl.currentUserProgress[task.$id].completed"></span>
+                                Completed<span ng-if="!ctrl.currentUserProgress[task.$id].completed"></span>
                             </span>
 
                         <span ng-if="!ctrl.currentUserSolutions[task.$id]">
@@ -386,15 +386,8 @@
 
                     <div ng-if="task.toEdit && !task.teamFormationMethod">
                         <div ng-if="ctrl.profile.user.school">
-                            <!--{{ctrl.profile.user.school.name | cmTruncate: 10}}-->
-                            <!--<md-button class="md-icon-button md-primary small-icon"-->
-                                       <!--aria-label="Update_profile"-->
-                                       <!--ng-click="ctrl.editProfileInfo(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant)"-->
-                                       <!--ng-if="task.openedAt"-->
-                            <!--&gt;-->
-                                <!--<md-icon md-svg-icon="create"></md-icon>-->
-                            <!--</md-button>-->
-                            <md-button class="md-raised md-primary"
+                            {{ctrl.profile.user.school.name | cmTruncate: 10}}
+                            <md-button class="md-icon-button md-primary small-icon"
                                        aria-label="Update_profile"
                                        ng-click="ctrl.editProfileInfo(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant)"
                                        ng-disabled="task.closedAt">
@@ -513,9 +506,7 @@
 
                     <div>
                         <span ng-if="task.coopSubmission && task.type!='formTeam'">
-                            <label ng-show="ctrl.showTeamComplete(participant.$id, task.$id,ctrl.event.$id, task)">
-                                {{ctrl.solutions[participant.$id][task.teamFormationRef]}} : {{ctrl.coopTeam[task.teamFormationRef][ctrl.teamId[task.teamFormationRef][participant.$id]].status[1]}} / {{ctrl.coopTeam[task.teamFormationRef][ctrl.teamId[task.teamFormationRef][participant.$id]].status[0]}}
-                            </label>
+                            <label ng-show="ctrl.showTeamComplete(participant.$id, task.$id,ctrl.event.$id, task)"><div ng-if="ctrl.coopTeam[task.teamFormationRef][ctrl.teamId[task.teamFormationRef][participant.$id]].status[0]">{{ctrl.solutions[participant.$id][task.teamFormationRef]}} : {{ctrl.coopTeam[task.teamFormationRef][ctrl.teamId[task.teamFormationRef][participant.$id]].status[1]}} / {{ctrl.coopTeam[task.teamFormationRef][ctrl.teamId[task.teamFormationRef][participant.$id]].status[0]}}</div></label>
                         </span>
                     </div>
                 </td>
