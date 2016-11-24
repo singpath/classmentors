@@ -2746,6 +2746,23 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
             self.filterSelected = true;
             self.searchText = '';
 
+            self.select = function(item){
+              var exist = false;
+              for(var i = 0; i < self.rankedQuestions.length; i++){
+                if(self.rankedQuestions[i].member == item.member){
+                  exist = true;
+                  break;
+                }
+              }
+              if(!exist){
+                self.rankedQuestions.push(item);
+              }
+            }
+
+            function searchRankedQuestions(item){
+              return
+            }
+
             //Watch rankedQuestions array
             $scope.$watch(()=>self.rankedQuestions, function (newValue, oldValue) {
                 if (newValue.length != oldValue.length) {
