@@ -236,7 +236,7 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
   var mcqInvalid = true;
   $scope.$on("$routeChangeStart", function (event, next, current) {
     if (mcqInvalid) {
-      if (!confirm("You have not finish your multiple choice questions. Are you sure you want to continue? All data will be lost.")) {
+      if (!confirm("You have not complete your multiple choice questions. Are you sure you want to continue? All data will be lost!")) {
         event.preventDefault();
       }
     }
