@@ -3,7 +3,9 @@
 </div>
 
 <div ng-if="!ctrl.loading">
-    <md-content class="md-padding">
+    <span ng-show="ctrl.visibleTasks.length != 0">Scroll right to see more challenges <i class="material-icons">fast_forward</i></span>
+
+    <md-content class="md-padding" >
         <table class="events tasks">
             <thead>
             <tr ng-class="{'reversed': ctrl.orderOptions.reversed}">
