@@ -1,3 +1,17 @@
+md-tooltip ._md-content {
+    height: auto;
+}
+
+/*@media screen and (min-width: 600px) {*/
+    /*md-tooltip .md-content {*/
+        /*font-size: 6px;*/
+        /*height: auto;*/
+        /*width: 300px;*/
+        /*padding: 8px;*/
+        /*max-width: 300px;*/
+    /*}*/
+/*}*/
+
 .events th, .events td {
     text-align: center;
     padding: 0 10px 0;
