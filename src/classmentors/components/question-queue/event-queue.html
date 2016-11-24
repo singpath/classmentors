@@ -13,7 +13,7 @@
     <md-button disabled="" ng-if="ctrl.event.owner.publicId != ctrl.currentUser.publicId && ctrl.event.closedForum" class="md-raised md-primary">Questions Disabled</md-button>
     <md-checkbox ng-if="ctrl.event.owner.publicId == ctrl.currentUser.publicId" ng-model="ctrl.event.closedForum" ng-change="ctrl.toggleForumStatus()">Close Event's Question Forum</md-checkbox>
     <md-list>
-        <md-subheader class="md-no-sticky">My recently posted questions</md-subheader>
+        <md-subheader class="md-no-sticky">My posted questions</md-subheader>
         <md-list-item ng-repeat="question in ctrl.questions | orderBy:'-'" ng-if="question.owner.publicId == ctrl.currentUser.publicId">
             <div layout="column" layout-align="end center">
                 <md-button class="md-icon-button launch" aria-label="Flag" ng-disabled="question.owner.publicId != ctrl.currentUser.publicId" ng-click="ctrl.toggleQnFlag(question)">
