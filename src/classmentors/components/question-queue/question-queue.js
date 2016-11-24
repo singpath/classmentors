@@ -149,12 +149,12 @@ function eventQController(initialData, spfNavBarService, urlFor, firebaseApp, sp
     this.toggleForumStatus = function () {
         if(self.event.closedForum) {
             console.log('forum is now closed');
-            spfAlert.success('Forum is now closed');
+            spfAlert.success('Forum is now closed.');
             db.ref(`classMentors/events/${self.event.$id}/closedForum`).set(true);
             db.ref(`classMentors/eventQuestions/${self.event.$id}/closedForum`).set(true);
         } else {
             console.log('forum is now open');
-            spfAlert.success('Forum is now open');
+            spfAlert.success('Forum is now open.');
             db.ref(`classMentors/events/${self.event.$id}/closedForum`).remove();
             db.ref(`classMentors/eventQuestions/${self.event.$id}/closedForum`).remove();
         }
@@ -189,7 +189,7 @@ function eventQController(initialData, spfNavBarService, urlFor, firebaseApp, sp
     this.toggleVote = function (question, questionId) {
         var ref = db.ref(`classMentors/eventQuestions/${self.event.$id}/questions/${questionId}/upVotes/${self.currentUser.publicId}`);
         if(question.owner.publicId == self.currentUser.publicId) {
-            spfAlert.error("You cannot upvote your own question.");
+            spfAlert.error("You cannot vote on your own question.");
         } else {
             if(question.upVotes && question.upVotes[self.currentUser.publicId]) {
                 ref.remove()
@@ -204,7 +204,7 @@ function eventQController(initialData, spfNavBarService, urlFor, firebaseApp, sp
             db.ref(`classMentors/eventQuestions/${self.event.$id}/questions/${question.$id}/flagged`).remove();
         } else {
             if(question.answeredBy) {
-                spfAlert.error('You cannot flag a question that has already been resolved!');
+                spfAlert.error('You cannot flag a question that has already been resolved.');
             } else {
                 db.ref(`classMentors/eventQuestions/${self.event.$id}/questions/${question.$id}/flagged`).set(true);
             }
@@ -233,7 +233,7 @@ function eventQController(initialData, spfNavBarService, urlFor, firebaseApp, sp
                 self.question.owner = self.user;
                 self.question.createdAt = Date.now();
                 clmDataStore.events.questions.create(self.question, self.event.$id).then(
-                    spfAlert.success('You have successfully posted a new question')
+                    spfAlert.success('You have successfully posted a new question.')
                 ).then($mdDialog.hide()).catch(function () {
                     spfAlert.error('You failed to post your question.')
                 });
@@ -283,7 +283,7 @@ function oneQnController(initialData, spfNavBarService, urlFor, firebaseApp, spf
     this.toggleQnVote = function (question, questionId) {
         var ref = db.ref(`classMentors/eventQuestions/${self.event.$id}/questions/${questionId}/upVotes/${self.currentUser.publicId}`);
         if(question.owner.publicId == self.currentUser.publicId) {
-            spfAlert.error("You cannot upvote your own question.");
+            spfAlert.error("You cannot vote on your own question.");
         } else {
             if(question.upVotes && question.upVotes[self.currentUser.publicId]) {
                 ref.remove()
@@ -296,7 +296,7 @@ function oneQnController(initialData, spfNavBarService, urlFor, firebaseApp, spf
     this.toggleAnsVote = function (questionId, answer) {
         var ref = db.ref(`classMentors/eventQuestions/${self.event.$id}/answers/${questionId}/${answer.$id}/upVotes/${self.currentUser.publicId}`);
         if(answer.owner.publicId == self.currentUser.publicId) {
-            spfAlert.error("You cannot upvote your own answer.");
+            spfAlert.error("You cannot vote on your own answer.");
         } else {
             if(answer.upVotes && answer.upVotes[self.currentUser.publicId]) {
                 ref.remove()
@@ -311,7 +311,7 @@ function oneQnController(initialData, spfNavBarService, urlFor, firebaseApp, spf
             db.ref(`classMentors/eventQuestions/${self.event.$id}/questions/${self.question.$id}/flagged`).remove();
         } else {
             if(self.question.answeredBy) {
-                spfAlert.error('You cannot flag a question that has already been resolved!');
+                spfAlert.error('You cannot flag a question that has already been resolved.');
             } else {
                 db.ref(`classMentors/eventQuestions/${self.event.$id}/questions/${self.question.$id}/flagged`).set(true);
             }
@@ -324,7 +324,7 @@ function oneQnController(initialData, spfNavBarService, urlFor, firebaseApp, spf
         if(accepted) {
             ref1.remove();
             ref2.remove();
-            spfAlert.success('You have re-opened this question');
+            spfAlert.success('You have re-opened this question.');
         } else {
             if(self.question.answeredBy) {
                 let oldAns = self.question.answeredBy;
@@ -335,7 +335,7 @@ function oneQnController(initialData, spfNavBarService, urlFor, firebaseApp, spf
             ref1.set(Date.now());
             ref2.set(answer.$id);
             db.ref(`classMentors/eventQuestions/${self.event.$id}/questions/${self.question.$id}/flagged`).remove();
-            spfAlert.success('You have marked this question as resolved');
+            spfAlert.success('You have marked this question as resolved.');
             var action = '';
             if(answer.owner.publicId == self.event.owner.publicId) {
                 action = 'questionResolvedByEducator';
@@ -380,10 +380,10 @@ function oneQnController(initialData, spfNavBarService, urlFor, firebaseApp, spf
                         var ref = db.ref(`classMentors/eventQuestions/${eventId}/questions/${questionId}/respondedBy/${answer.key}`);
                         ref.set(self.answer.createdAt);
                     })
-                    .then(spfAlert.success("Successfully posted your response"))
+                    .then(spfAlert.success("Successfully posted your response."))
                     .then($mdDialog.hide())
                     .catch(function () {
-                        spfAlert.error("Failed to post your response");
+                        spfAlert.error("Failed to post your response.");
                     });
                 clmDataStore.logging.inputLog({
                     action: "respondToQuestion",
