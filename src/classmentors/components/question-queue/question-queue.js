@@ -160,10 +160,29 @@ function eventQController(initialData, spfNavBarService, urlFor, firebaseApp, sp
 
     spfNavBarService.update(
         self.event.title,
-    {
-        title: 'Questions',
-        url: `#${urlFor('questionQueue')}`
-    });
+        {
+            title: 'Questions',
+            url: `#${urlFor('questionQueue')}`
+        }, getOptions()
+    );
+
+    //update options on navigation bar on top
+    function getOptions() {
+        var options = [];
+
+        if (!self.currentUser || !self.currentUser.publicId) {
+            return options;
+        }
+
+        options.push({
+            title: 'View Other Questions',
+            url: `#${urlFor('questionQueue')}`,
+            icon: 'arrow-back'
+        });
+
+        return options;
+    }
+
 
     this.toggleVote = function (question, questionId) {
         var ref = db.ref(`classMentors/eventQuestions/${self.event.$id}/questions/${questionId}/upVotes/${self.currentUser.publicId}`);
@@ -227,6 +246,7 @@ function eventQController(initialData, spfNavBarService, urlFor, firebaseApp, sp
                 $mdDialog.hide();
             };
         }
+
     }
 
 }
@@ -252,7 +272,7 @@ function oneQnController(initialData, spfNavBarService, urlFor, firebaseApp, spf
             title: self.event.title,
             url: `#${urlFor('eventQueue', {eventId: this.event.$id})}`
         }], [{
-            title: 'View Other Questions',
+            title: 'Back',
             url: `#${urlFor('eventQueue', {eventId: this.event.$id})}`,
             icon: 'arrow-back'
         }]

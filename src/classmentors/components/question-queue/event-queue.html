@@ -8,9 +8,10 @@
             <md-chip class="md-raised md-primary">{{ctrl.questions | countConditionally: ['flagged', true]}} instructor attention</md-chip>
         </md-chips>
     </div>
-    <md-button ng-if="ctrl.event.owner.publicId != ctrl.currentUser.publicId && !ctrl.event.closedForum" class="md-raised md-primary" ng-click="ctrl.askNewQuestion(ctrl.event, ctrl.currentUser)">Ask New Question</md-button>
+    <br>
+    <md-button ng-if="ctrl.event.owner.publicId != ctrl.currentUser.publicId && !ctrl.event.closedForum" class="md-raised md-primary" ng-click="ctrl.askNewQuestion(ctrl.event, ctrl.currentUser)">Post Question</md-button>
     <md-button disabled="" ng-if="ctrl.event.owner.publicId != ctrl.currentUser.publicId && ctrl.event.closedForum" class="md-raised md-primary">Questions Disabled</md-button>
-    <md-checkbox ng-if="ctrl.event.owner.publicId == ctrl.currentUser.publicId" ng-model="ctrl.event.closedForum" ng-change="ctrl.toggleForumStatus()">Close Event Questions</md-checkbox>
+    <md-checkbox ng-if="ctrl.event.owner.publicId == ctrl.currentUser.publicId" ng-model="ctrl.event.closedForum" ng-change="ctrl.toggleForumStatus()">Close Event's Question Forum</md-checkbox>
     <md-list>
         <md-subheader class="md-no-sticky">My recently posted questions</md-subheader>
         <md-list-item ng-repeat="question in ctrl.questions | orderBy:'-' | limitTo:ctrl.myQnLimit" ng-if="question.owner.publicId == ctrl.currentUser.publicId">
@@ -40,8 +41,8 @@
             <md-divider ng-if="!$last"></md-divider>
             <div ng-if="!$last"></div>
         </md-list-item>
-        <md-button class="md-raised" ng-click="ctrl.expandMyQns()">Show More</md-button>
-        <md-button ng-if="ctrl.myQnLimit > 1" class="md-accent" ng-click="ctrl.collapseMyQns()">Show Less</md-button>
+        <!--<md-button class="md-raised" ng-click="ctrl.expandMyQns()">Show More</md-button>-->
+        <!--<md-button ng-if="ctrl.myQnLimit > 1" class="md-accent" ng-click="ctrl.collapseMyQns()">Show Less</md-button>-->
     </md-list>
 
     <md-list>
@@ -73,7 +74,7 @@
             <md-divider ng-if="!$last"></md-divider>
             <div ng-if="!$last"></div>
         </md-list-item>
-        <md-button class="md-raised" ng-click="ctrl.expandVoteQns()">Show More</md-button>
-        <md-button ng-if="ctrl.voteQnLimit > 1" class="md-accent" ng-click="ctrl.collapseVoteQns()">Show Less</md-button>
+        <!--<md-button class="md-raised" ng-click="ctrl.expandVoteQns()">Show More</md-button>-->
+        <!--<md-button ng-if="ctrl.voteQnLimit > 1" class="md-accent" ng-click="ctrl.collapseVoteQns()">Show Less</md-button>-->
     </md-list>
 </md-content>
