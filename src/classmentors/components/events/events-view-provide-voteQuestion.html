@@ -35,21 +35,23 @@
                   </span>
               </md-content>
               <md-content>
-                  <md-list>
-                      <md-list-item class="md-3-line" ng-repeat="item in ctrl.allMemberAnswers" >
-                        <div class="md-list-item-text compact">
-                          <h3>{{item.member}}</h3>
-                          <p>{{item.answer}}</p>
-                        </div>
-                      </md-list-item>
-                  </md-list>
+                <md-list>
+                  <md-list-item class="md-3-line" ng-repeat="item in ctrl.allMemberAnswers" ng-click="ctrl.select(item)">
+                    <div class="md-list-item-text">
+                      <h3>{{item.member}}</h3>
+                      <p>{{item.answer}}</p>
+                      <p><i>Click here to vote for this question</i></p>
+                    </div>
+                    <md-divider ng-if="!$last"></md-divider>
+                  </md-list-item>
+                </md-list>
               </md-content>
           </div>
       </div>
       <div layout='row' layout-align="center center">
           <md-button type='submit' ng-disabled="ctrl.rankedQuestions.length != ctrl.allMemberAnswers.length" class="md-raised md-primary" style="width: 150px;">Submit and close
           </md-button>
-          <md-button ng-click="ctrl.cancel()" class=" md-accent" style="width: 150px;">
+          <md-button class="md-raised" ng-click="ctrl.cancel()" class=" md-accent" style="width: 150px;">
               Cancel
           </md-button>
       </div>

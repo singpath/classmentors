@@ -240,8 +240,6 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
         event.preventDefault();
       }
     }
-
-
   });
 
   var data = initialData;
