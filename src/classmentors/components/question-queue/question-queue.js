@@ -149,12 +149,12 @@ function eventQController(initialData, spfNavBarService, urlFor, firebaseApp, sp
     this.toggleForumStatus = function () {
         if(self.event.closedForum) {
             console.log('forum is now closed');
-            spfAlert.success('Forum is now closed.');
+            spfAlert.success('Forum is now closed');
             db.ref(`classMentors/events/${self.event.$id}/closedForum`).set(true);
             db.ref(`classMentors/eventQuestions/${self.event.$id}/closedForum`).set(true);
         } else {
             console.log('forum is now open');
-            spfAlert.success('Forum is now open.');
+            spfAlert.success('Forum is now open');
             db.ref(`classMentors/events/${self.event.$id}/closedForum`).remove();
             db.ref(`classMentors/eventQuestions/${self.event.$id}/closedForum`).remove();
         }
