@@ -116,6 +116,7 @@
                         <div flex>
                             <b>{{task.title}}</b>
                             <small>Last edited at: {{task.openedAt || task.closedAt | date}}</small><br>
+                            <a ng-if="task.link" href={{task.link}} target="_blank">Help link</a><br>
                             {{task.description}}<br>
                             <i>{{task.textResponse}}</i>
                         </div>
