@@ -188,7 +188,7 @@ function NewCohortCtrl(
         if (!self.profile) {
             cleanProfile();
             next = spfAuthData.publicId(currentUser).then(function() {
-                spfAlert.success('Public id and display name saved');
+                spfAlert.success('Public id and display name saved.');
                 return clmDataStore.initProfile();
             }).then(updateProfile);
         } else if (self.profileNeedsUpdate) {
@@ -367,7 +367,7 @@ function ViewCohortCtrl(
             self.cohort.title, {
                 title: 'Cohorts',
                 url: `#${urlFor('cohorts')}`
-            }, getOptions()
+            },getOptions()
         );
     }
 
@@ -381,7 +381,7 @@ function ViewCohortCtrl(
         // Add edit button
         if (self.cohort.owner.publicId === self.currentUser.publicId) {
             options.push({
-                title: 'Edit',
+                title: 'Edit This Cohort',
                 url: `#${urlFor('editCohort', {cohortId: self.cohort.$id})}`,
                 icon: 'create'
             });
@@ -422,7 +422,7 @@ function ViewCohortCtrl(
                         return err;
                     });
             } else {
-                spfAlert.success(self.selectedChallenge.title + " inserted into selected events");
+                spfAlert.success(self.selectedChallenge.title + " inserted into selected events.");
                 self.selectedEvent = null;
                 self.selectedChallenge = null;
                 self.selectedEvents = null;
@@ -593,6 +593,7 @@ editCohortCtrlInitialData.$inject = ['$q', '$route', 'spfAuthData', 'clmDataStor
 
 function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataStore) {
     var self = this;
+    console.log("initial data ", initialData);
 
     this.currentUser = initialData.currentUser;
     this.eventsArr = initialData.eventsArr;
@@ -602,8 +603,8 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
     this.savingCohort = false;
     this.creatingNewAnnouncement = false;
     this.newAnnouncement = {};
-    this.showingEvents = false;
-    this.showingAnnouncements = false;
+    this.showingEvents = true;
+    this.showingAnnouncements = true;
     this.addingEvent = false;
 
     // For searching events
@@ -641,28 +642,40 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
         }, {
             title: this.cohort.title,
             url: `#${urlFor('viewCohort', {cohortId: this.cohort.$id})}`
+        }], [{
+            title: 'View this Cohort',
+            url: `#${urlFor('viewCohort', {cohortId: this.cohort.$id})}`,
+            icon: 'arrow-back'
         }]
     );
+
+
+    // spfNavBarService.update(
+    //     {
+    //         title: 'View this Cohort',
+    //         url: `#${urlFor('viewCohort', {cohortId: this.cohort.$id})}`,
+    //         icon: 'arrow-back'
+    //     }
+    // );
 
     this.removeCohortEvent = function(eventId, eventIndex) {
         var newEventArray = self.cohort.events;
         newEventArray.splice(eventIndex, 1);
         clmDataStore.cohorts.removeEvent(self.cohort.$id, newEventArray).then(function () {
-            spfAlert.success('Removed event');
+            spfAlert.success('Removed event.');
         }).catch(function (err) {
-            spfAlert.error('Failed to remove event');
+            spfAlert.error('Failed to remove event.');
         });
     };
 
     this.saveAddedEvent = function () {
         clmDataStore.cohorts.addEvent(self.cohort.$id, self.selectedEvent.id, self.cohort.events.length).then(function() {
-            spfAlert.success(self.selectedEvent.title + ' has been added to the cohort!');
+            self.addingEvent = false;
+            spfAlert.success(self.selectedEvent.title + ' has been added to the cohort.');
             self.selectedEvent = null;
         }).catch(function(err) {
-            spfAlert.error('Failed to add ' + self.selectedEvent.title + ' to the cohort!');
+            spfAlert.error('Failed to add ' + self.selectedEvent.title + ' to the cohort.');
             self.selectedEvent = null;
-        }).finally(function() {
-            self.addingEvent = false;
         });
     };
 
@@ -717,11 +730,11 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
 
     this.saveAnnouncement = function(cohortId) {
         clmDataStore.cohorts.addAnnouncement(cohortId, this.currentUser, this.newAnnouncement, false).then(function() {
-            spfAlert.success('Announcement created');
-        }).catch(function () {
-            spfAlert.error('Failed to create announcement');
-        }).finally(function () {
             self.creatingNewAnnouncement = false;
+            spfAlert.success('Announcement created.');
+        }).catch(function () {
+            spfAlert.error('Failed to create announcement.');
+        }).finally(function () {
             self.newAnnouncement = {};
         })
     };
@@ -730,7 +743,7 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
         clmDataStore.cohorts.featureAnnouncement(cohortId, announcementId).then(function() {
             spfAlert.success('Announcement featured.');
         }).catch(function() {
-            spfAlert.error('Failed to feature announcement');
+            spfAlert.error('Failed to feature announcement.');
         });
     };
 
@@ -738,7 +751,7 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
         clmDataStore.cohorts.unfeatureAnnouncement(cohortId, announcementId).then(function() {
             spfAlert.success('Announcement un-featured.');
         }).catch(function() {
-            spfAlert.error('Failed to un-feature announcement');
+            spfAlert.error('Failed to un-feature announcement.');
         });
     };
 
@@ -746,7 +759,7 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
         clmDataStore.cohorts.showAnnouncement(cohortId, announcementId).then(function() {
             spfAlert.success('Announcement is now visible.');
         }).catch(function() {
-            spfAlert.error('Failed to make announcement visible');
+            spfAlert.error('Failed to make announcement visible.');
         });
     };
 
@@ -757,6 +770,7 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
             spfAlert.error('Failed to hide announcement');
         });
     };
+
 
 
 }
