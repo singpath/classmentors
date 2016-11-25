@@ -1788,7 +1788,7 @@ editEventTaskCtrlInitialData.$inject = ['$q', '$route', 'spfAuthData', 'clmDataS
 /**Todo: enable edit to multiple choice, index card, etc. **/
 function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmDataStore, eventService, $mdDialog, $location, clmSurvey) {
     var self = this;
-
+    self.edit = true;
     // console.log("the initialdata looks like this:", initialData);
     this.event = initialData.event;
     this.badges = initialData.badges;
