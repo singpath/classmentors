@@ -411,7 +411,7 @@ function ViewCohortCtrl(
                 var eventId = self.selectedEvents[eventIndex];
                 clmDataStore.events.addTask(eventId, self.selectedChallenge, true)
                     .then( function () {
-                        console.log(self.selectedChallenge.title + " inserted into " + eventId);
+                        console.log(self.selectedChallenge.title + " inserted into " + eventId +".");
                         eventIndex++;
                     })
                     .then(function () {
