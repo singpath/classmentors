@@ -869,7 +869,7 @@ export function clmCohortsStatsPageFactory() {
 
 function ClmCohortStatsPageCtrl(
     $scope, $q, $log, $mdDialog, $document, $firebaseArray,
-    urlFor, spfAlert, firebaseApp, clmServicesUrl, clmDataStore
+    urlFor, spfAlert, firebaseApp, clmServicesUrl, clmDataStore, $firebaseObject
 ) {
     var self = this;
     var db = firebaseApp.database();
@@ -877,56 +877,39 @@ function ClmCohortStatsPageCtrl(
     this.selectedStatistic = null;
     
     this.generateReportCard = function () {
+        var iter = 0;
+        var participantAchievements = {};
         loadParticipants();
-        let iter = 0;
         
         function loadParticipants() {
-            console.log('Loading participants!');
-            var participantAchievements = {};
             var eventId = self.cohort.events[iter];
 
             if (iter < self.cohort.events.length) {
-                var eventParticipants = $firebaseObject(db.ref(`classMentors/eventParticipants/${eventId}`));
-                eventParticipants.$loaded().then(
-                    // () => ,
-                    err => {
-                        oneEventData.participants = [];
-                        $log.error(err);
+                var eventParticipants = $firebaseArray(db.ref(`classMentors/eventParticipants/${eventId}`));
+                eventParticipants.$loaded().then(function () {
+                    // console.log(eventParticipants);
+                    for(let participantI in eventParticipants) {
+                        let participant = eventParticipants[participantI];
+                        if(!participantAchievements[participant.$id] && participant.$id != undefined) {
+                            fetchParticipantInfo(participant.$id);
+                        }
                     }
-                ).then(function () {
-                    console.log(eventParticipants);
-                    // fetchParticipantInfo(eventId);
                     iter++;
-                    loadInitialData();
+                    loadParticipants();
                 });
             }
         }
         
-        function fetchParticipantInfo(eventId) {
-            var participantsArray = $firebaseArray(db.ref(`classMentors/eventParticipants/${eventId}`));
-            participantsArray.$loaded().then(
-                () => (self.cohortEventData.find(e => e.id == eventId).participants = participantsArray)
-            ).then(function () {
-                self.cohortTotalParticipants = self.cohortTotalParticipants.concat(participantsArray);
-                for(let participantIndex = 0; participantIndex < participantsArray.length; participantIndex++) {
-                    // console.log("User " + participantsArray[participantIndex].$id + " from event " + eventId);
-                    $firebaseObject(db.ref(`classMentors/userProfiles/${participantsArray[participantIndex].$id}/services`)).$loaded().then(function (result) {
-                        if((result.freeCodeCamp && result.freeCodeCamp.totalAchievements >= 1) && (result.codeCombat && result.codeCombat.totalAchievements >= 1)) {
-                            self.cohortEventData.find(e => e.id == eventId).qualifiedParticipants.push({displayName: participantsArray[participantIndex].user.displayName, userId: participantsArray[participantIndex].$id, score: parseInt(result.freeCodeCamp.totalAchievements) + parseInt(result.codeCombat.totalAchievements)});
-                        }
-                        if((result.freeCodeCamp && result.freeCodeCamp.totalAchievements >= 1) && (!result.codeCombat || result.codeCombat.totalAchievements < 1)) {
-                            self.cohortEventData.find(e => e.id == eventId).qualifiedParticipants.push({displayName: participantsArray[participantIndex].user.displayName, userId: participantsArray[participantIndex].$id, score: result.freeCodeCamp.totalAchievements});
-                        }
-                        if((!result.freeCodeCamp || result.freeCodeCamp.totalAchievements < 1) && (result.codeCombat && result.codeCombat.totalAchievements >= 1)) {
-                            self.cohortEventData.find(e => e.id == eventId).qualifiedParticipants.push({displayName: participantsArray[participantIndex].user.displayName, userId: participantsArray[participantIndex].$id, score: result.codeCombat.totalAchievements});
-                        }
-                        self.cohortEventData.find(e => e.id == eventId).qualifiedParticipants.sort(function(a,b) {
-                            return b.score - a.score;
-                        });
-                    })
+        function fetchParticipantInfo(participantId) {
+            var participantAchievement = $firebaseObject(db.ref(`classMentors/userAchievements/${participantId}`));
+            participantAchievement.$loaded().then(function () {
+                if(participantAchievement.services) {
+                    participantAchievements[participantId] = participantAchievement.services;
                 }
             });
-        };
+        }
+
+        //after fetching all the stuff, now isolate by pivotalExpert, freeCodeCamp, codeSchool, and codeCombat. Each node has an acheivements object and a totalAchievements value.
     };
 
     this.renderDashboard = function() {
@@ -1029,7 +1012,8 @@ ClmCohortStatsPageCtrl.$inject = [
     'spfAlert',
     'firebaseApp',
     'clmServicesUrl',
-    'clmDataStore'
+    'clmDataStore',
+    '$firebaseObject'
 ];
 
 export function clmCohortRankPageFactory() {
