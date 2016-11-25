@@ -93,10 +93,10 @@
                         </md-option>
                     </md-select>
                     <div ng-if="ctrl.selectedEvent">
-                        <i>You have selected {{ctrl.selectedEvent}}.</i>
+                        <!--<i>You have selected {{ctrl.selectedEvent}}.</i>-->
 
                         <h4>Select the challenge you wish to duplicate</h4>
-                        <md-select ng-model="ctrl.selectedChallenge" aria-label="select_challenge" required placeholder="Challenges in event">
+                        <md-select ng-model="ctrl.selectedChallenge" aria-label="select_challenge" required placeholder="Challenges in event" >
                             <md-option ng-value="c" ng-repeat="c in ctrl.eventChallenges">
                                 {{c.title}}
                             </md-option>
@@ -104,7 +104,7 @@
                     </div>
 
                     <div ng-if="ctrl.selectedChallenge">
-                       You are duplicating <b>{{ctrl.selectedChallenge.title}}</b> from event <b>{{ctrl.events[ctrl.selectedEvent].title}}.</b><br>
+                       <!--You are duplicating <b>{{ctrl.selectedChallenge.title}}</b> from event <b>{{ctrl.events[ctrl.selectedEvent].title}}.</b><br>-->
 
                         <h4>Select events to duplicate the selected challenge to</h4>
                         <md-select ng-model="ctrl.selectedEvents"
@@ -116,12 +116,33 @@
                                        placeholder="Select the event(s) below"
                                        class="demo-header-searchbox md-text">
                             </md-select-header>
-                            <md-optgroup label="vegetables">
+                            <md-optgroup >
                                 <md-option ng-value="e" ng-repeat="e in ctrl.cohort.events |
               filter:searchTerm" ng-if="e != ctrl.selectedEvent">{{ctrl.events[e].title}}</md-option>
                             </md-optgroup>
                         </md-select>
                     </div>
+
+                    <br>
+                    <div ng-if="ctrl.selectedEvents">
+                        <h3>Review</h3>
+                        You are duplicating <b>{{ctrl.selectedChallenge.title}}</b> challenge into
+                        <md-chips class="md-padding">
+                            <md-chip ng-repeat = "reviewSelected in ctrl.selectedEvents">{{ctrl.events[reviewSelected].title}}</md-chip>
+                        </md-chips>
+
+                        <!--<md-card>-->
+                            <!--<md-card-title>-->
+                                <!--<md-card-title-text>-->
+                                    <!--<span class="md-headline">{{ctrl.selectedChallenge.title}}</span>-->
+                                    <!--&lt;!&ndash;<span class="md-subhead">{{ctrl.taskType}} Challenge</span>&ndash;&gt;-->
+                                    <!--<span class="md-subhead">{{ctrl.selectedChallenge.description}}</span>-->
+                                <!--</md-card-title-text>-->
+                            <!--</md-card-title>-->
+                        <!--</md-card>-->
+
+                    </div>
+
                     <div layout="row" layout-align="center center">
                         <md-button class="md-raised md-primary" ng-if="ctrl.selectedEvents" ng-click="ctrl.duplicateChallenges()">
                             Duplicate
