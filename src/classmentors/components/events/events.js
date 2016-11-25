@@ -1519,6 +1519,7 @@ function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNav
     };
 
     this.challengeRouteProvider = function (tasktype, task, isOpen) {
+
         if (tasktype == 'service') {
             console.log('service is clicked');
             return 'Save';
@@ -1793,7 +1794,6 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
     this.badges = initialData.badges;
     this.taskId = initialData.taskId;
     this.task = initialData.task;
-
     this.taskTitle = initialData.task.title;
     // console.log(this.taskTitle);
 
@@ -1899,19 +1899,19 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
             console.log('journalling is clicked');
             return 'Continue';
 
-        } else if (this.tasktype == 'teamActivity') {
+        } else if (this.taskType == 'teamActivity') {
             console.log('teamActivity is clicked');
             location = '/challenges/team-activity/edit';
             return 'Continue';
 
-        } else if (this.tasktype === 'profileEdit') {
+        } else if (this.taskType === 'profileEdit') {
             return 'Save';
 
         } else if (this.taskType == 'survey') {
             clmSurvey.set(this.event.$id, this.event, this.task, this.taskType, this.isOpen);
             var obj = clmSurvey.get();
+            console.log("survey in edit is clicked");
 
-            location = 'challenges/survey/edit';
             return 'Continue';
 
         } else {
@@ -1938,7 +1938,14 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
 
     this.saveTask = function (event, taskId, task, taskType, isOpen) {
         var copy = cleanObj(task);
-
+        console.log("this edit task is: ", task);
+        var editedTask = {
+            archived: task.archived,
+            description:task.description,
+            priority:task.priority,
+            showProgress: task.showProgress,
+            title: task.title
+        }
         var data = {
             taskType: taskType,
             isOpen: isOpen,
@@ -2006,7 +2013,11 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
             );
 
             eventService.set(data);
-
+            if(taskType==='survey'){
+                location = '/challenges/editSurvey/' + event.$id + '/' + taskId + '/' + JSON.stringify(editedTask);
+                // editSurvey: '/challenges/survey/edit/:eventId/:taskId'
+            }
+            console.log("location path is: ", location);
             $location.path(location);
 
         } else {
@@ -2023,10 +2034,10 @@ function EditEventTaskCtrl(initialData, spfAlert, urlFor, spfNavBarService, clmD
 
                 return clmDataStore.events.closeTask(event.$id, taskId);
             }).then(function () {
-                spfAlert.success('Challenge saved.');
+                spfAlert.success('Challenge edited.');
                 $location.path(urlFor('editEvent', {eventId: self.event.$id}));
             }).catch(function () {
-                spfAlert.error('Failed to save the challenge.');
+                spfAlert.error('Failed to edit the challenge.');
             }).then(function () {
                 self.savingTask = false;
             });
