@@ -145,37 +145,6 @@ function NewCohortCtrl(
     this.creatingEvent = false;
     this.profileNeedsUpdate = !this.currentUser.$completed();
 
-    this.taskType = null;
-
-    //deciding what tasktype this is
-    if (this.selectedEvents != null){
-        if (this.eventChallenges.serviceId) {
-            this.taskType = 'Service/Badge/Problem';
-
-        } else if (this.eventChallenges.linkPattern) {
-            this.taskType = 'Link Pattern';
-
-        } else if (this.eventChallenges.lang) {
-            this.taskType = 'Code';
-
-        } else if (this.eventChallenges.toEdit) {
-            this.taskType = 'Profile Edit';
-
-        } else if (this.eventChallenges.textResponse) {
-            this.taskType = 'Text Response';
-
-        } else if (this.eventChallenges.mcqQuestions) {
-            this.taskType = 'Multiple Choice';
-
-        } else if (this.eventChallenges.survey) {
-            this.taskType = 'Survey';
-
-        } else if (this.eventChallenges.teamFormationMethod) {
-            this.taskType = 'Team Activities';
-        }
-
-    }
-
 
     spfNavBarService.update(
         'New Cohorts',
@@ -463,49 +432,14 @@ function ViewCohortCtrl(
       });
     };
 
-    // this.taskType = null;
-
-    //deciding what tasktype this is [NOT WORKING ATM]
-    this.updateTaskType = function(selected){
-        if (selected != undefined){
-            console.log("selected equals ///////////////// ", selected);
-
-            if (this.selected.serviceId) {
-                this.taskType = 'Service/Badge/Problem';
-
-            } else if (this.selected.linkPattern) {
-                this.taskType = 'Link Pattern';
-
-            } else if (this.selected.lang) {
-                this.taskType = 'Code';
-
-            } else if (this.selected.toEdit) {
-                this.taskType = 'Profile Edit';
-
-            } else if (this.selected.textResponse) {
-                this.taskType = 'Text Response';
-
-            } else if (this.selected.mcqQuestions) {
-                this.taskType = 'Multiple Choice';
-
-            } else if (this.selected.survey) {
-                this.taskType = 'Survey';
-
-            } else if (this.selected.teamFormationMethod) {
-                this.taskType = 'Team Activities';
-            }
-        }
-
-    }
-
     this.duplicateChallenges = function() {
 
         self.selectedChallenge.archived = false;
         delete self.selectedChallenge.$$mdSelectId;
 
-        console.log("selected events are ",self.selectedEvents);
+        // console.log("selected events are ",self.selectedEvents);
 
-        console.log("selected challenge is ", self.selectedChallenge);
+        // console.log("selected challenge is ", self.selectedChallenge);
 
 
         var eventIndex = 0;
@@ -697,7 +631,7 @@ editCohortCtrlInitialData.$inject = ['$q', '$route', 'spfAuthData', 'clmDataStor
 
 function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataStore) {
     var self = this;
-    console.log("initial data ", initialData);
+    // console.log("initial data ", initialData);
 
     this.currentUser = initialData.currentUser;
     this.eventsArr = initialData.eventsArr;
