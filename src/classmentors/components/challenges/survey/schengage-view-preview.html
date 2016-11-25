@@ -1,12 +1,12 @@
 <md-content flex class="md-padding">
-    <form name="surveyForm" ng-submit="ctrl.submitSchEngageResponse(ctrl.schEngageResp)">
+    <form name="surveyForm" ng-submit="">
         <div>
-            <h1>School Engagement Scale</h1>
+            <h1>Preview: School Engagement Scale</h1>
         </div>
         <div>
             <h3>Please respond to the questions below using the following scale</h3>
         </div>
-
+        <md-button type="button" class="md-raised md-primary" ng-click="ctrl.back()">Back</md-button>
         <br>
         <hr style="background: #808080; border: 0; height: 3px"/>
         <md-input container flex>
@@ -31,26 +31,25 @@
                         {{key}}. {{value}}
                     </td>
                     <td ng-if="key != '0'">
-                        <md-radio-group layout="row" ng-model="$parent.ans" ng-change="ctrl.schEngageResp[key] = ans" required>
-                            <div ng-repeat="(key2, value2) in ctrl.responseRating">
-                                <md-radio-button style="margin-right:20px" class="md-primary"
-                                                 ng-value="value2.option">
-                                    {{value2.option}}
-                                </md-radio-button>
-                            </div>
+                        <md-radio-group layout="row" ng-model="$parent.ans" required>
+                            <md-radio-button style="margin-right:20px" class="md-primary" ng-value="1">Never
+                            </md-radio-button>
+                            <md-radio-button style="margin-right:20px" class="md-primary" ng-value="2">On Occasion
+                            </md-radio-button>
+                            <md-radio-button style="margin-right:20px" class="md-primary" ng-value="3">Some of the
+                                Time
+                            </md-radio-button>
+                            <md-radio-button style="margin-right:20px" class="md-primary" ng-value="4">Most of the
+                                Time
+                            </md-radio-button>
+                            <md-radio-button style="margin-right:20px" class="md-primary" ng-value="5">All of the Time
+                            </md-radio-button>
                         </md-radio-group>
                     </td>
                 </tr>
-
             </table>
+            <md-button type="button" class="md-raised md-primary" ng-click="ctrl.back()">Back</md-button>
             <br>
         </md-input>
-
-        <div align="center">
-            <md-button type="submit" ng-disabled="surveyForm.$invalid" class="md-raised md-primary" style="width: 150px;">Submit</md-button>
-            <md-button ng-click="ctrl.backToChallenge()" class="md-accent" style="width: 150px;">
-                Discard
-            </md-button>
-        </div>
     </form>
 </md-content>

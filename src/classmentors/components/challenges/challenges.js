@@ -59,8 +59,8 @@ export function configRoute($routeProvider, routes) {
     $routeProvider
         .when(routes.indexCard, {
             template: '',
-            controller:'',
-            controllerAs:'ctrl',
+            controller: '',
+            controllerAs: 'ctrl',
             resolve: {
                 initialData: ''
             }
@@ -124,7 +124,7 @@ export function configRoute($routeProvider, routes) {
             template: mentor.mentorCreationTmpl,
             controller: mentor.createMentoringController,
             controllerAs: 'ctrl',
-            resolve:{
+            resolve: {
                 initialData: mentor.createMentoringInitialData
 
             }
@@ -144,6 +144,32 @@ export function configRoute($routeProvider, routes) {
             controllerAs: 'ctrl',
             resolve: {
                 initialData: team.startTRATInitialData
+            }
+        })
+        .when(routes.viewSchEngagePreview, {
+            template: survey.schEngagePreview,
+            controller: survey.showPreviewController,
+            controllerAs: 'ctrl',
+            resolve: {
+                initialData: survey.showPreviewInitialData
+            }
+        })
+
+        .when(routes.viewMotiStratPreview, {
+            template: survey.motiStratPreview,
+            controller: survey.showPreviewController,
+            controllerAs: 'ctrl',
+            resolve: {
+                initialData: survey.showPreviewInitialData
+            }
+        })
+
+        .when(routes.viewEduDissPreview, {
+            template: survey.eduDissPreview,
+            controller: survey.showPreviewController,
+            controllerAs: 'ctrl',
+            resolve: {
+                initialData: survey.showPreviewInitialData
             }
         })
 
@@ -437,7 +463,7 @@ challengeServiceFactory.$inject =
 //
 // }
 
-function surveyFormEvent($scope, clmSurvey, clmDataStore, $log, spfAlert, $location, urlFor,$mdDialog, spfNavBarService) {
+function surveyFormEvent($scope, clmSurvey, clmDataStore, $log, spfAlert, $location, urlFor, $mdDialog, spfNavBarService, $route) {
 
     this.surveys = [
         {id: 1, name: 'Education vs Dissatisfaction with learning'},
@@ -446,22 +472,25 @@ function surveyFormEvent($scope, clmSurvey, clmDataStore, $log, spfAlert, $locat
 
     ];
     //TODO: retrieve selected value, add task into firebase
-    var sharedData = clmSurvey.get();
-    var getTask = sharedData.task;
+    // var sharedData = clmSurvey.get();
+    // var getTask = sharedData.task;
+    var eventTitle = $route.current.params.eventTitle;
     var self = this;
+    var eventId = $route.current.params.eventId;
+    var getTask = JSON.parse($route.current.params.task);
 
     // console.log(sharedData);
 
     spfNavBarService.update(
-        sharedData.task.title, [{
+        getTask.title, [{
             title: 'Events',
             url: `#${urlFor('events')}`
         }, {
-            title: sharedData.event.title,
-            url: `#${urlFor('oneEvent', {eventId: sharedData.event.$id})}`
+            title: eventTitle,
+            url: `#${urlFor('oneEvent', {eventId: eventId})}`
         }, {
             title: 'Challenges',
-            url: `#${urlFor('editEvent', {eventId: sharedData.event.$id})}`
+            url: `#${urlFor('editEvent', {eventId: eventId})}`
         }]
     );
 
@@ -470,46 +499,37 @@ function surveyFormEvent($scope, clmSurvey, clmDataStore, $log, spfAlert, $locat
     self.hasSurveyTitle = false;
 
     //check if survey template has been selected.
-    this.checkSurveyValid = function(){
-        if(self.surveyType == 0 || self.surveyType == undefined){
+    this.checkSurveyValid = function () {
+        if (self.surveyType == 0 || self.surveyType == undefined) {
             self.hasSurveyTitle = false;
-        }else{
+        } else {
             self.hasSurveyTitle = true;
         }
     };
 
     // console.log("the survey t/f is", self.hasSurveyTitle);
+    self.showPreview = function (surveyType) {
+        self.loadPreview = true;
+        if (surveyType.name == 'School engagement scale') {
+            $location.path('/challenges/survey1/' + eventTitle +'/' + eventId + '/' + $route.current.params.task + '/' + surveyType.name);
+        }
+        if (surveyType.name == 'Motivated strategies for learning') {
+            $location.path('/challenges/survey2/' + eventTitle +'/' + eventId + '/' + $route.current.params.task + '/' + surveyType.name);
+        }
+        if (surveyType.name == 'Education vs Dissatisfaction with learning') {
+            $location.path('/challenges/survey3/' + eventTitle +'/' + eventId + '/' + $route.current.params.task + '/' + surveyType.name);
+        }
+    };
 
     this.saveSurveyTask = function (surveyType) {
         var copy = cleanObj(getTask);
-        // console.log('my copy is ', copy);
-        if (sharedData.taskType === 'linkPattern') {
-            delete copy.badge;
-            delete copy.serviceId;
-            delete copy.singPathProblem;
-        } else if (copy.serviceId === 'singPath') {
-            delete copy.badge;
-            if (copy.singPathProblem) {
-                copy.singPathProblem.path = cleanObj(getTask.singPathProblem.path);
-                copy.singPathProblem.level = cleanObj(getTask.singPathProblem.level);
-                copy.singPathProblem.problem = cleanObj(getTask.singPathProblem.problem);
-            }
-        } else {
-            delete copy.singPathProblem;
-            copy.badge = cleanObj(getTask.badge);
-        }
-
-        if (!copy.link) {
-            // delete empty link. Can't be empty string
-            delete copy.link;
-        }
 
         self.creatingTask = true;
         // console.log("survey type is " + surveyType);
         copy.survey = surveyType;
-        clmDataStore.events.addTask(sharedData.eventId, copy, sharedData.isOpen).then(function () {
+        clmDataStore.events.addTask(eventId, copy, true).then(function () {
             spfAlert.success('Challenge created.');
-            $location.path(urlFor('editEvent', {eventId: sharedData.eventId}));
+            $location.path(urlFor('editEvent', {eventId: eventId}));
         }).catch(function (err) {
             $log.error(err);
             spfAlert.error('Failed to create new challenge.');
@@ -518,7 +538,7 @@ function surveyFormEvent($scope, clmSurvey, clmDataStore, $log, spfAlert, $locat
         });
     };
 
-    this.discardChanges = function (ev){
+    this.discardChanges = function (ev) {
         var confirm = $mdDialog.confirm()
             .title('Would you like to discard your changes?')
             .textContent('All of the information input will be discarded. Are you sure you want to continue?')
@@ -526,9 +546,9 @@ function surveyFormEvent($scope, clmSurvey, clmDataStore, $log, spfAlert, $locat
             .targetEvent(ev)
             .ok('Cancel Editing')
             .cancel('Continue Editing');
-        $mdDialog.show(confirm).then(function() {
+        $mdDialog.show(confirm).then(function () {
             // decided to discard data, bring user to previous page
-            $location.path(urlFor('editEvent', {eventId: sharedData.event.$id}));
+            $location.path(urlFor('editEvent', {eventId: eventId}));
         })
     }
 
@@ -542,10 +562,11 @@ surveyFormEvent.$inject = [
     '$location',
     'urlFor',
     '$mdDialog',
-    'spfNavBarService'
+    'spfNavBarService',
+    '$route'
 ];
 
-function editsurveyFormEvent($scope, clmSurvey, clmDataStore, $log, spfAlert, $location, urlFor,spfNavBarService,eventService, $mdDialog) {
+function editsurveyFormEvent($scope, clmSurvey, clmDataStore, $log, spfAlert, $location, urlFor, spfNavBarService, eventService, $mdDialog) {
 
     //todo: sheryl comment to add corner cases checking; only allow edit when 1. there are no submission for the challenge 2. the challenge is closed (avoid race conditions)
     this.surveys = [
@@ -567,12 +588,12 @@ function editsurveyFormEvent($scope, clmSurvey, clmDataStore, $log, spfAlert, $l
     self.hasSurveyTitle = false;
 
     //check if survey template has been selected.
-    this.checkSurveyValid = function(){
+    this.checkSurveyValid = function () {
         // self.currentSelected = self.surveyType.name;
 
-        if(self.surveyType == 0 || self.surveyType == undefined){
+        if (self.surveyType == 0 || self.surveyType == undefined) {
             self.hasSurveyTitle = false;
-        }else{
+        } else {
             self.hasSurveyTitle = true;
         }
     };
@@ -626,34 +647,34 @@ function editsurveyFormEvent($scope, clmSurvey, clmDataStore, $log, spfAlert, $l
             task: getTask
         };
 
-            eventService.set(data);
+        eventService.set(data);
 
-            $location.path(location);
+        $location.path(location);
 
-            self.savingTask = true;
-            clmDataStore.events.updateTask(sharedData.eventId, sharedData.task.$id, copy).then(function () {
-                if (
-                    (sharedData.isOpen && sharedData.task.openedAt) ||
-                    (!sharedData.isOpen && sharedData.task.closedAt)
-                ) {
-                    return;
-                } else if (sharedData.isOpen) {
-                    return clmDataStore.events.openTask(sharedData.eventId, sharedData.task.$id);
-                }
+        self.savingTask = true;
+        clmDataStore.events.updateTask(sharedData.eventId, sharedData.task.$id, copy).then(function () {
+            if (
+                (sharedData.isOpen && sharedData.task.openedAt) ||
+                (!sharedData.isOpen && sharedData.task.closedAt)
+            ) {
+                return;
+            } else if (sharedData.isOpen) {
+                return clmDataStore.events.openTask(sharedData.eventId, sharedData.task.$id);
+            }
 
-                return clmDataStore.events.closeTask(sharedData.eventId, sharedData.task.$id);
-            }).then(function () {
-                $location.path(urlFor('editEvent', {eventId: sharedData.event.$id}));
-                spfAlert.success('Challenge saved.');
-            }).catch(function () {
-                spfAlert.error('Failed to save the challenge.');
-            }).then(function () {
-                self.savingTask = false;
-            });
+            return clmDataStore.events.closeTask(sharedData.eventId, sharedData.task.$id);
+        }).then(function () {
+            $location.path(urlFor('editEvent', {eventId: sharedData.event.$id}));
+            spfAlert.success('Challenge saved.');
+        }).catch(function () {
+            spfAlert.error('Failed to save the challenge.');
+        }).then(function () {
+            self.savingTask = false;
+        });
 
     };
 
-    this.discardChanges = function (ev){
+    this.discardChanges = function (ev) {
         var confirm = $mdDialog.confirm()
             .title('Would you like to discard your changes?')
             .textContent('All of the information input will be discarded. Are you sure you want to continue?')
@@ -661,7 +682,7 @@ function editsurveyFormEvent($scope, clmSurvey, clmDataStore, $log, spfAlert, $l
             .targetEvent(ev)
             .ok('Cancel Editing')
             .cancel('Continue Editing');
-        $mdDialog.show(confirm).then(function() {
+        $mdDialog.show(confirm).then(function () {
             // decided to discard data, bring user to previous page
             $location.path(urlFor('editEvent', {eventId: sharedData.event.$id}));
         })
@@ -683,14 +704,10 @@ editsurveyFormEvent.$inject = [
 
 
 function getTaskSurveyValues(clmSurvey, $q, $route, spfAuthData, clmDataStore) {
-    var sharedData = clmSurvey.get();
 
-    var data = baseEditCtrlInitialData(sharedData, $q, $route, spfAuthData, clmDataStore, clmSurvey);
-    if (data != null) {
-        console.log("Data is not null!!!");
-    } else {
-        console.log("DATA IS NULLLL!!");
-    }
+    var eventId = $route.current.params.eventId;
+
+    var data = baseEditCtrlInitialData(eventId, $q, $route, spfAuthData, clmDataStore, clmSurvey);
     data.badges = clmDataStore.badges.all();
     data.singPath = $q.all({
         paths: clmDataStore.singPath.paths(),
@@ -703,15 +720,15 @@ function getTaskSurveyValues(clmSurvey, $q, $route, spfAuthData, clmDataStore) {
 getTaskSurveyValues.$inject = ['clmSurvey', '$q', '$route', 'spfAuthData', 'clmDataStore'];
 
 
-function baseEditCtrlInitialData(sharedData, $q, $route, spfAuthData, clmDataStore, clmSurvey) {
+function baseEditCtrlInitialData(eventId, $q, $route, spfAuthData, clmDataStore, clmSurvey) {
 
+    var task = $route.current.params.task;
 
-    var sharedData = clmSurvey.get();
+    // var sharedData = clmSurvey.get();
     var errNoEvent = new Error('Event not found');
     var errNotAuthaurized = new Error('You cannot edit this event');
-    var eventId = $route.current.params.eventId;
 
-    var eventPromise = clmDataStore.events.get(sharedData.eventId).then(function (event) {
+    var eventPromise = clmDataStore.events.get(eventId).then(function (event) {
         if (event.$value === null) {
             return $q.reject(errNoEvent);
         }
@@ -722,7 +739,6 @@ function baseEditCtrlInitialData(sharedData, $q, $route, spfAuthData, clmDataSto
         currentUser: spfAuthData.user(),
         event: eventPromise
     };
-    console.log("current user id: " + data.currentUser);
     data.canEdit = $q.all({
         currentUser: spfAuthData.user(),
         event: eventPromise

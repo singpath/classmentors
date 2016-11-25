@@ -202,7 +202,7 @@ export function editMcqController(initialData,spfNavBarService, challengeService
     checkMCQValid();
   }
 
-  //todo:add back button controls here
+  //back button controls here
   self.discardChanges = function (ev){
     var confirm = $mdDialog.confirm()
         .title('You have not saved your changes')
@@ -212,10 +212,7 @@ export function editMcqController(initialData,spfNavBarService, challengeService
         .ok('Discard my changes')
         .cancel('Continue editing');
     $mdDialog.show(confirm).then(function() {
-      // decided to discard data, bring user to previous page
 
-      //todo: link back to previous page
-      //$location.path(urlFor('editEventTask', {eventId: initialData.event.$id},{taskId: task.$id}));
       $location.path(urlFor('editEvent', {eventId: initialData.data.event.$id}));
     })
   }
@@ -239,12 +236,10 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
   var mcqInvalid = true;
   $scope.$on("$routeChangeStart", function (event, next, current) {
     if (mcqInvalid) {
-      if (!confirm("You have not finish your multiple choice questions. Are you sure you want to continue? All data will be lost.")) {
+      if (!confirm("You have not complete your multiple choice questions. Are you sure you want to continue? All data will be lost!")) {
         event.preventDefault();
       }
     }
-
-
   });
 
   var data = initialData;
@@ -347,7 +342,7 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
         clmDataStore.events.saveScore(eventId, participant.publicId, taskId, score),
         spfAlert.success('Your Mcq responses are saved.'),
 
-        //todo:set progress to true, and save the progress into firebase
+        //set progress to true, and save the progress into firebase
 
         initialData.progress[userId] = {taskId},
         initialData.progress[userId][taskId] = {completed: true},
@@ -378,9 +373,6 @@ export function startMcqController(initialData, challengeService, clmDataStore, 
         .ok('Cancel Answering')
         .cancel('Continue Answering');
     $mdDialog.show(confirm).then(function() {
-      // decided to discard data, bring user to previous page
-
-      //todo: link back to previous page
       $location.path(urlFor('oneEvent', {eventId: eventId}));
 
     })
@@ -433,6 +425,7 @@ export function newMcqController(initialData, challengeService, $filter,$mdDialo
     }
   };
   self.isOptionValid = false;
+
   self.checkOptionValid = function(text){
     if(text.length == 0 || text == undefined){
       self.isOptionValid = false;
@@ -500,7 +493,9 @@ export function newMcqController(initialData, challengeService, $filter,$mdDialo
     // Push new question object into questions list
     self.questions.push(question);
     checkMCQValid();
+
   }
+
   function checkMCQValid(){
     for (var i = 0; i < self.questions.length; i ++){
       if(self.questions[i].answers.length == 0){
@@ -529,9 +524,6 @@ export function newMcqController(initialData, challengeService, $filter,$mdDialo
     });
   };
 
-  // Functionality for toggleOption between single answer and multi ans functionality
-  // Needs further review though..
-  // Is it better to set the answers as default multiple and the users will just set 1..n answers?
   self.toggleOption = function(question, itemIndex){
     console.log('Index being deleted...', itemIndex)
     var idx = question.answers.indexOf(itemIndex);
@@ -542,6 +534,7 @@ export function newMcqController(initialData, challengeService, $filter,$mdDialo
       question.answers.push(itemIndex);
     }
     console.log(question.answers);
+
     checkMCQValid();
   }
 
@@ -551,6 +544,7 @@ export function newMcqController(initialData, challengeService, $filter,$mdDialo
     question.options.push({
       text:""
     });
+
     checkMCQValid();
   }
 
@@ -572,7 +566,6 @@ export function newMcqController(initialData, challengeService, $filter,$mdDialo
     checkMCQValid();
   }
 
-  //todo:back button add here
   self.discardChanges = function (ev){
     var confirm = $mdDialog.confirm()
         .title('You have not save your challenge information')
@@ -583,12 +576,10 @@ export function newMcqController(initialData, challengeService, $filter,$mdDialo
         .cancel('Continue Editing');
     $mdDialog.show(confirm).then(function() {
 
-      //todo: link back to previous page
       $location.path(urlFor('oneEvent', {eventId: initialData.event.$id}));
 
     })
   }
-
 
 }
 newMcqController.$inject = [
