@@ -23,7 +23,7 @@ loadingBar.$inject = ['cfpLoadingBarProvider'];
  */
 export function mdTheme($mdThemingProvider) {
   $mdThemingProvider.theme('default')
-    .primaryPalette('brown')
+    .primaryPalette('indigo')
     .accentPalette('amber')
     .warnPalette('deep-orange');
 }

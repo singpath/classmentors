@@ -23,7 +23,7 @@
             <div style="font-size: 15px;">{{ctrl.question.body}}</div>
         </div>
         <md-button ng-if="!ctrl.question.answeredBy" class="md-raised md-primary" ng-click="ctrl.answerQuestion(ctrl.event.$id, ctrl.question.$id, ctrl.currentUser)">Post a Response</md-button>
-        <md-button ng-if="ctrl.question.answeredBy" class="md-raised md-primary" disabled="">Question closed</md-button>
+        <md-button ng-if="ctrl.question.answeredBy" class="md-raised" ng-disabled="true">Question closed</md-button>
     </div>
 
     <!--<md-list>-->
