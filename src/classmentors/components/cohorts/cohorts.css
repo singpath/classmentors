@@ -35,3 +35,25 @@ md-dialog.announcement-dialog {
     width: auto; }
 .selectdemoSelectHeader md-content._md {
     max-height: 240px; }
+
+
+md-virtual-repeat-container {
+    height: 292px;
+    width: 100%;
+    /*max-width: 400px; */
+}
+
+div.repeated-item {
+    border-bottom: 1px solid #ddd;
+    box-sizing: border-box;
+    height: 40px;
+    padding-top: 10px; }
+
+.virtualRepeatdemoInfiniteScroll md-content {
+    margin: 16px; }
+
+md-virtual-repeat-container {
+    border: solid 1px grey; }
+
+md-virtual-repeat-container .md-virtual-repeat-offsetter div {
+    padding-left: 16px; }

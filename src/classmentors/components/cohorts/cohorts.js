@@ -871,15 +871,38 @@ function ClmCohortStatsPageCtrl(
     $scope, $q, $log, $mdDialog, $document, $firebaseArray,
     urlFor, spfAlert, firebaseApp, clmServicesUrl, clmDataStore, $firebaseObject
 ) {
+    console.log(this.cohort);
+    console.log(this.profile);
+
     var self = this;
     var db = firebaseApp.database();
 
     this.selectedStatistic = null;
+    this.participantAchievements = {};
+    this.badgesCount = {
+        codeCombat: {},
+        freeCodeCamp: {},
+        codeSchool: {},
+        pivotalExpert: {}
+    };
+    this.loadRequest = false;
+    this.loadingAchievements = false;
+    this.numParticipants = 0;
+    this.numLoaded = 0;
     
     this.generateReportCard = function () {
+        self.badgesCount = {
+            codeCombat: {},
+            freeCodeCamp: {},
+            codeSchool: {},
+            pivotalExpert: {}
+        };
+        self.loadRequest = true;
+        self.loadingAchievements = true;
         var iter = 0;
-        var participantAchievements = {};
         loadParticipants();
+        self.numParticipants = 0;
+        self.numLoaded = 0;
         
         function loadParticipants() {
             var eventId = self.cohort.events[iter];
@@ -890,13 +913,16 @@ function ClmCohortStatsPageCtrl(
                     // console.log(eventParticipants);
                     for(let participantI in eventParticipants) {
                         let participant = eventParticipants[participantI];
-                        if(!participantAchievements[participant.$id] && participant.$id != undefined) {
+                        if(!self.participantAchievements[participant.$id] && participant.$id != undefined) {
                             fetchParticipantInfo(participant.$id);
+                            self.numParticipants++;
                         }
                     }
                     iter++;
                     loadParticipants();
                 });
+            } else {
+                checkLoadFinish();
             }
         }
         
@@ -904,12 +930,116 @@ function ClmCohortStatsPageCtrl(
             var participantAchievement = $firebaseObject(db.ref(`classMentors/userAchievements/${participantId}`));
             participantAchievement.$loaded().then(function () {
                 if(participantAchievement.services) {
-                    participantAchievements[participantId] = participantAchievement.services;
+                    self.participantAchievements[participantId] = participantAchievement.services;
                 }
+                self.numLoaded++;
             });
         }
 
+        function checkLoadFinish() {
+            if(self.numParticipants == self.numLoaded) {
+                console.log('All data loaded');
+                transformData();
+            } else {
+                console.log('checking', self.numParticipants, self.numLoaded);
+                setTimeout(checkLoadFinish, 1000);
+            }
+        }
+
         //after fetching all the stuff, now isolate by pivotalExpert, freeCodeCamp, codeSchool, and codeCombat. Each node has an acheivements object and a totalAchievements value.
+
+        function transformData() {
+            // console.log('TRANSFORM DATA CALLED');
+            var partsWithAchievements = Object.keys(self.participantAchievements);
+            for(let user in partsWithAchievements) {
+                let userAchievements = self.participantAchievements[partsWithAchievements[user]];
+                if(userAchievements.codeCombat && userAchievements.codeCombat.achievements) {
+                    let codeCombatAchievements = Object.keys(userAchievements.codeCombat.achievements);
+                    for(let a in codeCombatAchievements) {
+                        let key = userAchievements.codeCombat.achievements[codeCombatAchievements[a]].name;
+                        if (self.badgesCount.codeCombat[key]) {
+                            self.badgesCount.codeCombat[key] = self.badgesCount.codeCombat[key] + 1;
+                        } else {
+                            self.badgesCount.codeCombat[key] = 1;
+                        }
+                    }
+                }
+                if(userAchievements.pivotalExpert && userAchievements.pivotalExpert.achievements) {
+                    let pivotalExpertAchievements = Object.keys(userAchievements.pivotalExpert.achievements);
+                    for(let a in pivotalExpertAchievements) {
+                        let key = userAchievements.pivotalExpert.achievements[pivotalExpertAchievements[a]].name;
+                        if (self.badgesCount.pivotalExpert[key]) {
+                            self.badgesCount.pivotalExpert[key] = self.badgesCount.pivotalExpert[key] + 1;
+                        } else {
+                            self.badgesCount.pivotalExpert[key] = 1;
+                        }
+                    }
+                }
+                if(userAchievements.freeCodeCamp && userAchievements.freeCodeCamp.achievements) {
+                    let freeCodeCampAchievements = Object.keys(userAchievements.freeCodeCamp.achievements);
+                    for(let a in freeCodeCampAchievements) {
+                        let key = userAchievements.freeCodeCamp.achievements[freeCodeCampAchievements[a]].name;
+                        if (self.badgesCount.freeCodeCamp[key]) {
+                            self.badgesCount.freeCodeCamp[key] = self.badgesCount.freeCodeCamp[key] + 1;
+                        } else {
+                            self.badgesCount.freeCodeCamp[key] = 1;
+                        }
+                    }
+                }
+                if(userAchievements.codeSchool && userAchievements.codeSchool.achievements) {
+                    let codeSchoolAchievements = Object.keys(userAchievements.codeSchool.achievements);
+                    for(let a in codeSchoolAchievements) {
+                        let key = userAchievements.codeSchool.achievements[codeSchoolAchievements[a]].name;
+                        if (self.badgesCount.codeSchool[key]) {
+                            self.badgesCount.codeSchool[key] = self.badgesCount.codeSchool[key] + 1;
+                        } else {
+                            self.badgesCount.codeSchool[key] = 1;
+                        }
+                    }
+                }
+            }
+            self.badgesCount.codeCombatA = Object.keys(self.badgesCount.codeCombat).map(function (k) {
+                return {
+                    'name': k,
+                    'count': self.badgesCount.codeCombat[k]
+                }
+            });
+            self.badgesCount.pivotalExpertA = Object.keys(self.badgesCount.pivotalExpert).map(function (k) {
+                return {
+                    'name': k,
+                    'count': self.badgesCount.pivotalExpert[k]
+                }
+            });
+            self.badgesCount.codeSchoolA = Object.keys(self.badgesCount.codeSchool).map(function (k) {
+                return {
+                    'name': k,
+                    'count': self.badgesCount.codeSchool[k]
+                }
+            });
+            self.badgesCount.freeCodeCampA = Object.keys(self.badgesCount.freeCodeCamp).map(function (k) {
+                return {
+                    'name': k,
+                    'count': self.badgesCount.freeCodeCamp[k]
+                }
+            });
+            self.badgesCount.codeCombatA.sort(function(a,b) {
+                return b.count - a.count;
+            });
+            self.badgesCount.pivotalExpertA.sort(function(a,b) {
+                return b.count - a.count;
+            });
+            self.badgesCount.codeSchoolA.sort(function(a,b) {
+                return b.count - a.count;
+            });
+            self.badgesCount.freeCodeCampA.sort(function(a,b) {
+                return b.count - a.count;
+            });
+            self.loadingAchievements = false;
+            setTimeout(function(){
+                $scope.$apply();
+            },1);
+            self.loadRequest = false;
+        }
     };
 
     this.renderDashboard = function() {
