@@ -1119,6 +1119,7 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
     this.participants = initialData.participants;
     this.event = initialData.event;
     this.tasks = initialData.tasks;
+
     this.showingAssistants = false;
     this.showingTasks = true;
 
@@ -1248,23 +1249,25 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
                 spfAlert.error('Only the event owner may manage assistants.');
             }
         }
+
+        self.addingNewAssistant = false;
     };
 
     self.eventChallengeBttnText = "Hide Challenges";
     this.toggleTaskEditView = function () {
         if (self.showingTasks) {
             self.showingTasks = false;
-            // self.taskLength = 0;
-            // self.taskStyle = {
-            //     height: self.taskLength + 'px'
-            // }
+            self.taskLength = 0;
+            self.taskStyle = {
+                height: self.taskLength + 'px'
+            }
             self.eventChallengeBttnText = "View Challenges"
         } else {
             self.showingTasks = true;
-            // self.taskLength = this.nonArchivedTask.length * 100;
-            // self.taskStyle = {
-            //     height: self.taskLength + 'px'
-            // }
+            self.taskLength = this.nonArchivedTask.length * 100;
+            self.taskStyle = {
+                height: self.taskLength + 'px'
+            }
             self.eventChallengeBttnText = "Hide Challenges"
         }
     };
@@ -1433,6 +1436,10 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
 
     this.archiveTask = function (eventId, taskId) {
         clmDataStore.events.archiveTask(eventId, taskId).then(function () {
+            self.taskLength = this.nonArchivedTask.length * 100;
+            self.taskStyle = {
+                height: self.taskLength + 'px'
+            }
             spfAlert.success('Challenge archived.');
         }).catch(function () {
             spfAlert.error('Failed to archive challenge.');
