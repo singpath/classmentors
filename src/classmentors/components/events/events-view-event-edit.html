@@ -202,17 +202,17 @@
         </tr>
     </table>
 
-    <div class="information collapsableTask " ng-class="{'showMe' : ctrl.showingTasks}" ng-style="ctrl.taskStyle">
-        <md-list>
-            <md-list-item ng-repeat="task in ctrl.tasks track by task.$id" ng-if="!task.archived" class="md-padding" flex>
-                    <div class="md-list-item-text" flex >
-                        <h3>{{ task.title }}
+    <div class="information collapsableTask " ng-class="{'showMe' : ctrl.showingTasks}" ng-style="ctrl.taskStyle" >
+        <md-list >
+            <md-list-item ng-repeat="task in ctrl.tasks track by task.$id" ng-if="!task.archived" class="md-padding">
+                    <div class="md-list-item-text" flex>
+                        <h3>
+                            {{ task.title }}
                             <span ng-if="task.closedAt">(closed)</span>
                             <span ng-if="task.openedAt">(opened)</span>
                         </h3>
-                        <span>{{ task.description }}</span>
+                        <p>{{ task.description |limitTo:80 }}...</p>
                         <p ng-if="task.badge.id">{{ task.badge.name}}</p>
-
                     </div>
 
                 <!--<div layout="row">-->
@@ -261,7 +261,6 @@
                         Archive
                     </md-button>
                 <!--</div>-->
-
                 <md-divider ng-if="!$last"></md-divider>
             </md-list-item>
         </md-list>
