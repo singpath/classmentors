@@ -205,7 +205,6 @@ export function eventServiceFactory($q, $route, spfAuthData, clmDataStore, $log,
             //     self.creatingTask = false;
             // });
         }
-
     };
     return eventService;
 }
@@ -962,6 +961,7 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
     }
 
     function viewCodeResponse(eventId, taskId, task, participant, userSolution) {
+        console.log("2");
         $mdDialog.show({
             clickOutsideToClose: true,
             parent: $document.body,
@@ -988,6 +988,7 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
         }
 
         function CodeController() {
+            console.log("11");
             this.task = task;
             this.viewOnly = true;
 
@@ -1613,12 +1614,19 @@ function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNav
     };
 
     this.saveTask = function (event, taskId, task, taskType, isOpen) {
+        console.log(taskType);
         if (taskType === 'profileEdit') {
             task.toEdit = self.selectedMetaData;
             task.textResponse = "Placeholder";
         }
 
         var copy = cleanObj(task);
+        console.log(copy);
+        if(taskType === 'code'){
+          delete copy.linkPattern
+          delete copy.textResponse
+          delete copy.badge
+        }
 
         //check if user keys in http inside Link Pattern
         var checkLinkPattern = copy.linkPattern;
@@ -1636,10 +1644,14 @@ function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNav
             task: task
         };
 
+
         if (taskType === 'linkPattern') {
             delete copy.badge;
             delete copy.serviceId;
             delete copy.singPathProblem;
+            delete copy.textResponse;
+            delete copy.lang
+
 
             // console.log("it went here when create");
             //check if user keys in http inside Link Pattern
@@ -1672,6 +1684,14 @@ function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNav
 
         self.creatingTask = true;
         if (taskType === 'multipleChoice' || taskType === 'journalling' || taskType === 'survey' || taskType === 'teamActivity' || taskType === 'mentoringActivity') {
+            delete task.textResponse;
+            delete task.linkPattern;
+            delete copy.badge;
+            delete copy.serviceId;
+            delete copy.singPathProblem;
+            delete copy.textResponse;
+            delete copy.lang
+            
             var data = {
                 taskType: taskType,
                 isOpen: isOpen,
@@ -2118,6 +2138,8 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         key: undefined,
         reversed: false
     };
+
+    this.saveDisabled = false;
 
     // Load 'team leaders' of each member.
     // self.teamLeaders = null;
@@ -3644,6 +3666,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         }
 
         function CodeController() {
+            console.log("22");
             this.task = task;
 
             this.checkEditor = function () {
@@ -3841,6 +3864,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
     };
 
     this.viewCodeResponse = function (task, solution) {
+        console.log("3");
         $mdDialog.show({
             clickOutsideToClose: true,
             parent: $document.body,
@@ -3853,6 +3877,8 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         this.loadingEditor = true;
         var parent = this;
 
+
+
         function loadEditor() {
             var editor = ace.edit($document[0].querySelector('#editor'));
             editor.setTheme("ace/theme/monokai");
@@ -3862,7 +3888,9 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         }
 
         function CodeController() {
+            console.log("33");
             this.task = task;
+            this.saveDisabled = true;
 
             this.checkEditor = function () {
                 return parent.loadingEditor;
@@ -5037,6 +5065,7 @@ function ClmEventResultsTableCtrl($scope, $q, $log, $mdDialog, $document,
     };
 
     this.viewCodeResponse = function (eventId, taskId, task, participant, userSolution) {
+        console.log("1");
         $mdDialog.show({
             clickOutsideToClose: true,
             parent: $document.body,
@@ -5063,6 +5092,7 @@ function ClmEventResultsTableCtrl($scope, $q, $log, $mdDialog, $document,
         }
 
         function CodeController() {
+            console.log("44");
             this.task = task;
             this.viewOnly = true;
 
