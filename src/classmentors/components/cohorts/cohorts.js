@@ -871,8 +871,6 @@ function ClmCohortStatsPageCtrl(
     $scope, $q, $log, $mdDialog, $document, $firebaseArray,
     urlFor, spfAlert, firebaseApp, clmServicesUrl, clmDataStore, $firebaseObject
 ) {
-    console.log(this.cohort);
-    console.log(this.profile);
 
     var self = this;
     var db = firebaseApp.database();
