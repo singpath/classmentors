@@ -962,6 +962,7 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
     }
 
     function viewCodeResponse(eventId, taskId, task, participant, userSolution) {
+        console.log("2");
         $mdDialog.show({
             clickOutsideToClose: true,
             parent: $document.body,
@@ -988,6 +989,7 @@ function ViewEventCtrl($scope, initialData, $document, $mdDialog, $route,
         }
 
         function CodeController() {
+            console.log("11");
             this.task = task;
             this.viewOnly = true;
 
@@ -2118,6 +2120,8 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         key: undefined,
         reversed: false
     };
+
+    this.saveDisabled = false;
 
     // Load 'team leaders' of each member.
     // self.teamLeaders = null;
@@ -3644,6 +3648,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         }
 
         function CodeController() {
+            console.log("22");
             this.task = task;
 
             this.checkEditor = function () {
@@ -3841,6 +3846,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
     };
 
     this.viewCodeResponse = function (task, solution) {
+        console.log("3");
         $mdDialog.show({
             clickOutsideToClose: true,
             parent: $document.body,
@@ -3853,6 +3859,8 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         this.loadingEditor = true;
         var parent = this;
 
+
+
         function loadEditor() {
             var editor = ace.edit($document[0].querySelector('#editor'));
             editor.setTheme("ace/theme/monokai");
@@ -3862,7 +3870,9 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         }
 
         function CodeController() {
+            console.log("33");
             this.task = task;
+            this.saveDisabled = true;
 
             this.checkEditor = function () {
                 return parent.loadingEditor;
@@ -5037,6 +5047,7 @@ function ClmEventResultsTableCtrl($scope, $q, $log, $mdDialog, $document,
     };
 
     this.viewCodeResponse = function (eventId, taskId, task, participant, userSolution) {
+        console.log("1");
         $mdDialog.show({
             clickOutsideToClose: true,
             parent: $document.body,
@@ -5063,6 +5074,7 @@ function ClmEventResultsTableCtrl($scope, $q, $log, $mdDialog, $document,
         }
 
         function CodeController() {
+            console.log("44");
             this.task = task;
             this.viewOnly = true;
 
