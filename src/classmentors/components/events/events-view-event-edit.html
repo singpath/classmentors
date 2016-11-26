@@ -45,14 +45,13 @@
     <table>
         <tr>
             <td>
-                <md-subheader><font size="4">EVENT ASSISTANTS</font></td></md-subheader>
+                <md-subheader><font size="4">Event Assistant(s)</font></td></md-subheader>
             <td>
-                <md-subheader>
-                    <md-button class="md-raised" style="height:10px" ng-click="ctrl.toggleAssistants()"><md-subheader>{{ctrl.eventAssistantBttnText}}</md-subheader>
-                        <md-tooltip ng-if="!ctrl.showingAssistants">Click to view and edit event assistants</md-tooltip>
-                        <md-tooltip ng-if="ctrl.showingAssistants">Click to hide event assistants</md-tooltip>
-                    </md-button>
-                </md-subheader>
+                <md-button class="md-raised" style="height:10px" ng-click="ctrl.toggleAssistants()">
+                    {{ctrl.eventAssistantBttnText}}
+                    <md-tooltip ng-if="!ctrl.showingAssistants">Click to view and edit event assistants</md-tooltip>
+                    <md-tooltip ng-if="ctrl.showingAssistants">Click to hide event assistants</md-tooltip>
+                </md-button>
             </td>
         </tr>
     </table>
@@ -114,7 +113,7 @@
     <div class=" md-padding collapsable" id="testingCollapse" ng-class="{'showMe2' : ctrl.showingAssistants}"
          ng-style="ctrl.divStyle">
         <md-list>
-            <md-subheader class="md-no-sticky">{{ ctrl.assistants | spfLength }} assistants</md-subheader>
+            <h4 class="md-no-sticky">{{ ctrl.assistants | spfLength }} assistant(s)</h4>
             <md-list-item ng-repeat="asst in ctrl.assistants track by asst.$id">
                 {{ asst.name }}
                 <span flex></span>
@@ -184,26 +183,25 @@
     <table>
         <tr>
             <td>
-                <md-subheader><font size="4" >EVENT CHALLENGES</font></md-subheader>
+                <md-subheader><font size="4" >Event Challenge(s)</font></md-subheader>
             </td>
             <td>
-                <md-subheader>
-                    <md-button class="md-raised" style="height:10px" ng-click="ctrl.toggleTaskEditView()"><md-subheader>{{ctrl.eventChallengeBttnText}}</md-subheader>
-                        <md-tooltip ng-if="!ctrl.showingTasks">Click to view and edit event challenges</md-tooltip>
-                        <md-tooltip ng-if="ctrl.showingTasks">Click to hide event challenges</md-tooltip>
-                    </md-button>
-                </md-subheader>
+                <md-button class="md-raised" style="height:10px" ng-click="ctrl.toggleTaskEditView()">
+                    {{ctrl.eventChallengeBttnText}}
+                    <md-tooltip ng-if="!ctrl.showingTasks">Click to view and edit event challenges</md-tooltip>
+                    <md-tooltip ng-if="ctrl.showingTasks">Click to hide event challenges</md-tooltip>
+                </md-button>
             </td>
         </tr>
         <tr>
             <td>
-                <md-subheader class="md-no-sticky">{{ ctrl.tasks | spfLength }} challenges</md-subheader>
+                <md-subheader class="md-no-sticky">{{ ctrl.tasks | spfLength }} challenge(s)</md-subheader>
             </td>
         </tr>
     </table>
 
     <div class="information collapsableTask " ng-class="{'showMe' : ctrl.showingTasks}" ng-style="ctrl.taskStyle" >
-        <md-list >
+        <md-list>
             <md-list-item ng-repeat="task in ctrl.tasks track by task.$id" ng-if="!task.archived" class="md-padding">
                     <div class="md-list-item-text" flex>
                         <h3>
