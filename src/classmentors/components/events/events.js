@@ -1119,15 +1119,28 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
     this.participants = initialData.participants;
     this.event = initialData.event;
     this.tasks = initialData.tasks;
+
     this.showingAssistants = false;
     this.showingTasks = true;
 
     this.nonArchivedTask = [];
+
     for (var i = 0; i < this.tasks.length; i++) {
         if (!this.tasks[i].archived) {
             this.nonArchivedTask.push(this.tasks[i]);
         }
     }
+
+    function updateNonArchivedTask(){
+        var archived = [];
+        for (var i = 0; i < this.tasks.length; i++) {
+            if (!this.tasks[i].archived) {
+                archived.push(this.tasks[i]);
+            }
+        }
+        this.nonArchivedTask = archived;
+    };
+
     // console.log("this event id isss:", this.event.$id);
     this.assistants = initialData.assistants;
     this.newPassword = '';
@@ -1248,23 +1261,25 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
                 spfAlert.error('Only the event owner may manage assistants.');
             }
         }
+
+        self.addingNewAssistant = false;
     };
 
     self.eventChallengeBttnText = "Hide Challenges";
     this.toggleTaskEditView = function () {
         if (self.showingTasks) {
+            self.taskLength = 0;
+            self.taskStyle = {
+                height: self.taskLength + 'px'
+            }
             self.showingTasks = false;
-            // self.taskLength = 0;
-            // self.taskStyle = {
-            //     height: self.taskLength + 'px'
-            // }
             self.eventChallengeBttnText = "View Challenges"
         } else {
+            self.taskLength = this.nonArchivedTask.length * 100;
+            self.taskStyle = {
+                height: self.taskLength + 'px'
+            }
             self.showingTasks = true;
-            // self.taskLength = this.nonArchivedTask.length * 100;
-            // self.taskStyle = {
-            //     height: self.taskLength + 'px'
-            // }
             self.eventChallengeBttnText = "Hide Challenges"
         }
     };
@@ -1434,10 +1449,17 @@ function EditEventCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmDataS
     this.archiveTask = function (eventId, taskId) {
         clmDataStore.events.archiveTask(eventId, taskId).then(function () {
             spfAlert.success('Challenge archived.');
+
         }).catch(function () {
             spfAlert.error('Failed to archive challenge.');
+        }).finally(function () {
+            updateNonArchivedTask();
+            self.taskLength = this.nonArchivedTask.length * 100;
+            self.taskStyle = {
+                height: self.taskLength + 'px'
+            }
         });
-    };
+};
 }
 EditEventCtrl.$inject = ['initialData', 'spfNavBarService', 'urlFor', 'spfAlert', 'clmDataStore', 'firebaseApp', '$firebaseArray', '$mdDialog', '$location'];
 
