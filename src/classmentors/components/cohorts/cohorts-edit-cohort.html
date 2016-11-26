@@ -27,13 +27,20 @@
         </div>
     </form>
 
+    <br>
     <md-divider></md-divider>
 
-    <md-subheader><md-button ng-click="ctrl.toggleEvents()">Cohort Events<md-tooltip ng-if="!ctrl.showingEvents">Click to view and edit cohort events</md-tooltip><md-tooltip ng-if="ctrl.showingEvents">Click to hide cohort events</md-tooltip></md-button></md-subheader>
+    <md-subheader >
+        <md-button ng-click="ctrl.toggleEvents()">
+            Cohort Events
+            <md-tooltip ng-if="!ctrl.showingEvents">Click to view and edit cohort events</md-tooltip>
+            <md-tooltip ng-if="ctrl.showingEvents">Click to hide cohort events</md-tooltip></md-button>
+    </md-subheader>
+
     <div ng-if="ctrl.showingEvents">
         <md-button class="md-raised md-primary" ng-click="ctrl.addEvent()" aria-label="addEvent">Add Event</md-button>
         <form name="addEventForm" ng-submit="ctrl.saveAddedEvent(ctrl.cohort.$id)">
-            <md-card ng-if="ctrl.addingEvent">
+            <md-card ng-if="ctrl.addingEvent" class="md-padding">
                 <md-card-content>
                     <md-autocomplete flex required ng-if="ctrl.addingEvent"
                                      md-input-name="eventName"
@@ -62,7 +69,7 @@
                 </md-card-actions>
             </md-card>
         </form>
-        <md-list>
+        <md-list class="md-padding">
             <md-list-item ng-repeat="e in ctrl.cohort.events" ng-if="ctrl.events[e]">
                 {{ctrl.events[e].title}}
                 <span flex></span>
@@ -83,7 +90,7 @@
     <div ng-if="ctrl.showingAnnouncements">
     <md-button class="md-raised md-primary" ng-click="ctrl.createNewAnnouncement()">New Announcement</md-button>
     <form name="addAnnouncementForm" ng-submit="ctrl.saveAnnouncement(ctrl.cohort.$id)">
-        <md-card ng-if="ctrl.creatingNewAnnouncement">
+        <md-card ng-if="ctrl.creatingNewAnnouncement" class="md-padding">
             <md-input-container>
                 <input aria-label="Announcement title" required placeholder="Announcement title" type="text" ng-model="ctrl.newAnnouncement.title" id="new-announcement-title" name="newAnnouncementTitle">
                 <div ng-messages="addAnnouncementForm.newAnnouncementTitle.$error">
@@ -94,10 +101,10 @@
                       ng-model="ctrl.newAnnouncement.content" rows="3">
             </textarea>
             <md-switch ng-model="ctrl.newAnnouncement.featured" aria-label="Featured?">
-                Featured: {{ ctrl.newAnnouncement.featured }}
+                Pin announcement at the top: {{ ctrl.newAnnouncement.featured }}
             </md-switch>
             <md-switch ng-model="ctrl.newAnnouncement.visible" aria-label="Visibility">
-                Visible: {{ ctrl.newAnnouncement.visible }}
+                Make announcement visible to participants: {{ ctrl.newAnnouncement.visible }}
             </md-switch>
             <md-card-actions layout="row" layout-align="start center">
                 <md-button class="md-raised md-primary" type="submit" ng-disabled="addAnnouncementForm.$pristine || addAnnouncementForm.$invalid">Save Announcement</md-button>
@@ -106,31 +113,31 @@
         </md-card>
     </form>
 
-    <md-list>
+    <md-list class="md-padding">
         <md-list-item ng-repeat="a in ctrl.announcements">
             {{a.title}}
             <span flex></span>
             <md-button ng-if="!a.featured" ng-click="ctrl.featureAnnouncement(ctrl.cohort.$id, a.$id)">
-                <md-icon class="material-icons">leak_add</md-icon>
-                <md-tooltip>
+                <md-icon class="material-icons">leak_remove</md-icon>
+                <md-tooltip md-direction="top">
                 Feature
                 </md-tooltip>
             </md-button>
             <md-button ng-if="a.featured" ng-click="ctrl.unfeatureAnnouncement(ctrl.cohort.$id, a.$id)">
-                <md-icon class="material-icons">leak_remove</md-icon>
-                <md-tooltip>
+                <md-icon class="material-icons">leak_add</md-icon>
+                <md-tooltip md-direction="top">
                     Un-Feature
                 </md-tooltip>
             </md-button>
             <md-button ng-if="!a.visible" ng-click="ctrl.showAnnouncement(ctrl.cohort.$id, a.$id)">
-                <md-icon class="material-icons">visibility</md-icon>
-                <md-tooltip>
+                <md-icon class="material-icons">visibility_off</md-icon>
+                <md-tooltip md-direction="top">
                     Show announcement
                 </md-tooltip>
             </md-button>
             <md-button ng-if="a.visible" ng-click="ctrl.hideAnnouncement(ctrl.cohort.$id, a.$id)">
-                <md-icon class="material-icons">visibility_off</md-icon>
-                <md-tooltip>
+                <md-icon class="material-icons">visibility</md-icon>
+                <md-tooltip md-direction="top">
                     Hide announcement
                 </md-tooltip>
             </md-button>
