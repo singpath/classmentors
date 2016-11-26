@@ -206,8 +206,8 @@
                     <div class="md-list-item-text" flex>
                         <h3>
                             {{ task.title }}
-                            <span ng-if="task.closedAt">(closed)</span>
-                            <span ng-if="task.openedAt">(opened)</span>
+                            <span ng-if="task.closedAt">(Closed)</span>
+                            <span ng-if="task.openedAt">(Open)</span>
                         </h3>
                         <p>{{ task.description |limitTo:80 }}...</p>
                         <p ng-if="task.badge.id">{{ task.badge.name}}</p>

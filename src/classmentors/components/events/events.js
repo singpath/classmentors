@@ -2724,7 +2724,7 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                     text: "Figured it out on my own or answered by peers"
                 },
                 {
-                    text: "Post this question to Question Queue to seek for an answer"
+                    text: "My question was not answered and I need help"
                 }
             ];
 

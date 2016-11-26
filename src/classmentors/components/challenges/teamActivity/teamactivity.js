@@ -188,7 +188,7 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
                     "Instructor answered it",
                     "Teaching Assistants answered it",
                     "Figured it out on my own or answered by peers",
-                    "Post this question to Question Queue to seek for an answer"
+                    "My question was not answered and I need help"
                 ]
             }),
             type: "reflectionQuestion"
