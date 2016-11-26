@@ -2,39 +2,37 @@
     <div layout="column" layout-align="center stretch">
         <form name="createTeamActivity" ng-submit="ctrl.submit()">
 
-            <div align="center">
-                <h4>Title: {{ctrl.task.title}}</h4>
-                <h4>Description: {{ctrl.task.description}}</h4>
-                <br>
-            </div>
+            <h3>Title: {{ctrl.task.title}}</h3>
+            <h4>Description: {{ctrl.task.description}}</h4>
 
-            <label><b>Select Activity Type</b></label><br>
+            <md-divider></md-divider>
+            <br>
+
             <div flex layout="column" layout-align="center stretch">
+                <h3>Select Activity Type</h3>
 
                 <!--Radio group for Activity Types-->
-                <div>
-                    <md-input-container>
-                        <md-radio-group ng-model='ctrl.activityType' required>
-                            <md-radio-button value="gameShow">IRAT:TRAT</md-radio-button>
-                            <md-radio-button value="indexCards">Team Questions</md-radio-button>
-                            <md-radio-button value="collabSubmission">Collaborative Submission</md-radio-button>
-                            <md-radio-button value="mentoring">Mentoring</md-radio-button>
-                            <md-radio-button value="cooperative">Cooperative Learning Activity</md-radio-button>
-                        </md-radio-group>
-                    </md-input-container>
-                </div>
+                <md-input-container>
+                    <md-radio-group ng-model='ctrl.activityType' required>
+                        <md-radio-button value="gameShow">IRAT:TRAT</md-radio-button>
+                        <md-radio-button value="indexCards">Team Questions</md-radio-button>
+                        <md-radio-button value="collabSubmission">Collaborative Submission</md-radio-button>
+                        <md-radio-button value="mentoring">Mentoring</md-radio-button>
+                        <md-radio-button value="cooperative">Cooperative Learning Activity</md-radio-button>
+                    </md-radio-group>
+                </md-input-container>
             </div>
 
             <!--team formation segment-->
             <div flex layout="column" layout-align="center stretch" ng-if="ctrl.activityType!='mentoring'">
                 <md-divider layout-padding ng-if="!$last"></md-divider>
-                <label><b>Team Formation</b></label><br>
+                <h3>Team Formation</h3>
                 <!--{{ctrl.newExistingTeams}}-->
                 <div>
                     <label for="newExistingTeams">Select team formation method:</label><br>
                     <md-input-container>
                         <md-select aria-label="Team Formation Type" ng-model="ctrl.newExistingTeams"
-                                   id="newExistingTeams">
+                                   id="newExistingTeams" ng-disabled="true">
                             <!--<md-option value="existingTeams" selected>From existing team formation</md-option>-->
                             <md-option value="newTeams" selected>Create new teams</md-option>
                         </md-select>
@@ -49,8 +47,8 @@
                     <md-input-container>
                         <md-select aria-label="Team Formation Method" ng-model="ctrl.teamFormationMethod"
                                    name="teamFormationMethod">
-                            <md-option value="teamSize">By Team Size</md-option>
-                            <md-option value="noOfTeams" selected>By Number
+                            <md-option value="teamSize">By Students Per Team</md-option>
+                            <md-option value="noOfTeams" selected>By Number of Team(s)</md-option>
                     </md-input-container>
                 </div>
 
@@ -99,17 +97,17 @@
                 <div flex layout="column" layout-align="center stretch" ng-if="ctrl.activityType == 'gameShow'">
 
                     <md-divider layout-padding ng-if="!$last"></md-divider>
-                    <label><b>IRAT/TRAT Questions</b></label><br>
+                    <h3>IRAT/TRAT Questions</h3>
 
                     {{ctrl.selectedMCQ}}
-                    <md-input-container>
-                        <label for="q-timelimit">Time limit for each question (in minutes)</label>
-                        <input type="number" ng-model="ctrl.questionTimeLimit" id="q-timelimit" required>
-                    </md-input-container>
+                    <!--<md-input-container>-->
+                        <!--<label for="q-timelimit">Time limit for each question (in minutes)</label>-->
+                        <!--<input type="number" ng-model="ctrl.questionTimeLimit" id="q-timelimit" required>-->
+                    <!--</md-input-container>-->
 
                     <label>Create new multiple choice question</label>
                     <md-input-container>
-                        <md-select aria-label="MCQ Type" ng-model="ctrl.selectedMCQ">
+                        <md-select aria-label="MCQ Type" ng-model="ctrl.selectedMCQ" ng-disabled="true">
                             <md-option ng-value="createMCQ" selected>Create new MCQ</md-option>
                             <!--<md-option ng-repeat="m in mcqs" ng-value="$index"></md-option>-->
                         </md-select>
@@ -121,11 +119,8 @@
                      ng-if="ctrl.activityType == 'collabSubmission' || ctrl.activityType == 'cooperative'">
 
                     <md-divider layout-padding ng-if="!$last"></md-divider>
-                    <label ng-if="ctrl.activityType == 'collabSubmission'"><b>Select Collaborative Submission
-                        Type</b></label>
-                    <label ng-if="ctrl.activityType == 'cooperative'"><b>Select Cooperative Submission Type</b></label>
-
-                    <br>
+                    <label ng-if="ctrl.activityType == 'collabSubmission'"><h3>Select Collaborative Submission Type</h3></label>
+                    <label ng-if="ctrl.activityType == 'cooperative'"><h3>Select Cooperative Submission Type</h3></label>
 
                     <md-input-container ng-if="ctrl.activityType=='collabSubmission'">
                         <md-select aria-label="ColSubType" ng-model="ctrl.collabChallengeType"
@@ -163,7 +158,7 @@
                         </md-input-container>
                     </div>
 
-                    <div ng-if="ctrl.collabChallengeType == 'textResponse' || ctrl.coopChallengeType == 'textResponse'">
+                    <div ng-if="ctrl.collabChallengeType == 'textResponse' || ctrl.coopChallengeType == 'textResponse'" layout="row">
                         <md-input-container>
 
                             <label for="edit-text-response">Question</label>
@@ -181,7 +176,7 @@
                     </div>
 
 
-                    <div ng-if="ctrl.collabChallengeType == 'code' || ctrl.coopChallengeType == 'code'">
+                    <div ng-if="ctrl.collabChallengeType == 'code' || ctrl.coopChallengeType == 'code'" layout="row">
                         <md-input-container>
                             <label for="edit-text-response">Question</label>
                             <textarea name="editCodeQuestion" id="edit-code-question"
@@ -212,7 +207,7 @@
                 <div flex layout="column" layout-align="center stretch">
 
                     <md-divider layout-padding ng-if="!$last"></md-divider>
-                    <label><b>Select Mentoring Activity Type</b></label><br>
+                    <label><h3>Select Mentoring Activity Type</h3></label>
 
                     <md-input-container>
                         <md-select aria-label="mentorChallengeType" ng-model="ctrl.mentorChallengeType"
@@ -240,8 +235,8 @@
                         </md-input-container>
                     </div>
 
-                    <div ng-if="ctrl.mentorChallengeType == 'textResponse'">
-                        <md-input-container>
+                    <div ng-if="ctrl.mentorChallengeType == 'textResponse'" layout="row">
+                        <md-input-container flex>
 
                             <label for="edit-text-response">Question</label>
                             <textarea name="editTextResponse" id="select-text-response"
@@ -258,7 +253,7 @@
                     </div>
 
 
-                    <div ng-if="ctrl.mentorChallengeType == 'code'">
+                    <div ng-if="ctrl.mentorChallengeType == 'code'" layout="row">
                         <md-input-container>
                             <label for="edit-text-response">Question</label>
                             <textarea name="editCodeQuestion" id="select-code-question"
@@ -283,7 +278,7 @@
                     </div>
 
                     <md-divider layout-padding ng-if="!$last"></md-divider>
-                    <label><b>Select Mentor Allocation Method</b></label><br>
+                    <label><h3>Select Mentor Allocation Method</h3></label>
 
                     <md-input-container>
                         <md-radio-group ng-model='ctrl.mentorAssignmentMethod' required>
@@ -297,13 +292,22 @@
                 </div>
             </div>
 
+            <br>
+            <md-divider></md-divider>
+            <br>
+            <div layout="row" ng-show="!createTeamActivity.$invalid" layout-align="center center" >
+                <span md-colors="{color:'primary'}"> <md-icon class="material-icons" md-colors="{color:'primary'}">error_outline</md-icon> You cannot edit your team activity challenges afterwards. Click "Save" to confirm.</span>
+            </div>
+
             <div align="center">
                 <md-button class="md-raised md-primary" type="submit" ng-disabled="createTeamActivity.$invalid">
-                    CREATE
+                    <span ng-if="ctrl.activityType=='gameShow'">Continue</span>
+                    <span ng-if="ctrl.activityType !='gameShow' || ctrl.activityType == undefined">Save</span>
                 </md-button>
                 <md-button type="button" class="md-accent" ng-click="ctrl.discardChanges($event)">Cancel
                 </md-button>
             </div>
+
 
         </form>
     </div>

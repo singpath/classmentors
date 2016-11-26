@@ -45,8 +45,8 @@
 
             </div>
             <!------------------log box--------------------------------------------->
-            <div style="width:300px" name='team_log' layout='column' class="md-whiteframe-3dp">
-                <md-tool-bar layout='row' class="md-hue-1">
+            <div style="width:30%;" name='team_log' layout='column' class="md-whiteframe-2dp" >
+                <md-tool-bar layout='row' md-colors="{background:'primary'}">
                     <div class='md-toolbar-tools'>
                         <span>Team Log</span>
                     </div>
@@ -54,8 +54,8 @@
                 <md-content>
                     <!--{{ctrl.teamLog}}-->
                     <!--<md-subheader class='md-no-sticky'>Last activity at: {{time}}</md-subheader>-->
-                    <md-virtual-repeat-container id="vertical-container" style="width:400px">
-                        <table md-virtual-repeat="msg in ctrl.teamLog | orderBy: '-'" width="100%">
+                    <md-virtual-repeat-container id="vertical-container" style="width:100%;">
+                        <table md-virtual-repeat="msg in ctrl.teamLog | orderBy: '-'" width="auto">
                             <tr>
                                 <td>
                                     <md-list-item class='md-3-line' ng-model='ctrl.teamLog'>
