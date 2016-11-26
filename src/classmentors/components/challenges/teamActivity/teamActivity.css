@@ -1,7 +1,7 @@
-/*.md-hue-1 {*/
-  /*background: #795548;*/
-  /*color: white;*/
-/*}*/
+.md-hue-1 {
+  background: #3F51B5;
+  color: white;
+}
 #vertical-container {
   height: 292px;
   width: 100%;
