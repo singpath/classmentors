@@ -641,8 +641,10 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
     this.savingCohort = false;
     this.creatingNewAnnouncement = false;
     this.newAnnouncement = {};
+
     this.showingEvents = true;
     this.showingAnnouncements = true;
+
     this.addingEvent = false;
 
     // For searching events
@@ -696,25 +698,37 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
     //     }
     // );
 
+    console.log(this.cohort.events);
+
     this.removeCohortEvent = function(eventId, eventIndex) {
         var newEventArray = self.cohort.events;
         newEventArray.splice(eventIndex, 1);
         clmDataStore.cohorts.removeEvent(self.cohort.$id, newEventArray).then(function () {
             spfAlert.success('Removed event.');
+            self.cohortEventLength = self.cohort.events.length * 50;
+            self.eventStyle = {
+                height: self.cohortEventLength + 'px'
+            }
         }).catch(function (err) {
             spfAlert.error('Failed to remove event.');
         });
+
     };
 
     this.saveAddedEvent = function () {
         clmDataStore.cohorts.addEvent(self.cohort.$id, self.selectedEvent.id, self.cohort.events.length).then(function() {
             self.addingEvent = false;
             spfAlert.success(self.selectedEvent.title + ' has been added to the cohort.');
+            self.cohortEventLength = self.cohort.events.length * 50;
+            self.eventStyle = {
+                height: self.cohortEventLength + 'px'
+            }
             self.selectedEvent = null;
         }).catch(function(err) {
             spfAlert.error('Failed to add ' + self.selectedEvent.title + ' to the cohort.');
             self.selectedEvent = null;
         });
+
     };
 
     this.addEvent = function () {
@@ -722,23 +736,58 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
     };
 
     this.closeAddingEvent = function () {
+        self.cohortEventLength = self.cohort.events.length * 50;
+        self.eventStyle = {
+            height: self.cohortEventLength + 'px'
+        }
         self.addingEvent = false;
     };
 
     this.toggleEvents = function () {
-        if(self.showingEvents) {
+        if (self.showingEvents) {
+            self.cohortEventLength = 0;
+            self.eventStyle = {
+                height: self.cohortEventLength + 'px'
+            }
             self.showingEvents = false;
         } else {
+            self.cohortEventLength = self.cohort.events.length * 50;
+            self.eventStyle = {
+                height: self.cohortEventLength + 'px'
+            }
             self.showingEvents = true;
         }
+
+        self.addingEvent = false;
+
+        // if(self.showingEvents) {
+        //     self.showingEvents = false;
+        // } else {
+        //     self.showingEvents = true;
+        // }
     };
 
     this.toggleAnnouncements = function () {
-        if(self.showingAnnouncements) {
+        if (self.showingAnnouncements) {
+            self.annnouncementArrLength = 0;
+            self.announcementStyle = {
+                height: self.annnouncementArrLength + 'px'
+            }
             self.showingAnnouncements = false;
         } else {
+            self.annnouncementArrLength = self.announcements.length * 50;
+            self.announcementStyle = {
+                height: self.annnouncementArrLength + 'px'
+            }
             self.showingAnnouncements = true;
         }
+
+        self.creatingNewAnnouncement = false;
+        // if(self.showingAnnouncements) {
+        //     self.showingAnnouncements = false;
+        // } else {
+        //     self.showingAnnouncements = true;
+        // }
     };
 
     this.createNewAnnouncement = function () {
@@ -770,6 +819,10 @@ function EditCohortCtrl(initialData, spfNavBarService, urlFor, spfAlert, clmData
         clmDataStore.cohorts.addAnnouncement(cohortId, this.currentUser, this.newAnnouncement, false).then(function() {
             self.creatingNewAnnouncement = false;
             spfAlert.success('Announcement created.');
+            self.annnouncementArrLength = self.announcements.length * 50;
+            self.announcementStyle = {
+                height: self.annnouncementArrLength + 'px'
+            }
         }).catch(function () {
             spfAlert.error('Failed to create announcement.');
         }).finally(function () {
