@@ -388,8 +388,7 @@
 
                     <div ng-if="task.toEdit && !task.teamFormationMethod">
                         <div ng-if="ctrl.profile.user.school">
-                            {{ctrl.profile.user.school.name | cmTruncate: 10}}
-                            <md-button class="md-icon-button md-primary small-icon"
+                            <md-button class="md-raised md-primary"
                                        aria-label="Update_profile"
                                        ng-click="ctrl.editProfileInfo(ctrl.event.$id, task.$id, task, ctrl.currentUserParticipant)"
                                        ng-disabled="task.closedAt">

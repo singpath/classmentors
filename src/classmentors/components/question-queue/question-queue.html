@@ -1,44 +1,100 @@
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
       rel="stylesheet">
-<md-content flex class="md-padding">
-    <md-content layout-align="center">
+<md-content class="md-padding" layout-xs="column" layout-align="center">
         <md-subheader>Events that I joined</md-subheader>
-        <md-list-item ng-repeat="event in ctrl.joinedEvents">
-            <md-button style="text-align:left" class="md-padding" ng-href="#{{ 'eventQueue' | urlFor:{'eventId': event.$id} }}" flex>
-                {{ event.title }} <i ng-if="event.closedForum">(Closed)</i><i ng-if="!event.closedForum">(Open)</i>
-            </md-button>
-            <div flex></div>
-            <md-chips>
-                <md-chip>{{(event.questions | countConditionally: ['answeredBy', false])}} open</md-chip>
-                <md-chip class="md-accent">{{(event.questions | countConditionally: ['answeredBy', true])}} closed</md-chip>
-                <md-chip class="md-raised md-primary">{{event.questions | countConditionally: ['flagged', true]}} instructor attention</md-chip>
-            </md-chips>
-        </md-list-item>
+        <div layout="row" layout-wrap layout-align="center left">
+            <md-card ng-repeat="event in ctrl.joinedEvents| orderBy:'-closedForum'" flex="30">
+                <md-card-title>
+                    <md-card-title-text>
+                        <span class="md-headline">{{ event.title }}</span>
+                    </md-card-title-text>
+                </md-card-title>
+                <md-card-content>
+                    This question forum is <b><i ng-if="event.closedForum">Closed</i><i ng-if="!event.closedForum">Open</i></b>.
+                    <!--the chips goes here-->
+                    <br>
+                    <md-chips>
+                        <md-chip>{{(event.questions | countConditionally: ['answeredBy', false])}} open</md-chip>
+                        <md-chip class="md-accent">{{(event.questions | countConditionally: ['answeredBy', true])}} closed</md-chip>
+                        <md-chip class="md-raised md-primary">{{event.questions | countConditionally: ['flagged', true]}} instructor attention</md-chip>
+                    </md-chips>
+
+                </md-card-content>
+
+                <md-card-actions layout="row" layout-align="end center">
+
+                    <md-button class="md-icon-button" aria-label="Go to Forum" ng-href="#{{ 'eventQueue' | urlFor:{'eventId': event.$id} }}">
+                        <md-tooltip md-direction="right">
+                            Go to question forum
+                        </md-tooltip>
+                        <md-icon class="material-icons" >open_in_new</md-icon>
+                    </md-button>
+                </md-card-actions>
+            </md-card>
+        </div>
+
         <md-divider></md-divider>
         <md-subheader>Events that I created</md-subheader>
-        <md-list-item ng-repeat="event in ctrl.createdEvents">
-            <md-button style="text-align:left" class="md-padding" ng-href="#{{ 'eventQueue' | urlFor:{'eventId': event.$id} }}" flex>
-                {{ event.title }} <i ng-if="event.closedForum">(Closed)</i><i ng-if="!event.closedForum">(Open)</i>
-            </md-button>
-            <div flex></div>
-            <md-chips>
-                <md-chip>{{(event.questions | countConditionally: ['answeredBy', false])}} open</md-chip>
-                <md-chip class="md-accent">{{(event.questions | countConditionally: ['answeredBy', true])}} closed</md-chip>
-                <md-chip class="md-raised md-primary">{{event.questions | countConditionally: ['flagged', true]}} instructor attention</md-chip>
-            </md-chips>
-        </md-list-item>
+        <div layout="row" layout-wrap layout-align="center left">
+            <md-card ng-repeat="event in ctrl.createdEvents | orderBy:'-closedForum'" flex="30">
+                <md-card-title>
+                    <md-card-title-text>
+                        <span class="md-headline">{{ event.title }}</span>
+                    </md-card-title-text>
+                </md-card-title>
+                <md-card-content>
+                    This question forum is <b><i ng-if="event.closedForum">Closed</i><i ng-if="!event.closedForum">Open</i></b>.
+                    <!--the chips goes here-->
+                    <br>
+                    <md-chips>
+                        <md-chip>{{(event.questions | countConditionally: ['answeredBy', false])}} open</md-chip>
+                        <md-chip class="md-accent">{{(event.questions | countConditionally: ['answeredBy', true])}} closed</md-chip>
+                        <md-chip class="md-raised md-primary">{{event.questions | countConditionally: ['flagged', true]}} instructor attention</md-chip>
+                    </md-chips>
+
+                </md-card-content>
+
+                <md-card-actions layout="row" layout-align="end center">
+                    <md-button class="md-icon-button" aria-label="Go to Forum" ng-href="#{{ 'eventQueue' | urlFor:{'eventId': event.$id} }}">
+                        <md-tooltip md-direction="right">
+                            Go to question forum
+                        </md-tooltip>
+                        <md-icon class="material-icons">open_in_new</md-icon>
+                    </md-button>
+                </md-card-actions>
+            </md-card>
+        </div>
+
         <md-divider></md-divider>
+
         <md-subheader>Events that I am an assistant of</md-subheader>
-        <md-list-item ng-repeat="event in ctrl.asstEvents">
-            <md-button style="text-align:left" class="md-padding" ng-href="#{{ 'eventQueue' | urlFor:{'eventId': event.$id} }}" flex>
-                {{ event.title }} <i ng-if="event.closedForum">(Closed)</i><i ng-if="!event.closedForum">(Open)</i>
-            </md-button>
-            <div flex></div>
-            <md-chips>
-                <md-chip>{{(event.questions | countConditionally: ['answeredBy', false])}} open</md-chip>
-                <md-chip class="md-accent">{{(event.questions | countConditionally: ['answeredBy', true])}} closed</md-chip>
-                <md-chip class="md-raised md-primary">{{event.questions | countConditionally: ['flagged', true]}} instructor attention</md-chip>
-            </md-chips>
-        </md-list-item>
-    </md-content>
+        <div layout="row" layout-wrap layout-align="center left">
+            <md-card ng-repeat="event in ctrl.asstEvents | orderBy:'-closedForum'" flex="30">
+                <md-card-title>
+                    <md-card-title-text>
+                        <span class="md-headline">{{ event.title }}</span>
+                    </md-card-title-text>
+                </md-card-title>
+                <md-card-content>
+                    This question forum is <b><i ng-if="event.closedForum"><font color="red"> Closed</font></i><i ng-if="!event.closedForum">Open</i></b>.
+                    <!--the chips goes here-->
+                    <br>
+                    <md-chips>
+                        <md-chip>{{(event.questions | countConditionally: ['answeredBy', false])}} open</md-chip>
+                        <md-chip class="md-accent">{{(event.questions | countConditionally: ['answeredBy', true])}} closed</md-chip>
+                        <md-chip class="md-raised md-primary">{{event.questions | countConditionally: ['flagged', true]}} instructor attention</md-chip>
+                    </md-chips>
+
+                </md-card-content>
+
+                <md-card-actions layout="row" layout-align="end center">
+                    <md-button class="md-icon-button" aria-label="Go to Forum" ng-href="#{{ 'eventQueue' | urlFor:{'eventId': event.$id} }}">
+                        <md-tooltip md-direction="right">
+                            Go to question forum
+                        </md-tooltip>
+                        <md-icon class="material-icons" >open_in_new</md-icon>
+                    </md-button>
+                </md-card-actions>
+            </md-card>
+        </div>
 </md-content>

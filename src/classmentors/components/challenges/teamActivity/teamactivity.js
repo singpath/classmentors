@@ -188,7 +188,7 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
                     "Instructor answered it",
                     "Teaching Assistants answered it",
                     "Figured it out on my own or answered by peers",
-                    "Post this question to Question Queue to seek for an answer"
+                    "My question was not answered and I need help"
                 ]
             }),
             type: "reflectionQuestion"
@@ -213,7 +213,7 @@ function createTeamActivityController($q, initialData, clmDataStore, $location, 
         return {
             taskFrom: taskFrom,
             title: task.title,
-            description: "As a team, select your favorite question",
+            description: "As a team, select your favorite question. Click on the question to rank them.",
             formationPattern: true,
             closedAt: {'.sv': 'timestamp'},
             showProgress: task.showProgress,

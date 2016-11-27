@@ -4,7 +4,54 @@
     <!--<script src="../../../jspm_packages/graphing/d3.min.js"></script>-->
     <script src="../../../jspm_packages/npm/c3@0.4.11/c3.css"></script>
 
-    <md-select flex ng-model="ctrl.selectedStatistic" name="selectStatistic" placeholder="Select statistic to view" ng-change="ctrl.renderDashboard()">
+    <md-button class="md-raised md-primary" ng-click="ctrl.generateReportCard()" ng-disabled="ctrl.loadRequest">
+        View Badges Count
+    </md-button>
+
+    <div ng-if="ctrl.loadRequest && ctrl.loadingAchievements" layout="column" layout-sm="column" layout-align="center-center">
+        <i>Please hold on while we crunch some data ...</i>
+        <md-progress-circular md-mode="indeterminate"></md-progress-circular>
+        <p>{{ctrl.numLoaded}} / {{ctrl.numParticipants}} users checked</p>
+    </div>
+
+    <div ng-if="ctrl.badgesCount.codeCombatA.length > 0">
+        <h3>Code Combat Badges</h3>
+        <md-virtual-repeat-container id="codeCombat-container">
+            <div md-virtual-repeat="a in ctrl.badgesCount.codeCombatA"
+                 class="repeated-item" flex>
+                {{a.name}}: <b>{{a.count}}</b>
+            </div>
+        </md-virtual-repeat-container>
+    </div>
+    <div ng-if="ctrl.badgesCount.freeCodeCampA.length > 0">
+        <h3>Free Code Camp Badges</h3>
+        <md-virtual-repeat-container id="freeCodeCamp-container">
+            <div md-virtual-repeat="a in ctrl.badgesCount.freeCodeCampA"
+                 class="repeated-item" flex>
+                {{a.name}}: <b>{{a.count}}</b>
+            </div>
+        </md-virtual-repeat-container>
+    </div>
+    <div ng-if="ctrl.badgesCount.pivotalExpertA.length > 0">
+        <h3>Pivotal Expert Badges</h3>
+        <md-virtual-repeat-container id="pivotalExpert-container">
+            <div md-virtual-repeat="a in ctrl.badgesCount.pivotalExpertA"
+                 class="repeated-item" flex>
+                {{a.name}}: <b>{{a.count}}</b>
+            </div>
+        </md-virtual-repeat-container>
+    </div>
+    <div ng-if="ctrl.badgesCount.codeSchoolA.length > 0">
+        <h3>Code School Badges</h3>
+        <md-virtual-repeat-container id="codeSchool-container">
+            <div md-virtual-repeat="a in ctrl.badgesCount.codeSchoolA"
+                 class="repeated-item" flex>
+                {{a.name}}: <b>{{a.count}}</b>
+            </div>
+        </md-virtual-repeat-container>
+    </div>
+
+    <md-select flex ng-model="ctrl.selectedStatistic" name="selectStatistic" placeholder="Select statistic to view" ng-change="ctrl.renderDashboard()" ng-if="ctrl.cohort.owner.publicId == ctrl.profile.$id">
         <md-option ng-repeat="statistic in ['Submission time series', 'Ordering']">
             {{statistic}}
         </md-option>
