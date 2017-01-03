@@ -78,7 +78,7 @@ function ClmListCohorts (initialData, spfNavBarService, urlFor, spfAuthData) {
         var cohortEvents = cohort.events;
         for(var j=0; j<this.joinedEvents.length; j++) {
             var eventId = this.joinedEvents[j].$id;
-            if(cohortEvents.indexOf(eventId) > -1) {
+            if(eventId && cohortEvents.indexOf(eventId) > -1) {
                 this.joinedCohorts.push(cohort);
                 break;
             }
