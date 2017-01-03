@@ -2963,7 +2963,6 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
         };
 
         function DialogController(initialData) {
-
             var self = this;
             // var participantId = participant.$id;
             self.taskId = taskId;
@@ -2989,6 +2988,10 @@ function ClmEventTableCtrl($scope, $q, $log, $mdDialog, $document,
                     }
                 }
             }
+
+            setTimeout(function(){
+                $scope.$apply();
+            },1);
 
             //ensure that radio button is checked if user clicks on one of the teams
             self.selectedTeam = self.userInCurrentTeam;

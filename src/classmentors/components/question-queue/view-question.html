@@ -5,7 +5,7 @@
         <div layout="column" layout-align="end center">
             <md-button class="md-icon-button launch" aria-label="Flag" ng-click="ctrl.toggleQnFlag()" ng-disabled="ctrl.question.owner.publicId != ctrl.currentUser.publicId">
                 <md-icon ng-if="!ctrl.question.flagged" style="font-size: 30px">error_outline</md-icon>
-                <md-icon ng-if="ctrl.question.flagged" style="font-size: 30px; color: red">error_outline</md-icon>
+                <md-icon ng-if="ctrl.question.flagged" style="font-size: 30px; color: #F44336">error_outline</md-icon>
             </md-button>
             <div style="font-size: 12px" >Alert</div>
             <div style="font-size: 12px" >Educator</div>
@@ -13,7 +13,7 @@
         <div layout="column" layout-align="center center" flex="10">
             <md-button class="md-icon-button launch" aria-label="Vote" ng-click="ctrl.toggleQnVote(ctrl.question, ctrl.question.$id)">
                 <md-icon ng-if="!ctrl.question.upVotes || !ctrl.question.upVotes[ctrl.currentUser.publicId]" style="font-size: 35px">thumb_up</md-icon>
-                <md-icon ng-if="ctrl.question.upVotes && ctrl.question.upVotes[ctrl.currentUser.publicId]" style="font-size: 35px; color: orange;">thumb_up</md-icon>
+                <md-icon ng-if="ctrl.question.upVotes && ctrl.question.upVotes[ctrl.currentUser.publicId]" style="font-size: 35px; color: #FFC107;">thumb_up</md-icon>
             </md-button>
             <div style="font-size: 15px" >{{ctrl.question.upVotes | countObjKeys}} vote(s)</div>
         </div>
@@ -72,19 +72,19 @@
                             <md-icon ng-style="{'font-size': '30px'}">star_rate</md-icon>
                         </md-button>
                         <md-button class="md-icon-button launch" ng-if="answer.acceptedAt" ng-click="ctrl.toggleAskerChoice(answer.$id, true, answer)">
-                            <md-icon ng-style="{'font-size': '30px', color: 'orange'}">star_rate</md-icon>
+                            <md-icon ng-style="{'font-size': '30px', color: '#FFEB3B'}">star_rate</md-icon>
                         </md-button>
                         <div style="font-size: 15px" ng-if="answer.acceptedAt">Asker's</div>
                         <div style="font-size: 15px" ng-if="answer.acceptedAt">Choice</div>
                     </div>
                     <div layout="column" layout-align="center center" ng-show="answer.acceptedAt && ctrl.question.owner.publicId != ctrl.currentUser.publicId">
-                        <md-icon ng-style="{color: 'yellow', 'font-size': '30px'}">star_rate</md-icon>
+                        <md-icon ng-style="{color: '#FFEB3B', 'font-size': '30px'}">star_rate</md-icon>
                         <div style="font-size: 15px" >Asker's</div>
                         <div style="font-size: 15px" >Choice</div>
                     </div>
                     <md-button class="md-icon-button launch" aria-label="Vote" ng-click="ctrl.toggleAnsVote(ctrl.question.$id, answer)">
                         <md-icon ng-if="!answer.upVotes || !answer.upVotes[ctrl.currentUser.publicId]" style="font-size: 35px">thumb_up</md-icon>
-                        <md-icon ng-if="answer.upVotes && answer.upVotes[ctrl.currentUser.publicId]" style="font-size: 35px; color: orange;">thumb_up</md-icon>
+                        <md-icon ng-if="answer.upVotes && answer.upVotes[ctrl.currentUser.publicId]" style="font-size: 35px; color: #FFC107;">thumb_up</md-icon>
                     </md-button>
                     <div style="font-size: 15px">{{answer.upVotes | countObjKeys}} vote(s)</div>
                 </md-card-actions>
