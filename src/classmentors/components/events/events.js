@@ -1624,7 +1624,6 @@ function AddEventTaskCtrl(initialData, $location, $log, spfAlert, urlFor, spfNav
         console.log(copy);
         if(taskType === 'code'){
           delete copy.linkPattern
-          delete copy.textResponse
           delete copy.badge
         }
 
