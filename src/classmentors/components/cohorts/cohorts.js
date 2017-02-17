@@ -1257,14 +1257,30 @@ function ClmCohortRankPageCtrl($q, $scope, $log, firebaseApp, $firebaseObject, $
             self.cohortTotalParticipants = self.cohortTotalParticipants.concat(participantsArray);
             for(let participantIndex = 0; participantIndex < participantsArray.length; participantIndex++) {
                 // console.log("User " + participantsArray[participantIndex].$id + " from event " + eventId);
+                var rankCodeCombat = true; // default to only Code Combat. 
+                var rankFreeCodeCamp = false;
+                if(self.cohort.rankedServices && self.cohort.rankedServices.codeCombat){
+                    if (self.cohort.rankedServices.codeCombat==true){
+                        rankCodeCombat = true;
+                    } else {
+                        rankCodeCombat = false;
+                    }
+                }
+                if(self.cohort.rankedServices && self.cohort.rankedServices.freeCodeCamp && self.cohort.rankedServices.freeCodeCamp==true){
+                    rankFreeCodeCamp = true;
+                }
+                
                 $firebaseObject(db.ref(`classMentors/userProfiles/${participantsArray[participantIndex].$id}/services`)).$loaded().then(function (result) {
-                    if((result.freeCodeCamp && result.freeCodeCamp.totalAchievements >= 1) && (result.codeCombat && result.codeCombat.totalAchievements >= 1)) {
+                    //Both services supported
+                    if((rankFreeCodeCamp && result.freeCodeCamp && result.freeCodeCamp.totalAchievements >= 1) && (rankCodeCombat && result.codeCombat && result.codeCombat.totalAchievements >= 1)) {
                         self.cohortEventData.find(e => e.id == eventId).qualifiedParticipants.push({displayName: participantsArray[participantIndex].user.displayName, userId: participantsArray[participantIndex].$id, score: parseInt(result.freeCodeCamp.totalAchievements) + parseInt(result.codeCombat.totalAchievements)});
                     }
-                    if((result.freeCodeCamp && result.freeCodeCamp.totalAchievements >= 1) && (!result.codeCombat || result.codeCombat.totalAchievements < 1)) {
+                    //Just freeCodeCamp
+                    if((rankFreeCodeCamp && result.freeCodeCamp && result.freeCodeCamp.totalAchievements >= 1) && (!rankCodeCombat || !result.codeCombat || result.codeCombat.totalAchievements < 1)) {
                         self.cohortEventData.find(e => e.id == eventId).qualifiedParticipants.push({displayName: participantsArray[participantIndex].user.displayName, userId: participantsArray[participantIndex].$id, score: result.freeCodeCamp.totalAchievements});
                     }
-                    if((!result.freeCodeCamp || result.freeCodeCamp.totalAchievements < 1) && (result.codeCombat && result.codeCombat.totalAchievements >= 1)) {
+                    //Just Code Combat
+                    if((!rankFreeCodeCamp || !result.freeCodeCamp || result.freeCodeCamp.totalAchievements < 1) && (rankCodeCombat && result.codeCombat && result.codeCombat.totalAchievements >= 1)) {
                         self.cohortEventData.find(e => e.id == eventId).qualifiedParticipants.push({displayName: participantsArray[participantIndex].user.displayName, userId: participantsArray[participantIndex].$id, score: result.codeCombat.totalAchievements});
                     }
                     self.cohortEventData.find(e => e.id == eventId).qualifiedParticipants.sort(function(a,b) {

@@ -1,7 +1,7 @@
 /**
  * classmentors/components/ace/ace.js - Define the ace component.
  */
-import template from './ace-view.html!text';
+import template from './ncc-view.html!text';
 
 
 /**
@@ -50,8 +50,7 @@ export function configRoute($routeProvider, routes) {
       template: '<ace stats="$resolve.stats"></ace>',
       resolve: {
         stats: getStats,
-        //navBar: () => ({title: 'Ace of Coders'})
-        navBar: () => ({title: '2017 National Coding Championships'})
+        navBar: () => ({title: 'National Coding Competition'})
       }
     })
     .otherwise(routes.home);

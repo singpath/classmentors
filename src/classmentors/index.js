@@ -134,6 +134,7 @@ module.run(routeProtection);
 module.constant('routes', {
   home: '/ace-of-coders', // The default route
   aceOfCoders: '/ace-of-coders',
+  nationalCodingChampionships: '/ncc', // Not yet implemented
   admin: '/admin',
   events: '/events',
   newEvent: '/new-event',
