@@ -2,6 +2,10 @@
   "rules": {
     ".read": false,
     ".write": false,
+    "messages":{
+      ".read": "root.child('classMentors/admins').child(auth.uid).val() === true",
+      ".write":"root.child('classMentors/admins').child(auth.uid).val() === true"
+    },
     "auth": {
       "publicIds": {
         "$publicId": {
@@ -89,6 +93,10 @@
       }
     },
     "classMentors": {
+      "stats":{
+      ".read": "root.child('classMentors/admins').child(auth.uid).val() === true",
+      ".write":"root.child('classMentors/admins').child(auth.uid).val() === true"
+      },
       "cohortAnalysis": {
         ".read": true,
         ".write": false

@@ -10,17 +10,22 @@
   "database": {
     "rules": "database/security-rules.json",
     "_maintenance": {
-      "defaults": [{
-        "url": "/classMentors/settings",
-        "path": "settings.json"
-      }],
-      "backups": [{
-        "url": "/classMentors/schools",
-        "path": "schools.json"
-      }, {
-        "url": "/classMentors/badges",
-        "path": "badges.json"
-      }]
+      "defaults": [
+        {
+          "url": "/classMentors/settings",
+          "path": "settings.json"
+        }
+      ],
+      "backups": [
+        {
+          "url": "/classMentors/schools",
+          "path": "schools.json"
+        },
+        {
+          "url": "/classMentors/badges",
+          "path": "badges.json"
+        }
+      ]
     }
   }
 }
