@@ -10,7 +10,8 @@
       "publicIds": {
         "$publicId": {
           ".validate": "newData.isString() && newData.val().matches(/^[-:a-zA-Z0-9]+$/) && $publicId.matches(/^[-a-z0-9]{3,20}$/) && ($publicId == null || newData.parent().parent().parent().child('auth').child('publicIds').child($publicId).val() == newData.val() && newData.parent().parent().parent().child('auth').child('usedPublicIds').child($publicId).val() == true && newData.parent().parent().parent().child('auth').child('users').child(newData.val()).child('publicId').val() == $publicId)",
-          ".write": "auth != null && auth.uid == newData.val() && (newData.val() != null && data.val() == null)"
+          ".write": "auth != null && auth.uid == newData.val() && (newData.val() != null && data.val() == null)",
+          ".read": "root.child('classMentors/admins').child(auth.uid).val() === true"
         }
       },
       "usedPublicIds": {
@@ -25,7 +26,7 @@
           "$other": {
             ".validate": "false"
           },
-          ".read": "auth != null && auth.uid == $userId",
+          ".read": "auth != null && (auth.uid == $userId || root.child('classMentors/admins').child(auth.uid).val() === true)",
           ".validate": "newData.hasChildren(['id', 'fullName', 'displayName', 'email', 'gravatar', 'createdAt']) && $userId == newData.child('id').val() && (newData.child('publicId').val() == null || newData.parent().parent().parent().child('auth').child('publicIds').child(newData.child('publicId').val()).val() == newData.child('id').val() && newData.parent().parent().parent().child('auth').child('usedPublicIds').child(newData.child('publicId').val()).val() == true && newData.parent().parent().parent().child('auth').child('users').child(newData.child('id').val()).child('publicId').val() == newData.child('publicId').val())",
           ".write": "newData.val() != null && (auth != null && auth.uid == $userId)",
           "country": {
