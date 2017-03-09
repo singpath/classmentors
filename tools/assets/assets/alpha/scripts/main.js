@@ -20,6 +20,11 @@ function FriendlyChat() {
   this.messageInput = document.getElementById('message');
   this.submitButton = document.getElementById('submit');
   this.buildButton = document.getElementById('build');
+  this.templatesButton = document.getElementById('templates');
+  this.select= document.getElementById('select');
+  this.schoolSelect= document.getElementById('schoolSelect');
+  this.pre= document.getElementById('pre');
+
   this.submitImageButton = document.getElementById('submitImage');
   this.imageForm = document.getElementById('image-form');
   this.mediaCapture = document.getElementById('mediaCapture');
@@ -34,7 +39,9 @@ function FriendlyChat() {
   this.signOutButton.addEventListener('click', this.signOut.bind(this));
   this.signInButton.addEventListener('click', this.signIn.bind(this));
   this.buildButton.addEventListener('click', this.build.bind(this));
-
+  this.templatesButton.addEventListener('click', this.useTemplates.bind(this));
+  this.select.addEventListener('change', this.selectTemplate.bind(this));
+   this.schoolSelect.addEventListener('change', this.selectSchool.bind(this));
   // Toggle for the button.
   var buttonTogglingHandler = this.toggleButton.bind(this);
   this.messageInput.addEventListener('keyup', buttonTogglingHandler);
@@ -49,6 +56,42 @@ function FriendlyChat() {
   this.initFirebase();
 }
 
+/* 
+  TODO: function to replace currly braces in templace with values from this.nicParticipation 
+  Add another selector to select the school. 
+  Call the template generator on select changes when the selected school and template both exist. 
+
+
+*/ 
+FriendlyChat.prototype.updatePre = function () {
+    console.log(this.schoolSelect.value);
+    console.log(this.select.value);
+    var messageText = this.templates[this.select.value].text;
+    if(this.schoolSelect.value && this.select.value){
+      for(var restriction in this.templates[this.select.value].restrictions){
+        console.log(restriction);
+        var replacement = "*** MISSING ***";
+        if(FriendlyChat.nicParticipation[this.schoolSelect.value].hasOwnProperty(restriction)){
+          replacement = FriendlyChat.nicParticipation[this.schoolSelect.value][restriction];
+        }
+        messageText = messageText.replace("{{"+restriction+"}}",replacement);
+      }
+      this.pre.innerHTML = messageText;
+    }
+};
+
+FriendlyChat.prototype.selectTemplate = function (val) {
+  console.log("Change on template select.",val.target.value);
+  this.updatePre();
+};
+
+FriendlyChat.prototype.selectSchool = function (val) {
+  console.log("Change on school select.",val.target.value);
+  this.updatePre();
+};
+
+
+// Signs-in Friendly Chat.
 FriendlyChat.prototype.initFirebase = function () {
   // Shortcuts to Firebase SDK features.
   this.auth = firebase.auth();
@@ -94,8 +137,8 @@ FriendlyChat.prototype.loadMessages2 = function () {
     //console.log(val);
     this.displayMessage2(data.key, val.userId, val.totalAchievements, val.photoUrl, val.imageUrl);
   }.bind(this);
-  this.messages2Ref.limitToLast(20).on('child_added', setMessage);
-  this.messages2Ref.limitToLast(20).on('child_changed', setMessage);
+  this.messages2Ref.limitToLast(5).on('child_added', setMessage);
+  this.messages2Ref.limitToLast(5).on('child_changed', setMessage);
 
 };
 FriendlyChat.prototype.loadMessages3 = function () {
@@ -231,13 +274,13 @@ FriendlyChat.prototype.signOut = function () {
 };
 
 FriendlyChat.prototype.getStudentEmailsFromStudents = function (school) {
-    console.log("Returning student emails");
-    var emailsList = [];
-    for(var studentKey in FriendlyChat.nicParticipation[school]['students']){
-        var student = FriendlyChat.nicParticipation[school]['students'][studentKey];
-        emailsList.push(" "+student.displayName + " <"+student.email+">");
-    }
-    return emailsList.join(",");
+  console.log("Returning student emails");
+  var emailsList = [];
+  for (var studentKey in FriendlyChat.nicParticipation[school]['students']) {
+    var student = FriendlyChat.nicParticipation[school]['students'][studentKey];
+    emailsList.push(" " + student.displayName + " <" + student.email + ">");
+  }
+  return emailsList.join(",");
 }
 
 FriendlyChat.prototype.updateEmails = function (school, user) {
@@ -247,32 +290,59 @@ FriendlyChat.prototype.updateEmails = function (school, user) {
   //"studentEmails":true
 }
 
+FriendlyChat.prototype.getUser = function (school, userId) {
+  //Could call for achievements here as well. 
+  var self = this;
+  var userPath = '/auth/users/' + userId;
+  FriendlyChat.userRef = this.database.ref(userPath);
+  FriendlyChat.numCallbacks++;
+  FriendlyChat.userRef.once('value').then(function (snapshot) {
+    var user = snapshot.val();
+    self.updateEmails(school, user);
+    FriendlyChat.numCallbacks--;
+    if (FriendlyChat.numCallbacks) {
+      //console.log(FriendlyChat.numCallbacks);
+    } else {
+      console.log("no more callbacks");
+      console.log(FriendlyChat.nicParticipation);
+    }
+  });
+}
+
+FriendlyChat.prototype.getUserAchievements = function (school, userKey) {
+  var self = this;  
+  var achievementsPath = "classMentors/userAchievements/" + userKey + "/services/codeCombat/totalAchievements";
+  FriendlyChat.achievementsRef = this.database.ref(achievementsPath);
+  FriendlyChat.numCallbacks++;
+  FriendlyChat.achievementsRef.once('value').then(function (snapshot) {
+    FriendlyChat.numCallbacks--;
+    var codeCombatAchievements = snapshot.val();
+    var record = {userKey:userKey, codeCombatAchievements:codeCombatAchievements};
+    if(!FriendlyChat.nicParticipation[school].hasOwnProperty('ranking')){
+      FriendlyChat.nicParticipation[school]['ranking'] = [];
+    }
+    FriendlyChat.nicParticipation[school]['ranking'].push(record);
+    //Resort ranking as new entries are added. 
+    FriendlyChat.nicParticipation[school]['ranking'] = FriendlyChat.nicParticipation[school]['ranking'].sort(function (a, b) {
+        return parseFloat(b['codeCombatAchievements'] - parseFloat(a['codeCombatAchievements']));
+    });
+  });
+
+}
+
 FriendlyChat.prototype.getParticipantsEmails = function (school, participants) {
   var self = this;
   //TODO: reset students
   FriendlyChat.nicParticipation[school]['students'] = {};
   for (var participant in participants) {
     //console.log(participant);
+    self.getUserAchievements(school,participant);
     var path = '/auth/publicIds/' + participant;
     FriendlyChat.pRef = this.database.ref(path);
-    FriendlyChat.numCallbacks++;
     FriendlyChat.pRef.once('value').then(function (snapshot) {
       var userId = snapshot.val();
       //console.log(userId);
-      var userPath = '/auth/users/' + userId;
-      FriendlyChat.userRef = self.database.ref(userPath);
-      FriendlyChat.userRef.once('value').then(function (snapshot) {
-        var user = snapshot.val();
-        self.updateEmails(school, user);
-        FriendlyChat.numCallbacks--;
-        if (FriendlyChat.numCallbacks) {
-          //console.log(FriendlyChat.numCallbacks);
-        } else {
-          console.log("no more callbacks");
-          console.log(FriendlyChat.nicParticipation);
-        }
-      });
-
+      self.getUser(school,userId);
     });
   }
 }
@@ -340,8 +410,12 @@ FriendlyChat.prototype.go = function () {
   }
 
 };
+FriendlyChat.prototype.useTemplates = function () {
+  // Build the schoolDetails
+  console.log("Generating messages from templates.");
+  console.log(this.templates);
+};
 
-// Build the schoolDetails
 FriendlyChat.prototype.build = function () {
   //console.log("Fetching nicParticipation and teachers.");
 
@@ -349,7 +423,10 @@ FriendlyChat.prototype.build = function () {
   //Load templates
   FriendlyChat.templatesRef = this.database.ref('/classMentors/stats/templates');
   FriendlyChat.templatesRef.once('value').then(function (snapshot) {
-    FriendlyChat.templates = snapshot.val();
+    self.templates = snapshot.val();
+    console.log(self.templates);
+    //Update template selector. 
+    self.updateTemplateSelector();
     //console.log(FriendlyChat.templates);
   });
 
@@ -398,7 +475,7 @@ FriendlyChat.prototype.onAuthStateChanged = function (user) {
     this.loadMessages();
     this.loadMessages2();
     this.loadMessages4();
-    this.build();
+    //this.build();
 
     // We save the Firebase Messaging Device token and enable notifications.
     this.saveMessagingDeviceToken();
@@ -602,6 +679,31 @@ FriendlyChat.prototype.displayMessage5 = function (key, val) {
   container.querySelector('.Delta').textContent = delta;//val["NCC2017"];
   setTimeout(function () { container.classList.add('visible') }, 1);
 };
+
+FriendlyChat.prototype.updateTemplateSelector = function () {
+
+  //var container = document.getElementById("select");
+  //console.log("select", container);
+  console.log("templates", this.templates);
+  for(var template in this.templates){
+    console.log(template);
+    var option = document.createElement("option");
+    option.text = template;
+    option.value = template;
+    this.select.add(option);
+  }
+  //console.log("schools", this.nicParticipation);
+  for(var school in FriendlyChat.nicParticipation){
+    console.log(school);
+    var option = document.createElement("option");
+    option.text = school;
+    option.value = school;
+    this.schoolSelect.add(option);
+  }
+
+};
+
+
 // Enables or disables the submit button depending on the values of the input
 // fields.
 FriendlyChat.prototype.toggleButton = function () {
