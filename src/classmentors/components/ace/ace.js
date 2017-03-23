@@ -18,7 +18,7 @@ export const component = {
   }
 };
 
-export const ACE_STATS_URL = 'https://dl.dropboxusercontent.com/u/4972572/ace_of_coders_2016_stats.json';
+export const ACE_STATS_URL = 'https://singpath.firebaseio.com/classMentors/userProfiles/cboesch/user/displayName.json';//https://dl.dropboxusercontent.com/u/4972572/ace_of_coders_2016_stats.json';
 
 /**
  * Route resolver helper.
