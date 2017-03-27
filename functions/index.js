@@ -64,25 +64,56 @@ exports.serviceChangesFound = functions.database.ref('/serviceCheckResults/chang
 
 //TODO: May need to focus on totalAchievements and grab parents to avoid lastUpdate triggering. 
 //Last update triggering would tell you how often enqueue requests are being made. 
-exports.userAchievementsChanged = functions.database.ref('/classMentors/userAchievements/{userId}/services/codeCombat/totalAchievements')
+//Chnage this to update the userAchievements root to allow queries by totalAchievements 
+exports.userAchievementsChanged = functions.database.ref('/classMentors/userAchievements/{userId}/services/{serviceId}/totalAchievements')
     .onWrite(event => {
       // Grab the current value of what was written to the Realtime Database.
       const original = event.data.val();
-      var data = {"userId": event.params.userId};
+      var userId = event.params.userId;
+      var serviceId = event.params.serviceId;
+      var data = {};
       //if(original && original.hasOwnProperty("id")) data["codeCombatId"] = original.id;
       //if(original && original.hasOwnProperty("lastUpdate")) data["lastUpdate"] = original.lastUpdate;
-      
-      if(original) {
-        data["totalAchievements"] = original;
-      }
-      //"codeCombatId":original.id,
-      //"lastUpdate": original.lastUpdate,
-      //"totalAchievements": original.totalAchievements,
-      //console.log(event.data.ref.parent.child('freeCodeCamp'));     
-      console.log('User achievements changed', data);
-      admin.database().ref('/messages/userAchievementsChanged').push({"userAchievementsChanged":data}).then(snapshot => {
-          return null;
-      });;
+      admin.database().ref('/messages/totalAchievements/'+userId).once('value').then(function(dataSnapshot) {
+        var totalAchievements = dataSnapshot.val();
+        var hasChanged = false;
+        if(!totalAchievements){
+          totalAchievements = {};
+        }
+        if(original) {
+          if(totalAchievements.hasOwnProperty(serviceId) && totalAchievements[serviceId] == parseInt(original)){
+             console.log("Not updating since original ",original, "for",serviceId,"matches", totalAchievements[serviceId]);
+             hasChanged = false;
+          }
+          else{
+           totalAchievements[serviceId] =  parseInt(original);
+           hasChanged = true;
+          }
+        } 
+        else{ // deletion
+          totalAchievements[serviceId] = 0;
+          hasChanged = true;
+        }  
+        //Add logic to fetch the current value to compute the total. 
+        //data["totalAchievements"] = original;
+        if(hasChanged){
+          var codeCombat = 0;
+          var freeCodeCamp = 0;
+          if(totalAchievements.hasOwnProperty("codeCombat") ){
+            codeCombat =  totalAchievements['codeCombat'];
+          }
+          if(totalAchievements.hasOwnProperty("freeCodeCamp") ){
+            freeCodeCamp = totalAchievements['freeCodeCamp'];
+          }
+          totalAchievements['totalAchievements'] = codeCombat+freeCodeCamp; 
+          console.log("Updateing totalAchievements for", userId, totalAchievements);
+          admin.database().ref('/messages/totalAchievements/'+userId).update(totalAchievements).then(snapshot => {
+            return null; // update complete. 
+          });
+        } else{
+          return null; // no updates made. 
+        }
+      });
 });
 
 // Top of table. 
@@ -243,16 +274,50 @@ exports.nicParticipation = functions.https.onRequest((request, response) => {
                 content += "<td>" + -1 + "</td>";
                 content += "<td>" + nicData[property]["Ace2015-and-16"] + "</td>";
         }
-        content +="</tr>";
-        
-        
+        content +="</tr>";   
       }
     }
-
-
   });
  });
 
+exports.updateSchool = functions.https.onRequest((request, response) => {
+  const userKey = request.query.userKey;
+  const schoolKey = request.query.schoolKey;
+  const token = request.query.token;
+  var html = "Updaing school for user "+userKey+" and school "+schoolKey +" with token "+token;
+  
+  admin.database().ref('/messages/securityTokens/'+token).once('value').then(function(dataSnapshot) {
+    goodToken = dataSnapshot.val();
+    //console.log(goodToken, "value of token");
+    html+="\n<br>";
+    html+="token check was "+goodToken;
+    html+="\n<br>";
+    if(goodToken){
+        //Get the school details from school url. 
+        admin.database().ref('/classMentors/schools/'+schoolKey).once('value').then(function(dataSnapshot) {
+          schoolDetails = dataSnapshot.val();
+          html+="school details were "+JSON.stringify(schoolDetails);
+          html+="\n<br>";
+          //set the school details to userProfiles/userKey/user/school
+          admin.database().ref('/classMentors/userProfiles/'+userKey+'/user/school').set(schoolDetails).then(snapshot => {
+            console.log("Updated school details to",schoolDetails);
+            response.send(html);
+          });
+          
+        });
+    }
+    else{
+       response.send(html);
+    }
+    
+    
+  });
+
+
+
+
+  
+ });
 /*
 // It is possible to create public endpoints to process unauthenticated calls.  
 exports.updateCohort = functions.https.onRequest((request, response) => {
