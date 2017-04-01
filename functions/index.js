@@ -356,17 +356,17 @@ exports.updateSchool = functions.https.onRequest((request, response) => {
            html+="Added joined event.\n<br>";
            //set null user record for eventParticipants/<currentEvent>/<userKey>
            // Could parallelize these last two set to nulls. 
-           return admin.database().ref('classMentors/eventParticipants/'+currentEvent+'/'+userKey).set(null); 
-       }).then(function(dataSnapshot){
-            //joinedEvents = dataSnapshot.val();
-            html+="Found eventParticipants/currentEvent/userKey\n<br>";
-            ///userProfiles/cboesch/joinedEvents/-KckYfAqDMmtvdmhEKqy
-            return admin.database().ref('/classMentors/userProfiles/'+userKey+'/joinedEvents/'+currentEvent).set(null); 
-        }).then(function(dataSnapshot){
+           return Promise.all([ admin.database().ref('/classMentors/eventParticipants/'+currentEvent+'/'+userKey).set(null),
+                                admin.database().ref('/classMentors/userProfiles/'+userKey+'/joinedEvents/'+currentEvent).set(null)
+
+           ]);
+        }).then(([result1, result2]) => {
+            console.log(result1,result2);
+            html+="Deleted userKey from currentEvent eventParticipants.\n<br>";
             html+="Delted userProfiles joined event record.\n<br>";
             response.send(html);
-        });
-        
+
+        });        
     }
     else{
        response.send(html);
