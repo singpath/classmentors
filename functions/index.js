@@ -86,6 +86,7 @@ exports.userAchievementsChanged = functions.database.ref('/classMentors/userAchi
              hasChanged = false;
           }
           else{
+           //previous = totalAchievements[serviceId];
            totalAchievements[serviceId] =  parseInt(original);
            hasChanged = true;
           }
@@ -94,8 +95,7 @@ exports.userAchievementsChanged = functions.database.ref('/classMentors/userAchi
           totalAchievements[serviceId] = 0;
           hasChanged = true;
         }  
-        //Add logic to fetch the current value to compute the total. 
-        //data["totalAchievements"] = original;
+        //Add the timestamp
         if(hasChanged){
           var codeCombat = 0;
           var freeCodeCamp = 0;
@@ -106,7 +106,8 @@ exports.userAchievementsChanged = functions.database.ref('/classMentors/userAchi
             freeCodeCamp = totalAchievements['freeCodeCamp'];
           }
           totalAchievements['totalAchievements'] = codeCombat+freeCodeCamp; 
-          console.log("Updateing totalAchievements for", userId, totalAchievements);
+          totalAchievements['lastUpdated'] = {".sv": "timestamp"};
+          console.log("Updating totalAchievements for", userId, totalAchievements);
           admin.database().ref('/messages/totalAchievements/'+userId).update(totalAchievements).then(snapshot => {
             return null; // update complete. 
           });
@@ -309,69 +310,66 @@ exports.updateSchool = functions.https.onRequest((request, response) => {
     else{
        response.send(html);
     }
-    
-    
   });
-
-
-
-
-  
  });
-/*
-// It is possible to create public endpoints to process unauthenticated calls.  
-exports.updateCohort = functions.https.onRequest((request, response) => {
-  const cohortId = request.query.cohort;
-  var html = "Updating cohort event rankings\n<br>";
-  html +="Second line of text\n<br>";
-  console.log('Returning data for cohort ', cohortId);
-  html += "\n<br><hr>";
-  admin.database().ref('/classMentors/cohorts/'+cohortId).once('value').then(function(dataSnapshot) {
-    cohortData = dataSnapshot.val();
-    html += "There are "+cohortData['events'].length+" events in this cohort.<br>";
-    var remainingCalls = cohortData.events.length;
-    for(var e = 0; e < cohortData.events.length; e++) {
-        var eventId = cohortData.events[e];
-        admin.database().ref('/classMentors/events/'+eventId).once('value').then(function(eventSnapshot) {
-          var eventKey  = eventSnapshot.key;
-          var eventData = eventSnapshot.val();
- 
-          admin.database().ref('/classMentors/eventParticipants/'+eventKey).once('value').then(function(participantsSnapshot) {
-            var participantsData = participantsSnapshot.val();
-            //console.log(participantsData);
-            var numParticipants = 0;
-            if(participantsData){
-              numParticipants = Object.keys(participantsData).length;
-            }
-            
-            html += eventData.title +"(" + numParticipants + ") EventKey " + eventKey +  "<br>";
 
-            for (var property in participantsData) {
-              if (participantsData.hasOwnProperty(property)) {
-                html += "Updating badges for " + property +  "<br>";
-                // TODO: Enqueue requests to update badges 
-              }
-            }
-            remainingCalls--;
-            // Check to see if this was the last call to return.
-            if(remainingCalls>0){
-              //console.log(remainingCalls);
-            } else {
-              //console.log(remainingCalls+ " finished!<br>");
-              response.send(html);
-            }
-          });
-
+ exports.changeEvent = functions.https.onRequest((request, response) => {
+  const userKey = request.query.userKey;
+  const currentEvent = request.query.currentEvent;
+  const newEvent = request.query.newEvent;
+  const token = request.query.token;
+  var html = "Moving user "+userKey+" from currentEvent "+currentEvent +" to newEvent "+newEvent+" with API token "+token;
+  
+  admin.database().ref('/messages/securityTokens/'+token).once('value').then(function(dataSnapshot) {
+    goodToken = dataSnapshot.val();
+    //console.log(goodToken, "value of token");
+    html+="\n<br>";
+    html+="token check was "+goodToken;
+    html+="\n<br>";
+    if(goodToken){
+        // Add newEvent details to student registered events. 
+        // Delete currentEvent from student registered events. 
+       
+        admin.database().ref('/classMentors/userProfiles/'+userKey).once('value').then(function(dataSnapshot) {
+          userData = dataSnapshot.val();
+          html+="Found user\n<br>";
+          //console.log("Found user",user);
+          var theData = {joinedAt :  {".sv": "timestamp"},
+                        user:{"displayName":userData.user.displayName, gravatar:userData.user.gravatar}};
+          
+          //Add user data to eventParticipants rather than fetching. 
+          return admin.database().ref('/classMentors/eventParticipants/'+newEvent+'/'+userKey).set(theData);
+          
+        }).then(function(dataSnapshot) {
+           //newEventData = dataSnapshot.val();
+           html+="Added user to new event.t\n<br>";
+          //add new event to userProfiles/userKey/joinedEvents
+          //Get the event data to post to joined events. 
+          return admin.database().ref('/classMentors/events/'+newEvent).once('value')
+        }).then(function(dataSnapshot){
+          eventData = dataSnapshot.val();
+          html+="Fetched newEvent data.\n<br>";
+          //Post the event data
+           return admin.database().ref('/classMentors/userProfiles/'+userKey+'/joinedEvents/'+newEvent).set(eventData); 
+        }).then(function(dataSnapshot) {
+           //joinedEvents = dataSnapshot.val();
+           html+="Added joined event.\n<br>";
+           //set null user record for eventParticipants/<currentEvent>/<userKey>
+           // Could parallelize these last two set to nulls. 
+           return admin.database().ref('classMentors/eventParticipants/'+currentEvent+'/'+userKey).set(null); 
+       }).then(function(dataSnapshot){
+            //joinedEvents = dataSnapshot.val();
+            html+="Found eventParticipants/currentEvent/userKey\n<br>";
+            ///userProfiles/cboesch/joinedEvents/-KckYfAqDMmtvdmhEKqy
+            return admin.database().ref('/classMentors/userProfiles/'+userKey+'/joinedEvents/'+currentEvent).set(null); 
+        }).then(function(dataSnapshot){
+            html+="Delted userProfiles joined event record.\n<br>";
+            response.send(html);
         });
+        
+    }
+    else{
+       response.send(html);
     }
   });
  });
- */
-
-// // Start writing Firebase Functions
-// // https://firebase.google.com/preview/functions/write-firebase-functions
-/*
-exports.helloWorld = functions.https.onRequest((request, response) => {
-  response.send("Hello from Firebase!");
- });
-*/
