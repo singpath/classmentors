@@ -77,7 +77,7 @@ describe('configRoute', function() {
   it('should configure navbar title', function() {
     const resolveNavbar = $routeProvider.when.lastCall.args[1].resolve.navBar;
 
-    expect(resolveNavbar()).to.eql({title: '2017 National Coding Championships'});
+    expect(resolveNavbar()).to.eql({title: '2017 Ace of Coders'});
   });
 
 });

@@ -51,7 +51,7 @@ export function configRoute($routeProvider, routes) {
       resolve: {
         stats: getStats,
         //navBar: () => ({title: 'Ace of Coders'})
-        navBar: () => ({title: '2017 National Coding Championships'})
+        navBar: () => ({title: '2017 Ace of Coders'})
       }
     })
     .otherwise(routes.home);

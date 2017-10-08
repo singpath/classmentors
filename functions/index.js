@@ -121,11 +121,12 @@ exports.userAchievementsChanged = functions.database.ref('/classMentors/userAchi
 var template1 = `<table border="1" id="myTable">
   <tr>
     <th>School <button onclick="sortTable(0,false)">sort</button> </th>
-    <th>2015-16 Ace <button onclick="sortTable(1,true)">sort</button></th>
-    <th>2015 Ace <button onclick="sortTable(2,true)">sort</button></th>
-    <th>2016 Ace <button onclick="sortTable(3,true)">sort</button></th>
-    <th>2017 NCC <button onclick="sortTable(4,true)">sort</button></th>
+    <th>2015 Ace <button onclick="sortTable(1,true)">sort</button></th>
+    <th>2016 Ace <button onclick="sortTable(2,true)">sort</button></th>
+    <th>2017 NCC <button onclick="sortTable(3,true)">sort</button></th>
+    <th>Average<button onclick="sortTable(4,true)">sort</button></th>
     <th>Off Pace<button onclick="sortTable(5,true)">sort</button></th>
+    <th>2017 Ace of Coders <button onclick="sortTable(6,true)">sort</button></th>
   </tr>
   `; // end start template
 
@@ -178,7 +179,7 @@ function sortTable(col,numericSort) {
     }
   }
 }
-sortTable(5,true);
+sortTable(6,true);
 </script>
 `;
 
@@ -193,7 +194,7 @@ exports.nicParticipation = functions.https.onRequest((request, response) => {
   html += "\n<br><hr>";
 
   var content = "";
-  
+  var nicTotal = 0;
   admin.database().ref('/classMentors/stats/nic-participation').once('value').then(function(dataSnapshot) {
     nicData = dataSnapshot.val();
     var remainingCalls = 0;
@@ -203,10 +204,10 @@ exports.nicParticipation = functions.https.onRequest((request, response) => {
       var hasNCC2017Event = false;
       if (nicData.hasOwnProperty(property)) {
         //html += " " + property +" " +nicData[property]["Ace2015-and-16"] +"<br>";
-        if(nicData[property].hasOwnProperty("NCC2017 Event Key")){
+        if(nicData[property].hasOwnProperty("Ace2017 Event Key")){
 
             remainingCalls++; // increment before each async call. 
-            var eventKey = nicData[property]["NCC2017 Event Key"];
+            var eventKey = nicData[property]["Ace2017 Event Key"];
             eventsData[eventKey] = {"school":property};
             admin.database().ref('/classMentors/eventParticipants/'+eventKey).once('value').then(function(participantsSnapshot) {
               //var school = property; //local copy
@@ -223,11 +224,11 @@ exports.nicParticipation = functions.https.onRequest((request, response) => {
               }
              
               // Update NCC2017 data
-              if(nicData[school].hasOwnProperty("NCC2017") && (numRegistered > nicData[school]["NCC2017"])){
+              if(nicData[school].hasOwnProperty("Ace2017") && (numRegistered > nicData[school]["Ace2017"])){
                       console.log(eventKey+" event for " + school + " has "+ numRegistered +" participants which is greater than current "+nicData[school]["NCC2017"]);
                       remainingCalls++;
-                      admin.database().ref('/classMentors/stats/nic-participation/'+school+"/NCC2017").set(numRegistered).then(snapshot => {
-                          console.log("Updated school "+school+" from "+nicData[school]["NCC2017"]+" to "+ numRegistered+ " participants");
+                      admin.database().ref('/classMentors/stats/nic-participation/'+school+"/Ace2017").set(numRegistered).then(snapshot => {
+                          console.log("Updated school "+school+" from "+nicData[school]["Ace2017"]+" to "+ numRegistered+ " participants");
                           remainingCalls--;
                           //Final checks must also go here. 
                           if(!remainingCalls){
@@ -237,10 +238,10 @@ exports.nicParticipation = functions.https.onRequest((request, response) => {
 
                       });
                 //TODO: Combine these two since they are almost identical.       
-              } else if(!nicData[school].hasOwnProperty("NCC2017")){ // initial data
-                      console.log(eventKey+" event for school "+ school +" does not have NCC2017 key");
+              } else if(!nicData[school].hasOwnProperty("Ace2017")){ // initial data
+                      console.log(eventKey+" event for school "+ school +" does not have Ace2017 key");
                       remainingCalls++;
-                      admin.database().ref('/classMentors/stats/nic-participation/'+school+"/NCC2017").set(numRegistered).then(snapshot => {
+                      admin.database().ref('/classMentors/stats/nic-participation/'+school+"/Ace2017").set(numRegistered).then(snapshot => {
                           console.log("Updated school "+school+" from nothing to "+ numRegistered+ " participants");
                           remainingCalls--;
                           //final checks must also go here. 
@@ -255,7 +256,7 @@ exports.nicParticipation = functions.https.onRequest((request, response) => {
               
               // Let the last completing callback send back the HTML. 
               if(!remainingCalls){
-                  html += template1+content+template2;
+                  html += "<div>Total Ace2017 participants: "+nicTotal+"</div>"+template1+content+template2;
                   response.send(html);
               }
 
@@ -264,20 +265,46 @@ exports.nicParticipation = functions.https.onRequest((request, response) => {
         // Add rows with the stale data. 
         content += "<tr>";
         content += "<td>" + property + "</td>";
-        content += "<td>" + nicData[property]["Ace2015-and-16"] +"</td>";
         content += "<td>" + nicData[property]["Ace 2015"] + "</td>";
         content += "<td>" + nicData[property]["Ace 2016 "]  + "</td>";
-        if(nicData[property].hasOwnProperty("NCC2017")){
-                content += "<td>" + nicData[property]["NCC2017"]  + "</td>";
-                content += "<td>" + ((nicData[property]["Ace2015-and-16"]/2) - nicData[property]["NCC2017"]) + "</td>";
+        
+        var event_1 = 0;
+        var event_2 = 0;
+        var event_3 = 0;
+        var event_4 = 0;
 
+        // These event keys are a mess and need to be fixed. 
+        if(nicData[property].hasOwnProperty("Ace 2015")) event_1 = nicData[property]["Ace 2015"];
+        if(nicData[property].hasOwnProperty("Ace 2016 ")) event_2 = nicData[property]["Ace 2016 "];
+        if(nicData[property].hasOwnProperty("NCC2017")) event_3 = nicData[property]["NCC2017"];
+        if(nicData[property].hasOwnProperty("Ace2017")) event_4 = nicData[property]["Ace2017"];
+        
+        // Since it may not exist at times. 
+        content += "<td>" + event_3  + "</td>";
+
+        var eventsTotal = event_1 + event_2 + event_3; 
+        var eventsAverage = eventsTotal/3;
+        eventsAverage = eventsAverage.toFixed(2);
+
+        console.log(eventsAverage);
+      
+        content += "<td>" + eventsAverage  + "</td>";
+      
+        //Ace 2017
+        if(nicData[property].hasOwnProperty("Ace2017")){
+          var gap = eventsAverage - event_4;
+          var offPaceLine = "<td>" + gap + "</td>";
+          content += offPaceLine; 
+          content += "<td>" + nicData[property]["Ace2017"]  + "</td>";
+          nicTotal+=parseInt(nicData[property]["Ace2017"]);
         }else{
-                content += "<td>" + -1 + "</td>";
-                content += "<td>" + nicData[property]["Ace2015-and-16"] + "</td>";
+          content += "<td>" + eventsAverage + "</td>";
+          content += "<td>" + -1 + "</td>";          
         }
-        content +="</tr>";   
+        content +="</tr>"; 
       }
     }
+
   });
  });
 
